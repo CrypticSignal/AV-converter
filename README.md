@@ -2,7 +2,7 @@ https://freeaudioconverter.net - convert an audio file to another format or extr
 
 MP3 - LAME v3.100. https://lame.sourceforge.io/
 
-AAC - Fraunhofer FDK AAC. More specifically, libfdk-aac 4.0.0 which is a command line encoder frontend for Fraunhofer FDK AAC and is also open-source. https://github.com/nu774/fdkaac
+AAC - libfdk-aac 4.0.0 (https://github.com/nu774/fdkaac) which is a command line encoder frontend for fdkaac (https://github.com/nu774/fdkaac). 
 
 Opus - libopus 1.3.1 (the latest version of Opus). http://opus-codec.org/
 
