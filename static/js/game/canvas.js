@@ -2,14 +2,10 @@ const canvas = document.querySelector('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
-const audio = document.getElementById("myAudio");
 canvas.addEventListener("click", getClickLocation)
 ctx.font = "20px arial";
 
-//alert("This game tests your reaction speed. Whenever you click on the circle, it spawns in a new location. How many times can you click on the circle in 10 seconds? Dismiss this alert to begin playing.")
-// Self-explanatory.
-
-ctx.fillText(`Window Dimensions: ${canvas.width}x${canvas.height}`, 0, 20);
+alert("This game tests your reaction speed. Whenever you click on the circle, it spawns in a new location. How many times can you click on the circle in 10 seconds? Dismiss this alert to begin playing.")
 
 let x = Math.round(canvas.width / 2);
 let y = Math.round(canvas.height / 2);
