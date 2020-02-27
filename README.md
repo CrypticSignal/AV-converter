@@ -1,4 +1,4 @@
-https://freeaudioconverter.net - convert an audio file to another format or extract the audio from a video. Many formats supported and high quality encoders are used. Easy to use and no software to download. The following encoders are used:
+https://freeaudioconverter.net - convert an audio file to another format or extract the audio from a video. Many formats supported and high quality encoders are used. Easy to use and no software to download. FFmpeg is used as well as the following encoders:
 
 MP3 - LAME v3.100. https://lame.sourceforge.io/
 
