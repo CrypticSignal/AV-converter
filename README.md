@@ -4,9 +4,9 @@ MP3 - LAME v3.100. https://lame.sourceforge.io/
 
 AAC - fdkaac 1.0.0 (https://github.com/nu774/fdkaac) which uses libfdk-aac 4.0.0. fdkaac is a command line encoder frontend for fdk-aac (https://github.com/mstorsjo/fdk-aac).
 
-Opus - libopus 1.3.1 (the latest version of Opus). http://opus-codec.org/
+Opus - libopus 1.3.1 (the latest version of the Opus encoder). https://github.com/xiph/opus
 
-Vorbis - Xiph.Org libVorbis 20180316
+Vorbis - libvorbis 1.3.6 (the latest version of the Vorbis encoder). https://github.com/xiph/vorbis
 
 You can also convert to WAV, FLAC, ALAC, DTS, AC3 or MKV.
 
