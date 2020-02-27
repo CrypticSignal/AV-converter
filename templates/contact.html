@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact</title>
+
+    <!--Required meta tags-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!--CSS-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
+  
+</head>
+
+<body>
+
+    <div class="topnav" id="myTopnav">
+        <a href="/">Home</a>
+        <a href="about">About</a>
+        <a href="filetypes">Filetypes</a>
+        <a class="active">Contact</a>
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars"></i>
+        </a>
+        
+        <div id="coffee">
+            <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fezCGRFkb"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
+        </div>       
+    </div>
+
+    <h1>Contact</h1><br>
+
+    <h2>Feedback? Feature request? Email me at:</h2><br>
+    <p>theaudiophile@outlook.com</p>
+
+    <!--My JavaScript file-->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>

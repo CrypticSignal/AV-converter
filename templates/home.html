@@ -1,0 +1,306 @@
+<!doctype html>
+<head>
+  <title>Convert Audio Files or Extract Audio from Video. No software download!</title>
+  <meta name="description" content="Convert audio files to MP3, WAV, AAC, FLAC, Opus, Vorbis, and more! You can also extract the audio from a video and save it as an audio file.">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!--CSS-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
+</head>
+
+<body>
+
+  <div class="topnav" id="myTopnav">
+
+    <a class="active">Home</a>
+    <a href="about">About</a>
+    <a href="filetypes">Filetypes</a>
+    <a href="contact">Contact</a>
+    <a target="_blank" href="game">Bored?</a>
+    <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+      <i class="fa fa-bars"></i>
+    </a>
+    
+    <div id="coffee">
+      <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fezCGRFkb"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
+    </div>
+
+  </div>
+
+  <h1>Audio Converter. Audio Extractor.</h1>
+
+  <div class="tagline">
+    <p>Convert audio files or extract the audio from a video. Files up to 5GB are supported!</p>
+  </div><br>
+
+  <h3><b>1. Select the file you wish to convert:</b></h3>
+
+  <div class="container">
+
+    <div class="mb-3 mt-3">
+      <div class="form-group mb-3">
+        <div class="custom-file">
+          <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS, .ac3, .3gp, .dts, .webm, .ADPCM, .spx, .caf" type="file" multiple class="custom-file-input" name="file_input" id="file_input" oninput="input_filename()">
+          <label id="file_input_label" class="custom-file-label">Select file</label>
+        </div>
+      </div>
+    </div>
+  
+    <p>To see the list of supported input filetypes, click <a href=filetypes target="_blank">here</a>.</p>
+    <i>Videos are converted to audio-only files, unless you select MKV as the output format.</i>
+  
+    <hr><h3><b>2. Select your desired format:</b></h3>
+  
+    <!--List of Codecs-->
+    <select name="codecs" id="codecs" onchange="showHide(this.value);">
+      <option disabled value>Select an encoder</option>
+      <option selected value="MP3">MP3 (LAME v3.100)</option>
+      <option value="AAC">AAC (.m4a)</option>
+      <option value="WAV">WAV (.wav)</option>
+      <option value="FLAC">FLAC (.flac)</option>
+      <option value="ALAC">ALAC (.m4a)</option>
+      <option value="Opus">Opus (libopus 1.3.1)</option>
+      <option value="Vorbis">Vorbis (libvorbis 1.3.6)</option>
+      <option value="AC3">AC3 (.ac3)</option>
+      <option value="MKA">MKA (.mka)</option>
+      <option value="DTS">DTS (.dts)</option>
+      <option value="CAF">CAF (.caf)</option>
+      <option value="MKV">MKV (.mkv)</option>
+    </select>
+  
+    <hr>
+    <h3><b>3. Encoder Settings:</b></h3>
+
+    <!--MP3 DIV-->
+    <div id="MP3">
+
+      <!--Bitrate modes for MP3-->
+      <br><div id="mp3_encoding_div" style="display:none">
+        <label for="mp3_encoding_type">CBR, VBR or ABR?</label>
+        <select name="mp3_encoding_type" id="mp3_encoding_type" onchange="showHideMP3(this.value);">
+          <option disabled value>Select encoding type</option> 
+          <option selected value="cbr">CBR (Constant Bitrate)</option>
+          <option value="vbr">VBR (Variable Bitrate)</option>
+          <option value="abr">ABR (Average Bitrate)</option>
+        </select>
+      </div><br>
+  
+      <!--Bitrate slider for MP3 CBR and ABR-->
+      <div id="mp3sliderdiv" style="display:none">
+        <p>Set your desired bitrate via the slider:</p>
+        <input type="range" name="cbr_abr_bitrate" min="64" max="320" step="64" value="192" id="cbr_abr_bitrate" class="slider"/>
+        <p><span id="mp3value"></span></p>
+        <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
+      </div>
+  
+      <!--VBR settings for MP3-->
+      <div id="mp3_vbr_setting_div" style="display:none">
+        <label for="mp3_vbr_setting">Setting:</label>
+        <select name="mp3_vbr_setting" id="mp3_vbr_setting">
+          <option disabled value>Choose VBR setting</option>
+          <option selected value="0">-V0 (~240kbps)</option>
+          <option value="1">-V1 (~220kbps)</option>
+          <option value="2">-V2 (~190kbps)</option>
+          <option value="3">-V3 (~170kbps)</option>
+          <option value="4">-V4 (~160kbps)</option>
+          <option value="5">-V5 (~130kbps)</option>
+          <option value="6">-V6 (~120kbps)</option>
+        </select><br><br>
+        <i>For more details about the settings, click <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_settings_details">here</a>.</i>
+      </div>
+
+    <!--Closing tag for MP3 div-->
+    </div>
+  
+    <!--Bitrate settings for AC3-->
+    <div id="ac3-div" style="display:none">
+      <label for="ac3-bitrate">Setting:</label>
+      <select name="ac3-bitrate" id="ac3-bitrate">
+        <option disabled value>Select a Bitrate</option>
+        <option value="192">192kbps</option>
+        <option value="384">384kbps</option>
+        <option value="448">448kbps</option>
+        <option selected value="640">640kbps</option>
+      </select><br><br>
+    </div>
+  
+    <!--AAC DIV-->
+    <div id="AAC" style="display:none">
+
+      <div id="fdk-type" style="display:none">
+        <label for="fdk-encoding">CBR or VBR:</label>
+        <select name="fdk_encoding" id="fdk_encoding" onchange="fdkEncodingType(this.value);">
+          <option disabled value>Select Encoding Type</option>
+          <option selected value="fdk-cbr">CBR (Constant Bitrate)</option>
+          <option value="fdk-vbr">VBR (Variable Bitrate)</option>
+        </select>
+      </div>
+
+      <!--Bitrate slider for FDK CBR-->
+      <div id="fdk_cbr_div" style="display:none">
+        <p>Set your desired bitrate via the slider:</p>
+          <input type="range" name="fdk-slider-aac" min="32" max="480" step="32" value="256" id="fdk-slider-aac" class="slider"/>
+          <p><span id="fdkvalue"></span></p>
+        <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
+      </div>
+
+      <div id="fdk-vbr" style="display:none">
+        <label for="fdk-vbr-value">Quality:</label>
+        <select name="fdk-vbr-value" id="fdk-vbr-value">
+          <option disabled value>Select VBR quality</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">2</option>
+          <option value="4">4</option>
+          <option selected value="5">5</option>
+        </select><br>
+        <i>Quality range is from 1 (lowest) to 5 (highest).</i>
+      </div>
+
+    <!--Closing tag for AAC div-->
+    </div>
+
+     <!--Bitrate slider for DTS-->
+     <div id="dts-div" style="display:none">
+      <p>Set your desired bitrate via the slider:</p>
+        <input type="range" name="dts-slider" min="768" max="3840" step="256" value="768" id="dts-slider" class="slider">
+        <p><span id="dtsvalue"></span></p>
+      <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
+    </div>
+
+    <!--FLAC-->
+    <div id="flac" style="display:none">
+      <p>Set your desired compression level via the slider:</p>
+        <input type="range" name="flac_compression" min="0" max="12" step="1" value="5" id="flac_compression" class="slider"/>
+        <p><span id="flac_value"></span></p>
+      <i>A higher value means a slighter smaller file size, but a longer conversion time.</i>
+    </div>
+
+    <!--VORBIS DIV-->
+    <div id="Vorbis" style="display:none">
+
+      <br><div id="vorbis_encoding_div" style="display:none">
+        <label>VBR setting:</label>
+        <select name="vorbis_encoding" id="vorbis_encoding" onchange="showHideVorbis(this.value);">
+          <option disabled value>Select encoding type</option>
+          <option value="vbr_bitrate">VBR (with a nominal bitrate)</option>
+          <option value="vbr_quality">VBR (select a quality-level)</option>
+        </select><br><br>
+      </div>
+  
+      <!--Quality slider for Vorbis-->
+      <div id="vorbis_quality_div" style="display:none">
+        <p>Set your desired quality setting via the slider:</p>
+          <input type="range" name="vorbis_quality" min="-2" max="10" step="1" value="6" id="vorbis_quality" class="slider"/>
+          <p><span id="vorbisvalue"></span></p>
+        <i>Quality range is from "q -2" (lowest) to "q 10" (highest). For more details, click <a target="_blank" href="https://wiki.hydrogenaud.io/index.php?title=Recommended_Ogg_Vorbis#Recommended_Encoder_Settings">here</a>.</i>
+      </div>
+    <!--Closing tag for Vorbis div-->
+    </div>
+
+    <!--OPUS DIV-->
+    <div id="Opus" style="display:none">
+
+      <div id="opus-encoding" style="display:none">
+        <label for="opus-encoding-type">CBR or VBR?</label>
+        <select id="opus-encoding-type" onchange="opusEncodingType(this.value);">
+          <option disabled value>Select Encoding Type</option>
+          <option selected value="opus-vbr">VBR (with a target bitrate)</option>
+          <option value="opus-cbr">CBR (Constant Bitrate)</option>
+        </select>
+      </div><br>
+
+    <div id="opus-cbr-bitrate" style="display:none">
+      <p>Please enter your desired bitrate:</p>
+        <input onclick="this.select();" type="tel" maxlength="3" name="opus_cbr_slider" value="192" id="opus_cbr_slider"/>
+        <span id="opuscbrvalue"></span><br><br>
+      <i>You must enter a number between 6 and 512.</i>
+    </div>
+    <!--Closing tag for Opus div-->
+    </div>
+
+    <!--Bitrate slider for Opus/Vorbis VBR-->
+    <div id="vorbis_opus_vbr_bitrate" style="display:none">
+      <p>Set your desired target bitrate via the slider:</p>
+        <input type="range" name="slider" min="32" max="480" step="32" value="192" id="slider" class="slider"/>
+        <p><span id="value">q 10</span></p>
+      <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
+    </div>
+
+    <div id="wav_flac_msg" style="display:none">
+      <i>You chose a format that does not require you to specify any encoder settings.</i>
+    </div><hr>
+  
+    <!--Desired filename section-->
+    <h3><b>4. Enter your desired filename:</b></h3>
+    <div class="was-validated">
+      <input type="text" class="form-control" maxlength="200" name="output_name" id="output_name" required/>
+    </div><br>
+
+    <div id="downmix">
+      <p>Downmix multi-channel audio to stereo?</p>
+      <input type="radio" name="downmix" id="opt2" value="-ac 2">
+      <label for="opt2">Yes</label>
+      <input type="radio" checked="checked" name="downmix" id="opt1" value="">
+      <label for="opt1">No</label>
+    </div><br>
+    
+    <!--When the convert button is clicked, run the upload_and_convert function-->
+    <button onclick="upload_and_convert()" id="upload_btn" class="btn btn-primary">Convert</button>
+  
+    <button class="btn btn-primary d-none" id="loading_btn" type="button" disabled>
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      Uploading file for conversion...
+    </button>
+  
+    <!--Cancel upload button-->
+    <button type="button" id="cancel_btn" class="btn btn-secondary d-none">Cancel upload</button><br><br>
+  
+    <!--Upload-progress bar-->
+    <div id="progress_wrapper" class="d-none">
+      <div class="progress mb-3">
+        <div id="progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <label id="progress_status"></label>
+    </div>
+  
+    <div id="alert_wrapper"></div>
+   
+    <div class="text-center" id="spinner" style="display:none">
+      <br><button class="btn btn-info" disabled> 
+          <span class="spinner-border spinner-border-sm"></span>
+          File uploaded. Converting...
+      </button>
+    </div>
+
+  <!--Closing tag for div class="container" div-->
+  </div><hr>
+
+<p>Like this website? Share it on Facebook or Twitter!</p>
+<!--Facebook-->
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3A%2F%2Ffreeaudioconverter.net%2F" target="_blank" rel="noopener" aria-label="Share on Facebook">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--large"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/></svg>
+    </div>Share</div>
+</a>
+
+<!--Twitter-->
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?text=Convert%20Audio%20Files%20or%20Extract%20the%20Audio%20from%20a%20Video!&amp;url=https%3A%2F%2Ffreeaudioconverter.net%2F" target="_blank" rel="noopener" aria-label="Share on Twitter">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--large"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"/></svg>
+    </div>Tweet</div>
+</a>
+
+<!--My JavaScript files-->
+<script src="{{ url_for('static', filename='js/elements.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<!--jQuery-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!--Bootstrap JS-->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>
