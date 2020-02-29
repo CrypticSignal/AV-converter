@@ -1,7 +1,7 @@
 import os
 
 def ffmpeg(chosen_file, params):
-    os.system(f'ffmpeg -hide_banner -i "{chosen_file}" {params}')
+    os.system(f'ffmpeg -y -hide_banner -progress 1.txt -i "{chosen_file}" {params}')
 
 # MP3
 def run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, output_name, radio_button):
