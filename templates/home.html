@@ -67,9 +67,14 @@
       <option value="AC3">AC3 (.ac3)</option>
       <option value="MKA">MKA (.mka)</option>
       <option value="DTS">DTS (.dts)</option>
+      <option value="Speex">Speex (.spx)</option>
       <option value="CAF">CAF (.caf)</option>
       <option value="MKV">MKV (.mkv)</option>
     </select>
+  
+    <div id="vorbis-msg" style="display:none">
+      <br><p>This website uses the latest version of <a target="_blank" href="https://github.com/AO-Yumi/vorbis_aotuv">Aoyumi's Tuned Vorbis (aoTuV)</a>, which is aoTuV b6.03. Aoyumi's Tuned Vorbis <a target="_blank" href="https://wiki.hydrogenaud.io/index.php?title=AoTuV">"improves significantly on Vorbis quality"</a>.</p>
+    </div>
   
     <hr>
     <h3><b>3. Encoder Settings:</b></h3>
@@ -130,14 +135,24 @@
     <!--AAC DIV-->
     <div id="AAC" style="display:none">
 
-      <div id="fdk-type" style="display:none">
+      <br><div id="aac-encoder" style="display:none">
+        <label for="aac_encoder">Encoder:</label>
+        <select name="aac_encoder" id="aac_encoder" onchange="AAC_encoder(this.value);">
+          <option disabled selected value>Select Encoder</option>
+          <option selected value="qaac">QAAC (Apple's Encoder)</option>
+          <option value="fdk">Fraunhofer FDK AAC</option>
+        </select><br>
+        <i>For more details about the encoders, click <a target="_blank" href=about>here</a> and refer to the "AAC" section.</i>
+      </div>
+
+      <div id="fdk-type" style="display:none"><br>
         <label for="fdk-encoding">CBR or VBR:</label>
         <select name="fdk_encoding" id="fdk_encoding" onchange="fdkEncodingType(this.value);">
           <option disabled value>Select Encoding Type</option>
-          <option selected value="fdk-cbr">CBR (Constant Bitrate)</option>
-          <option value="fdk-vbr">VBR (Variable Bitrate)</option>
+          <option value="fdk-cbr">CBR (Constant Bitrate)</option>
+          <option selected value="fdk-vbr">VBR (Variable Bitrate)</option>
         </select>
-      </div>
+      </div><br>
 
       <!--Bitrate slider for FDK CBR-->
       <div id="fdk_cbr_div" style="display:none">
@@ -158,6 +173,43 @@
           <option selected value="5">5</option>
         </select><br>
         <i>Quality range is from 1 (lowest) to 5 (highest).</i>
+      </div>
+  
+      <!--Bitrate modes for QAAC-->
+      <div id="aac_encoding_div" style="display:none">
+        <label for="aac_encoding">Encoding Type:</label>
+        <select name="aac_encoding" id="qaac_encoding_type" onchange="showHideAAC(this.value);">
+          <option disabled value>Select Encoding Type</option>
+          <option selected value="cbr">CBR (Constant Bitrate)</option>
+          <option value="tvbr">VBR (Variable Bitrate)</option>
+          <option value="vbr">CVBR (Constrained Variable Bitrate)</option>
+          <option value="abr">ABR (Average Bitrate)</option>
+        </select><br><br>
+      </div>
+  
+      <!--Bitrate slider for qAAC CBR-->
+      <div id="aac_cbr_div" style="display:none">
+        <p>Set your desired bitrate via the slider:</p>
+          <input type="range" name="cbr_slider_aac" min="64" max="320" step="32" value="256" id="cbr_slider_aac" class="slider"/>
+          <p><span id="aacvalue"></span></p>
+        <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
+      </div>
+  
+      <!--Bitrate slider for AAC TVBR-->
+      <div id="aac_tvbr_div" style="display:none">
+        <p>Use the slider to select your desired quality setting:</p>
+          <input type="range" name="tvbr_slider_aac" min="0" max="127" step="9" value="63" id="tvbr_slider_aac" class="slider"/>
+          <p><span id="aacTVBRvalue"></span></p>
+        <p>The slider values are a little odd, eh? Well, QAAC uses these particular values for encoding quality. For more information, click <a target="_blank" href="https://github.com/nu774/qaac/wiki/Encoder-configuration">here</a>.<p>
+        <i>Quality range is from 0 (lowest) to 127 (highest).</i>
+      </div>
+  
+      <!--Bitrate slider for AAC VBR-->
+      <div id="aac_vbr_div" style="display:none">
+        <p>Set your desired target average bitrate via the slider:</p>
+          <input type="range" name="vbr_slider_aac" min="64" max="320" step="32" value="256" id="vbr_slider_aac" class="slider"/>
+          <p><span id="aacVBRvalue"></span></p>
+        <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
       </div>
 
     <!--Closing tag for AAC div-->
@@ -208,7 +260,7 @@
         <label for="opus-encoding-type">CBR or VBR?</label>
         <select id="opus-encoding-type" onchange="opusEncodingType(this.value);">
           <option disabled value>Select Encoding Type</option>
-          <option selected value="opus-vbr">VBR (with a target bitrate)</option>
+          <option selected value="opus-vbr">VBR (with a nominal bitrate)</option>
           <option value="opus-cbr">CBR (Constant Bitrate)</option>
         </select>
       </div><br>
@@ -233,12 +285,14 @@
     <div id="wav_flac_msg" style="display:none">
       <i>You chose a format that does not require you to specify any encoder settings.</i>
     </div><hr>
-  
-    <!--Desired filename section-->
-    <h3><b>4. Enter your desired filename:</b></h3>
-    <div class="was-validated">
-      <input type="text" class="form-control" maxlength="200" name="output_name" id="output_name" required/>
-    </div><br>
+    
+    <form method="POST":>
+      <!--Desired filename section-->
+      <h3><b>4. Enter your desired filename:</b></h3>
+      <div class="was-validated">
+        <input type="text" class="form-control" maxlength="200" name="output_name" id="output_name" required/>
+      </div><br>
+    </form>
 
     <div id="downmix">
       <p>Downmix multi-channel audio to stereo?</p>
@@ -248,7 +302,7 @@
       <label for="opt1">No</label>
     </div><br>
     
-    <!--When the convert button is clicked, run the upload_and_convert function-->
+    <!--When the convert button is clicked, run the upload function-->
     <button onclick="upload_and_convert()" id="upload_btn" class="btn btn-primary">Convert</button>
   
     <button class="btn btn-primary d-none" id="loading_btn" type="button" disabled>
@@ -272,8 +326,8 @@
     <div class="text-center" id="spinner" style="display:none">
       <br><button class="btn btn-info" disabled> 
           <span class="spinner-border spinner-border-sm"></span>
-          File uploaded. Converting...
-      </button>
+          File uploaded. Converting...</button>
+      <div id="log"></div> <!-- /#log -->
     </div>
 
   <!--Closing tag for div class="container" div-->
@@ -297,6 +351,9 @@
 <!--My JavaScript files-->
 <script src="{{ url_for('static', filename='js/elements.js') }}"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/progress.js') }}"></script>
 <!--jQuery-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!--Bootstrap JS-->
