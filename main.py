@@ -1,18 +1,53 @@
-from flask import Flask, request, render_template, send_from_directory, make_response, jsonify
+from flask import Flask, request, render_template, send_from_directory, make_response, jsonify, url_for, copy_current_request_context
+from flask_socketio import SocketIO, emit
 from werkzeug.utils import secure_filename
 from colorama import init
 init()
 from colorama import Fore, Style
 import os
 import converter
-from time import time, strftime
-
+from time import time, strftime, sleep
+from threading import Thread, Event
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 # Limit file upload size to 5GB.
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000 * 1000
 
-allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf"]
+# Turn the flask app into a socketio app
+socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
+
+thread = Thread()
+thread_stop_event = Event()
+
+def GetOutput():
+    while not thread_stop_event.isSet():
+       with open('1.txt', 'r') as f:
+            lines = f.readlines()
+            last_line = lines[-5:]
+            last_line = last_line[0]
+            last_line = last_line[:-8]
+            last_line = last_line[9:]
+            formatted_output = last_line + " [HH:MM:SS]" + " of the file has been converted so far..."
+            # Trigger a new event called "show progress" 
+            socketio.emit('show progress', {'number': formatted_output})
+            socketio.sleep(1)
+
+@app.route('/progress')
+def progress():
+    # Only by sending this page first will the client be connected to the socketio instance
+    return render_template('progress.html')
+
+@socketio.on('my event') # Decorator to catch an event called "my event":
+def test_connect(): # test_connect() is the event callback function.
+    global thread # Need visibility of the global thread object
+    print('Client connected')
+
+
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected')
+
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 @app.route("/")
 def homepage():
@@ -34,51 +69,44 @@ def contact():
 
 @app.route("/game")
 def game():
-    return render_template("game.html")
+    return render_template("index.html")
 
 @app.route("/", methods=["POST"])
 def upload():
+    allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf"]
 
     if request.form["requestType"] == "upload": # Upload complete.
         
         # Get the time as soon as the upload is complete.
         time_upload_complete = strftime('%d-%m-%Y [%H:%M:%S]')
+        #socketio.stop()
 
         # Make a variable called chosen_file which is the uploaded audio file.
         chosen_file = request.files["chosen_file"]
 
-        extension = (chosen_file.filename).rsplit(".", 1)[1]
-      
+        extension = (chosen_file.filename).split(".")[-1]
+        print("Extension is " + extension)
+
         if extension not in allowed_filetypes:
             return make_response(jsonify({"message": "error: Incompatible filetype selected."}), 415)
 
         print("\n" + Fore.GREEN + chosen_file.filename + " uploaded at {}".format(time_upload_complete))
         print(Style.RESET_ALL)
-
         # Sanitize the filename to make it safe (or something like that).
         filename_secure = secure_filename(chosen_file.filename)
-
         # Save the uploaded file to the uploads folder.
         chosen_file.save(os.path.join("uploads", filename_secure))
-
         res = make_response(jsonify({"message": "File uploaded. Converting..."}), 200)
-
         return res
     
     if request.form["requestType"] == "convert":
-
         start_time = time()
-
+        thread = socketio.start_background_task(GetOutput)
         file_name = request.form["file_name"]
-
         # Get the path of the uploaded file.
         chosen_file = os.path.join("uploads", secure_filename(file_name))
-
         chosen_codec = request.form["chosen_codec"]
-
         # Put the JavaSript FormData into appropriately-named variables:
-
-        # MP3
         mp3_encoding_type = request.form["mp3_encoding_type"]
         cbr_abr_bitrate = request.form["cbr_abr_bitrate"]
         mp3_vbr_setting = request.form["mp3_vbr_setting"]
@@ -148,7 +176,7 @@ def upload():
             extension = 'spx'
 
         end_time = time()
-        #print(f'{conversion_time:.2sf}')
+        
         conversion_time = end_time - start_time
 
         print(Fore.GREEN + f'Conversion took {conversion_time:.2f} seconds. File saved as {output_name}.{extension}')
@@ -171,10 +199,9 @@ def upload():
 def download_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        return send_from_directory(os.getcwd(), filename, mimetype="audio/m4a", as_attachment=True)
+        return send_from_directory(os.getcwd(), filename, mimetype="audio/m4a", as_attachment=True)   
     else:
         return send_from_directory(os.getcwd(), filename, as_attachment=True)
         
-    
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    socketio.run(app)
