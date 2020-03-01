@@ -70,22 +70,16 @@ def upload():
     allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf"]
 
     if request.form["requestType"] == "upload": # Upload complete.
-        
-        # Get the time as soon as the upload is complete.
-        visit_time = strftime('%d-%m-%Y [%H:%M:%S]')
 
-        # Make a variable called chosen_file which is the uploaded audio file.
+        # Make a variable called chosen_file which is the uploaded file.
         chosen_file = request.files["chosen_file"]
 
         extension = (chosen_file.filename).split(".")[-1]
-        print("Extension is " + extension)
 
         if extension not in allowed_filetypes:
             return make_response(jsonify({"message": "error: Incompatible filetype selected."}), 415)
 
-        print("\n" + Fore.GREEN + chosen_file.filename + " uploaded at {}".format(visit_time))
-        print(Style.RESET_ALL)
-        # Sanitize the filename to make it safe (or something like that).
+        # Sanitize the filename to make it safe.
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
         chosen_file.save(os.path.join("uploads", filename_secure))
@@ -94,7 +88,7 @@ def upload():
     
     if request.form["requestType"] == "convert":
      
-        # Start the textfile reading thread.
+        # Start the GetOutput function as a thread.
         thread = socketio.start_background_task(GetOutput)
 
         file_name = request.form["file_name"]
