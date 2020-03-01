@@ -32,16 +32,10 @@ def GetOutput():
             socketio.emit('show progress', {'number': formatted_output})
             socketio.sleep(1)
 
-@app.route('/progress')
-def progress():
-    # Only by sending this page first will the client be connected to the socketio instance
-    return render_template('progress.html')
-
 @socketio.on('my event') # Decorator to catch an event called "my event":
 def test_connect(): # test_connect() is the event callback function.
     global thread # Need visibility of the global thread object
     print('Client connected')
-
 
 @socketio.on('disconnect')
 def test_disconnect():
@@ -51,8 +45,8 @@ def test_disconnect():
 
 @app.route("/")
 def homepage():
-    time_upload_complete = strftime('%d-%m-%Y [%H:%M:%S]')
-    print("Page Visit at {}".format(time_upload_complete))
+    visit_time = strftime('%d-%m-%Y [%H:%M:%S]')
+    print("Page Visit at {}".format(visit_time))
     return render_template("home.html")
 
 @app.route("/about")
@@ -78,8 +72,7 @@ def upload():
     if request.form["requestType"] == "upload": # Upload complete.
         
         # Get the time as soon as the upload is complete.
-        time_upload_complete = strftime('%d-%m-%Y [%H:%M:%S]')
-        #socketio.stop()
+        visit_time = strftime('%d-%m-%Y [%H:%M:%S]')
 
         # Make a variable called chosen_file which is the uploaded audio file.
         chosen_file = request.files["chosen_file"]
@@ -90,7 +83,7 @@ def upload():
         if extension not in allowed_filetypes:
             return make_response(jsonify({"message": "error: Incompatible filetype selected."}), 415)
 
-        print("\n" + Fore.GREEN + chosen_file.filename + " uploaded at {}".format(time_upload_complete))
+        print("\n" + Fore.GREEN + chosen_file.filename + " uploaded at {}".format(visit_time))
         print(Style.RESET_ALL)
         # Sanitize the filename to make it safe (or something like that).
         filename_secure = secure_filename(chosen_file.filename)
@@ -100,10 +93,11 @@ def upload():
         return res
     
     if request.form["requestType"] == "convert":
-        start_time = time()
+     
+        # Start the textfile reading thread.
         thread = socketio.start_background_task(GetOutput)
+
         file_name = request.form["file_name"]
-        # Get the path of the uploaded file.
         chosen_file = os.path.join("uploads", secure_filename(file_name))
         chosen_codec = request.form["chosen_codec"]
         # Put the JavaSript FormData into appropriately-named variables:
@@ -175,17 +169,6 @@ def upload():
             converter.run_speex(chosen_file, output_name, radio_button)
             extension = 'spx'
 
-        end_time = time()
-        
-        conversion_time = end_time - start_time
-
-        print(Fore.GREEN + f'Conversion took {conversion_time:.2f} seconds. File saved as {output_name}.{extension}')
-        print(Style.RESET_ALL)
-
-        is_downmix = 'No' if radio_button == '' else 'Yes'
-        print(f'User opted to downmix? {is_downmix}')
-
-        # Filename of converted file.
         converted_file_name = output_name + "." + extension
 
         res = make_response(jsonify({
