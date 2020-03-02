@@ -21,30 +21,30 @@ thread_stop_event = Event()
 
 def GetOutput():
     while not thread_stop_event.isSet():
-       with open('1.txt', 'r') as f:
+        with open('1.txt', 'r') as f:
             lines = f.readlines()
             last_line = lines[-5:]
             last_line = last_line[0]
             last_line = last_line[:-8]
             last_line = last_line[9:]
             formatted_output = last_line + " [HH:MM:SS]" + " of the file has been converted so far..."
+            print(formatted_output)
             # Trigger a new event called "show progress" 
-            socketio.emit('show progress', {'number': formatted_output})
+            socketio.emit('show progress', {'progress': formatted_output})
             socketio.sleep(1)
 
 @socketio.on('my event') # Decorator to catch an event called "my event":
 def test_connect(): # test_connect() is the event callback function.
     global thread # Need visibility of the global thread object
     print('Client connected')
-
+    
 @socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected')
 
-#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 @app.route("/")
 def homepage():
+    thread = socketio.start_background_task(GetOutput)
     visit_time = strftime('%d-%m-%Y [%H:%M:%S]')
     print("Page Visit at {}".format(visit_time))
     return render_template("home.html")
@@ -63,9 +63,9 @@ def contact():
 
 @app.route("/game")
 def game():
-    return render_template("index.html")
+    return render_template("game.html")
 
-@app.route("/", methods=["POST"])
+@app.route("/", methods=["GET", "POST"])
 def upload():
     allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf"]
 
@@ -87,9 +87,6 @@ def upload():
         return res
     
     if request.form["requestType"] == "convert":
-     
-        # Start the GetOutput function as a thread.
-        thread = socketio.start_background_task(GetOutput)
 
         file_name = request.form["file_name"]
         chosen_file = os.path.join("uploads", secure_filename(file_name))
