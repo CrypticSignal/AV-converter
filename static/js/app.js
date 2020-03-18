@@ -1,18 +1,11 @@
-// Get a reference to the file input element & input label 
 const input = document.getElementById("file_input");
 const file_input_label = document.getElementById("file_input_label");
-
-// Get a reference to the progress bar, wrapper & status label
 const progress = document.getElementById("progress");
 const progress_wrapper = document.getElementById("progress_wrapper");
 const progress_status = document.getElementById("progress_status");
-
-// Get a reference to the 3 buttons
 const upload_btn = document.getElementById("upload_btn");
 const loading_btn = document.getElementById("loading_btn");
 const cancel_btn = document.getElementById("cancel_btn");
-
-// Get a reference to the alert wrapper
 const alert_wrapper = document.getElementById("alert_wrapper");
 
 // Function to show alerts
@@ -28,8 +21,8 @@ function show_alert(message, alert) {
   `
 }
 
-// Function to update the input placeholder
-function input_filename() {
+// Show the file selected and enter a default output name.
+function updateBoxes() {
 
     file_input_label.innerText = input.files[0].name; // Show name of selected file.
 
@@ -48,19 +41,8 @@ function input_filename() {
     // outputNameBox.select(); // Auto-highlight the text in the box, so the user can simply start typing to change the default output name.
 }
 
-var uploadStartTime;
-
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_convert() {
-
-    const time_at_start = new Date();
-    uploadStartTime = time_at_start.getTime();
-
-    // Show an error if the user enters an incompatible bitrate for Opus.
-    if (!(document.getElementById('opus_cbr_slider').value >= 6 && document.getElementById('opus_cbr_slider').value <= 512)) {
-        show_alert("You must enter a bitrate between 6 and 512.", "danger")
-        return;
-    }
 
     // Show an error if no filename selected or if filename input is empty.
     if (!input.value && document.getElementById("output_name").value == '') {
@@ -162,7 +144,7 @@ function upload_and_convert() {
 
     // Open and send the request
     request.open("POST", "/");
-    data.append("requestType", "upload");
+    data.append("requestType", "uploaded");
     request.send(data);
 
     cancel_btn.addEventListener("click", function () {
@@ -218,17 +200,21 @@ function convert_file(filename) {
     const mp3EncodingType = document.getElementById('mp3_encoding_type').value;
     const cbr_abr_Bitrate = document.getElementById('cbr_abr_bitrate').value; 
     const vbrSettingMP3 = document.getElementById('mp3_vbr_setting').value;
+    const isYswitch = document.querySelector('input[name="is-y-switch"]:checked').value;
     const ac3Bitrate = document.getElementById('ac3-bitrate').value;
     const vorbisQuality = document.getElementById('vorbis_quality').value
     const vorbisEncoding = document.getElementById('vorbis_encoding').value;
     const flacCompression = document.getElementById('flac_compression').value;
-    const radioButton = document.querySelector('input[name="downmix"]:checked').value;
     const fdkType = document.getElementById('fdk_encoding').value;
     const fdkCBR = document.getElementById('fdk-slider-aac').value;
     const fdkVBR = document.getElementById('fdk-vbr-value').value;
+    const isFDKLowpass = document.querySelector('input[name="is-lowpass"]:checked').value;
+    const FDKLowpass = document.getElementById('fdk-lowpass').value;
     const dtsBitrate = document.getElementById('dts-slider').value;
     const opusBitrate = document.getElementById('opus_cbr_slider').value;
     const opusEncodingType = document.getElementById('opus-encoding-type').value;
+    const isDownmix = document.querySelector('input[name="is-downmix"]:checked').value;
+
     
     const conversionRequest = new XMLHttpRequest();
     conversionRequest.responseType = "json";
@@ -248,13 +234,16 @@ function convert_file(filename) {
     data.append("vorbis_quality", vorbisQuality);
     data.append("vorbis_encoding", vorbisEncoding);
     data.append("flac_compression", flacCompression);
-    data.append("radio_button", radioButton);
+    data.append("is_downmix", isDownmix);
     data.append("fdk_type", fdkType);
     data.append("fdk_cbr", fdkCBR);
     data.append("fdk_vbr", fdkVBR);
+    data.append("is_fdk_lowpass", isFDKLowpass);
+    data.append("fdk_lowpass", FDKLowpass);
     data.append("dts_bitrate", dtsBitrate);
     data.append("opus-cbr-bitrate", opusBitrate);
     data.append("opus-encoding-type", opusEncodingType);
+    data.append("is_y_switch", isYswitch);
 
     // Open the request and send the required data to main.py so the conversion can happen.
     conversionRequest.open('POST', '/');

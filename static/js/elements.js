@@ -21,12 +21,13 @@ function showHide(value) {
     if (value=='MP3') {
         document.getElementById('MP3').style.display = 'block';
         document.getElementById('mp3_encoding_div').style.display = 'block';
-        document.getElementById("mp3_encoding_type").selectedIndex = 1;
+        document.getElementById("mp3_encoding_type").selectedIndex = 3;
         document.getElementById('mp3sliderdiv').style.display = 'block';
+        document.getElementById('mp3_vbr_setting_div').style.display = 'none';
+        document.getElementById('y-switch-div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("dts-div").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
-        document.getElementById('mp3_vbr_setting_div').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
         document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
         document.getElementById('ac3-div').style.display = 'none';
@@ -38,7 +39,10 @@ function showHide(value) {
         document.getElementById('AAC').style.display = 'block';
         document.getElementById('fdk-type').style.display = 'block';
         document.getElementById('fdk_encoding').selectedIndex = 1;
-        document.getElementById('fdk_cbr_div').style.display = 'block';
+        document.getElementById('fdk_cbr_div').style.display = 'block';;
+        document.getElementById('is-lowpass-div').style.display = 'block';
+        document.getElementById('no').checked = true;
+        document.getElementById('fdk-lowpass-div').style.display = 'none';
         document.getElementById('fdk-vbr').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("dts-div").style.display = 'none';
@@ -130,15 +134,8 @@ function showHide(value) {
 }
 
 // Show MP3 CBR div by default
-if (document.getElementsByName('codecs')[0].selectedOptions[0].value === "MP3") {
-    document.getElementById('mp3_encoding_div').style.display = 'block';
-    document.getElementById('mp3_vbr_setting_div').style.display = 'none';
-    document.getElementById('mp3sliderdiv').style.display = 'block';
-}
 
-else {
-    document.getElementById('MP3').style.display = 'none';
-}
+
 
 // // Show Opus VBR div by default
 // if (document.getElementsByName('codecs')[0].selectedOptions[0].value === "Opus") {
@@ -151,10 +148,12 @@ else {
 function showHideMP3(value) {
     if (value=='cbr' || value=='abr') {
         document.getElementById('mp3sliderdiv').style.display = 'block';
+        document.getElementById('y-switch-div').style.display = 'none';
         document.getElementById('mp3_vbr_setting_div').style.display = 'none';
 }
     else {
         document.getElementById('mp3_vbr_setting_div').style.display = 'block';
+        document.getElementById('y-switch-div').style.display = 'block';
         document.getElementById('mp3sliderdiv').style.display = 'none';
     }
 }
@@ -163,12 +162,26 @@ function fdkEncodingType(value) {
     if (value=='fdk-cbr') {
         document.getElementById('fdk-type').style.display = 'block';
         document.getElementById('fdk_cbr_div').style.display = 'block';
+        document.getElementById('is-lowpass-div').style.display = 'block';
+        document.getElementById('no').checked = true;
+        document.getElementById('fdk-lowpass-div').style.display = 'none';
         document.getElementById('fdk-vbr').style.display = 'none';  
     }
     else {
         document.getElementById('fdk-type').style.display = 'block';
         document.getElementById('fdk-vbr').style.display = 'block';
+        document.getElementById('is-lowpass-div').style.display = 'block';
+        document.getElementById('no').checked = true;
+        document.getElementById('fdk-lowpass-div').style.display = 'none';
         document.getElementById('fdk_cbr_div').style.display = 'none';
+    }
+}
+
+function isFDKLowpass() {
+    if (document.getElementById('yes').checked) {
+        document.getElementById('fdk-lowpass-div').style.display = 'block';
+    } else {
+        document.getElementById('fdk-lowpass-div').style.display = 'none';
     }
 }
 
@@ -177,7 +190,7 @@ function showHideAAC(value) {
         document.getElementById('aac_cbr_div').style.display = 'block';
         document.getElementById('fdk_cbr_div').style.display = 'none';
         document.getElementById('fdk-vbr').style.display = 'none';
-}
+    }
     else if (value=='tvbr') {
         document.getElementById('aac_tvbr_div').style.display = 'block';
         document.getElementById('fdk_cbr_div').style.display = 'none';
@@ -218,10 +231,10 @@ function opusEncodingType(value) {
 // Slider for MP3
 const mp3slider = document.getElementById("cbr_abr_bitrate");
 const mp3output = document.getElementById("mp3value");
-mp3output.innerHTML = mp3slider.value + "kbps";
+mp3output.innerHTML = mp3slider.value + " kbps";
 // Update the current slider value (each time you drag the slider handle)
 mp3slider.oninput = function () {
-    mp3output.innerHTML = this.value + "kbps";
+    mp3output.innerHTML = this.value + " kbps";
 }
 
 // Slider for FDK CBR
@@ -235,9 +248,9 @@ fdkslider.oninput = function () {
 // Slider for Vorbis Quality
 const vorbisslider = document.getElementById("vorbis_quality");
 const vorbisoutput = document.getElementById("vorbisvalue");
-vorbisoutput.innerHTML = "q " + vorbisslider.value;
+vorbisoutput.innerHTML = "-q " + vorbisslider.value;
 vorbisslider.oninput = function () {
-    vorbisoutput.innerHTML = "q " + this.value;
+    vorbisoutput.innerHTML = "-q " + this.value;
 }
 
 // Target VBR bitrate slider for Vorbis/Opus.
@@ -248,13 +261,13 @@ slider.oninput = function () {
     output.innerHTML = this.value + "kbps";
 }
 
-// Opus CBR.
-const opus_cbr_slider = document.getElementById("opus_cbr_slider");
-const opusoutput = document.getElementById("opuscbrvalue");
-opusoutput.innerHTML = "kbps";
-opus_cbr_slider.oninput = function () {
-    opusoutput.innerHTML = "kbps";
-}
+// // Opus CBR.
+// const opus_cbr_slider = document.getElementById("opus_cbr_slider");
+// const opusoutput = document.getElementById("opuscbrvalue");
+// opusoutput.innerHTML = "kbps";
+// opus_cbr_slider.oninput = function () {
+//     opusoutput.innerHTML = "kbps";
+// }
 
 // Slider for FLAC
 const flacslider = document.getElementById("flac_compression");
@@ -271,33 +284,3 @@ dtsoutput.innerHTML = dtsslider.value + "kbps";
 dtsslider.oninput = function () {
     dtsoutput.innerHTML = this.value + "kbps";
 }
-
-// // Slider for QAAC CBR/CVBR
-// const aacslider = document.getElementById("cbr_slider_aac");
-// const aacoutput = document.getElementById("aacvalue");
-// aacoutput.innerHTML = aacslider.value + "kbps";
-// aacslider.oninput = function () {
-//     aacoutput.innerHTML = this.value + "kbps";
-// }
-
-// // Slider for QAAC CVBR
-// const aacVBRslider = document.getElementById("vbr_slider_aac");
-// const aacVBRoutput = document.getElementById("aacVBRvalue");
-// aacVBRoutput.innerHTML = aacVBRslider.value + "kbps";
-// aacVBRslider.oninput = function () {
-//     aacVBRoutput.innerHTML = this.value + "kbps";
-// }
-
-// // Slider for AAC TVBR
-// const aacTVBRslider = document.getElementById("tvbr_slider_aac");
-// const aacTVBRoutput = document.getElementById("aacTVBRvalue");
-// aacTVBRoutput.innerHTML = aacTVBRslider.value;
-
-// aacTVBRslider.oninput = function() { 
-//     if ([72, 81, 90, 99, 108, 117, 126].includes(Number(this.value))) {
-//       aacTVBRoutput.innerHTML = Number(this.value) + 1;
-//     }
-//     else {
-//       aacTVBRoutput.innerHTML = this.value;
-//     }
-//   

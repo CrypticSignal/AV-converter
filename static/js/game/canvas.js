@@ -7,9 +7,11 @@ ctx.font = "20px arial";
 
 alert("This game tests your reaction speed. Whenever you click on the circle, it spawns in a new location. How many times can you click on the circle in 10 seconds? Dismiss this alert to begin playing.")
 
+ctx.fillText(`Window Dimensions: ${canvas.width}x${canvas.height}`, 0, 20);
+
 let x = Math.round(canvas.width / 2);
 let y = Math.round(canvas.height / 2);
-const radius = Math.round(canvas.height / 12);
+const radius = Math.round(canvas.height / 10);
 
 // Function to create a circle.
 function createCircle(x, y) {
