@@ -12,7 +12,7 @@ Vorbis - libvorbis 1.3.6 (the latest version of the Vorbis encoder). https://git
 
 You can also convert to WAV, FLAC, ALAC, DTS, AC3 or MKV.
 
-A lot of input formats are supported (every format that FFmpeg can decode). For example:
+A lot of input formats are supported:
 
 3GP (.3gp)
 
