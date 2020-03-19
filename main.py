@@ -1,4 +1,3 @@
-
 from flask import Flask, request, render_template, send_from_directory, make_response, jsonify
 from flask_socketio import SocketIO, emit
 from werkzeug.utils import secure_filename
@@ -11,7 +10,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1000 * 1000 * 1000
 
 # Turn the flask app into a socketio app
-socketio = SocketIO(app, logger=True, engineio_logger=True)
+socketio = SocketIO(app)
 
 thread_stop_event = Event()
 
@@ -55,10 +54,6 @@ def contact():
 @app.route("/game")
 def game():
     return render_template("game.html")
-
-@app.route("/progress")
-def prog():
-    return render_template("progress.html,", content=formatted_output)
 
 @app.route("/", methods=["POST"])
 def uploaded():
@@ -179,4 +174,4 @@ def download_file(filename):
         return send_from_directory(os.getcwd(), filename, as_attachment=True)
         
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=80)
+    socketio.run(app, host='0.0.0.0', port=443)
