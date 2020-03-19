@@ -1,14 +1,18 @@
-const canvas = document.querySelector('canvas');
+const canvas = document.getElementById('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
+ctx.font = "20px arial";
+ctx.fillText(`Window Dimensions: ${canvas.width}x${canvas.height}`, 0, 20);
 canvas.addEventListener("touchstart", isCircleHit)
 canvas.addEventListener("click", isCircleHit)
-ctx.font = "20px arial";
 
-alert("This game tests your reaction speed. Whenever you hit the circle, it spawns in a new location. How many times can you hit the circle in 10 seconds? Dismiss this alert to begin playing.")
-
-ctx.fillText(`Window Dimensions: ${canvas.width}x${canvas.height}`, 0, 20);
+// If the user has visited the page Before, don't show the opening alert.
+const isVisited = localStorage.getItem('isVisited');
+if (isVisited !== "yes") {
+    alert("This game tests your reaction speed. Whenever you hit the circle, it spawns in a new location. How many times can you hit the circle in 10 seconds? Dismiss this alert to begin playing.");
+    localStorage.setItem('isVisited', 'yes')
+}
 
 // The centre of the first circle should be in the middle of the canvas.
 x = Math.round(canvas.width / 2);
@@ -58,17 +62,21 @@ function showTimer() {
     ctx.fillText(timer, canvas.width/2, 20);
 
     if (timer == 0) {
-        alert(`
+
+        if (confirm(`
         You hit the circle ${timesHit} times.
         Average hits per second: ${timesHit/10}
         Misses: ${timesMissed}
         Accuracy: ${((timesHit / (timesHit + timesMissed)) * 100).toFixed(1)}%
-        To play again, dismiss this alert and hit the circle.`)
+        To play again, click on 'OK'`)) {
+            location.reload();
+        }
+        else {
+            window.location.href = "https://freeaudioconverter.net";
+        }
     }
-
     else if (timer < 0) {
         ctx.clearRect(0, 0, canvas.width, 20)
-        timesHit = 100;
     }
 }
 
@@ -87,20 +95,21 @@ function isCircleHit (event) {
     const deltaY = yPosition - currentYLocation
 
     // Use a^2 + b^2 = c^2 to check if the hit is within the circle.
-    if ((deltaX * deltaX) + (deltaY * deltaY) <= (radius * radius)) {
+    if (((deltaX * deltaX) + (deltaY * deltaY)) <= (radius * radius)) {
 
         newCircle();
+        //navigator.vibrate(50); 
 
         if (timesHit == 1) {
             setInterval(showTimer, 1000); // Run the showTimer function every 1000ms.
-            ctx.clearRect(0, 0, canvas.width, 24);
+            ctx.clearRect(0, 0, canvas.width, 20);
         }
 
         else if (timesHit == 101) {
             location.reload();
         } 
     }
-    
+
     else { // Don't spawn a new square and increased timesMissed by 1.
         timesMissed += 1;
     }
