@@ -6,12 +6,15 @@ canvas.addEventListener("touchstart", isCircleHit)
 canvas.addEventListener("click", isCircleHit)
 ctx.font = "20px arial";
 
-alert("This game tests your reaction speed. Whenever you click on the circle, it spawns in a new location. How many times can you click on the circle in 10 seconds? Dismiss this alert to begin playing.")
+alert("This game tests your reaction speed. Whenever you hit the circle, it spawns in a new location. How many times can you hit the circle in 10 seconds? Dismiss this alert to begin playing.")
 
 ctx.fillText(`Window Dimensions: ${canvas.width}x${canvas.height}`, 0, 20);
 
-let x = Math.round(canvas.width / 2);
-let y = Math.round(canvas.height / 2);
+// The centre of the first circle should be in the middle of the canvas.
+x = Math.round(canvas.width / 2);
+y = Math.round(canvas.height / 2);
+
+// Make the diameter of the circle a fifth of the height of the canvas.
 const radius = Math.round(canvas.height / 10);
 
 // Function to create a circle.
@@ -35,12 +38,12 @@ function removeCircle(currentXLocation, currentYLocation){
     ctx.closePath();
 }
 
-let timesClicked = 0;
+let timesHit = 0;
 let timesMissed = 0;
 let timer = 10;
 
 function newCircle() {
-    timesClicked += 1;
+    timesHit += 1;
     x = Math.floor(Math.random() * (canvas.width - radius - radius)) + radius;
     y = Math.floor(Math.random() * (canvas.height - radius - radius)) + radius;
     removeCircle(currentXLocation, currentYLocation);
@@ -49,6 +52,25 @@ function newCircle() {
     currentYLocation = y;
 }
 
+function showTimer() {
+    timer -= 1; 
+    ctx.clearRect(canvas.width/2, 0, 20, 20);
+    ctx.fillText(timer, canvas.width/2, 20);
+
+    if (timer == 0) {
+        alert(`
+        You hit the circle ${timesHit} times.
+        Average hits per second: ${timesHit/10}
+        Misses: ${timesMissed}
+        Accuracy: ${((timesHit / (timesHit + timesMissed)) * 100).toFixed(1)}%
+        To play again, dismiss this alert and hit the circle.`)
+    }
+
+    else if (timer < 0) {
+        ctx.clearRect(0, 0, canvas.width, 20)
+        timesHit = 100;
+    }
+}
 
 function isCircleHit (event) {
 
@@ -60,50 +82,26 @@ function isCircleHit (event) {
         var yPosition = event.offsetY;
     }
 
-    // Check if the click location is within the circle:
-
-    // Distance of click from centre of circle.
+    // Distance of hit from the centre of the circle.
     const deltaX = xPosition - currentXLocation
     const deltaY = yPosition - currentYLocation
 
-    // a^2 + b^2 = c^2
+    // Use a^2 + b^2 = c^2 to check if the hit is within the circle.
     if ((deltaX * deltaX) + (deltaY * deltaY) <= (radius * radius)) {
 
         newCircle();
 
-        if (timesClicked == 1) {
+        if (timesHit == 1) {
             setInterval(showTimer, 1000); // Run the showTimer function every 1000ms.
-            showTimer();
             ctx.clearRect(0, 0, canvas.width, 24);
         }
 
-        else if (timesClicked == 101) {
-            removeCircle(currentXLocation, currentYLocation);
+        else if (timesHit == 101) {
             location.reload();
         } 
     }
-
+    
     else { // Don't spawn a new square and increased timesMissed by 1.
         timesMissed += 1;
-    }
-}
-
-function showTimer() {
-    timer -= 1; 
-    ctx.clearRect(canvas.width/2, 0, 20, 20);
-    ctx.fillText(timer, canvas.width/2, 20);
-
-    if (timer == 0) {
-        alert(`
-        You got the circle ${timesClicked} times.
-        Average hits per second: ${timesClicked/10}
-        Misses: ${timesMissed}
-        Accuracy: ${((timesClicked / (timesClicked + timesMissed)) * 100).toFixed(1)}%
-        To play again, dismiss this alert and click on the circle.`)
-    }
-
-    else if (timer < 0) {
-        ctx.clearRect(0, 0, canvas.width, 20)
-        timesClicked = 100;
     }
 }
