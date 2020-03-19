@@ -2,7 +2,8 @@ const canvas = document.querySelector('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
-canvas.addEventListener("click", getClickLocation)
+canvas.addEventListener("touchstart", isCircleHit)
+canvas.addEventListener("click", isCircleHit)
 ctx.font = "20px arial";
 
 alert("This game tests your reaction speed. Whenever you click on the circle, it spawns in a new location. How many times can you click on the circle in 10 seconds? Dismiss this alert to begin playing.")
@@ -48,10 +49,17 @@ function newCircle() {
     currentYLocation = y;
 }
 
-function getClickLocation (event) {
-    // Detect where the user clicks/touches
-    let xPosition = event.offsetX;
-    let yPosition = event.offsetY;
+
+function isCircleHit (event) {
+
+    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        var xPosition = event.touches[0].clientX;
+        var yPosition = event.touches[0].clientY;
+    } else {
+        var xPosition = event.offsetX;
+        var yPosition = event.offsetY;
+    }
+
     // Check if the click location is within the circle:
 
     // Distance of click from centre of circle.
