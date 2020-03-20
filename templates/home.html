@@ -1,37 +1,5 @@
-<!doctype html>
-<head>
-  <title>Convert Audio Files or Extract Audio from Video. No software download!</title>
-  <meta name="description" content="Convert audio files to MP3, WAV, AAC, FLAC, Opus, Vorbis, and more! You can also extract the audio from a video and save it as an audio file.">
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <!--CSS-->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <!-- Nice font for the "Buy me a coffee" button -->
-  <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
-  <!-- Needed for hamburger icon on mobile -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-</head>
-
-<body>
-
-  <div class="topnav" id="myTopnav">
-    <!-- Navbar -->
-    <a class="active">Home</a>
-    <a href="about">About</a>
-    <a href="filetypes">Filetypes</a>
-    <a href="yt">YouTube Downloader</a>
-    <a href="contact">Contact</a>
-    <a href="game">Play a game</a>
-    <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-      <i class="fa fa-bars"></i>
-    </a>
-    <!-- Buy me a coffee -->
-    <div id="coffee">
-      <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fezCGRFkb"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span><br><br></a>
-    </div>
-
-  </div> <!--Closing tag for topnav-->
+{% extends "layout.html" %}
+{% block content %}
 
   <h1>Audio Converter. Audio Extractor.</h1>
 
@@ -339,5 +307,5 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!--Bootstrap JS-->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-</body>
-</html>
+
+{% endblock content %}

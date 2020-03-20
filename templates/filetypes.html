@@ -1,88 +1,53 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Filetypes</title>
-    <!--Required meta tags-->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <!--CSS-->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
-  
-</head>
+{% extends "layout.html" %}
+{% block content %}
 
-<body>
+<h1>Supported Filetypes</h1><br>
 
-    <div class="topnav" id="myTopnav">
-        <a href="/">Home</a>
-        <a href="about">About</a>
-        <a class="active">Filetypes</a>
-        <a href="yt">YouTube Downloader</a>
-        <a href="contact">Contact</a>
-        <a href="game">Play a game</a>
-        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-            <i class="fa fa-bars"></i>
-        </a>
-        
-        <div id="coffee">
-            <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fezCGRFkb"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
-        </div>
-    </div>
+<div class="audiofiletypes">
+    <h3>Input Audio File</h3><hr>
+    <p>3GP (.3gp)</p>
+    <p>AAC (.aac or .m4a)</p>
+    <p>AC3 (.ac3)</p>
+    <p>.ADPCM</p>
+    <p>ALAC</p>
+    <p>DTS (.dts)</p>
+    <p>FLAC (.flac)</p>
+    <p>.m4a</p>
+    <p>MP3 (.mp3)</p>
+    <p>.ogg</p>
+    <p>Opus (.opus)</p>
+    <p>Speex (.spx)</p>
+    <p>Vorbis</p>
+    <p>WAV (.wav)</p>
+    <p>WMA (.wma)</p>
+</div>
 
-    <h1>Supported Filetypes</h1><br>
+<div class="videofiletypes">
+    <h3>Input Video File</h3><hr>
+    <p>AVI (.avi)</p>
+    <p>FLV (.flv)</p>
+    <p>MKV (.mkv)</p>
+    <p>MOV (.mov)</p>
+    <p>MP4 (.mp4)</p>
+    <p>.MTS</p>
+    <p>.webm</p>
+    <p>WMV (.wmv)</p>
+</div>
 
-    <div class="audiofiletypes">
-        <h3>Input Audio File</h3><hr>
-        <p>3GP (.3gp)</p>
-        <p>AAC (.aac or .m4a)</p>
-        <p>AC3 (.ac3)</p>
-        <p>.ADPCM</p>
-        <p>ALAC</p>
-        <p>DTS (.dts)</p>
-        <p>FLAC (.flac)</p>
-        <p>.m4a</p>
-        <p>MP3 (.mp3)</p>
-        <p>.ogg</p>
-        <p>Opus (.opus)</p>
-        <p>Speex (.spx)</p>
-        <p>Vorbis</p>
-        <p>WAV (.wav)</p>
-        <p>WMA (.wma)</p>
-    </div>
+<div class="outputformats">
+    <h3>Output Formats</h3><hr>
+    <p>AAC (.m4a)</p>
+    <p>AC3 (.ac3)</p>
+    <P>ALAC (.m4a)</p>
+    <p>DTS (.dts)</p>
+    <p>FLAC (.flac)</p>
+    <p>MKA (.mka)</p>
+    <p>MKV (.mkv)</p>
+    <p>MP3 (.mp3)</p>
+    <p>Opus (.opus)</p>
+    <p>Speex (.spx)</p>
+    <p>Vorbis (.ogg)</p>
+    <p>WAV (.wav)</p>
+</div>     
 
-    <div class="videofiletypes">
-        <h3>Input Video File</h3><hr>
-        <p>AVI (.avi)</p>
-        <p>FLV (.flv)</p>
-        <p>MKV (.mkv)</p>
-        <p>MOV (.mov)</p>
-        <p>MP4 (.mp4)</p>
-        <p>.MTS</p>
-        <p>.webm</p>
-        <p>WMV (.wmv)</p>
-    </div>
-
-    <div class="outputformats">
-        <h3>Output Formats</h3><hr>
-        <p>AAC (.m4a)</p>
-        <p>AC3 (.ac3)</p>
-        <P>ALAC (.m4a)</p>
-        <p>DTS (.dts)</p>
-        <p>FLAC (.flac)</p>
-        <p>MKA (.mka)</p>
-        <p>MKV (.mkv)</p>
-        <p>MP3 (.mp3)</p>
-        <p>Opus (.opus)</p>
-        <p>Speex (.spx)</p>
-        <p>Vorbis (.ogg)</p>
-        <p>WAV (.wav)</p>
-    </div>     
-
-    <!--My JavaScript file-->
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    
-</body>
-</html>
+{% endblock content %}
