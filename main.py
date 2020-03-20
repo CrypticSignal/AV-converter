@@ -47,6 +47,10 @@ def about():
 def filetypes():
     return render_template("filetypes.html")
 
+@app.route("/yt")
+def youtube():
+    return render_template("yt.html")
+
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
