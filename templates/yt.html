@@ -1,0 +1,49 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+    <!--CSS-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <!-- Nice font for the "Buy me a coffee" button -->
+  <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
+  <!-- Needed for hamburger icon on mobile -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="topnav" id="myTopnav">
+        <!-- Navbar -->
+        <a href="/">Home</a>
+        <a href="about">About</a>
+        <a href="filetypes">Filetypes</a>
+        <a class="active">YouTube Downloader</a>
+        <a href="contact">Contact</a>
+        <a target="_blank" href="game">Play a game</a>
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+          <i class="fa fa-bars"></i>
+        </a>
+        <!-- Buy me a coffee -->
+        <div id="coffee">
+          <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fezCGRFkb"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span><br><br></a>
+        </div>
+      </div> <!--Closing tag for topnav-->
+
+    <div class="container">
+        <div class="mb-3 mt-3">
+            <p>An ad-free, no-nonsense webpage to download YouTube videos or simply extract the audio (the highest quality audio stream is downloaded, which is usally of the Opus (.opus) format). Simply paste the video link into the box below and select the appropriate button.</p>
+            <div class="form-group mb-3">
+                <form action="http://18.130.98.207:5000" name="link" method="POST">
+                    <h3><b>Paste YouTube link:</b></h3>
+                    <input type="text" class="form-control" maxlength="200" name="link" required/>
+                    <br>
+                    <input type="submit" name="submit" value="Download Video"><br><br>
+                    <input type="submit" name="submit" value="Download Audio">
+                </form>
+            </div>
+            <p> It may seem like nothing is happening after you click on the appropriate button, but do not worry. Worry about the spread of COVID-19 instead. The file is being downloaded in the background, and on completion, the file will be sent to your browser and automatically start downloading to your device. This doesn't take long (with the videos I tested with), but you can <a target="_blank" href="https://freeaudioconverter.net/game">play my game</a> while you wait.</p>
+        </div>
+    </div>
+
+</body>
+</html>
