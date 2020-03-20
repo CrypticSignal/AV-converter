@@ -3,16 +3,14 @@ from flask_socketio import SocketIO, emit
 from werkzeug.utils import secure_filename
 import os
 import converter
-from threading import Event
+from threading import Event, Thread
+
 app = Flask(__name__)
+socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-# Limit file upload size to 5GB.
-app.config['MAX_CONTENT_LENGTH'] = 2 * 1000 * 1000 * 1000
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1000 * 1000 * 1000 # 2 GB max upload size.
 
-# Turn the flask app into a socketio app
-socketio = SocketIO(app)
-
-thread_stop_event = Event()
+thread_stop_event = Event() # Not sure why this is needed, got it from https://github.com/shanealynn/async_flask/blob/master/application.py
 
 def GetOutput():
     while not thread_stop_event.isSet():
@@ -27,6 +25,9 @@ def GetOutput():
             socketio.emit('show progress', {'progress': formatted_output})
             socketio.sleep(1)
 
+# Make a thread that will run the GetOutput function.
+progress_thread = Thread(target=GetOutput)
+
 @socketio.on('my event') # Decorator to catch an event called "my event".
 def test_connect(): # test_connect() is the event callback function.
     print('Client connected')
@@ -37,27 +38,27 @@ def test_disconnect():
 
 @app.route("/")
 def homepage():
-    return render_template("home.html")
+    return render_template("home.html", title="FreeAudioConverter.net")
 
 @app.route("/about")
 def about():
-    return render_template("about.html")
+    return render_template("about.html", title="About")
 
 @app.route("/filetypes")
 def filetypes():
-    return render_template("filetypes.html")
+    return render_template("filetypes.html", title="Filetypes")
 
 @app.route("/yt")
 def youtube():
-    return render_template("yt.html")
+    return render_template("yt.html", title="YouTube Downloader")
 
 @app.route("/contact")
 def contact():
-    return render_template("contact.html")
+    return render_template("contact.html", title="Contact")
 
 @app.route("/game")
 def game():
-    return render_template("game.html")
+    return render_template("game.html", title="Game")
 
 @app.route("/", methods=["POST"])
 def uploaded():
@@ -66,7 +67,7 @@ def uploaded():
 
     if request.form["requestType"] == "uploaded": # Upload complete.
 
-        socketio.start_background_task(GetOutput)
+        progress_thread.start()
 
         # Make a variable called chosen_file which is the uploaded file.
         chosen_file = request.files["chosen_file"]
@@ -80,8 +81,9 @@ def uploaded():
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
         chosen_file.save(os.path.join("uploads", filename_secure))
-        res = make_response(jsonify({"message": "File uploaded. Converting..."}), 200)
-        return res
+
+        response = make_response(jsonify({"message": "File uploaded. Converting..."}), 200)
+        return response
     
     if request.form["requestType"] == "convert":
 
@@ -162,12 +164,12 @@ def uploaded():
 
         converted_file_name = output_name + "." + extension
 
-        res = make_response(jsonify({
+        response = make_response(jsonify({
             "message": "File converted. The converted file will now start downloading.",
             "downloadFilePath": 'download/' + converted_file_name
         }), 200)
 
-        return res
+        return response
 
 @app.route("/download/<path:filename>", methods=["GET"])
 def download_file(filename):
