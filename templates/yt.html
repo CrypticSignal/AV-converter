@@ -3,18 +3,22 @@
 
 <div class="container">
     <div class="mb-3 mt-3">
-        <p>An ad-free, no-nonsense webpage to download YouTube videos or simply extract the audio (the highest quality audio stream is downloaded, which is usally of the Opus (.opus) format). Simply paste the video link into the box below and select the appropriate button.</p>
+        <p>An ad-free, no-nonsense webpage to download YouTube videos or just the audio. Simply paste the video link into the box below and select the appropriate button.</p>
         <div class="form-group mb-3">
             <form action="http://18.130.98.207:5000" name="link" method="POST">
                 <h3><b>Paste YouTube link:</b></h3>
                 <input type="text" class="form-control" maxlength="200" name="link" required/>
                 <br>
                 <input type="submit" name="submit" value="Download Video"><br><br>
-                <input type="submit" name="submit" value="Download Audio (best quality)"><br><br>
-                <input type="submit" name="submit" value="Download Audio (MP3)">
+                <input type="submit" name="submit" value="Download Video [iOS]"><br><br>
+                <input type="submit" name="submit" value="Download Audio [best quality]"><br><br>
+                <input type="submit" name="submit" value="Download as an MP3 file">
             </form>
         </div>
-        <p> It may seem like nothing is happening after you click on the appropriate button, but do not worry. Worry about the spread of COVID-19 instead. The file is being downloaded in the background, and on completion, the file will be sent to your browser and automatically start downloading to your device. This doesn't take long (with the videos I tested with), but you can <a target="_blank" href="https://freeaudioconverter.net/game">play my game</a> while you wait.</p>
+        <p> It may seem like nothing is happening after you click on the appropriate button, but the file is being downloaded to the server. How long this will take depends on the length of the video. For short videos such as music videos, this won't take long. On completion, the server will send the file to your browser and one of two things will happen: <p>
+        <p>[A] Your browser will start downloading the file automatically.<p>
+        <p>[B] Your browser will ask if you want to download the file.</p>
+        <i>If using an iOS device, select "Download Video [iOS]" or "Download as an MP3 file".</i>
     </div>
 </div>
 
