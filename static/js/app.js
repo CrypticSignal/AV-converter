@@ -1,5 +1,6 @@
 const input = document.getElementById("file_input");
 const file_input_label = document.getElementById("file_input_label");
+const outputNameBox = document.getElementById("output_name");
 const progress = document.getElementById("progress");
 const progress_wrapper = document.getElementById("progress_wrapper");
 const progress_status = document.getElementById("progress_status");
@@ -9,16 +10,14 @@ const cancel_btn = document.getElementById("cancel_btn");
 const alert_wrapper = document.getElementById("alert_wrapper");
 
 // Function to show alerts
-function show_alert(message, alert) {
-
-    alert_wrapper.innerHTML = `
-    <div id="alert" class="alert alert-${alert} alert-dismissible fade show" role="alert">
+function show_alert(message, type) {
+    alert_wrapper.innerHTML =
+    `<div id="alert" class="alert alert-${type} alert-dismissible fade show" role="alert">
       <span>${message}</span>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
-    </div>
-  `
+    </div>`
 }
 
 // Show the file selected and enter a default output name.
@@ -34,11 +33,7 @@ function updateBoxes() {
 
     defaultOutputName = inputFilenameFormatted.substring(0, inputFilenameFormatted.lastIndexOf('.')); // Get the filename without the extension by only getting the part before the last "."
 
-    const outputNameBox = document.getElementById("output_name");
-
     outputNameBox.value = defaultOutputName; // Put the formatted filename into the textbox.
-
-    // outputNameBox.select(); // Auto-highlight the text in the box, so the user can simply start typing to change the default output name.
 }
 
 // Run this function when the user clicks on the "Convert" button.
@@ -129,11 +124,13 @@ function upload_and_convert() {
         let speed = ((loaded - previousLoaded) / ((Date.now() / 1000) - previousTime)) * 8;
     
         const percentageComplete = (loaded / total) * 100;
-    
-        // Show the user some tings.
+
+        // Add percentage complete to progress div.
+        $('#progress').html(`${Math.floor(percentageComplete)}%`);
+        // Add a style attribute to the progress div, i.e. "style=width: x%"
         progress.setAttribute("style", `width: ${Math.floor(percentageComplete)}%`);
-        progress_status.innerText = `Percentage Complete: ${Math.floor(percentageComplete)}%
-        ${loaded.toFixed(2)}MB of ${total.toFixed(2)}MB uploaded
+        // Show extra info.
+        progress_status.innerText = `${loaded.toFixed(2)}MB of ${total.toFixed(2)}MB uploaded
         Upload Speed: ${speed.toFixed(2)}Mbps (${(speed / 8).toFixed(2)}MB/s)`;
     
         // Set the previous value for "loaded" to the current one just before we exit.
@@ -148,9 +145,7 @@ function upload_and_convert() {
     request.send(data);
 
     cancel_btn.addEventListener("click", function () {
-
         request.abort();
-    
     })
 
     // Request load handler (transfer complete)
@@ -158,8 +153,8 @@ function upload_and_convert() {
 
         if (request.status == 200) {
             //show_alert(`${request.response.message}`, "info"); <-- No longer needed as I'm showing a loading button instead.
+            document.getElementById('spinner').style.display = 'block'; // Show the converting button.
             convert_file(chosen_file.name);
-            document.getElementById('spinner').style.display = 'block'; // Show the converting button.  
         }
          else if (request.status == 415) {
             show_alert('Incompatible filetype selected. Click <a href="http://onlineaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
@@ -167,18 +162,13 @@ function upload_and_convert() {
         else {
             show_alert("Error uploading file.", "danger");
         }
-
         reset();
-
     });
 
     // Request error handler
     request.addEventListener("error", function (e) {
-
         reset();
-
         show_alert(`${request.response.message}`, "danger");
-
     });
 
     // Request abort handler
@@ -253,6 +243,7 @@ function convert_file(filename) {
 
         alert_wrapper.innerHTML = ""; // Clear any existing alerts.
         document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
+
         show_alert(`${conversionRequest.response.message} <a href="${conversionRequest.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
 
         const link = document.createElement("a"); // Create a virtual link.
@@ -264,31 +255,22 @@ function convert_file(filename) {
 
 // Function to reset the page
 function reset() {
-    
     // Clear the input
     input.value = null;
-
     // Hide the cancel button
     cancel_btn.classList.add("d-none");
-
     // Reset the input element
     input.disabled = false;
-
     // Show the upload button
-    upload_btn.classList.remove("d-none");
-
+    upload_btn.classList.remove("d-none")
     // Hide the loading button
     loading_btn.classList.add("d-none");
-
     // Hide the progress bar
     progress_wrapper.classList.add("d-none");
-
     // Reset the progress bar state
     progress.setAttribute("style", `width: 0%`);
-
     // Reset the input placeholder
     file_input_label.innerText = "Select file";
-
-    outputNameBox = document.getElementById("output_name");
+    // Clear the output filename box.
     outputNameBox.value = ''
 }

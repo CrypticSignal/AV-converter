@@ -1,9 +1,9 @@
 from flask import Flask, request, render_template, send_from_directory, make_response, jsonify
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, disconnect
 from werkzeug.utils import secure_filename
 import os
 import converter
-from threading import Event, Thread
+from threading import Thread, Event
 
 app = Flask(__name__)
 socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
@@ -12,21 +12,22 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1000 * 1000 * 1000 # 2 GB max upload size
 
 thread_stop_event = Event() # Not sure why this is needed, got it from https://github.com/shanealynn/async_flask/blob/master/application.py
 
-def GetOutput():
+def ReadProgress():
     while not thread_stop_event.isSet():
         with open('1.txt', 'r') as f:
             lines = f.readlines()
-            last_line = lines[-5:]
-            last_line = last_line[0]
-            last_line = last_line[:-8]
-            last_line = last_line[9:]
-            formatted_output = str(last_line + " [HH:MM:SS]" + " of the file has been converted so far...")
+            relevant_string = lines[-5:]
+            relevant_string = relevant_string[0]
+            relevant_string = relevant_string[:-8]
+            relevant_string = relevant_string[9:]
+            edited_string = relevant_string + " [HH:MM:SS]" + " of the file has been converted so far..."
+            
             # Trigger a new event called "show progress" 
-            socketio.emit('show progress', {'progress': formatted_output})
+            socketio.emit('show progress', {'progress': edited_string})
             socketio.sleep(1)
 
-# Make a thread that will run the GetOutput function.
-progress_thread = Thread(target=GetOutput)
+# Define the progress-reader thread.
+progress_thread = Thread(target=ReadProgress)
 
 @socketio.on('my event') # Decorator to catch an event called "my event".
 def test_connect(): # test_connect() is the event callback function.
@@ -48,10 +49,6 @@ def about():
 def filetypes():
     return render_template("filetypes.html", title="Filetypes")
 
-@app.route("/yt")
-def youtube():
-    return render_template("yt.html", title="YouTube Downloader")
-
 @app.route("/contact")
 def contact():
     return render_template("contact.html", title="Contact")
@@ -60,14 +57,12 @@ def contact():
 def game():
     return render_template("game.html", title="Game")
 
+allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf", "mov"]
+
 @app.route("/", methods=["POST"])
 def uploaded():
 
-    allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf", "mov"]
-
-    if request.form["requestType"] == "uploaded": # Upload complete.
-
-        progress_thread.start()
+    if request.form["requestType"] == "uploaded":
 
         # Make a variable called chosen_file which is the uploaded file.
         chosen_file = request.files["chosen_file"]
@@ -75,7 +70,7 @@ def uploaded():
         extension = (chosen_file.filename).split(".")[-1]
 
         if extension not in allowed_filetypes:
-            return make_response(jsonify({"message": "error: Incompatible filetype selected."}), 415)
+            return make_response(jsonify({"message": "Incompatible filetype selected."}), 415)
 
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
@@ -83,9 +78,14 @@ def uploaded():
         chosen_file.save(os.path.join("uploads", filename_secure))
 
         response = make_response(jsonify({"message": "File uploaded. Converting..."}), 200)
+
         return response
-    
+
     if request.form["requestType"] == "convert":
+
+        if not progress_thread.is_alive():
+            print("Thread not running. Starting...")
+            progress_thread.start()
 
         file_name = request.form["file_name"]
         chosen_file = os.path.join("uploads", secure_filename(file_name))
@@ -95,7 +95,7 @@ def uploaded():
         cbr_abr_bitrate = request.form["cbr_abr_bitrate"]
         mp3_vbr_setting = request.form["mp3_vbr_setting"]
         is_y_switch = request.form["is_y_switch"]
-        # Fraunhofer
+        # AAC
         fdk_type = request.form["fdk_type"]
         fdk_cbr = request.form["fdk_cbr"]
         fdk_vbr = request.form["fdk_vbr"]
@@ -180,4 +180,4 @@ def download_file(filename):
         return send_from_directory(os.getcwd(), filename, as_attachment=True)
         
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=443)
+    socketio.run(app, host='0.0.0.0')
