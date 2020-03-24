@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, send_from_directory, make_response, jsonify
-from flask_socketio import SocketIO, emit, disconnect
+from flask_socketio import SocketIO, emit
 from werkzeug.utils import secure_filename
 import os
 import converter
@@ -21,12 +21,11 @@ def ReadProgress():
             relevant_string = relevant_string[:-8]
             relevant_string = relevant_string[9:]
             edited_string = relevant_string + " [HH:MM:SS]" + " of the file has been converted so far..."
-            
             # Trigger a new event called "show progress" 
             socketio.emit('show progress', {'progress': edited_string})
             socketio.sleep(1)
 
-# Define the progress-reader thread.
+# Define the progress thread.
 progress_thread = Thread(target=ReadProgress)
 
 @socketio.on('my event') # Decorator to catch an event called "my event".
