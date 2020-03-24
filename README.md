@@ -1,5 +1,3 @@
-**Added the ability to download a YouTube video or just the audio. [19/03/2020]**
-
 https://freeaudioconverter.net - convert an audio file to another format or extract the audio from a video. Many file formats supported and high quality encoders are used. Easy to use and no software to download. FFmpeg is used as well as the following encoders:
 
 MP3 - LAME v3.100. https://lame.sourceforge.io/
