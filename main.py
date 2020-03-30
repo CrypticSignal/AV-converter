@@ -8,7 +8,7 @@ from threading import Thread, Event
 app = Flask(__name__)
 socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config['MAX_CONTENT_LENGTH'] = 2 * 1000 * 1000 * 1000 # 2 GB max upload size.
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000 * 1000 # 2 GB max upload size.
 
 thread_stop_event = Event() # Not sure why this is needed, got it from https://github.com/shanealynn/async_flask/blob/master/application.py
 
@@ -16,13 +16,10 @@ def ReadProgress():
     while not thread_stop_event.isSet():
         with open('1.txt', 'r') as f:
             lines = f.readlines()
-            relevant_string = lines[-5:]
-            relevant_string = relevant_string[0]
-            relevant_string = relevant_string[:-8]
-            relevant_string = relevant_string[9:]
-            edited_string = relevant_string + " [HH:MM:SS]" + " of the file has been converted so far..."
+            get_time = lines[-5].split('=')[1].split('.')[0]
+            progress_message = get_time + " [HH:MM:SS]" + " of the file has been converted so far..."
             # Trigger a new event called "show progress" 
-            socketio.emit('show progress', {'progress': edited_string})
+            socketio.emit('show progress', {'progress': progress_message})
             socketio.sleep(1)
 
 # Define the progress thread.
@@ -47,6 +44,10 @@ def about():
 @app.route("/filetypes")
 def filetypes():
     return render_template("filetypes.html", title="Filetypes")
+
+@app.route("/video-trimmer")
+def trimmer():
+    return render_template("trimmer.html")
 
 @app.route("/contact")
 def contact():
@@ -177,6 +178,59 @@ def download_file(filename):
         return send_from_directory(os.getcwd(), filename, mimetype="audio/m4a", as_attachment=True)   
     else:
         return send_from_directory(os.getcwd(), filename, as_attachment=True)
+
+@app.route("/video-trimmer", methods=["GET", "POST"])
+def trim_video():
+
+    if request.form["request_type"] == "upload_complete":
+   
+        chosen_file = request.files["chosen_file"]
+
+        extension = (chosen_file.filename).split(".")[-1]
+
+        if extension not in allowed_filetypes:
+            return make_response(jsonify({"message": "Incompatible filetype selected."}), 415)
+
+        # Make the filename safe
+        filename_secure = secure_filename(chosen_file.filename)
+
+        # Save the uploaded file to the uploads folder.
+        chosen_file.save(os.path.join("uploads", filename_secure))
+
+        response = make_response(jsonify({"message": "File uploaded. Converting..."}), 200)
+
+        return response
+
+    if request.form["request_type"] == "trim":
+
+        file_name = request.form["filename"]
+        chosen_file = os.path.join("uploads", secure_filename(file_name))
+        filename = request.form["filename"]
+        start_time = request.form["start_time"]
+        end_time = request.form["end_time"]
+        ext = "." + filename.split(".")[-1]
+        just_name = filename.split(".")[0]
+        output_name = just_name + " [trimmed]" + ext
+        os.system(f'ffmpeg -y -i "{chosen_file}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
         
+        response = make_response(jsonify({
+            "message": "File converted. The converted file will now start downloading.",
+            "downloadFilePath": 'download/' + output_name
+        }), 200)
+
+        return response
+        
+
+@app.route("/download/<path:filename>", methods=["GET"])
+def download_trimmed_file(filename):
+    print("filename in path ting: " + filename)
+    just_extension = filename.split('.')[-1]
+
+    if just_extension == "m4a":
+        return send_from_directory(os.getcwd(), filename, mimetype="audio/m4a", as_attachment=True)   
+    else:
+        return send_from_directory(os.getcwd(), filename, as_attachment=True)
+        
+
 if __name__ == "__main__":
     socketio.run(app, host='0.0.0.0')
