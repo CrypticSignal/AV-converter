@@ -2,7 +2,10 @@
 {% block content %}
 
 <h1>Contact</h1><br>
-<h2>Feedback? Feature request? Email me at:</h2><br>
-<p>theaudiophile@outlook.com</p>
+<h6>Feedback? Feature request? You can send me an email:</h6>
+<i>Please include your email addresss in your message if you would like me to get back to you.</i>
+<form action="/contact" method="POST">
+    <textarea name='message' rows="4" cols="50" placeholder="Enter your message"></textarea>
+<button class="btn btn-primary">Send</button>
 
 {% endblock content %}

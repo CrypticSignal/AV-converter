@@ -5,6 +5,10 @@ import os
 import converter
 from threading import Thread
 import logging
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
+from confidential import *
 
 app = Flask(__name__)
 socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
@@ -41,7 +45,7 @@ def test_disconnect():
 def homepage():
     return render_template("home.html", title="FreeAudioConverter.net")
 
-@app.route("/about")
+@app.route("/about", methods=["GET", "POST"])
 def about():
     return render_template("about.html", title="About")
 
@@ -52,10 +56,6 @@ def filetypes():
 @app.route("/video-trimmer")
 def trimmer():
     return render_template("trimmer.html", title="File Trimmer")
-
-@app.route("/contact")
-def contact():
-    return render_template("contact.html", title="Contact")
 
 @app.route("/game")
 def game():
@@ -132,6 +132,7 @@ def main():
             is_downmix = request.form["is_downmix"]
 
             # Run the appropritate section of converter.py:
+
             if chosen_codec == 'MP3':
                 converter.run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_name, is_downmix)
                 extension = 'mp3'
@@ -173,7 +174,7 @@ def main():
                 extension = 'spx'
 
             converted_file_name = output_name + "." + extension
-
+           
             response = make_response(jsonify({
                 "message": "File converted. The converted file will now start downloading.",
                 "downloadFilePath": 'download/' + converted_file_name
@@ -188,6 +189,32 @@ def download_file(filename):
         return send_from_directory(os.getcwd(), filename, mimetype="audio/m4a")   
     else:
         return send_from_directory(os.getcwd(), filename)
+
+# Contact Page
+
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if request.method == "POST":
+        send_from = "theaudiophile@outlook.com"
+        send_to = "hshafiq@hotmail.co.uk"
+        text = MIMEMultipart()
+        text['From'] = send_from
+        text['To'] = send_to
+        text['Subject'] = "Your Website"
+        body = request.form['message']
+        text.attach(MIMEText(body, 'plain'))
+        server = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(my_email, password)
+        text = text.as_string()
+        server.sendmail(send_from, send_to, text)
+        return make_response("Message sent!", 200)
+    else:
+        return render_template("contact.html", title="Contact")
+
+# File Trimmer
 
 @app.route("/video-trimmer", methods=["GET", "POST"])
 def trim_video():
@@ -229,10 +256,10 @@ def trim_video():
         }), 200)
 
         return response
-        
+
 @app.route("/download/<path:filename>", methods=["GET"])
 def download_trimmed_file(filename):
-    app.logger.info("filename in path ting: " + filename)
+
     just_extension = filename.split('.')[-1]
 
     if just_extension == "m4a":
