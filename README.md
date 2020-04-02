@@ -1,3 +1,5 @@
+## Demo
+![Demo](demo/demo.gif)
 https://freeaudioconverter.net - convert an audio file to another format (high quality encoders are used) or extract the audio from a video. Many file formats are supported, click [here](https://freeaudioconverter.net/filetypes) for details. A recent addition is the ability to trim a video or audio file.
 ## Contributing
 Simply submit a pull request. I will respond to all pull requests.
