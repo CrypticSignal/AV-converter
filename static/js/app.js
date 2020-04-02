@@ -247,7 +247,7 @@ function convert_file(filename) {
         show_alert(`${conversionRequest.response.message} <a href="${conversionRequest.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
 
         const link = document.createElement("a"); // Create a virtual link.
-        link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename. This is not needed because as_attachment=True in main.py already specifies that the file will be downloaded.
+        link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
         link.href = conversionRequest.response.downloadFilePath;
         link.click();
     });
