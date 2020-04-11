@@ -1,9 +1,13 @@
 ## Demo
 ![Demo](demo/demo.gif)
 ## About
-https://freeaudioconverter.net - convert an audio file to another format (high quality encoders are used) or extract the audio from a video. Many file formats are supported, click [here](https://freeaudioconverter.net/filetypes) for details. A recent addition is the ability to trim a video or audio file.
-
-I'm not a proponent of lossy-to-lossy encoding which is something that you can do with this website, but perhaps you have an audio file that you'd like to convert to a format that is more compatible with certain devices/players. The best use of this website is using it to convert a lossless (e.g. WAV, FLAC) audio file to a lossy format for space saving. Or to extract the audio from a video. Simply upload the video and select your desired audio format, and you will receive an audio-only file of your desired format when the conversion is complete.
+On https://freeaudioconverter.net, you can:
+- Convert an audio file to another format - MP3, AAC, WAV, FLAC, ALAC, CAF, Opus, Vorbis, AC3, DTS or Speex.
+- Convert a video to an audio-only file (to any of the above formats).
+- Trim a video or audio file [https://freeaudioconverter.net/file-trimmer]
+- Convert a video to the MKV format (well, container).
+## Supported filetypes
+Many filetypes are supported, click [here](https://freeaudioconverter.net/filetypes) for details. Support for other filetypes may be added, feel free to [contact me](https://freeaudioconverter.net/contact) to enquire. 
 ## About me
 I'm a 24-year-old from the UK. This website is a personal project of mine which I started working on in 2019. Over time I've added features and it's been a continual work-in-progress. I've been into audio for several years, and in case you didn't notice, my username is another way of saying "bass that hurts".
 ## Technologies and encoders used:
