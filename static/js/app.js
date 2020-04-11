@@ -157,7 +157,7 @@ function upload_and_convert() {
             convert_file(chosen_file.name);
         }
          else if (request.status == 415) {
-            show_alert('Incompatible filetype selected. Click <a href="http://onlineaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
+            show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
         }
         else {
             show_alert("Error uploading file.", "danger");

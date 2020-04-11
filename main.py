@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, send_from_directory, make_response, jsonify
 from flask_socketio import SocketIO, emit
 from datetime import datetime, timedelta
-import logging, time, os
 from werkzeug.utils import secure_filename
+import logging, os
 import converter
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -10,11 +10,13 @@ import smtplib
 from confidential import *
 
 app = Flask(__name__)
-socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000 * 1000 # 5 GB max upload size.
+app.jinja_env.auto_reload = True
 
-log_format = '[%(levelname)s] %(message)s'
+socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
+
+log_format = '%(levelname)s | %(message)s'
 logging.basicConfig(filename='PythonLogs.txt', format=log_format, level=logging.DEBUG)
 logger = logging.getLogger()
 
@@ -37,12 +39,11 @@ def read_progress():
                 break
             # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop
             previous_time = current_time
-
             progress_message = current_time + " [HH:MM:SS]" + " of the file has been converted so far..."
             logger.info(progress_message)
             # Trigger a new event called "show progress" 
             socketio.emit('show progress', {'progress': progress_message})
-            time.sleep(1)
+            socketio.sleep(1)
 
 @socketio.on('my event') # Decorator to catch an event called "my event".
 def test_connect(): # test_connect() is the event callback function.
@@ -112,7 +113,9 @@ def main():
             file_name = request.form["file_name"]
             chosen_file = os.path.join("uploads", secure_filename(file_name))
             chosen_codec = request.form["chosen_codec"]
+
             # Put the JavaSript FormData into appropriately-named variables:
+            
             mp3_encoding_type = request.form["mp3_encoding_type"]
             cbr_abr_bitrate = request.form["cbr_abr_bitrate"]
             mp3_vbr_setting = request.form["mp3_vbr_setting"]
@@ -137,52 +140,57 @@ def main():
             # Opus
             opus_cbr_bitrate = request.form["opus-cbr-bitrate"]
             opus_encoding_type = request.form["opus-encoding-type"]
-            # Desired filename
-            output_name = request.form["output_name"]
             # Downmix multi-channel audio to stereo?
             is_downmix = request.form["is_downmix"]
+            # Desired filename
+            output_name = request.form["output_name"]
+
+            output_path = f'"/home/ubuntu/website/Conversions/{output_name}"'
 
             # Run the appropritate section of converter.py:
 
             if chosen_codec == 'MP3':
-                converter.run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_name, is_downmix)
+                converter.run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_name, is_downmix, output_path)
                 extension = 'mp3'
             elif chosen_codec == 'AAC':
-                converter.run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, output_name, is_downmix, is_fdk_lowpass, fdk_lowpass)
+                converter.run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, output_name, is_downmix, is_fdk_lowpass, fdk_lowpass, output_path)
                 extension = 'm4a'
             elif chosen_codec == 'Opus':
-                converter.run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_name, is_downmix)
+                converter.run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_name, is_downmix, output_path)
                 extension = 'opus'                                                                     
             elif chosen_codec == 'FLAC':
-                converter.run_flac(chosen_file, flac_compression, output_name, is_downmix)
+                converter.run_flac(chosen_file, flac_compression, output_name, is_downmix, output_path)
                 extension = 'flac'
             elif chosen_codec == 'Vorbis':
-                converter.run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, output_name, is_downmix) 
+                converter.run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, output_name, is_downmix, output_path) 
                 extension = 'ogg'
             elif chosen_codec == 'WAV':
-                converter.run_wav(chosen_file, output_name, is_downmix)
+                converter.run_wav(chosen_file, output_name, is_downmix, output_path)
                 extension = 'wav'
             elif chosen_codec == 'MKV':
-                converter.run_mkv(chosen_file, output_name, is_downmix)
+                converter.run_mkv(chosen_file, output_name, is_downmix, output_path)
                 extension = 'mkv'
             elif chosen_codec == 'MKA':
-                converter.run_mka(chosen_file, output_name, is_downmix)
+                converter.run_mka(chosen_file, output_name, is_downmix, output_path)
                 extension = 'mka'
             elif chosen_codec == 'ALAC':
-                converter.run_alac(chosen_file, output_name, is_downmix)
+                converter.run_alac(chosen_file, output_name, is_downmix, output_path)
                 extension = 'm4a'
             elif chosen_codec == 'AC3':
-                converter.run_ac3(chosen_file, ac3_bitrate, output_name, is_downmix)
+                converter.run_ac3(chosen_file, ac3_bitrate, output_name, is_downmix, output_path)
                 extension = 'ac3'
             elif chosen_codec == 'CAF':
-                converter.run_caf(chosen_file, output_name, is_downmix)
+                converter.run_caf(chosen_file, output_name, is_downmix, output_path)
                 extension = 'caf'
             elif chosen_codec == 'DTS':
-                converter.run_dts(chosen_file, dts_bitrate, output_name, is_downmix)
+                converter.run_dts(chosen_file, dts_bitrate, output_name, is_downmix, output_path)
                 extension = 'dts'
             else: # The chosen codec is Speex
-                converter.run_speex(chosen_file, output_name, is_downmix)
+                converter.run_speex(chosen_file, output_name, is_downmix, output_path)
                 extension = 'spx'
+
+            current_time = (datetime.now() + timedelta(hours=1)).strftime('%H:%M:%S')
+            logger.info(f'{file_name} converted at {current_time}')
 
             converted_file_name = output_name + "." + extension
            
@@ -192,14 +200,6 @@ def main():
             }), 200)
 
             return response
-
-@app.route("/download/<path:filename>", methods=["GET"])
-def download_file(filename):
-    just_extension = filename.split('.')[-1]
-    if just_extension == "m4a":
-        return send_from_directory(os.getcwd(), filename, mimetype="audio/mp4")   
-    else:
-        return send_from_directory(os.getcwd(), filename)
 
 # CONTACT PAGE
 
@@ -232,8 +232,6 @@ def contact():
 def trim_file():
 
     if request.form["request_type"] == "upload_complete":
-
-        current_datetime("File uploaded")
    
         chosen_file = request.files["chosen_file"]
 
@@ -265,7 +263,7 @@ def trim_file():
 
         os.system(f'ffmpeg -y -i "{chosen_file}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
 
-        current_datetime("Trim complete")
+        logger.info("Trim complete")
         
         response = make_response(jsonify({
             "message": "File converted. The converted file will now start downloading.",
@@ -274,15 +272,14 @@ def trim_file():
 
         return response
 
-@app.route("/download-trimmed-file/<path:filename>", methods=["GET"])
-def download_trimmed_file(filename):
-
+# Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
+@app.route("/download/<filename>", methods=["GET"])
+def download_file(filename):
     just_extension = filename.split('.')[-1]
-
     if just_extension == "m4a":
-        return send_from_directory(os.getcwd(), filename, mimetype="audio/mp4")   
+        return send_from_directory(os.getcwd() + "/Conversions", filename, mimetype="audio/mp4")   
     else:
-        return send_from_directory(os.getcwd(), filename)
-        
+        return send_from_directory(os.getcwd()+ "/Conversions", filename)
+
 if __name__ == "__main__":
     socketio.run(app)

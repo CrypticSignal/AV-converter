@@ -110,7 +110,7 @@ function trim() {
     });
 
     // Open and send the request
-    request.open("POST", "/video-trimmer");
+    request.open("POST", "/file-trimmer");
     data.append("request_type", "upload_complete");
     data.append("chosen_file", chosen_file);
     request.send(data);
@@ -128,7 +128,7 @@ function trim() {
             trim_file();
         }
          else if (request.status == 415) {
-            show_alert('Incompatible filetype selected. Click <a href="http://onlineaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
+            show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
         }
         else {
             show_alert("Error uploading file.", "danger");
@@ -176,7 +176,7 @@ function trim_file() {
     data.append("filename", inputFilename);
     data.append("start_time", startTime);
     data.append("end_time", endTime);
-    request.open("POST", "/video-trimmer");
+    request.open("POST", "/file-trimmer");
     request.send(data);
 
     request.addEventListener("load", function (e) { // "load" means when the conversionRequest is complete
@@ -191,7 +191,7 @@ function trim_file() {
         show_alert(`${request.response.message} <a href="${request.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
 
         const link = document.createElement("a"); // Create a virtual link.
-        link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename. This is not needed because as_attachment=True in main.py already specifies that the file will be downloaded.
+        link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
         link.href = request.response.downloadFilePath;
         link.click();
     });
