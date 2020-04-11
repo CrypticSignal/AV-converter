@@ -19,6 +19,6 @@ libopus 1.3.1 | https://github.com/xiph/opus
 
 libvorbis 1.3.6 | https://github.com/xiph/vorbis
 ## Contributing
-Simply submit a pull request. I will respond to all pull requests. Feel free to contact me using the [contact](https://freeaudioconverter.net/contact) section of the website if you'd like to propose an idea.
+I'm open to contributors, especially those who are familiar with video encoding with FFmpeg because a consideration that I have is adding the ability to transcode a video (under a new Flask route (/video-encoder)) to expand on what users can do on the website. Feel free to contact me using the [contact](https://freeaudioconverter.net/contact) section of the website if you have any questions.
 ## License
 Custom - see the [LICENSE](https://github.com/BassThatHertz/freeaudioconverter.net/blob/master/LICENSE) file for details.
