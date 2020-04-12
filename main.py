@@ -16,66 +16,96 @@ app.jinja_env.auto_reload = True
 
 socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
 
-log_format = '%(levelname)s | %(message)s'
-logging.basicConfig(filename='PythonLogs.txt', format=log_format, level=logging.DEBUG)
-logger = logging.getLogger()
+def setup_logger(name, log_file, level=logging.DEBUG):
+    log_format = logging.Formatter('%(message)s')
+    file_handler = logging.FileHandler(log_file)        
+    file_handler.setFormatter(log_format)
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.addHandler(file_handler)
+    return logger
 
-def current_datetime(description):
+info_logger = setup_logger('info_logger', 'Info.log')
+visit_logger = setup_logger('visit_logger', 'Visit.log')
+user_agent_logger = setup_logger('user_agent_logger', 'UserAgent.log')
+socket_logger = setup_logger('socket_logger', 'Socket.log')
+
+# Info.log
+def log_this(message):
+    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
     client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y (%H:%M:%S)')
-    logger.info(f'{client} {description} at {current_datetime}')
+    info_logger.info(f'{current_datetime} | {client} {message}')
+
+# Visit.log
+def log_visit(message):
+    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
+    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    visit_logger.info(f'{client} {message} on {current_datetime}')
+
+# UserAgent.log
+def log_user_agent():
+    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
+    user_agent = request.headers.get('User-Agent')
+    user_agent_logger.info(f'{current_datetime}\n{user_agent}')
+
+# Socket.log
+def log_socket(message):
+    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
+    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    socket_logger.info(f'{current_datetime} | {client} {message}.')
 
 # FFmpeg will write the conversion progress to a txt file. Read the file eery second to get the current conversion progress every second.
 def read_progress():
-    previous_time = '00:00:00'
     while True:
         with open('progress.txt', 'r') as f:
             lines = f.readlines()
-            # This gives us the amount of the file (HH:MM:SS) that has been converted so far
+            # This gives us the amount of the file (HH:MM:SS) that has been converted so far.
             current_time = lines[-5].split('=')[-1].split('.')[0]
+            info_logger.info(current_time)
             # If the amount converted is the same twice in a row, that means that the conversion is complete.
             if previous_time == current_time:
-                logger.info("Conversion complete. Progress no longer being read.")
+                info_logger.info("Conversion complete. Progress no longer being read.")
                 break
-            # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop
+            # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
             previous_time = current_time
             progress_message = current_time + " [HH:MM:SS]" + " of the file has been converted so far..."
-            logger.info(progress_message)
+            info_logger.info(progress_message)
             # Trigger a new event called "show progress" 
             socketio.emit('show progress', {'progress': progress_message})
             socketio.sleep(1)
 
-@socketio.on('my event') # Decorator to catch an event called "my event".
+@socketio.on('my event') # Decorator to catch an event called "my event"
 def test_connect(): # test_connect() is the event callback function.
-    current_datetime("connected")
+    log_socket("disconected")
 
 @socketio.on('disconnect')
 def test_disconnect():
-    current_datetime("disconnected")
+    log_socket("connected")
 
 @app.route("/")
 def homepage():
-    current_datetime("visited homepage")
+    log_visit("visited homepage")
+    log_user_agent()
     return render_template("home.html", title="FreeAudioConverter.net")
 
 @app.route("/about", methods=["GET", "POST"])
 def about():
-    current_datetime("visited about page")
+    log_visit("visited about page")
     return render_template("about.html", title="About")
 
 @app.route("/filetypes")
 def filetypes():
-    current_datetime("visited filetypes")
+    log_visit("visited filetypes")
     return render_template("filetypes.html", title="Filetypes")
 
 @app.route("/file-trimmer")
 def trimmer():
-    current_datetime("visited trimmer")
+    log_visit("visited trimmer")
     return render_template("trimmer.html", title="File Trimmer")
 
 @app.route("/game")
 def game():
-    current_datetime("visited game")  
+    log_visit("visited game")  
     return render_template("game.html", title="Game")
 
 allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf", "mov"]
@@ -104,10 +134,12 @@ def main():
 
         try:
             socketio.start_background_task(read_progress)
-            logger.info("Started progress reader.")
 
         except Exception as error:
-            logger.error(error)
+            info_logger.error(f'start_background_task error: {error}')
+
+        else:
+            info_logger.info("Started progress reader.")
 
         finally:
             file_name = request.form["file_name"]
@@ -115,7 +147,8 @@ def main():
             chosen_codec = request.form["chosen_codec"]
 
             # Put the JavaSript FormData into appropriately-named variables:
-            
+
+            # MP3
             mp3_encoding_type = request.form["mp3_encoding_type"]
             cbr_abr_bitrate = request.form["cbr_abr_bitrate"]
             mp3_vbr_setting = request.form["mp3_vbr_setting"]
@@ -144,6 +177,9 @@ def main():
             is_downmix = request.form["is_downmix"]
             # Desired filename
             output_name = request.form["output_name"]
+
+            log_this(f'Wants to convert "{file_name}" to {chosen_codec}.')
+            info_logger.info(f'OUTPUT NAME: {output_name}')
 
             output_path = f'"/home/ubuntu/website/Conversions/{output_name}"'
 
@@ -189,9 +225,6 @@ def main():
                 converter.run_speex(chosen_file, output_name, is_downmix, output_path)
                 extension = 'spx'
 
-            current_time = (datetime.now() + timedelta(hours=1)).strftime('%H:%M:%S')
-            logger.info(f'{file_name} converted at {current_time}')
-
             converted_file_name = output_name + "." + extension
            
             response = make_response(jsonify({
@@ -223,7 +256,7 @@ def contact():
         server.sendmail(send_from, send_to, text)
         return make_response("Message sent!", 200)
     else:
-        current_datetime("visited contact page")
+        log_this("visited contact page")
         return render_template("contact.html", title="Contact")
 
 # FILE TRIMMER
@@ -261,10 +294,13 @@ def trim_file():
         just_name = filename.split(".")[0]
         output_name = just_name + " [trimmed]" + ext
 
-        os.system(f'ffmpeg -y -i "{chosen_file}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
+        try:
+            os.system(f'ffmpeg -y -i "{chosen_file}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
+        except Exception as error:
+            info_logger.error(f'TRIM ERROR: {error}')
+        else:
+            info_logger.info('Trim complete.')
 
-        logger.info("Trim complete")
-        
         response = make_response(jsonify({
             "message": "File converted. The converted file will now start downloading.",
             "downloadFilePath": 'download/' + output_name
@@ -276,10 +312,16 @@ def trim_file():
 @app.route("/download/<filename>", methods=["GET"])
 def download_file(filename):
     just_extension = filename.split('.')[-1]
-    if just_extension == "m4a":
-        return send_from_directory(os.getcwd() + "/Conversions", filename, mimetype="audio/mp4")   
+    try:
+        if just_extension == "m4a":
+            info_logger.info('Sending file to user...')
+            return send_from_directory(os.getcwd() + "/Conversions", filename, mimetype="audio/mp4")
+        else:
+            return send_from_directory(os.getcwd()+ "/Conversions", filename)
+    except Exception as error:
+        info_logger.error(error)
     else:
-        return send_from_directory(os.getcwd()+ "/Conversions", filename)
+        info_logger.info("File sent.")
 
 if __name__ == "__main__":
     socketio.run(app)

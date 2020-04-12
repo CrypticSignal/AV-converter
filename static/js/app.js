@@ -36,8 +36,14 @@ function updateBoxes() {
     outputNameBox.value = defaultOutputName; // Put the formatted filename into the textbox.
 }
 
+
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_convert() {
+
+    if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&')) {
+        show_alert('Output name cannot contain any of the following characters: "/?*><|:', "danger");
+        return;
+    }
 
     // Show an error if no filename selected or if filename input is empty.
     if (!input.value && document.getElementById("output_name").value == '') {
