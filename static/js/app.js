@@ -84,7 +84,7 @@ function upload_and_convert() {
 
     allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 
-    if (!allowedFiletypes.includes(fileExt)) {
+    if (!allowed_filetypes.includes(fileExt)) {
         show_alert("Incompatible filetype selected.", "danger")
         return;
     }

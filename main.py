@@ -118,7 +118,7 @@ def main():
     if request.form["requestType"] == "uploaded":
 
         chosen_file = request.files["chosen_file"]
-        
+
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
@@ -179,7 +179,7 @@ def main():
             log_this(f'Wants to convert "{file_name}" to {chosen_codec}.')
             info_logger.info(f'OUTPUT NAME: {output_name}')
 
-            output_path = f'"/home/ubuntu/website/Conversions/{output_name}"'
+            output_path = f'"/home/ubuntu/website/conversions/{output_name}"'
 
             # Run the appropritate section of converter.py:
 
