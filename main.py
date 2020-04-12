@@ -56,20 +56,24 @@ def log_socket(message):
 
 # FFmpeg will write the conversion progress to a txt file. Read the file eery second to get the current conversion progress every second.
 def read_progress():
+    previous_time = '00:00:00'
     while True:
         with open('progress.txt', 'r') as f:
             lines = f.readlines()
             # This gives us the amount of the file (HH:MM:SS) that has been converted so far.
             current_time = lines[-5].split('=')[-1].split('.')[0]
-            info_logger.info(current_time)
+
             # If the amount converted is the same twice in a row, that means that the conversion is complete.
             if previous_time == current_time:
                 info_logger.info("Conversion complete. Progress no longer being read.")
                 break
+
             # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
             previous_time = current_time
-            progress_message = current_time + " [HH:MM:SS]" + " of the file has been converted so far..."
+
+            progress_message = f'{current_time} [HH:MM:SS] of the file has been converted so far...'
             info_logger.info(progress_message)
+
             # Trigger a new event called "show progress" 
             socketio.emit('show progress', {'progress': progress_message})
             socketio.sleep(1)
