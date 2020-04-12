@@ -112,19 +112,13 @@ def game():
     log_visit("visited game")  
     return render_template("game.html", title="Game")
 
-allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf", "mov"]
-
 @app.route("/", methods=["POST"])
 def main():
 
     if request.form["requestType"] == "uploaded":
 
         chosen_file = request.files["chosen_file"]
-        extension = (chosen_file.filename).split(".")[-1]
-
-        if extension not in allowed_filetypes:
-            return make_response(jsonify({"message": "Incompatible filetype selected."}), 415)
-
+        
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
@@ -319,9 +313,9 @@ def download_file(filename):
     try:
         if just_extension == "m4a":
             info_logger.info('Sending file to user...')
-            return send_from_directory(os.getcwd() + "/Conversions", filename, mimetype="audio/mp4")
+            return send_from_directory(os.getcwd() + "/conversions", filename, mimetype="audio/mp4")
         else:
-            return send_from_directory(os.getcwd()+ "/Conversions", filename)
+            return send_from_directory(os.getcwd()+ "/conversions", filename)
     except Exception as error:
         info_logger.error(error)
     else:

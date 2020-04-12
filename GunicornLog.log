@@ -1,262 +1,0 @@
-[2020-04-12 16:33:53 +0000] [12487] [INFO] Starting gunicorn 20.0.4
-[2020-04-12 16:33:53 +0000] [12487] [INFO] Listening at: http://127.0.0.1:8000 (12487)
-[2020-04-12 16:33:53 +0000] [12487] [INFO] Using worker: threads
-[2020-04-12 16:33:53 +0000] [12509] [INFO] Booting worker with pid: 12509
-Input #0, ogg, from 'uploads/Michael_Miller_ft._Eloy__Mamie_-_Choosin.opus':
-  Duration: 00:03:16.39, start: 0.007500, bitrate: 141 kb/s
-    Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavf58.20.100
-Stream mapping:
-  Stream #0:0 -> #0:0 (opus (native) -> pcm_s16le (native))
-Press [q] to stop, [?] for help
-Output #0, wav, to 'pipe:':
-  Metadata:
-    ISFT            : Lavf58.29.100
-    Stream #0:0(eng): Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
-    Metadata:
-      encoder         : Lavc58.54.100 pcm_s16le
-size=    2331kB time=00:00:12.43 bitrate=1536.1kbits/s speed=24.9x    size=    4645kB time=00:00:24.77 bitrate=1536.0kbits/s speed=24.8x    size=    6970kB time=00:00:37.17 bitrate=1536.0kbits/s speed=24.8x    size=    9310kB time=00:00:49.65 bitrate=1536.0kbits/s speed=24.8x    size=   11549kB time=00:01:01.59 bitrate=1536.0kbits/s speed=24.6x    size=   13866kB time=00:01:13.95 bitrate=1536.0kbits/s speed=24.6x    size=   16176kB time=00:01:26.27 bitrate=1536.0kbits/s speed=24.6x    size=   18423kB time=00:01:38.25 bitrate=1536.0kbits/s speed=24.5x    size=   20710kB time=00:01:50.45 bitrate=1536.0kbits/s speed=24.5x    size=   23035kB time=00:02:02.85 bitrate=1536.0kbits/s speed=24.5x    size=   25435kB time=00:02:15.65 bitrate=1536.0kbits/s speed=24.6x    size=   27891kB time=00:02:28.75 bitrate=1536.0kbits/s speed=24.8x    size=   30333kB time=00:02:41.77 bitrate=1536.0kbits/s speed=24.9x    size=   32763kB time=00:02:54.73 bitrate=1536.0kbits/s speed=24.9x    size=   34983kB time=00:03:06.57 bitrate=1536.0kbits/s speed=24.9x    size=   36820kB time=00:03:16.37 bitrate=1536.0kbits/s speed=24.9x    
-video:0kB audio:36820kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000207%
-LAME 3.100 64bits (http://lame.sf.net)
-Using polyphase lowpass filter, transition band: 19548 Hz - 20129 Hz
-Encoding <stdin>
-      to /home/ubuntu/website/Conversions/Michael Miller (ft. Eloy & Mamie) - Choosin'.mp3
-Encoding as 48 kHz j-stereo MPEG-1 Layer III (6x) average 256 kbps qval=3
-[2020-04-12 16:47:00 +0000] [12487] [INFO] Handling signal: term
-[2020-04-12 16:47:30 +0000] [12509] [INFO] Worker exiting (pid: 12509)
-Exception in thread Thread-2:
-Traceback (most recent call last):
-  File "/usr/lib/python3.6/threading.py", line 916, in _bootstrap_inner
-    self.run()
-  File "/usr/lib/python3.6/threading.py", line 864, in run
-    self._target(*self._args, **self._kwargs)
-  File "/home/ubuntu/website/main.py", line 67, in read_progress
-    if previous_time == current_time:
-UnboundLocalError: local variable 'previous_time' referenced before assignment
-
-[2020-04-12 16:47:30 +0000] [12487] [INFO] Shutting down: Master
-[2020-04-12 16:47:31 +0000] [12920] [INFO] Starting gunicorn 20.0.4
-[2020-04-12 16:47:31 +0000] [12920] [INFO] Listening at: http://127.0.0.1:8000 (12920)
-[2020-04-12 16:47:31 +0000] [12920] [INFO] Using worker: threads
-[2020-04-12 16:47:31 +0000] [12941] [INFO] Booting worker with pid: 12941
-Input #0, ogg, from 'uploads/Michael_Miller_ft._Eloy__Mamie_-_Choosin.opus':
-  Duration: 00:03:16.39, start: 0.007500, bitrate: 141 kb/s
-    Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavf58.20.100
-Stream mapping:
-  Stream #0:0 -> #0:0 (opus (native) -> pcm_s16le (native))
-Press [q] to stop, [?] for help
-Output #0, wav, to 'pipe:':
-  Metadata:
-    ISFT            : Lavf58.29.100
-    Stream #0:0(eng): Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
-    Metadata:
-      encoder         : Lavc58.54.100 pcm_s16le
-size=    2316kB time=00:00:12.35 bitrate=1536.1kbits/s speed=24.7x    size=    4574kB time=00:00:24.39 bitrate=1536.0kbits/s speed=24.4x    size=    6884kB time=00:00:36.71 bitrate=1536.0kbits/s speed=24.4x    size=    9186kB time=00:00:48.99 bitrate=1536.0kbits/s speed=24.5x    size=   11440kB time=00:01:01.01 bitrate=1536.0kbits/s speed=24.4x    size=   13686kB time=00:01:12.99 bitrate=1536.0kbits/s speed=24.3x    size=   15963kB time=00:01:25.13 bitrate=1536.0kbits/s speed=24.3x    size=   18201kB time=00:01:37.07 bitrate=1536.0kbits/s speed=24.3x    size=   20463kB time=00:01:49.13 bitrate=1536.0kbits/s speed=24.2x    size=   22709kB time=00:02:01.11 bitrate=1536.0kbits/s speed=24.2x    size=   25038kB time=00:02:13.53 bitrate=1536.0kbits/s speed=24.3x    size=   27415kB time=00:02:26.21 bitrate=1536.0kbits/s speed=24.4x    size=   29875kB time=00:02:39.33 bitrate=1536.0kbits/s speed=24.5x    size=   32260kB time=00:02:52.05 bitrate=1536.0kbits/s speed=24.6x    size=   34491kB time=00:03:03.95 bitrate=1536.0kbits/s speed=24.5x    size=   36820kB time=00:03:16.37 bitrate=1536.0kbits/s speed=24.5x    
-video:0kB audio:36820kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000207%
-LAME 3.100 64bits (http://lame.sf.net)
-Using polyphase lowpass filter, transition band: 19548 Hz - 20129 Hz
-Encoding <stdin>
-      to /home/ubuntu/website/Conversions/Michael Miller (ft. Eloy & Mamie) - Choosin'.mp3
-Encoding as 48 kHz j-stereo MPEG-1 Layer III (6x) average 256 kbps qval=3
-[2020-04-12 16:49:14 +0000] [12920] [INFO] Handling signal: term
-[2020-04-12 16:49:14 +0000] [12941] [INFO] Worker exiting (pid: 12941)
-[2020-04-12 16:49:14 +0000] [12920] [INFO] Shutting down: Master
-[2020-04-12 16:49:15 +0000] [13057] [INFO] Starting gunicorn 20.0.4
-[2020-04-12 16:49:15 +0000] [13057] [INFO] Listening at: http://127.0.0.1:8000 (13057)
-[2020-04-12 16:49:15 +0000] [13057] [INFO] Using worker: threads
-[2020-04-12 16:49:15 +0000] [13078] [INFO] Booting worker with pid: 13078
-Input #0, ogg, from 'uploads/Michael_Miller_ft._Eloy__Mamie_-_Choosin.opus':
-  Duration: 00:03:16.39, start: 0.007500, bitrate: 141 kb/s
-    Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavf58.20.100
-Stream mapping:
-  Stream #0:0 -> #0:0 (opus (native) -> pcm_s16le (native))
-Press [q] to stop, [?] for help
-Output #0, wav, to 'pipe:':
-  Metadata:
-    ISFT            : Lavf58.29.100
-    Stream #0:0(eng): Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
-    Metadata:
-      encoder         : Lavc58.54.100 pcm_s16le
-size=    2301kB time=00:00:12.27 bitrate=1536.1kbits/s speed=24.5x    size=    4611kB time=00:00:24.59 bitrate=1536.0kbits/s speed=24.6x    size=    6903kB time=00:00:36.81 bitrate=1536.0kbits/s speed=24.5x    size=    9243kB time=00:00:49.29 bitrate=1536.0kbits/s speed=24.6x    size=   11316kB time=00:01:00.35 bitrate=1536.0kbits/s speed=24.1x    size=   13518kB time=00:01:12.09 bitrate=1536.0kbits/s speed=  24x    size=   15805kB time=00:01:24.29 bitrate=1536.0kbits/s speed=24.1x    size=   18074kB time=00:01:36.39 bitrate=1536.0kbits/s speed=24.1x    size=   20354kB time=00:01:48.55 bitrate=1536.0kbits/s speed=24.1x    size=   22664kB time=00:02:00.87 bitrate=1536.0kbits/s speed=24.1x    size=   25026kB time=00:02:13.47 bitrate=1536.0kbits/s speed=24.2x    size=   27381kB time=00:02:26.03 bitrate=1536.0kbits/s speed=24.3x    size=   29875kB time=00:02:39.33 bitrate=1536.0kbits/s speed=24.5x    size=   32313kB time=00:02:52.33 bitrate=1536.0kbits/s speed=24.6x    size=   34409kB time=00:03:03.51 bitrate=1536.0kbits/s speed=24.4x    size=   36813kB time=00:03:16.33 bitrate=1536.0kbits/s speed=24.5x    size=   36820kB time=00:03:16.37 bitrate=1536.0kbits/s speed=24.5x    
-video:0kB audio:36820kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000207%
-LAME 3.100 64bits (http://lame.sf.net)
-Using polyphase lowpass filter, transition band: 19548 Hz - 20129 Hz
-Encoding <stdin>
-      to /home/ubuntu/website/Conversions/Michael Miller (ft. Eloy & Mamie) - Choosin'.mp3
-Encoding as 48 kHz j-stereo MPEG-1 Layer III (6x) average 256 kbps qval=3
-Input #0, ogg, from 'uploads/Michael_Miller_ft._Eloy__Mamie_-_Choosin.opus':
-  Duration: 00:03:16.39, start: 0.007500, bitrate: 141 kb/s
-    Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavf58.20.100
-Stream mapping:
-  Stream #0:0 -> #0:0 (opus (native) -> pcm_s16le (native))
-Press [q] to stop, [?] for help
-Output #0, wav, to 'pipe:':
-  Metadata:
-    ISFT            : Lavf58.29.100
-    Stream #0:0(eng): Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
-    Metadata:
-      encoder         : Lavc58.54.100 pcm_s16le
-size=    2324kB time=00:00:12.39 bitrate=1536.1kbits/s speed=24.8x    size=    4653kB time=00:00:24.81 bitrate=1536.0kbits/s speed=24.8x    size=    6783kB time=00:00:36.17 bitrate=1536.0kbits/s speed=24.1x    size=    9111kB time=00:00:48.59 bitrate=1536.0kbits/s speed=24.3x    size=   11358kB time=00:01:00.57 bitrate=1536.0kbits/s speed=24.2x    size=   13653kB time=00:01:12.81 bitrate=1536.0kbits/s speed=24.3x    size=   15940kB time=00:01:25.01 bitrate=1536.0kbits/s speed=24.3x    size=   18171kB time=00:01:36.91 bitrate=1536.0kbits/s speed=24.2x    size=   20485kB time=00:01:49.25 bitrate=1536.0kbits/s speed=24.3x    size=   22810kB time=00:02:01.65 bitrate=1536.0kbits/s speed=24.3x    size=   25203kB time=00:02:14.41 bitrate=1536.0kbits/s speed=24.4x    size=   27554kB time=00:02:26.95 bitrate=1536.0kbits/s speed=24.5x    size=   29860kB time=00:02:39.25 bitrate=1536.0kbits/s speed=24.5x    size=   32294kB time=00:02:52.23 bitrate=1536.0kbits/s speed=24.6x    size=   34443kB time=00:03:03.69 bitrate=1536.0kbits/s speed=24.5x    size=   36820kB time=00:03:16.37 bitrate=1536.0kbits/s speed=24.5x    
-video:0kB audio:36820kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000207%
-LAME 3.100 64bits (http://lame.sf.net)
-Using polyphase lowpass filter, transition band: 19548 Hz - 20129 Hz
-Encoding <stdin>
-      to /home/ubuntu/website/Conversions/Michael Miller (ft. Eloy & Mamie) - Choosin'.mp3
-Encoding as 48 kHz j-stereo MPEG-1 Layer III (6x) average 256 kbps qval=3
-[2020-04-12 16:52:31 +0000] [13057] [INFO] Handling signal: term
-[2020-04-12 16:53:01 +0000] [13078] [INFO] Worker exiting (pid: 13078)
-Exception in thread Thread-2:
-Traceback (most recent call last):
-  File "/usr/lib/python3.6/threading.py", line 916, in _bootstrap_inner
-    self.run()
-  File "/usr/lib/python3.6/threading.py", line 864, in run
-    self._target(*self._args, **self._kwargs)
-  File "/home/ubuntu/website/main.py", line 67, in read_progress
-    if previous_time == current_time:
-UnboundLocalError: local variable 'previous_time' referenced before assignment
-
-Exception in thread Thread-3:
-Traceback (most recent call last):
-  File "/usr/lib/python3.6/threading.py", line 916, in _bootstrap_inner
-    self.run()
-  File "/usr/lib/python3.6/threading.py", line 864, in run
-    self._target(*self._args, **self._kwargs)
-  File "/home/ubuntu/website/main.py", line 67, in read_progress
-    if previous_time == current_time:
-UnboundLocalError: local variable 'previous_time' referenced before assignment
-
-[2020-04-12 16:53:01 +0000] [13057] [INFO] Shutting down: Master
-[2020-04-12 16:53:02 +0000] [13268] [INFO] Starting gunicorn 20.0.4
-[2020-04-12 16:53:02 +0000] [13268] [INFO] Listening at: http://127.0.0.1:8000 (13268)
-[2020-04-12 16:53:02 +0000] [13268] [INFO] Using worker: threads
-[2020-04-12 16:53:02 +0000] [13291] [INFO] Booting worker with pid: 13291
-Input #0, ogg, from 'uploads/Michael_Miller_ft._Eloy__Mamie_-_Choosin.opus':
-  Duration: 00:03:16.39, start: 0.007500, bitrate: 141 kb/s
-    Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavf58.20.100
-Stream mapping:
-  Stream #0:0 -> #0:0 (opus (native) -> pcm_s16le (native))
-Press [q] to stop, [?] for help
-Output #0, wav, to 'pipe:':
-  Metadata:
-    ISFT            : Lavf58.29.100
-    Stream #0:0(eng): Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
-    Metadata:
-      encoder         : Lavc58.54.100 pcm_s16le
-size=    2316kB time=00:00:12.35 bitrate=1536.1kbits/s speed=24.7x    size=    4653kB time=00:00:24.81 bitrate=1536.0kbits/s speed=24.8x    size=    7004kB time=00:00:37.35 bitrate=1536.0kbits/s speed=24.9x    size=    9370kB time=00:00:49.97 bitrate=1536.0kbits/s speed=24.9x    size=   11725kB time=00:01:02.53 bitrate=1536.0kbits/s speed=24.9x    size=   14046kB time=00:01:14.91 bitrate=1536.0kbits/s speed=24.9x    size=   16405kB time=00:01:27.49 bitrate=1536.0kbits/s speed=24.9x    size=   18738kB time=00:01:39.93 bitrate=1536.0kbits/s speed=24.9x    size=   21115kB time=00:01:52.61 bitrate=1536.0kbits/s speed=  25x    size=   23459kB time=00:02:05.11 bitrate=1536.0kbits/s speed=  25x    size=   25949kB time=00:02:18.39 bitrate=1536.0kbits/s speed=25.1x    size=   28506kB time=00:02:32.03 bitrate=1536.0kbits/s speed=25.3x    size=   31098kB time=00:02:45.85 bitrate=1536.0kbits/s speed=25.5x    size=   33580kB time=00:02:59.09 bitrate=1536.0kbits/s speed=25.5x    size=   35969kB time=00:03:11.83 bitrate=1536.0kbits/s speed=25.5x    size=   36820kB time=00:03:16.37 bitrate=1536.0kbits/s speed=25.6x    
-video:0kB audio:36820kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000207%
-LAME 3.100 64bits (http://lame.sf.net)
-Using polyphase lowpass filter, transition band: 18774 Hz - 19355 Hz
-Encoding <stdin>
-      to /home/ubuntu/website/Conversions/Michael Miller (ft. Eloy & Mamie) - Choosin'.mp3
-Encoding as 48 kHz j-stereo MPEG-1 Layer III (8x) average 192 kbps qval=3
-[2020-04-12 16:54:54 +0000] [13291] [ERROR] Error handling request /socket.io/?EIO=3&transport=polling&t=1586710491492-78&sid=026aff7f75ac4f0cab7157612584a6ab
-Traceback (most recent call last):
-  File "/home/ubuntu/.local/lib/python3.6/site-packages/gunicorn/workers/gthread.py", line 271, in handle
-    keepalive = self.handle_request(req, conn)
-  File "/home/ubuntu/.local/lib/python3.6/site-packages/gunicorn/workers/gthread.py", line 320, in handle_request
-    respiter = self.wsgi(environ, resp.start_response)
-  File "/home/ubuntu/.local/lib/python3.6/site-packages/flask/app.py", line 2463, in __call__
-    return self.wsgi_app(environ, start_response)
-  File "/home/ubuntu/.local/lib/python3.6/site-packages/flask_socketio/__init__.py", line 46, in __call__
-    start_response)
-  File "/home/ubuntu/.local/lib/python3.6/site-packages/engineio/middleware.py", line 60, in __call__
-    return self.engineio_app.handle_request(environ, start_response)
-  File "/home/ubuntu/.local/lib/python3.6/site-packages/socketio/server.py", line 534, in handle_request
-    return self.eio.handle_request(environ, start_response)
-  File "/home/ubuntu/.local/lib/python3.6/site-packages/engineio/server.py", line 373, in handle_request
-    socket = self._get_socket(sid)
-  File "/home/ubuntu/.local/lib/python3.6/site-packages/engineio/server.py", line 561, in _get_socket
-    raise KeyError('Session is disconnected')
-KeyError: 'Session is disconnected'
-[2020-04-12 17:00:55 +0000] [13268] [INFO] Handling signal: term
-[2020-04-12 17:00:55 +0000] [13291] [INFO] Worker exiting (pid: 13291)
-[2020-04-12 17:00:55 +0000] [13268] [INFO] Shutting down: Master
-[2020-04-12 17:00:56 +0000] [13808] [INFO] Starting gunicorn 20.0.4
-[2020-04-12 17:00:56 +0000] [13808] [INFO] Listening at: http://127.0.0.1:8000 (13808)
-[2020-04-12 17:00:56 +0000] [13808] [INFO] Using worker: threads
-[2020-04-12 17:00:56 +0000] [13828] [INFO] Booting worker with pid: 13828
-Input #0, ogg, from 'uploads/Michael_Miller_ft._Eloy__Mamie_-_Choosin.opus':
-  Duration: 00:03:16.39, start: 0.007500, bitrate: 141 kb/s
-    Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavf58.20.100
-Stream mapping:
-  Stream #0:0 -> #0:0 (opus (native) -> pcm_s16le (native))
-Press [q] to stop, [?] for help
-Output #0, wav, to 'pipe:':
-  Metadata:
-    ISFT            : Lavf58.29.100
-    Stream #0:0(eng): Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
-    Metadata:
-      encoder         : Lavc58.54.100 pcm_s16le
-size=    2223kB time=00:00:11.85 bitrate=1536.1kbits/s speed=23.7x    size=    4473kB time=00:00:23.85 bitrate=1536.0kbits/s speed=23.8x    size=    6786kB time=00:00:36.19 bitrate=1536.0kbits/s speed=24.1x    size=    9081kB time=00:00:48.43 bitrate=1536.0kbits/s speed=24.2x    size=   11335kB time=00:01:00.45 bitrate=1536.0kbits/s speed=24.2x    size=   13551kB time=00:01:12.27 bitrate=1536.0kbits/s speed=24.1x    size=   15809kB time=00:01:24.31 bitrate=1536.0kbits/s speed=24.1x    size=   18040kB time=00:01:36.21 bitrate=1536.0kbits/s speed=  24x    size=   20331kB time=00:01:48.43 bitrate=1536.0kbits/s speed=24.1x    size=   22525kB time=00:02:00.13 bitrate=1536.0kbits/s speed=  24x    size=   24700kB time=00:02:11.73 bitrate=1536.0kbits/s speed=23.9x    size=   27096kB time=00:02:24.51 bitrate=1536.0kbits/s speed=24.1x    size=   29541kB time=00:02:37.55 bitrate=1536.0kbits/s speed=24.2x    size=   31953kB time=00:02:50.41 bitrate=1536.0kbits/s speed=24.3x    size=   34206kB time=00:03:02.43 bitrate=1536.0kbits/s speed=24.3x    size=   36505kB time=00:03:14.69 bitrate=1536.0kbits/s speed=24.3x    size=   36820kB time=00:03:16.37 bitrate=1536.0kbits/s speed=24.3x    
-video:0kB audio:36820kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000207%
-LAME 3.100 64bits (http://lame.sf.net)
-Using polyphase lowpass filter, transition band: 19548 Hz - 20129 Hz
-Encoding <stdin>
-      to /home/ubuntu/website/Conversions/Michael Miller (ft. Eloy & Mamie) - Choosin'.mp3
-Encoding as 48 kHz j-stereo MPEG-1 Layer III (6x) average 256 kbps qval=3
-[2020-04-12 17:02:03 +0000] [13808] [INFO] Handling signal: term
-[2020-04-12 17:02:04 +0000] [13828] [INFO] Worker exiting (pid: 13828)
-[2020-04-12 17:02:04 +0000] [13808] [INFO] Shutting down: Master
-[2020-04-12 17:02:04 +0000] [13965] [INFO] Starting gunicorn 20.0.4
-[2020-04-12 17:02:04 +0000] [13965] [INFO] Listening at: http://127.0.0.1:8000 (13965)
-[2020-04-12 17:02:04 +0000] [13965] [INFO] Using worker: threads
-[2020-04-12 17:02:04 +0000] [13986] [INFO] Booting worker with pid: 13986
-Input #0, ogg, from 'uploads/Michael_Miller_ft._Eloy__Mamie_-_Choosin.opus':
-  Duration: 00:03:16.39, start: 0.007500, bitrate: 141 kb/s
-    Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavf58.20.100
-Stream mapping:
-  Stream #0:0 -> #0:0 (opus (native) -> pcm_s16le (native))
-Press [q] to stop, [?] for help
-Output #0, wav, to 'pipe:':
-  Metadata:
-    ISFT            : Lavf58.29.100
-    Stream #0:0(eng): Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
-    Metadata:
-      encoder         : Lavc58.54.100 pcm_s16le
-size=    2313kB time=00:00:12.33 bitrate=1536.1kbits/s speed=24.7x    size=    4596kB time=00:00:24.51 bitrate=1536.0kbits/s speed=24.5x    size=    6861kB time=00:00:36.59 bitrate=1536.0kbits/s speed=24.4x    size=    9186kB time=00:00:48.99 bitrate=1536.0kbits/s speed=24.5x    size=   11350kB time=00:01:00.53 bitrate=1536.0kbits/s speed=24.2x    size=   13540kB time=00:01:12.21 bitrate=1536.0kbits/s speed=  24x    size=   15824kB time=00:01:24.39 bitrate=1536.0kbits/s speed=24.1x    size=   18093kB time=00:01:36.49 bitrate=1536.0kbits/s speed=24.1x    size=   20380kB time=00:01:48.69 bitrate=1536.0kbits/s speed=24.1x    size=   22683kB time=00:02:00.97 bitrate=1536.0kbits/s speed=24.2x    size=   24993kB time=00:02:13.29 bitrate=1536.0kbits/s speed=24.2x    size=   27408kB time=00:02:26.17 bitrate=1536.0kbits/s speed=24.3x    size=   29886kB time=00:02:39.39 bitrate=1536.0kbits/s speed=24.5x    size=   32313kB time=00:02:52.33 bitrate=1536.0kbits/s speed=24.6x    size=   34551kB time=00:03:04.27 bitrate=1536.0kbits/s speed=24.5x    size=   36820kB time=00:03:16.37 bitrate=1536.0kbits/s speed=24.6x    
-video:0kB audio:36820kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000207%
-LAME 3.100 64bits (http://lame.sf.net)
-Using polyphase lowpass filter, transition band: 19548 Hz - 20129 Hz
-Encoding <stdin>
-      to /home/ubuntu/website/Conversions/Michael Miller (ft. Eloy & Mamie) - Choosin'.mp3
-Encoding as 48 kHz j-stereo MPEG-1 Layer III (6x) average 256 kbps qval=3
-[2020-04-12 17:05:26 +0000] [13965] [INFO] Handling signal: term
-[2020-04-12 17:05:56 +0000] [13965] [INFO] Shutting down: Master
-[2020-04-12 17:05:56 +0000] [14214] [INFO] Starting gunicorn 20.0.4
-[2020-04-12 17:05:56 +0000] [14214] [INFO] Listening at: http://127.0.0.1:8000 (14214)
-[2020-04-12 17:05:56 +0000] [14214] [INFO] Using worker: threads
-[2020-04-12 17:05:56 +0000] [14237] [INFO] Booting worker with pid: 14237
-Input #0, ogg, from 'uploads/Michael_Miller_ft._Eloy__Mamie_-_Choosin.opus':
-  Duration: 00:03:16.39, start: 0.007500, bitrate: 141 kb/s
-    Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp
-    Metadata:
-      encoder         : Lavf58.20.100
-Stream mapping:
-  Stream #0:0 -> #0:0 (opus (native) -> pcm_s16le (native))
-Press [q] to stop, [?] for help
-Output #0, wav, to 'pipe:':
-  Metadata:
-    ISFT            : Lavf58.29.100
-    Stream #0:0(eng): Audio: pcm_s16le ([1][0][0][0] / 0x0001), 48000 Hz, stereo, s16, 1536 kb/s
-    Metadata:
-      encoder         : Lavc58.54.100 pcm_s16le
-size=    2316kB time=00:00:12.35 bitrate=1536.1kbits/s speed=24.7x    size=    4593kB time=00:00:24.49 bitrate=1536.0kbits/s speed=24.5x    size=    6865kB time=00:00:36.61 bitrate=1536.0kbits/s speed=24.4x    size=    9194kB time=00:00:49.03 bitrate=1536.0kbits/s speed=24.5x    size=   11474kB time=00:01:01.19 bitrate=1536.0kbits/s speed=24.5x    size=   13758kB time=00:01:13.37 bitrate=1536.0kbits/s speed=24.4x    size=   16056kB time=00:01:25.63 bitrate=1536.0kbits/s speed=24.4x    size=   18329kB time=00:01:37.75 bitrate=1536.0kbits/s speed=24.4x    size=   20609kB time=00:01:49.91 bitrate=1536.0kbits/s speed=24.4x    size=   22923kB time=00:02:02.25 bitrate=1536.0kbits/s speed=24.4x    size=   25296kB time=00:02:14.91 bitrate=1536.0kbits/s speed=24.5x    size=   27674kB time=00:02:27.59 bitrate=1536.0kbits/s speed=24.6x    size=   30149kB time=00:02:40.79 bitrate=1536.0kbits/s speed=24.7x    size=   32553kB time=00:02:53.61 bitrate=1536.0kbits/s speed=24.8x    size=   34544kB time=00:03:04.23 bitrate=1536.0kbits/s speed=24.5x    size=   36820kB time=00:03:16.37 bitrate=1536.0kbits/s speed=24.6x    
-video:0kB audio:36820kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000207%
-LAME 3.100 64bits (http://lame.sf.net)
-Using polyphase lowpass filter, transition band: 19548 Hz - 20129 Hz
-Encoding <stdin>
-      to /home/ubuntu/website/Conversions/Michael Miller (ft. Eloy & Mamie) - Choosin'.mp3
-Encoding as 48 kHz j-stereo MPEG-1 Layer III (6x) average 256 kbps qval=3

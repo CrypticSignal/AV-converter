@@ -40,7 +40,7 @@ function updateBoxes() {
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_convert() {
 
-    if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&')) {
+    if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('||')) {
         show_alert('Output name cannot contain any of the following characters: "/?*><|:', "danger");
         return;
     }
@@ -82,7 +82,7 @@ function upload_and_convert() {
     const filenameParts = filename.split('.');
     const fileExt = filenameParts[filenameParts.length - 1];
 
-    allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf"]
+    allowed_filetypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 
     if (!allowedFiletypes.includes(fileExt)) {
         show_alert("Incompatible filetype selected.", "danger")
