@@ -52,17 +52,17 @@
         <label for="mp3_encoding_type">CBR, VBR or ABR?</label>
         <select id="mp3_encoding_type" onchange="showHideMP3(this.value);">
           <option disabled value>Select encoding type</option> 
-          <option value="cbr">CBR (Constant Bitrate)</option>
+          <option selected value="cbr">CBR (Constant Bitrate)</option>
           <option value="vbr">VBR (Variable Bitrate)</option>
-          <option selected value="abr">ABR (Average Bitrate)</option>
+          <option value="abr">ABR (Average Bitrate)</option>
         </select><br>
-        <i>Click <a href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_encoder_settings" target="_blank">here</a> for recommendations. Generally, <a href="http://wiki.hydrogenaud.io/index.php?title=LAME#Remarks" target="_blank">VBR > ABR > CBR</a> in terms of quality.</i>
+        <i>Click <a href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_encoder_settings" target="_blank">here</a> for recommendations.</i>
       </div><br>
 
       <!--Bitrate slider for MP3 CBR and ABR-->
       <div id="mp3sliderdiv">
         <p>Set your desired bitrate via the slider:</p>
-        <input type="range" min="64" max="320" step="64" value="256" id="cbr_abr_bitrate" class="slider"/>
+        <input type="range" min="64" max="320" step="64" value="192" id="cbr_abr_bitrate" class="slider"/>
         <span id="mp3value"></span><br><br>
         <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
       </div>
@@ -89,7 +89,8 @@
         <label for="opt2">Yes</label>
         <input type="radio" checked="checked" name="is-y-switch" value="no">
         <label for="opt1">No</label><br>
-        <p>What the F is the Y switch? <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME_Y_SWITH">This</a> might help. Or not. It's technical stuff.</p>
+        <i>The -Y switch tells LAME not to encode the highest frequencies accurately, if doing so causes disproportional increases in bitrate.</i>
+        <i>This setting only applies if V0 to V2 is selected. V3 to V6 use the Y switch and this cannot be changed. More details <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME_Y_SWITH">here</a>.</i>
       </div>
     
     </div> <!--Closing tag for MP3 div-->
@@ -256,7 +257,7 @@
     <!--When the convert button is clicked, run the upload function-->
     <button onclick="upload_and_convert()" id="upload_btn" class="btn btn-primary">Convert</button>
   
-    <button class="btn btn-primary d-none" id="loading_btn" type="button" disabled>
+    <button class="btn btn-primary d-none" id="convert_btn" type="button" disabled>
       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
       Uploading file for conversion...
     </button>

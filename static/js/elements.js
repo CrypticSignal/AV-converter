@@ -21,7 +21,7 @@ function showHide(value) {
     if (value=='MP3') {
         document.getElementById('MP3').style.display = 'block';
         document.getElementById('mp3_encoding_div').style.display = 'block';
-        document.getElementById("mp3_encoding_type").selectedIndex = 3;
+        document.getElementById("mp3_encoding_type").selectedIndex = 1;
         document.getElementById('mp3sliderdiv').style.display = 'block';
         document.getElementById('mp3_vbr_setting_div').style.display = 'none';
         document.getElementById('y-switch-div').style.display = 'none';

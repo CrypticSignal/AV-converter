@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_from_directory, make_response, jsonify
+from flask import Flask, request, render_template, send_from_directory
 from flask_socketio import SocketIO, emit
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
@@ -60,31 +60,34 @@ def read_progress():
     while True:
         with open('progress.txt', 'r') as f:
             lines = f.readlines()
-            # This gives us the amount of the file (HH:MM:SS) that has been converted so far.
-            current_time = lines[-5].split('=')[-1].split('.')[0]
+            # This gives us the amount of the file that has been converted so far.
+            current_time = lines[-5].split('=')[-1]
 
             # If the amount converted is the same twice in a row, that means that the conversion is complete.
             if previous_time == current_time:
                 info_logger.info("Conversion complete. Progress no longer being read.")
                 break
 
-            # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
-            previous_time = current_time
+            hh_mm_ss = current_time.split('.')[0]
+            milliseconds = current_time.split('.')[-1][:-4]
 
-            progress_message = f'{current_time} [HH:MM:SS] of the file has been converted so far...'
+            progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)'
             info_logger.info(progress_message)
 
             # Trigger a new event called "show progress" 
             socketio.emit('show progress', {'progress': progress_message})
             socketio.sleep(1)
 
+            # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
+            previous_time = current_time
+
 @socketio.on('my event') # Decorator to catch an event called "my event"
 def test_connect(): # test_connect() is the event callback function.
-    log_socket("disconected")
+    log_socket("connected")
 
 @socketio.on('disconnect')
 def test_disconnect():
-    log_socket("connected")
+    log_socket("disconnected")
 
 @app.route("/")
 def homepage():
@@ -92,7 +95,7 @@ def homepage():
     log_user_agent()
     return render_template("home.html", title="FreeAudioConverter.net")
 
-@app.route("/about", methods=["GET", "POST"])
+@app.route("/about")
 def about():
     log_visit("visited about page")
     return render_template("about.html", title="About")
@@ -115,20 +118,17 @@ def game():
 @app.route("/", methods=["POST"])
 def main():
 
-    if request.form["requestType"] == "uploaded":
+    if request.form["request_type"] == "uploaded":
 
         chosen_file = request.files["chosen_file"]
-
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
         chosen_file.save(os.path.join("uploads", filename_secure))
 
-        response = make_response(jsonify({"message": "File uploaded. Converting..."}), 200)
+        return ''
 
-        return response
-
-    if request.form["requestType"] == "convert":
+    if request.form["request_type"] == "convert":
 
         try:
             socketio.start_background_task(read_progress)
@@ -169,8 +169,8 @@ def main():
             # DTS
             dts_bitrate = request.form["dts_bitrate"]
             # Opus
-            opus_cbr_bitrate = request.form["opus-cbr-bitrate"]
-            opus_encoding_type = request.form["opus-encoding-type"]
+            opus_cbr_bitrate = request.form["opus_cbr_bitrate"]
+            opus_encoding_type = request.form["opus_encoding_type"]
             # Downmix multi-channel audio to stereo?
             is_downmix = request.form["is_downmix"]
             # Desired filename
@@ -224,13 +224,11 @@ def main():
                 extension = 'spx'
 
             converted_file_name = output_name + "." + extension
-           
-            response = make_response(jsonify({
-                "message": "File converted. The converted file will now start downloading.",
-                "downloadFilePath": 'download/' + converted_file_name
-            }), 200)
-
-            return response
+            
+            return {
+                "message": "File converted.",
+                "downloadFilePath": f'/download/{converted_file_name}'
+            }
 
 # CONTACT PAGE
 
@@ -254,32 +252,23 @@ def contact():
         server.sendmail(send_from, send_to, text)
         return make_response("Message sent!", 200)
     else:
-        log_this("visited contact page")
+        log_visit("visited contact page")
         return render_template("contact.html", title="Contact")
 
 # FILE TRIMMER
 
-@app.route("/file-trimmer", methods=["GET", "POST"])
+@app.route("/file-trimmer", methods=["POST"])
 def trim_file():
 
     if request.form["request_type"] == "upload_complete":
    
         chosen_file = request.files["chosen_file"]
-
-        extension = (chosen_file.filename).split(".")[-1]
-
-        if extension not in allowed_filetypes:
-            return make_response(jsonify({"message": "Incompatible filetype selected."}), 415)
-
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
-
         # Save the uploaded file to the uploads folder.
         chosen_file.save(os.path.join("uploads", filename_secure))
-
-        response = make_response(jsonify({"message": "File uploaded. Converting..."}), 200)
-
-        return response
+        
+        return ''
 
     if request.form["request_type"] == "trim":
 
@@ -299,12 +288,10 @@ def trim_file():
         else:
             info_logger.info('Trim complete.')
 
-        response = make_response(jsonify({
-            "message": "File converted. The converted file will now start downloading.",
-            "downloadFilePath": 'download/' + output_name
-        }), 200)
-
-        return response
+        return {
+            "message": "File trimmed. The trimmed file will now start downloading.",
+            "downloadFilePath": f'/download/{output_name}'
+        }
 
 # Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
 @app.route("/download/<filename>", methods=["GET"])
@@ -313,9 +300,9 @@ def download_file(filename):
     try:
         if just_extension == "m4a":
             info_logger.info('Sending file to user...')
-            return send_from_directory(os.getcwd() + "/conversions", filename, mimetype="audio/mp4")
+            return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4")
         else:
-            return send_from_directory(os.getcwd()+ "/conversions", filename)
+            return send_from_directory(f'{os.getcwd()}/conversions', filename)
     except Exception as error:
         info_logger.error(error)
     else:

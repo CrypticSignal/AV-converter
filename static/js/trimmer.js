@@ -1,48 +1,59 @@
 const input = document.getElementById("file_input");
-const file_input_label = document.getElementById("file_input_label");
-const trim_btn = document.getElementById("trim-btn");
+const inputLabel = document.getElementById("file_input_label");
+const trimButton = document.getElementById("trim-btn");
 
-// Function to show alerts
-function show_alert(message, type) {
-    alert_wrapper.innerHTML =
-    `<div id="alert" class="alert alert-${type} alert-dismissible fade show" role="alert">
-      <span>${message}</span>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>`
+function trim_file() {
+
+    inputFilename = input.files[0].name;
+
+    let startTime = document.getElementById('start-time').value;
+    let endTime = document.getElementById('end-time').value;
+    if (startTime.length == 5) { 
+        startTime += ':00';
+    }
+    if (endTime.length == 5){
+        endTime += ':00'
+    }
+
+    const request = new XMLHttpRequest();
+    request.responseType = "json";
+    request.open("POST", "/file-trimmer");
+    
+    const data = new FormData();
+    data.append("request_type", "trim");
+    data.append("filename", inputFilename);
+    data.append("start_time", startTime);
+    data.append("end_time", endTime);
+
+    request.send(data);
+
+    request.addEventListener("load", function () {
+
+        alert_wrapper.innerHTML = ""; // Clear any existing alerts.
+        document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
+
+        show_alert(`${request.response.message} <a href="${request.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
+
+        const link = document.createElement("a"); // Create a virtual link.
+        link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
+        link.href = request.response.downloadFilePath;
+        link.click();
+    });
 }
 
-
-function updatePlaceholder() {
-    file_input_label.innerText = input.files[0].name;
-}
-
-// Run this function when the user clicks on the "Convert" button
-
-function trim() {
+// Run this function when the user clicks on the "Trim file" button
+function upload_and_trim() {
     
     if (!input.value) {
         show_alert("No file selected.", "danger")
         return;
     }
 
-    // Create a new FormData instance
-    const data = new FormData();
-
-    // Create a XMLHTTPRequest instance
-    const request = new XMLHttpRequest();
-
-    // Set the response type
-    request.responseType = "json";
-
-    // Clear any existing alerts
     alert_wrapper.innerHTML = "";
 
-    // Get a reference to the file
-    const chosen_file = input.files[0];
-    
-    inputFilename = input.files[0].name;
+    const chosenFile = input.files[0];
+    const filesize = chosenFile.size;
+    const inputFilename = input.files[0].name;
     const filenameParts = inputFilename.split('.');
     const fileExt = filenameParts[filenameParts.length - 1];
 
@@ -52,21 +63,25 @@ function trim() {
         show_alert("Incompatible filetype selected.", "danger")
         return;
     }
-
-    // Get a reference to the filesize & set a cookie
-    const filesize = chosen_file.size;
-    // document.cookie = `filesize=${filesize}`;
-
-    if (filesize > 5000000000) {
+   
+    else if (filesize > 5000000000) {
         show_alert("The selected file is larger than 5GB; unable to convert.", "danger")
         return;    
     }
+
+    const request = new XMLHttpRequest();
+    request.responseType = "json";
+    request.open("POST", "/file-trimmer");
+
+    const data = new FormData();
+    data.append("request_type", "upload_complete");
+    data.append("chosen_file", chosenFile);
 
     // Disable the input during upload
     input.disabled = true;
 
     // Hide the upload button
-    trim_btn.classList.add("d-none");
+    trimButton.classList.add("d-none");
 
     // Show the loading button
     loading_btn.classList.remove("d-none");
@@ -77,20 +92,17 @@ function trim() {
     // Show the progress bar
     progress_wrapper.classList.remove("d-none");
 
-    // Append the file to the FormData instance
-   
-
     let previousTime = Date.now() / 1000;
     let previousLoaded = 0;
     
     request.upload.addEventListener("progress", function (event) {
-        // Get the loaded amount and total filesize (MB)
+
+        // Get the uploaded amount and total filesize (MB)
         const loaded = event.loaded / 10**6;
         const total = event.total / 10**6;
     
-        // MB loaded in this interval --> loaded - previousLoaded;
-        
-        // (Date.now() - previousTime) will give us the time since the last time-interval.
+        // MB loaded in this interval is loaded - previousLoaded and
+        // (Date.now() - previousTime) gives us the time since the last time-interval.
         let speed = ((loaded - previousLoaded) / ((Date.now() / 1000) - previousTime)) * 8;
     
         const percentageComplete = (loaded / total) * 100;
@@ -103,28 +115,22 @@ function trim() {
         progress_status.innerText = `${loaded.toFixed(2)}MB of ${total.toFixed(2)}MB uploaded
         Upload Speed: ${speed.toFixed(2)}Mbps (${(speed / 8).toFixed(2)}MB/s)`;
     
-        // Set the previous value for "loaded" to the current one just before we exit.
         previousLoaded = loaded;
-        // Do the same for previousTime.
         previousTime = Date.now() / 1000;
     });
-
-    // Open and send the request
-    request.open("POST", "/file-trimmer");
-    data.append("request_type", "upload_complete");
-    data.append("chosen_file", chosen_file);
-    request.send(data);
 
     cancel_btn.addEventListener("click", function () {
         request.abort();
     })
 
-    // Request load handler (transfer complete)
+    // Send the request.
+    request.send(data);
+
+    // Upload complete
     request.addEventListener("load", function (e) {
 
         if (request.status == 200) {
-            //show_alert(`${request.response.message}`, "info"); <-- No longer needed as I'm showing a loading button instead.
-            document.getElementById('spinner').style.display = 'block'; // Show the converting button.
+            document.getElementById('spinner').style.display = 'block';
             trim_file();
         }
          else if (request.status == 415) {
@@ -144,57 +150,26 @@ function trim() {
 
     // Request abort handler
     request.addEventListener("abort", function (e) {
-
         reset();
-
         show_alert(`Upload cancelled`, "primary");
-
     });
  
-} // Closing bracket for trim function.
+} // Closing bracket for upload_and_trim function.
 
-function trim_file() {
+// This function runs when the user selects a file.
+function updatePlaceholder() {
+    inputLabel.innerText = input.files[0].name;
+}
 
-    inputFilename = input.files[0].name;
-    let startTime = document.getElementById('start-time').value;
-    let endTime = document.getElementById('end-time').value;
-    if (startTime.length == 5) { 
-        startTime += ':00';
-    }
-    if (endTime.length == 5){
-        endTime += ':00'
-    }
-
-     // Create a new FormData instance
-    const data = new FormData();
-
-     // Create a XMLHTTPRequest instance
-    const request = new XMLHttpRequest();
-    request.responseType = "json";
-
-    data.append("request_type", "trim");
-    data.append("filename", inputFilename);
-    data.append("start_time", startTime);
-    data.append("end_time", endTime);
-    request.open("POST", "/file-trimmer");
-    request.send(data);
-
-    request.addEventListener("load", function (e) { // "load" means when the conversionRequest is complete
-
-        alert_wrapper.innerHTML = ""; // Clear any existing alerts.
-        document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
-
-        console.log(request.response)
-        console.log("response msg: " + request.response.message)
-        console.log("download path: " + request.response.downloadFilePath)
-
-        show_alert(`${request.response.message} <a href="${request.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
-
-        const link = document.createElement("a"); // Create a virtual link.
-        link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
-        link.href = request.response.downloadFilePath;
-        link.click();
-    });
+// Function to show alerts
+function show_alert(message, type) {
+    alert_wrapper.innerHTML =
+    `<div id="alert" class="alert alert-${type} alert-dismissible fade show" role="alert">
+      <span>${message}</span>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`
 }
 
 // Function to reset the page
@@ -206,7 +181,7 @@ function reset() {
     // Reset the input element
     input.disabled = false;
     // Show the upload button
-    trim_btn.classList.remove("d-none")
+    trimButton.classList.remove("d-none")
     // Hide the loading button
     loading_btn.classList.add("d-none");
     // Hide the progress bar
@@ -214,6 +189,17 @@ function reset() {
     // Reset the progress bar state
     progress.setAttribute("style", `width: 0%`);
     // Reset the input placeholder
-    file_input_label.innerText = "Select file";
-
+    inputLabel.innerText = "Select file";
 }
+
+// // create the video element but don't add it to the page
+// var vid = document.createElement('video');
+// document.querySelector('#file_input').addEventListener('change', function() {
+//   // create url to use as the src of the video
+//   var fileURL = URL.createObjectURL(this.files[0]);
+//   vid.src = fileURL;
+//   // wait for duration to change from NaN to the actual duration
+//   vid.ondurationchange = function() {
+//     alert(this.duration);
+//   };
+// });

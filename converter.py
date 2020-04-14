@@ -13,7 +13,7 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 info_logger = setup_logger('info_logger', 'Info.log')
 
 def ffmpeg(chosen_file, params):
-    os.system(f'ffmpeg -hide_banner -loglevel 24 -report -progress progress.txt -y -i "{chosen_file}" {params}')
+    os.system(f'ffmpeg -hide_banner -progress progress.txt -y -i "{chosen_file}" {params}')
 
 # MP3
 def run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_name, is_downmix, output_path):

@@ -6,21 +6,21 @@
 
 <h3><b>Select the file you wish to trim:</b></h3>
 
-  <!-- <div class="container"> -->
+<div class="container">
 
-    <div class="mb-3 mt-3">
-      <div class="form-group mb-3">
-        <div class="custom-file">
-          <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS, .ac3, .3gp, .dts, .webm, .ADPCM, .spx, .caf, .mov, .dtshd" id="file_input" type="file" multiple class="custom-file-input" id="trimmer-file" oninput="updatePlaceholder()">
-          <label id="file_input_label" class="custom-file-label">Select file</label>
-        </div>
+  <div class="mb-3 mt-3">
+    <div class="form-group mb-3">
+      <div class="custom-file">
+        <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS, .ac3, .3gp, .dts, .webm, .ADPCM, .spx, .caf, .mov, .dtshd" id="file_input" type="file" multiple class="custom-file-input" id="trimmer-file" oninput="updatePlaceholder()">
+        <label id="file_input_label" class="custom-file-label">Select file</label>
       </div>
     </div>
+  </div>
 
-<label for="start-time">Start</label>
-<input name="start" id="start-time" value="00:00:00" type="time" step="1">
-<label for="end-time">End</label>
-<input name="end" id="end-time" value="00:00:00" type="time" step="1">
+<label for="start-time">Start segment at:</label>
+<input name="start" id="start-time" value="00:00:00" type="time" step="1"><br>
+<label for="end-time">End segment at:</label>
+<input name="end" id="end-time" value="00:00:00" type="time" step="1"><br><br>
 <button onclick="trim()" id="trim-btn" type="submit" class="btn btn-primary">Trim file</button>
 
 <button class="btn btn-primary d-none" id="loading_btn" type="button" disabled>
@@ -46,10 +46,17 @@
         <span class="spinner-border spinner-border-sm"></span>
         Trimming...</button>
   </div>
-   
+</div>
 
-<!-- <button type="submit" onclick="trim()" id="trim_btn" class="btn btn-primary">Trim</button> -->
 <script src="{{ url_for('static', filename='js/trimmer.js') }}"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 {% endblock content%}
+
+<!-- <div data-role="main" class="ui-content">
+  <div data-role="rangeslider">
+    <label for="start-time">Desired Segment</label>
+    <input type="range" id="start-time" value="0" min="0" max="1000">
+  </div>
+  <button onclick="trim()" id="trim-btn" type="submit" class="btn btn-primary">Trim file</button>
+</div> -->
