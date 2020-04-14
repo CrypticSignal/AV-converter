@@ -1,5 +1,3 @@
-## Demo
-![Demo](demo/demo.gif)
 ## About
 On https://freeaudioconverter.net, you can:
 - Convert an audio file to another format - MP3, AAC, WAV, FLAC, ALAC, CAF, Opus, Vorbis, AC3, DTS or Speex.
