@@ -7,7 +7,7 @@ On https://freeaudioconverter.net, you can:
 - Trim a video or audio file [https://freeaudioconverter.net/file-trimmer]
 - Convert a video to the MKV format (well, container).
 ## How does it work?
-- Your file is uploaded to a server, where the conversion/file trimming takes place. On completion, the file is sent to your browser and is automatically downloaded.
+Your file is uploaded to a server, where the conversion/file trimming takes place. On completion, the file is sent to your browser and is automatically downloaded.
 ## Features
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
