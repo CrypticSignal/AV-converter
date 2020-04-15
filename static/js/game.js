@@ -63,17 +63,35 @@ function showTimer() {
 
     if (timer == 0) {
 
-        if (confirm(`
-        You hit the circle ${timesHit} times.
-        Average hits per second: ${timesHit/10}
-        Misses: ${timesMissed}
-        Accuracy: ${((timesHit / (timesHit + timesMissed)) * 100).toFixed(1)}%
-        To play again, click on 'OK'`)) {
-            location.reload();
+        if (localStorage.getItem('highScore') == null) {
+            localStorage.setItem('highScore', timesHit)
         }
-        else {
-            window.location.href = "https://freeaudioconverter.net";
+       
+        else if (timesHit > localStorage.getItem('highScore')){
+            localStorage.setItem('highScore', timesHit)
         }
+
+        let highScore = localStorage.getItem('highScore')
+        
+        const request = new XMLHttpRequest();
+        request.open('POST', '/game', true);
+        //const accuracy = `${((timesHit / (timesHit + timesMissed)) * 100).toFixed(1)}`
+        const data = new FormData();
+        data.append('score', timesHit);
+        data.append('canvas_width', canvas.width)
+        data.append('canvas_height', canvas.height)
+        request.send(data);
+        
+        request.onreadystatechange = function() {
+            if (request.readyState === 4)  { 
+                if (confirm(`You hit the circle ${timesHit} times\nYour high score: ${highScore}\nWorld Record: ${request.responseText}\nTo play again, click on 'OK'`)) {
+                    location.reload();
+                }
+                else {
+                    window.location.href = "https://freeaudioconverter.net";
+                }
+            }
+        };
     }
     else if (timer < 0) {
         ctx.clearRect(0, 0, canvas.width, 20)

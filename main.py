@@ -308,5 +308,28 @@ def download_file(filename):
     else:
         info_logger.info("File sent.")
 
+@app.route("/game", methods=['POST'])
+def get_score():
+    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
+    user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    user_agent = request.headers.get('User-Agent')
+    score = int(request.form['score'])
+    canvas_width = request.form['canvas_width']
+    canvas_height = request.form['canvas_height']
+
+    with open("HighScores.txt", "a") as f:
+        f.write(f'{score} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
+
+    just_scores = []
+    
+    with open('HighScores.txt', 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            just_scores.append(line.split('|')[0][:-1])
+    
+    world_record = max(just_scores, key=lambda x: int(x))
+
+    return world_record
+  
 if __name__ == "__main__":
     socketio.run(app)
