@@ -2,14 +2,17 @@
 On https://freeaudioconverter.net, you can:
 - Convert an audio file to another format - MP3, AAC, WAV, FLAC, ALAC, CAF, Opus, Vorbis, AC3, DTS or Speex.
 - Convert a video to an audio-only file (to any of the above formats).
-- Trim a video or audio file [https://freeaudioconverter.net/file-trimmer]
+- Trim a video or audio file | https://freeaudioconverter.net/file-trimmer
 - Convert a video to the MKV format (well, container).
+- Play a reaction-time game! https://freeaudioconverter.net/game
 ## How does it work?
 Your file is uploaded to a server, where the conversion/file trimming takes place. On completion, the file is sent to your browser and is automatically downloaded.
 ## Features
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
 - Whilst the file is being converted, you can see how far into the file the encoder currently is. This information is updated every second.
+- [game] see your high score.
+- [game] see the world record.
 ## Supported filetypes
 Many filetypes are supported, click [here](https://freeaudioconverter.net/filetypes) for details. Support for other filetypes may be added, feel free to [contact me](https://freeaudioconverter.net/contact) to enquire. 
 ## To-do
