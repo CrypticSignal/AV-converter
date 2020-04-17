@@ -313,15 +313,17 @@ def get_score():
     current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
     user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
     user_agent = request.headers.get('User-Agent')
-    score = int(request.form['score'])
+    score = request.form['score']
+    times_missed = request.form['times_missed']
+    accuracy = request.form['accuracy']
     canvas_width = request.form['canvas_width']
     canvas_height = request.form['canvas_height']
 
     with open("HighScores.txt", "a") as f:
-        f.write(f'{score} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
+        f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
 
     just_scores = []
-    
+
     with open('HighScores.txt', 'r') as f:
         lines = f.readlines()
         for line in lines:

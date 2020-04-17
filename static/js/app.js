@@ -9,7 +9,6 @@ const convertButton = document.getElementById("convert_btn");
 const cancelButton = document.getElementById("cancel_btn");
 const alertWrapper = document.getElementById("alert_wrapper");
 
-// Function to show alerts
 function show_alert(message, type) {
 
     alertWrapper.innerHTML =
@@ -21,11 +20,10 @@ function show_alert(message, type) {
     </div>`
 }
 
-function convert_file(filename) {
+function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
 
     const conversionRequest = new XMLHttpRequest();
     conversionRequest.responseType = "json";
-    conversionRequest.open('POST', '/');
 
     const chosenCodec = document.getElementById('codecs').value;
     const sliderValue = document.getElementById("slider").value;
@@ -73,6 +71,7 @@ function convert_file(filename) {
     data.append("opus_encoding_type", opusEncodingType);
     data.append("is_y_switch", isYSwitch);
 
+    conversionRequest.open('POST', '/');
     conversionRequest.send(data);
 
     conversionRequest.addEventListener("load", function () { // conversionRequest is complete
@@ -82,7 +81,7 @@ function convert_file(filename) {
         if (conversionRequest.status == 200) {
 
             alertWrapper.innerHTML = ""; // Clear any existing alerts.
-            document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
+            //document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
 
             show_alert(`${conversionRequest.response.message} <a href="${conversionRequest.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
 
@@ -96,50 +95,51 @@ function convert_file(filename) {
             reset();
         }        
     });
-}
+
+} // Closing bracket for convert
 
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_convert() {
 
-    // Get info about the file.
-    const chosenFile = input.files[0];
-    const filesize = chosenFile.size;
-    const filename = chosenFile.name;
-    const filenameParts = filename.split('.');
-    const fileExt = filenameParts[filenameParts.length - 1];
-
     allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 
-    if (!allowedFiletypes.includes(fileExt)) {
-    show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
-        reset();
-        return;
-    }
-
-    else if (filesize > 5000000000) {
-        show_alert("File cannot be larger than 5 GB.", "danger")
-        reset();
-        return;    
-    }
-
-    else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('||')) {
-        show_alert('Output name cannot contain any of the following characters: "/?*><|:', "danger");
-        return;
-    }
-
-    // Show an error if no filename selected or if filename input is empty.
-    else if (!input.value && document.getElementById("output_name").value == '') {
+    if (!input.value && document.getElementById("output_name").value == '') {
         show_alert("Perhaps in the future a website will be able to read your mind and automatically complete the required fields, but technology hasn't gotten that far yet.", "info")
         return;
     }
 
-    else if (!input.value) {
-        show_alert("No file selected.", "danger")
-        return;
+    else if (input.value) { // If a file has been selected
+        const chosenFile = input.files[0];
+        const filename = chosenFile.name;
+        const filenameParts = filename.split('.');
+        const fileExt = filenameParts[filenameParts.length - 1];
+        const filesize = chosenFile.size;
+
+        if (!allowedFiletypes.includes(fileExt)) {
+            show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
+                reset();
+                return;
+            }
+
+        else if (filesize > 5000000000) {
+            show_alert("File cannot be larger than 5 GB.", "danger")
+            reset();
+            return;    
+        }
+
+        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('||')) {
+            show_alert('Output name cannot contain any of the following characters: "/?*><|:', "danger");
+            return;
+        }
+
+        else if (document.getElementById("output_name").value == '') {
+            show_alert("You must enter your desired filename.", "danger")
+            return;
+        }
     }
 
-    else if (document.getElementById("output_name").value == '') {
-        show_alert("You must enter your desired filename.", "danger")
+    else {
+        show_alert("No file selected.", "danger")
         return;
     }
 
@@ -150,19 +150,28 @@ function upload_and_convert() {
     convertButton.classList.remove("d-none");
     cancelButton.classList.remove("d-none");
     progressWrapper.classList.remove("d-none");
+
+    const chosenFile = input.files[0];
    
     const uploadRequest = new XMLHttpRequest();
+    
+    uploadRequest.upload.addEventListener("progress", showProgress);
+    uploadRequest.addEventListener("load", uploadComplete);
+    uploadRequest.addEventListener("error", showError);
+    cancelButton.addEventListener("click", abortUpload);
+
     uploadRequest.open("POST", "/")
 
     const data = new FormData();
     data.append("request_type", "uploaded");
     data.append("chosen_file", chosenFile);
+    uploadRequest.send(data);
 
     let previousTime = Date.now() / 1000;
     let previousLoaded = 0;
 
-    uploadRequest.upload.addEventListener("progress", function () {
-
+    function showProgress(event) {
+    
         // Get amount uploaded and total filesize (MB)
         const loaded = event.loaded / 10**6;
         const total = event.total / 10**6;
@@ -179,10 +188,10 @@ function upload_and_convert() {
         const seconds = Math.ceil(completionTimeSeconds % 60)
         const completionTime = `${hours}:${minutes}:${seconds} [H:M:S]`
     
-        $('#progress').html(`${Math.floor(percentageComplete)}%`);
+        $('#progress_bar').html(`${Math.floor(percentageComplete)}%`);
 
         // Add a style attribute to the progress div, i.e. "style=width: x%"
-        progress.setAttribute("style", `width: ${Math.floor(percentageComplete)}%`);
+        progress_bar.setAttribute("style", `width: ${Math.floor(percentageComplete)}%`);
         
         progressStatus.innerText = `${loaded.toFixed(1)} MB of ${total.toFixed(1)} MB uploaded
         Upload Speed: ${(speed * 8).toFixed(1)} Mbps (${(speed).toFixed(1)} MB/s)
@@ -190,46 +199,41 @@ function upload_and_convert() {
     
         previousLoaded = loaded;
         previousTime = Date.now() / 1000;
-    });
+    }
 
     // Abort the upload request when the cancel button is clicked.
-    cancelButton.addEventListener("click", function () {
+    function abortUpload() {
         uploadRequest.abort();
-        reset();
-    })
-
-    // Show an alert when the upload request is aborted.
-    uploadRequest.addEventListener("abort", function () {
         show_alert(`Upload cancelled`, "info");
         reset();
-    });
+    }
 
-    uploadRequest.addEventListener("error", function () {
+    function showError() {
         show_alert(`${uploadRequest.response.message}`, "danger");
         reset();
-    });
-
-    // Send the request.
-    uploadRequest.send(data);
+    }
 
     // When the upload is commplete:
-    uploadRequest.addEventListener("load", function () {
-      
+    function uploadComplete() {
+        
         cancelButton.classList.add("d-none");
         uploadButton.classList.remove("d-none")
+        uploadButton.innerText = "Converting..."
         convertButton.classList.add("d-none");
         progressWrapper.classList.add("d-none");
+        progress_bar.setAttribute("style", "width: 0%");
 
         if (uploadRequest.status == 200) {
-            document.getElementById('spinner').style.display = 'block'; // Show the converting button.
-            convert_file(chosenFile.name);
+
+            //document.getElementById('spinner').style.display = 'block'; // Show the converting button.
+            document.getElementById("progress").style.display = 'block';
+            pythonHeresWhatYouNeed(chosenFile.name);
         }
         else {
             show_alert("Error uploading file.", "danger");
             reset();
         }
-    });
-
+    }
 } // Closing bracket for upload_and_convert function.
 
 // This function runs when a file is selected.
@@ -245,7 +249,7 @@ function updateBoxes() {
 
 // Function to reset the page
 function reset() {
-
+    document.getElementById("progress").style.display = 'none';
     input.value = null;
     cancelButton.classList.add("d-none");
     input.disabled = false;
@@ -253,7 +257,6 @@ function reset() {
     uploadButton.classList.remove("d-none")
     convertButton.classList.add("d-none");
     progressWrapper.classList.add("d-none");
-    progress.setAttribute("style", `width: 0%`);
     inputLabel.innerText = "Select file";
     outputNameBox.value = ''
 }

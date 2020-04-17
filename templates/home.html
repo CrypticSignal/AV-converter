@@ -1,10 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v6.0"></script>
+
   <h1>FreeAudioConverter.net</h1>
 
   <div class="tagline">
-    <p>Convert an audio file to another format or extract the audio from a video.</p>
+    <p>Convert an audio file to another format, extract the audio from a video or convert a video to MKV.</p>
   </div><br>
 
   <h3><b>1. Select the file you wish to convert:</b></h3>
@@ -14,7 +17,7 @@
     <div class="mb-3 mt-3">
       <div class="form-group mb-3">
         <div class="custom-file">
-          <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS, .ac3, .3gp, .dts, .webm, .ADPCM, .spx, .caf, .mov, .dtshd, .thd" type="file" multiple class="custom-file-input" id="file_input" oninput="updateBoxes()">
+          <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS, .ac3, .3gp, .dts, .webm, .ADPCM, .spx, .caf, .mov, .dtshd, .thd" type="file" class="custom-file-input" id="file_input" oninput="updateBoxes()">
           <label id="file_input_label" class="custom-file-label">Select file</label>
         </div>
       </div>
@@ -38,7 +41,7 @@
       <option value="DTS">DTS (.dts)</option>
       <option value="Speex">Speex (.spx)</option>
       <option value="CAF">CAF (.caf)</option>
-      <option value="MKV">MKV (.mkv)</option>
+      <option value="MKV">Convert video to MKV (.mkv)</option>
       <option value="MKA">Extract audio without converting (.mka)</option>
     </select>
   
@@ -256,6 +259,12 @@
     
     <!--When the convert button is clicked, run the upload function-->
     <button onclick="upload_and_convert()" id="upload_btn" class="btn btn-primary">Convert</button>
+
+    <div class="text-center" id="spinner" style="display:none">
+      <br><button class="btn btn-info" disabled> 
+          <span class="spinner-border spinner-border-sm"></span>
+          Converting...</button><br>
+    </div>
   
     <button class="btn btn-primary d-none" id="convert_btn" type="button" disabled>
       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -268,35 +277,30 @@
     <!--Upload-progress bar-->
     <div id="progress_wrapper" class="d-none">
       <div class="progress mb-3">
-        <div id="progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        <div id="progress_bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
       <label id="progress_status"></label>
     </div>
   
+    
+
     <div id="alert_wrapper"></div>
-   
-    <div class="text-center" id="spinner" style="display:none">
-      <br><button class="btn btn-info" disabled> 
-          <span class="spinner-border spinner-border-sm"></span>
-          Converting...</button><br>
-      <div id="log"></div>
-    </div>
+    
+    <p id="progress" style="display:none"></p><hr>
+    <p>Like this website? Please share or tweet :)</p>
+  </div> <!--Closing tag for div class="container" div-->
 
-  </div><hr> <!--Closing tag for div class="container" div-->
 
-<p>Like this website? Share it on Facebook or Twitter!</p>
 <!--Facebook-->
-<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3A%2F%2Ffreeaudioconverter.net%2F" target="_blank" rel="noopener" aria-label="Share on Facebook">
-  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--large"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/></svg>
-    </div>Share</div>
-</a>
+<div class="fb-like" data-href="https://freeaudioconverter.net" data-width="" data-layout="button_count" data-action="like" data-size="large" data-share="true"></div><br><br>
+
+<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-dnt="true" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <!--Twitter-->
-<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?text=Convert%20Audio%20Files%20or%20Extract%20the%20Audio%20from%20a%20Video!&amp;url=https%3A%2F%2Ffreeaudioconverter.net%2F" target="_blank" rel="noopener" aria-label="Share on Twitter">
+<!-- <a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?text=Convert%20Audio%20Files%20or%20Extract%20the%20Audio%20from%20a%20Video!&amp;url=https%3A%2F%2Ffreeaudioconverter.net%2F" target="_blank" rel="noopener" aria-label="Share on Twitter">
   <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--large"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"/></svg>
     </div>Tweet</div>
-</a>
+</a> -->
 <!--My JavaScript files-->
 <script src="{{ url_for('static', filename='js/elements.js') }}"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>

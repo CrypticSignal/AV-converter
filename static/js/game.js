@@ -71,15 +71,18 @@ function showTimer() {
             localStorage.setItem('highScore', timesHit)
         }
 
-        let highScore = localStorage.getItem('highScore')
+        const highScore = localStorage.getItem('highScore')
+        const accuracy = `${Math.round((timesHit / (timesHit + timesMissed)) * 100)}%`
         
         const request = new XMLHttpRequest();
         request.open('POST', '/game', true);
-        //const accuracy = `${((timesHit / (timesHit + timesMissed)) * 100).toFixed(1)}`
+        
         const data = new FormData();
         data.append('score', timesHit);
-        data.append('canvas_width', canvas.width)
-        data.append('canvas_height', canvas.height)
+        data.append('times_missed', timesMissed);
+        data.append('accuracy', accuracy);
+        data.append('canvas_width', canvas.width);
+        data.append('canvas_height', canvas.height);
         request.send(data);
         
         request.onreadystatechange = function() {
