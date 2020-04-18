@@ -236,7 +236,7 @@ def main():
 def contact():
     if request.method == "POST":
         send_from = "theaudiophile@outlook.com"
-        send_to = "hshafiq@hotmail.co.uk"
+        send_to = "theaudiophile@outlook.com"
         text = MIMEMultipart()
         text['From'] = send_from
         text['To'] = send_to
@@ -250,7 +250,7 @@ def contact():
         server.login(my_email, password)
         text = text.as_string()
         server.sendmail(send_from, send_to, text)
-        return make_response("Message sent!", 200)
+        return "Message sent!"
     else:
         log_visit("visited contact page")
         return render_template("contact.html", title="Contact")

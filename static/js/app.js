@@ -1,16 +1,17 @@
 const input = document.getElementById("file_input");
 const inputLabel = document.getElementById("file_input_label");
 const outputNameBox = document.getElementById("output_name");
-const progress = document.getElementById("progress");
+const conversionProgress = document.getElementById("progress");
 const progressWrapper = document.getElementById("progress_wrapper");
 const progressStatus = document.getElementById("progress_status");
-const uploadButton = document.getElementById("upload_btn");
 const convertButton = document.getElementById("convert_btn");
+const uploadingButton = document.getElementById("uploading_btn");
 const cancelButton = document.getElementById("cancel_btn");
 const alertWrapper = document.getElementById("alert_wrapper");
 
 function show_alert(message, type) {
 
+    alertWrapper.style.display = 'block';
     alertWrapper.innerHTML =
     `<div id="alert" class="alert alert-${type} alert-dismissible fade show" role="alert">
       <span>${message}</span>
@@ -24,6 +25,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
 
     const conversionRequest = new XMLHttpRequest();
     conversionRequest.responseType = "json";
+    conversionProgress.addEventListener('load', conversionComplete);
 
     const chosenCodec = document.getElementById('codecs').value;
     const sliderValue = document.getElementById("slider").value;
@@ -74,14 +76,11 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
     conversionRequest.open('POST', '/');
     conversionRequest.send(data);
 
-    conversionRequest.addEventListener("load", function () { // conversionRequest is complete
+    function conversionComplete() { // conversionRequest is complete
 
         reset(); // Reset the page to the default state,
 
         if (conversionRequest.status == 200) {
-
-            alertWrapper.innerHTML = ""; // Clear any existing alerts.
-            //document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
 
             show_alert(`${conversionRequest.response.message} <a href="${conversionRequest.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
 
@@ -92,11 +91,9 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
         } 
         else {
             show_alert("Error converting file.", "danger")
-            reset();
         }        
-    });
-
-} // Closing bracket for convert
+    }
+} // Closing bracket pythonHeresWhatYouNeed
 
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_convert() {
@@ -146,8 +143,8 @@ function upload_and_convert() {
     alertWrapper.innerHTML = "";
     input.disabled = true;
     outputNameBox.disabled = true;
-    uploadButton.classList.add("d-none");
-    convertButton.classList.remove("d-none");
+    convertButton.classList.add("d-none");
+    uploadingButton.classList.remove("d-none");
     cancelButton.classList.remove("d-none");
     progressWrapper.classList.remove("d-none");
 
@@ -171,6 +168,11 @@ function upload_and_convert() {
     let previousLoaded = 0;
 
     function showProgress(event) {
+
+        convertButton.classList.add('d-none');
+        uploadingButton.classList.remove('d-none');
+        cancelButton.classList.remove('d-none');
+        progressWrapper.style.display = 'block';
     
         // Get amount uploaded and total filesize (MB)
         const loaded = event.loaded / 10**6;
@@ -215,31 +217,27 @@ function upload_and_convert() {
 
     // When the upload is commplete:
     function uploadComplete() {
-        
-        cancelButton.classList.add("d-none");
-        uploadButton.classList.remove("d-none")
-        uploadButton.innerText = "Converting..."
-        convertButton.classList.add("d-none");
+
+        uploadingButton.classList.add('d-none');
+        cancelButton.classList.add('d-none');
         progressWrapper.classList.add("d-none");
         progress_bar.setAttribute("style", "width: 0%");
 
         if (uploadRequest.status == 200) {
-
-            //document.getElementById('spinner').style.display = 'block'; // Show the converting button.
-            document.getElementById("progress").style.display = 'block';
+            document.getElementById("converting_btn").style.display = 'block';
+            conversionProgress.style.display = 'block';
             pythonHeresWhatYouNeed(chosenFile.name);
         }
         else {
             show_alert("Error uploading file.", "danger");
-            reset();
         }
     }
 } // Closing bracket for upload_and_convert function.
 
 // This function runs when a file is selected.
 function updateBoxes() {
-
     inputLabel.innerText = input.files[0].name; // Show name of selected file.
+    console.log(input.files[0]);
     inputFilename = input.files[0].name; // Filename of the selected file.
     removePercentageSign = inputFilename.replace(/%/g, ''); // Remove percentage sign(s) as this causes an issue due to secure_filename?
     inputFilenameFormatted = removePercentageSign.replace(/_/g, ' '); // Replace the underscores with spaces, to make the filename look more aesthetically pleasing.
@@ -249,14 +247,15 @@ function updateBoxes() {
 
 // Function to reset the page
 function reset() {
-    document.getElementById("progress").style.display = 'none';
-    input.value = null;
-    cancelButton.classList.add("d-none");
+    alertWrapper.innerHTML = "";
     input.disabled = false;
-    outputNameBox.disabled = false;
-    uploadButton.classList.remove("d-none")
-    convertButton.classList.add("d-none");
-    progressWrapper.classList.add("d-none");
     inputLabel.innerText = "Select file";
+    convertButton.classList.remove("d-none");
+    document.getElementById("converting_btn").style.display = 'none';
+    document.getElementById("progress").style.display = 'none';
+    cancelButton.classList.add('d-none');
+    outputNameBox.disabled = false;
+    uploadingButton.classList.add('d-none');
+    progressWrapper.style.display = 'none';
     outputNameBox.value = ''
 }
