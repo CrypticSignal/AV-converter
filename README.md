@@ -4,19 +4,20 @@ On https://freeaudioconverter.net, you can:
 - Convert a video to an audio-only file (to any of the above formats).
 - Trim a video or audio file | https://freeaudioconverter.net/file-trimmer
 - Convert a video to the MKV format (well, container).
-- Play a reaction-time game! https://freeaudioconverter.net/game
+- Play reaction-time games! https://freeaudioconverter.net/game & https://freeaudioconverter.net/game2
 ## How does it work?
 Your file is uploaded to a server, where the conversion/file trimming takes place. On completion, the file is sent to your browser and is automatically downloaded.
-## Features
+## Features [converter]
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
 - Whilst the file is being converted, you can see how far into the file the encoder currently is. This information is updated every second.
-- [game] see your high score.
-- [game] see the world record.
+## Features [the games]
+- See your high score.
+- See the world record.
 ## Supported filetypes
 Many filetypes are supported, click [here](https://freeaudioconverter.net/filetypes) for details. Support for other filetypes may be added, feel free to [contact me](https://freeaudioconverter.net/contact) to enquire. 
 ## To-do
-The file trimmer will not work when using the Safari browser as it does not support the HTML <input type="time">
+The file trimmer will not work when using the Safari browser as it does not support the HTML `<input type="time">`.
 I may try to find another user-friendly way to allow the user to input their desired start and end time that is compatible with all browsers. Feel free to submit a pull request if you know of a good alternative implementation that is compatible with all browsers.
 ## Technologies and encoders used:
 [Flask](https://github.com/pallets/flask) - a micro framework for building web applications with Python.
