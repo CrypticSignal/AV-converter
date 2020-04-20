@@ -17,7 +17,7 @@ Your file is uploaded to a server, where the conversion/file trimming takes plac
 ## Supported filetypes
 Many filetypes are supported, click [here](https://freeaudioconverter.net/filetypes) for details. Support for other filetypes may be added, feel free to [contact me](https://freeaudioconverter.net/contact) to enquire. 
 ## To-do
-The file trimmer will not work when using the Safari browser as it does not support the HTML <input type="time">
+The file trimmer will not work when using the Safari browser as it does not support the HTML `<input type="time">`.
 I may try to find another user-friendly way to allow the user to input their desired start and end time that is compatible with all browsers. Feel free to submit a pull request if you know of a good alternative implementation that is compatible with all browsers.
 ## Technologies and encoders used:
 [Flask](https://github.com/pallets/flask) - a micro framework for building web applications with Python.
