@@ -1,18 +1,19 @@
 const canvas = document.getElementById('canvas');
-canvas.addEventListener("touchmove", function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-}, false);
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
 ctx.font = "20px arial";
 ctx.fillText(`Window Dimensions: ${canvas.width}x${canvas.height}`, 0, 20);
-canvas.addEventListener("touchstart", isCircleHit);
-canvas.addEventListener("mousedown", isCircleHit);
 
-if (! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    canvas.addEventListener("touchstart", isCircleHit);
+    canvas.addEventListener("touchmove", function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }, false);
+} else {
     canvas.addEventListener("mousemove", changeColour);
+    canvas.addEventListener("mousedown", isCircleHit);
 }
 
 // If the user has visited the page Before, don't show the opening alert.
@@ -89,7 +90,7 @@ function newCircle() {
     currentYLocation = y;
 }
 
-function showTimer() {
+async function showTimer() {
     timer -= 1; 
     ctx.clearRect(canvas.width/2, 0, 40, 20);
     ctx.fillText(timer, canvas.width/2, 20);
@@ -107,27 +108,32 @@ function showTimer() {
         const highScore = localStorage.getItem('highScore')
         const accuracy = `${Math.round((timesHit / (timesHit + timesMissed)) * 100)}%`
         
-        const request = new XMLHttpRequest();
-        request.open('POST', '/game', true);
-        
         const data = new FormData();
         data.append('score', timesHit);
         data.append('times_missed', timesMissed);
         data.append('accuracy', accuracy);
         data.append('canvas_width', canvas.width);
         data.append('canvas_height', canvas.height);
-        request.send(data);
         
-        request.onreadystatechange = function() {
-            if (request.readyState === 4)  { 
-                if (confirm(`You hit the circle ${timesHit} times\nYour high score: ${highScore}\nWorld Record: ${request.responseText}\nTo play again, click on 'OK'`)) {
-                    location.reload();
-                }
-                else {
-                    window.location.href = "https://freeaudioconverter.net";
-                }
+        const response = await fetch('/game', {
+            method: 'POST',
+            body: data
+        });
+
+        const responseText = await response.text();
+
+        if (response.status === 200) { 
+
+            if (confirm(`You hit the circle ${timesHit} times\nYour high score: ${highScore}\nWorld Record: ${responseText}\nTo play again, click on 'OK'`)) {
+                location.reload();
             }
-        };
+            else {
+                window.location.href = "https://freeaudioconverter.net";
+            }
+        }
+        else {
+            console.log(request.status)
+        }
     }
     else if (timer < 0) {
         ctx.clearRect(0, 0, canvas.width, 20)

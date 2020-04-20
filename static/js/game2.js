@@ -1,21 +1,21 @@
 const pageLoadTime = Date.now();
-
 const canvas = document.getElementById('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
-window.addEventListener("keydown", mouseClicked);
-canvas.addEventListener("touchstart", mouseClicked);
-canvas.addEventListener("mousedown", mouseClicked);
+
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    canvas.addEventListener("touchstart", mouseClicked);
+} else {
+    window.addEventListener("keydown", mouseClicked);
+    canvas.addEventListener("mousedown", mouseClicked);
+} 
 
 // If the user has visited the page Before, don't show the opening alert.
 const isVisited = localStorage.getItem('isVisitedGame2');
 if (isVisited !== "yes") {
-    if (confirm("This game tests your reaction speed. Click on the screen (or hit any key) as soon as it turns green.")) {
+    alert("This game tests your reaction speed. Click on the screen (or hit any key) as soon as it turns green.")
         localStorage.setItem('isVisitedGame2', 'yes');
-    } else {
-        window.location.href = "https://freeaudioconverter.net";
-    }
 }
 
 let t = [];
@@ -23,9 +23,9 @@ let refreshRate;
 
 function animate(timeSinceTimeOrigin) {
     t.unshift(timeSinceTimeOrigin);
-    if (t.length > 20) {
+    if (t.length > 50) {
         const t0 = t.pop();
-        refreshRate = (1000 * 20) / (timeSinceTimeOrigin - t0);
+        refreshRate = (1000 * 50) / (timeSinceTimeOrigin - t0);
         console.log(`20 samples taken in ${timeSinceTimeOrigin} ms.`);
         return;
     }
@@ -85,18 +85,18 @@ async function mouseClicked() {
         const highScore = localStorage.getItem('game2score');
 
         const data = new FormData();
-        data.append('reaction_time', reactionTime);
+        data.append("reaction_time", reactionTime)
 
         const response = await fetch('/game2', {
             method: 'POST',
             body: data
         });
 
-        if (response.ok) {
+        const responseText = await response.text();
 
-            const responseText = await response.text();
+        if (response.status === 200) {
 
-            if (confirm(`Reaction Time: ~${reactionTime} ms\nPersonal Best: ~${highScore} ms\nWorld Record: ~${responseText} ms\nYour browser updated the canvas every ${Math.round(canvasUpdateRate)} ms (${Math.round(refreshRate)} Hz refresh rate).\nTo play again, click on 'OK'`)) {
+            if (confirm(`Reaction Time: ~${reactionTime} ms\nPersonal Best: ${highScore} ms\nWorld Record: ${responseText} ms\nCanvas Refresh Rate: ${Math.round(refreshRate)} Hz\nTo play again, click on 'OK'`)) {
                 location.reload();
             }
             else {
@@ -104,11 +104,7 @@ async function mouseClicked() {
             }
         }
         else {
-            console.log("response was not ok");
+            console.log("status is: " + response.status)
         }
     }
-}
-
-function reloadPage () {
-    location.reload();
 }
