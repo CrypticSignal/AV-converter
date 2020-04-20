@@ -89,6 +89,11 @@ def test_connect(): # test_connect() is the event callback function.
 def test_disconnect():
     log_socket("disconnected")
 
+@app.route("/game2")
+def game_2():
+    log_visit("visited game 2")  
+    return render_template("game2.html", title="Game 2")
+
 @app.route("/")
 def homepage():
     log_visit("visited homepage")
@@ -219,9 +224,6 @@ def main():
             elif chosen_codec == 'DTS':
                 converter.run_dts(chosen_file, dts_bitrate, output_name, is_downmix, output_path)
                 extension = 'dts'
-            else: # The chosen codec is Speex
-                converter.run_speex(chosen_file, output_name, is_downmix, output_path)
-                extension = 'spx'
 
             converted_file_name = output_name + "." + extension
             
@@ -327,11 +329,32 @@ def get_score():
     with open('HighScores.txt', 'r') as f:
         lines = f.readlines()
         for line in lines:
-            just_scores.append(line.split('|')[0][:-1])
+            just_scores.append(line.split('|')[0].strip())
     
     world_record = max(just_scores, key=lambda x: int(x))
 
     return world_record
+
+@app.route("/game2", methods=['POST'])
+def game2():
+    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
+    user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    user_agent = request.headers.get('User-Agent')
+    reaction_time = request.form['reaction_time']
+
+    with open("ReactionTimes.txt", "a") as f:
+        f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')
+
+    reaction_times = []
+
+    with open('ReactionTimes.txt', 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            reaction_times.append(line.split('|')[0][:-3].strip())
+    
+    reaction_record = min(reaction_times, key=lambda x: int(x))
+
+    return reaction_record
   
 if __name__ == "__main__":
     socketio.run(app)

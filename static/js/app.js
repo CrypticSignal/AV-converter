@@ -25,7 +25,6 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
 
     const conversionRequest = new XMLHttpRequest();
     conversionRequest.responseType = "json";
-    conversionProgress.addEventListener('load', conversionComplete);
 
     const chosenCodec = document.getElementById('codecs').value;
     const sliderValue = document.getElementById("slider").value;
@@ -76,7 +75,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
     conversionRequest.open('POST', '/');
     conversionRequest.send(data);
 
-    function conversionComplete() { // conversionRequest is complete
+    conversionRequest.addEventListener("load", function () { // conversionRequest is complete
 
         reset(); // Reset the page to the default state,
 
@@ -92,7 +91,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
         else {
             show_alert("Error converting file.", "danger")
         }        
-    }
+    })
 } // Closing bracket pythonHeresWhatYouNeed
 
 // Run this function when the user clicks on the "Convert" button.
@@ -247,6 +246,8 @@ function updateBoxes() {
 
 // Function to reset the page
 function reset() {
+    document.getElementById("converting_btn").style.display = 'none ';
+    conversionProgress.style.display = 'none';
     alertWrapper.innerHTML = "";
     input.disabled = false;
     inputLabel.innerText = "Select file";
