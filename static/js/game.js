@@ -45,6 +45,7 @@ createCircle(x, y);
 let currentXLocation = x;
 let currentYLocation = y;
 
+// Make circle green when mouse is hovered on the circle.
 function changeColour (event) {
 
     xPosition = event.offsetX;
@@ -132,7 +133,7 @@ async function showTimer() {
             }
         }
         else {
-            console.log(request.status)
+            console.log(`Couldn't receive response from server [${respose.status}]`)
         }
     }
     else if (timer < 0) {

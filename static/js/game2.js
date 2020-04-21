@@ -19,21 +19,30 @@ if (isVisited !== "yes") {
 }
 
 let t = [];
+const sampleSize = 30;
+let sumOfDifferences = 0;
+let canvasUpdateRate;
 let refreshRate;
 
-function animate(timeSinceTimeOrigin) {
-    t.unshift(timeSinceTimeOrigin);
-    if (t.length > 50) {
-        const t0 = t.pop();
-        refreshRate = (1000 * 50) / (timeSinceTimeOrigin - t0);
-        console.log(`20 samples taken in ${timeSinceTimeOrigin} ms.`);
+// Calculate how often the browser updates the canvas.
+function calculateCanvasUpdateRate(millisecondsSinceTimeOrigin) {
+    t.push(millisecondsSinceTimeOrigin);
+    // Put sampleSize + 1 samples into the array so we can check the difference 50 times.
+    if (t.length == (sampleSize + 1)) {
+        for (let i = 1; i < (sampleSize + 1); i++) {
+            sumOfDifferences += (t[i] - t[i - 1]);
+        }
+        canvasUpdateRate = sumOfDifferences / sampleSize;
+        refreshRate = (1000 / canvasUpdateRate).toFixed(1);
+        console.log(`Average time to update: ${canvasUpdateRate.toFixed(1)} ms (${refreshRate} Hz).`);
+        console.log(`Calculation took ${millisecondsSinceTimeOrigin} ms with a sampleSize of ${sampleSize}.`);
         return;
     }
-    window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(calculateCanvasUpdateRate);
 };
 
-// Start the above function.
-window.requestAnimationFrame(animate);
+// Run the above function.
+window.requestAnimationFrame(calculateCanvasUpdateRate);
 
 function randInt(min, max) {
     return min + Math.floor(Math.random() * (max - min + 1));
@@ -74,7 +83,6 @@ async function mouseClicked() {
         clickTime = Date.now();
 
         const reactionTimeRaw = clickTime - changeTime;
-        const canvasUpdateRate = (1000 / refreshRate);
         const averageDelay = canvasUpdateRate / 2;
         const reactionTime = Math.round(reactionTimeRaw - averageDelay);
 
@@ -96,7 +104,7 @@ async function mouseClicked() {
 
         if (response.status === 200) {
 
-            if (confirm(`Reaction Time: ~${reactionTime} ms\nPersonal Best: ${highScore} ms\nWorld Record: ${responseText} ms\nCanvas Refresh Rate: ${Math.round(refreshRate)} Hz\nTo play again, click on 'OK'`)) {
+            if (confirm(`Reaction Time: ~${reactionTime} ms\nPersonal Best: ${highScore} ms\nWorld Record: ${responseText} ms\nCanvas Refresh Rate: ${refreshRate} Hz\nTo play again, click on 'OK'`)) {
                 location.reload();
             }
             else {
@@ -104,7 +112,7 @@ async function mouseClicked() {
             }
         }
         else {
-            console.log("status is: " + response.status)
+            console.log(`Couldn't receive response from server [${respose.status}]`)
         }
     }
 }
