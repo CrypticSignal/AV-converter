@@ -25,7 +25,7 @@ def run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is
             ffmpeg(chosen_file, f'-ac 2 -f wav - | lame --tc "Encoded using freeaudioconverter.net" -b {cbr_abr_bitrate} - {output_path}.mp3')
             logger.info(command)
         elif mp3_encoding_type == "abr": 
-            ffmpeg(chosen_file, f'-ac 2 -f wav - | lame --preset {cbr_abr_bitrate} - {output_path}.mp3')
+            ffmpeg(chosen_file, f'-ac 2 -f wav - | lame --tc "Encoded using freeaudioconverter.net" --preset {cbr_abr_bitrate} - {output_path}.mp3')
         elif mp3_encoding_type == "vbr": 
             if is_y_switch == "no":
                 ffmpeg(chosen_file, f'-ac 2 -f wav - | lame --tc "Encoded using freeaudioconverter.net" -V {mp3_vbr_setting} - {output_path}.mp3')
@@ -67,10 +67,10 @@ def run_wav(chosen_file, output_name, output_path):
 # Opus
 def run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_name, output_path):
     try:
-        if opus_encoding_type == "opus-vbr": 
-            ffmpeg_pipe(chosen_file, f'opusenc --comment "Comment=Encoded using freeaudioconverter.net" --bitrate {slider_value} {output_path}.opus')
+        if opus_encoding_type == "opus-vbr":
+            ffmpeg_pipe(chosen_file, f'opusenc --comment Comment="Encoded using freeaudioconverter.net" --bitrate {slider_value} - {output_path}.opus')
         else: # CBR
-            ffmpeg_pipe(chosen_file, f'opusenc --comment "Comment=Encoded using freeaudioconverter.net" --hard-cbr {opus_cbr_bitrate} {output_path}.opus')
+            ffmpeg_pipe(chosen_file, f'opusenc --comment Comment="Encoded using freeaudioconverter.net" --hard-cbr {opus_cbr_bitrate} - {output_path}.opus')
     except Exception as error:
         logger.error(error)
     else:
