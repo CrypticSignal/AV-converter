@@ -1,6 +1,6 @@
 ## About
 On https://freeaudioconverter.net, you can:
-- Convert an audio file to another format - MP3, AAC, WAV, FLAC, ALAC, CAF, Opus, Vorbis, AC3, DTS or Speex.
+- Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (.ogg), FLAC, ALAC, AC3, DTS or CAF.
 - Convert a video to an audio-only file (to any of the above formats).
 - Trim a video or audio file | https://freeaudioconverter.net/file-trimmer
 - Convert a video to the MKV format (well, container).
