@@ -28,10 +28,8 @@ LAME v3.100 | https://lame.sourceforge.io/
 
 fdkaac (https://github.com/nu774/fdkaac) which is a command line encoder frontend for fdk-aac (https://github.com/mstorsjo/fdk-aac).
 
-libopus 1.3.1 | https://github.com/xiph/opus
+libopus | https://github.com/xiph/opus
 
 libvorbis 1.3.6 | https://github.com/xiph/vorbis
 ## Contributing
-I'm open to contributors, especially those who are familiar with video encoding with FFmpeg because a consideration that I have is adding the ability to transcode a video (under a new Flask route (/video-encoder)) to expand on what users can do on the website. Feel free to contact me using the [contact](https://freeaudioconverter.net/contact) section of the website if you have any questions.
-## License
-Custom - see the [LICENSE](https://github.com/BassThatHertz/freeaudioconverter.net/blob/master/LICENSE) file for details.
+Contributors, especially those who are familiar with video encoding with FFmpeg because a consideration that I have is adding the ability to transcode a video (under a new Flask route (/video-encoder)) to expand on what users can do on the website. Feel free to contact me using the [contact](https://freeaudioconverter.net/contact) section of the website if you have any questions.
