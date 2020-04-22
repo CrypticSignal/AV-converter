@@ -179,8 +179,6 @@ def main():
             # Opus
             opus_cbr_bitrate = request.form["opus_cbr_bitrate"]
             opus_encoding_type = request.form["opus_encoding_type"]
-            # Downmix multi-channel audio to stereo?
-            is_downmix = request.form["is_downmix"]
             # Desired filename
             output_name = request.form["output_name"]
 
@@ -192,40 +190,40 @@ def main():
             # Run the appropritate section of converter.py:
 
             if chosen_codec == 'MP3':
-                converter.run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_name, is_downmix, output_path)
+                converter.run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_name, output_path)
                 extension = 'mp3'
             elif chosen_codec == 'AAC':
-                converter.run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, output_name, is_downmix, is_fdk_lowpass, fdk_lowpass, output_path)
+                converter.run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, output_name, is_fdk_lowpass, fdk_lowpass, output_path)
                 extension = 'm4a'
             elif chosen_codec == 'Opus':
-                converter.run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_name, is_downmix, output_path)
+                converter.run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_name, output_path)
                 extension = 'opus'                                                                     
             elif chosen_codec == 'FLAC':
-                converter.run_flac(chosen_file, flac_compression, output_name, is_downmix, output_path)
+                converter.run_flac(chosen_file, flac_compression, output_name, output_path)
                 extension = 'flac'
             elif chosen_codec == 'Vorbis':
-                converter.run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, output_name, is_downmix, output_path) 
+                converter.run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, output_name, output_path) 
                 extension = 'ogg'
             elif chosen_codec == 'WAV':
-                converter.run_wav(chosen_file, output_name, is_downmix, output_path)
+                converter.run_wav(chosen_file, output_name, output_path)
                 extension = 'wav'
             elif chosen_codec == 'MKV':
-                converter.run_mkv(chosen_file, output_name, is_downmix, output_path)
+                converter.run_mkv(chosen_file, output_name, output_path)
                 extension = 'mkv'
             elif chosen_codec == 'MKA':
-                converter.run_mka(chosen_file, output_name, is_downmix, output_path)
+                converter.run_mka(chosen_file, output_name, output_path)
                 extension = 'mka'
             elif chosen_codec == 'ALAC':
-                converter.run_alac(chosen_file, output_name, is_downmix, output_path)
+                converter.run_alac(chosen_file, output_name, output_path)
                 extension = 'm4a'
             elif chosen_codec == 'AC3':
-                converter.run_ac3(chosen_file, ac3_bitrate, output_name, is_downmix, output_path)
+                converter.run_ac3(chosen_file, ac3_bitrate, output_name, output_path)
                 extension = 'ac3'
             elif chosen_codec == 'CAF':
-                converter.run_caf(chosen_file, output_name, is_downmix, output_path)
+                converter.run_caf(chosen_file, output_name, output_path)
                 extension = 'caf'
             elif chosen_codec == 'DTS':
-                converter.run_dts(chosen_file, dts_bitrate, output_name, is_downmix, output_path)
+                converter.run_dts(chosen_file, dts_bitrate, output_name, output_path)
                 extension = 'dts'
 
             converted_file_name = output_name + "." + extension

@@ -45,7 +45,6 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
     const dtsBitrate = document.getElementById('dts-slider').value;
     const opusBitrate = document.getElementById('opus_cbr_slider').value;
     const opusEncodingType = document.getElementById('opus-encoding-type').value;
-    const isDownmix = document.querySelector('input[name="is-downmix"]:checked').value;
 
     const data = new FormData();
 
@@ -61,7 +60,6 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
     data.append("vorbis_quality", vorbisQuality);
     data.append("vorbis_encoding", vorbisEncoding);
     data.append("flac_compression", flacCompression);
-    data.append("is_downmix", isDownmix);
     data.append("fdk_type", fdkType);
     data.append("fdk_cbr", fdkCBR);
     data.append("fdk_vbr", fdkVBR);
