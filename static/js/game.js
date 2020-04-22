@@ -133,7 +133,7 @@ async function showTimer() {
             }
         }
         else {
-            console.log(`Couldn't receive response from server [${respose.status}]`)
+            console.log(`Couldn't receive response from server [${response.status}]`)
         }
     }
     else if (timer < 0) {

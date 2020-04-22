@@ -25,7 +25,7 @@ def setup_logger(name, log_file, level=logging.DEBUG):
     logger.addHandler(file_handler)
     return logger
 
-info_logger = setup_logger('info_logger', 'Info.log')
+logger = setup_logger('logger', 'Info.log')
 visit_logger = setup_logger('visit_logger', 'Visit.log')
 user_agent_logger = setup_logger('user_agent_logger', 'UserAgent.log')
 socket_logger = setup_logger('socket_logger', 'Socket.log')
@@ -34,7 +34,7 @@ socket_logger = setup_logger('socket_logger', 'Socket.log')
 def log_this(message):
     current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
     client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    info_logger.info(f'{current_datetime} | {client} {message}')
+    logger.info(f'{current_datetime} | {client} {message}')
 
 # Visit.log
 def log_visit(message):
@@ -56,30 +56,33 @@ def log_socket(message):
 
 # FFmpeg will write the conversion progress to a txt file. Read the file eery second to get the current conversion progress every second.
 def read_progress():
-    previous_time = '00:00:00'
-    while True:
-        with open('progress.txt', 'r') as f:
-            lines = f.readlines()
-            # This gives us the amount of the file that has been converted so far.
-            current_time = lines[-5].split('=')[-1]
+    try:
+        previous_time = '00:00:00'
+        while True:
+            with open('progress.txt', 'r') as f:
+                lines = f.readlines()
+                # This gives us the amount of the file that has been converted so far.
+                current_time = lines[-5].split('=')[-1]
 
-            # If the amount converted is the same twice in a row, that means that the conversion is complete.
-            if previous_time == current_time:
-                info_logger.info("Conversion complete. Progress no longer being read.")
-                break
+                # If the amount converted is the same twice in a row, that means that the conversion is complete.
+                if previous_time == current_time:
+                    logger.info("Conversion complete. Progress no longer being read.")
+                    break
 
-            hh_mm_ss = current_time.split('.')[0]
-            milliseconds = current_time.split('.')[-1][:-4]
+                hh_mm_ss = current_time.split('.')[0]
+                milliseconds = current_time.split('.')[-1][:-4]
 
-            progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)'
-            info_logger.info(progress_message)
+                progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)'
+                logger.info(progress_message)
 
-            # Trigger a new event called "show progress" 
-            socketio.emit('show progress', {'progress': progress_message})
-            socketio.sleep(1)
+                # Trigger a new event called "show progress" 
+                socketio.emit('show progress', {'progress': progress_message})
+                socketio.sleep(1)
 
-            # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
-            previous_time = current_time
+                # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
+                previous_time = current_time
+    except Exception as error:
+        logger.info(error)
 
 @socketio.on('my event') # Decorator to catch an event called "my event"
 def test_connect(): # test_connect() is the event callback function.
@@ -139,10 +142,10 @@ def main():
             socketio.start_background_task(read_progress)
 
         except Exception as error:
-            info_logger.error(f'start_background_task error: {error}')
+            logger.error(f'start_background_task error: {error}')
 
         else:
-            info_logger.info("Started progress reader.")
+            logger.info("Started progress reader.")
 
         finally:
             file_name = request.form["file_name"]
@@ -182,7 +185,7 @@ def main():
             output_name = request.form["output_name"]
 
             log_this(f'Wants to convert "{file_name}" to {chosen_codec}.')
-            info_logger.info(f'OUTPUT NAME: {output_name}')
+            logger.info(f'OUTPUT NAME: {output_name}')
 
             output_path = f'"/home/ubuntu/website/conversions/{output_name}"'
 
@@ -286,9 +289,9 @@ def trim_file():
         try:
             os.system(f'ffmpeg -y -i "{chosen_file}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
         except Exception as error:
-            info_logger.error(f'TRIM ERROR: {error}')
+            logger.error(f'TRIM ERROR: {error}')
         else:
-            info_logger.info('Trim complete.')
+            logger.info('Trim complete.')
 
         return {
             "message": "File trimmed. The trimmed file will now start downloading.",
@@ -301,14 +304,14 @@ def download_file(filename):
     just_extension = filename.split('.')[-1]
     try:
         if just_extension == "m4a":
-            info_logger.info('Sending file to user...')
+            logger.info('Sending file to user...')
             return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4")
         else:
             return send_from_directory(f'{os.getcwd()}/conversions', filename)
     except Exception as error:
-        info_logger.error(error)
+        logger.error(error)
     else:
-        info_logger.info("File sent.")
+        logger.info("File sent.")
 
 @app.route("/game", methods=['POST'])
 def get_score():

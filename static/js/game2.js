@@ -32,9 +32,8 @@ function calculateCanvasUpdateRate(millisecondsSinceTimeOrigin) {
         for (let i = 1; i < (sampleSize + 1); i++) {
             sumOfDifferences += (t[i] - t[i - 1]);
         }
-        canvasUpdateRate = sumOfDifferences / sampleSize;
-        refreshRate = (1000 / canvasUpdateRate).toFixed(1);
-        console.log(`Average time to update: ${canvasUpdateRate.toFixed(1)} ms (${refreshRate} Hz).`);
+        canvasUpdateRate = Math.round(sumOfDifferences / sampleSize);
+        //refreshRate = (1000 / canvasUpdateRate).toFixed(1);;
         console.log(`Calculation took ${millisecondsSinceTimeOrigin} ms with a sampleSize of ${sampleSize}.`);
         return;
     }
@@ -49,7 +48,6 @@ function randInt(min, max) {
 }
 
 const randomTime = randInt(1000, 5000)
-console.log("Colour will change in " + randomTime + " millseconds.")
 
 // Run the changeColour func after randomTime ms
 setTimeout(changeColour, randomTime)
@@ -85,6 +83,7 @@ async function mouseClicked() {
         const reactionTimeRaw = clickTime - changeTime;
         const averageDelay = canvasUpdateRate / 2;
         const reactionTime = Math.round(reactionTimeRaw - averageDelay);
+        const lowerRange = Math.round(reactionTime - canvasUpdateRate)
 
         if (localStorage.getItem('game2score') == null || reactionTime < localStorage.getItem('game2score')) {
             localStorage.setItem('game2score', reactionTime);
@@ -104,7 +103,7 @@ async function mouseClicked() {
 
         if (response.status === 200) {
 
-            if (confirm(`Reaction Time: ~${reactionTime} ms\nPersonal Best: ${highScore} ms\nWorld Record: ${responseText} ms\nCanvas Refresh Rate: ${refreshRate} Hz\nTo play again, click on 'OK'`)) {
+            if (confirm(`Reaction Time: ~${reactionTime} ms\nActually ${lowerRange}-${reactionTimeRaw} ms due to the canvas re-draw rate of ${canvasUpdateRate} ms.\nPersonal Best: ~${highScore} ms\nWorld Record: ~${responseText} ms\nTo play again, click on 'OK'`)) {
                 location.reload();
             }
             else {
@@ -112,7 +111,7 @@ async function mouseClicked() {
             }
         }
         else {
-            console.log(`Couldn't receive response from server [${respose.status}]`)
+            console.log(`Couldn't receive response from server [${response.status}]`)
         }
     }
 }
