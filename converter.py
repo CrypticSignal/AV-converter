@@ -36,15 +36,6 @@ def run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is
     else:
         logger.info(f'{chosen_file} converted.')
 
-# AC3
-def run_ac3(chosen_file, ac3_bitrate, output_name, output_path):
-    try:
-        ffmpeg(chosen_file, f'-c:a ac3 -b:a {ac3_bitrate}k {output_path}.ac3')
-    except Exception as error:
-        logger.error(error)
-    else:
-        logger.info(f'{chosen_file} converted.')
-    
 # AAC
 def run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, output_name, is_fdk_lowpass, fdk_lowpass, output_path):
     try:
@@ -63,23 +54,23 @@ def run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, output_name, is_fdk_lowpass
         logger.error(error)
     else:
         logger.info(f'{chosen_file} converted.')
-            
-# Opus
-def run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_name, output_path):
+
+# WAV
+def run_wav(chosen_file, output_name, output_path):
     try:
-        if opus_encoding_type == "opus-vbr": 
-            ffmpeg(chosen_file, f'-c:a libopus -b:a {slider_value}k {output_path}.opus')
-        else: # CBR
-            ffmpeg(chosen_file, f'-c:a libopus -vbr off -b:a {opus_cbr_bitrate}k {output_path}.opus')
+        ffmpeg(chosen_file, f'{output_path}.wav')
     except Exception as error:
         logger.error(error)
     else:
         logger.info(f'{chosen_file} converted.')
 
-# FLAC
-def run_flac(chosen_file, flac_compression, output_name, output_path):
+# Opus
+def run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_name, output_path):
     try:
-        ffmpeg(chosen_file, f'-c:a flac -compression_level {flac_compression} {output_path}.flac')
+        if opus_encoding_type == "opus-vbr": 
+            ffmpeg_pipe(chosen_file, f'opusenc --comment "Comment=Encoded using freeaudioconverter.net" --bitrate {slider_value} {output_path}.opus')
+        else: # CBR
+            ffmpeg_pipe(chosen_file, f'opusenc --comment "Comment=Encoded using freeaudioconverter.net" --hard-cbr {opus_cbr_bitrate} {output_path}.opus')
     except Exception as error:
         logger.error(error)
     else:
@@ -97,22 +88,15 @@ def run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, outpu
     else:
         logger.info(f'{chosen_file} converted.')
 
-# WAV
-def run_wav(chosen_file, output_name, output_path):
+# FLAC
+def run_flac(chosen_file, flac_compression, output_name, output_path):
     try:
-        ffmpeg(chosen_file, f'{output_path}.wav')
+        ffmpeg(chosen_file, f'-c:a flac -compression_level {flac_compression} {output_path}.flac')
     except Exception as error:
         logger.error(error)
     else:
         logger.info(f'{chosen_file} converted.')
-# MKV
-def run_mkv(chosen_file, output_name, output_path):
-    try:
-        ffmpeg(chosen_file, f'-c copy {output_path}.mkv')
-    except Exception as error:
-        logger.error(error)
-    else:
-        logger.info(f'{chosen_file} converted.')
+
 # ALAC
 def run_alac(chosen_file, output_name, output_path):
     try:
@@ -121,14 +105,16 @@ def run_alac(chosen_file, output_name, output_path):
         logger.error(error)
     else:
         logger.info(f'{chosen_file} converted.')
-# CAF
-def run_caf(chosen_file, output_name, output_path):
+
+# AC3
+def run_ac3(chosen_file, ac3_bitrate, output_name, output_path):
     try:
-        ffmpeg(chosen_file, f'{output_path}.caf')
+        ffmpeg(chosen_file, f'-c:a ac3 -b:a {ac3_bitrate}k {output_path}.ac3')
     except Exception as error:
         logger.error(error)
     else:
         logger.info(f'{chosen_file} converted.')
+
 # DTS
 def run_dts(chosen_file, dts_bitrate, output_name, output_path):
     try:
@@ -137,18 +123,29 @@ def run_dts(chosen_file, dts_bitrate, output_name, output_path):
         logger.error(error)
     else:
         logger.info(f'{chosen_file} converted.')
-# Speex
-def run_speex(chosen_file, output_name, output_path):
+
+# CAF
+def run_caf(chosen_file, output_name, output_path):
     try:
-        ffmpeg(chosen_file, f'-c:a libspeex {output_path}.spx')
+        ffmpeg(chosen_file, f'{output_path}.caf')
     except Exception as error:
         logger.error(error)
     else:
         logger.info(f'{chosen_file} converted.')
+
 # MKA
 def run_mka(chosen_file, output_name, output_path):
     try:
         ffmpeg(chosen_file, f'-c:a copy {output_path}.mka')
+    except Exception as error:
+        logger.error(error)
+    else:
+        logger.info(f'{chosen_file} converted.')
+
+# MKV
+def run_mkv(chosen_file, output_name, output_path):
+    try:
+        ffmpeg(chosen_file, f'-c copy {output_path}.mkv')
     except Exception as error:
         logger.error(error)
     else:
