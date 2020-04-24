@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, render_template, send_from_directory, escape
 from flask_socketio import SocketIO, emit
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
@@ -136,7 +136,7 @@ def main():
 
         return ''
 
-    if request.form["request_type"] == "convert":
+    elif request.form["request_type"] == "convert":
 
         try:
             socketio.start_background_task(read_progress)
@@ -182,57 +182,80 @@ def main():
             # Desired filename
             output_name = request.form["output_name"]
 
-            log_this(f'Wants to convert "{file_name}" to {chosen_codec}.')
-            logger.info(f'OUTPUT NAME: {output_name}')
+            # Want to validate the contents of all variables, putting them in a list makes it easier to do so.
+            variables_to_validate = [file_name, chosen_file, chosen_codec, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, slider_value, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name]
 
-            output_path = f'"/home/ubuntu/website/conversions/{output_name}"'
+            # Do not allow the following characters in any of the above variables.
+            not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':']
 
-            # Run the appropritate section of converter.py:
+            i = 0
 
-            if chosen_codec == 'MP3':
-                converter.run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_name, output_path)
-                extension = 'mp3'
-            elif chosen_codec == 'AAC':
-                converter.run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, output_name, is_fdk_lowpass, fdk_lowpass, output_path)
-                extension = 'm4a'
-            elif chosen_codec == 'Opus':
-                converter.run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_name, output_path)
-                extension = 'opus'                                                                     
-            elif chosen_codec == 'FLAC':
-                converter.run_flac(chosen_file, flac_compression, output_name, output_path)
-                extension = 'flac'
-            elif chosen_codec == 'Vorbis':
-                converter.run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, output_name, output_path) 
-                extension = 'ogg'
-            elif chosen_codec == 'WAV':
-                converter.run_wav(chosen_file, output_name, output_path)
-                extension = 'wav'
-            elif chosen_codec == 'MKV':
-                converter.run_mkv(chosen_file, output_name, output_path)
-                extension = 'mkv'
-            elif chosen_codec == 'MKA':
-                converter.run_mka(chosen_file, output_name, output_path)
-                extension = 'mka'
-            elif chosen_codec == 'ALAC':
-                converter.run_alac(chosen_file, output_name, output_path)
-                extension = 'm4a'
-            elif chosen_codec == 'AC3':
-                converter.run_ac3(chosen_file, ac3_bitrate, output_name, output_path)
-                extension = 'ac3'
-            elif chosen_codec == 'CAF':
-                converter.run_caf(chosen_file, output_name, output_path)
-                extension = 'caf'
-            elif chosen_codec == 'DTS':
-                converter.run_dts(chosen_file, dts_bitrate, output_name, output_path)
-                extension = 'dts'
+            for var in variables_to_validate:
 
-            converted_file_name = output_name + "." + extension
-            
-            return {
-                "message": "File converted.",
-                "downloadFilePath": f'/download/{converted_file_name}'
-            }
+                while i < len(not_allowed):
 
+                    if not_allowed[i] in variables_to_validate:
+
+                        logger.info(f'The user entered {not_allowed[i]}. Conversion aborted.')
+                        return {"message": "You thought you are so fucking smart."}, 400
+
+                    elif i == len(not_allowed) - 1:
+
+                        i += 1 # To prevent infinite loop.
+                        
+                        log_this(f'wants to convert "{file_name}" to a {chosen_codec} with a filename of {output_name}')
+                    
+                        output_path = f'"/home/ubuntu/website/conversions/{output_name}"'
+
+                        # Run the appropritate section of converter.py:
+
+                        if chosen_codec == 'MP3':
+                            converter.run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_path)
+                            extension = 'mp3'
+                        elif chosen_codec == 'AAC':
+                            converter.run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
+                            extension = 'm4a'
+                        elif chosen_codec == 'Opus':
+                            converter.run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_path)
+                            extension = 'opus'                                                                     
+                        elif chosen_codec == 'FLAC':
+                            converter.run_flac(chosen_file, flac_compression, output_path)
+                            extension = 'flac'
+                        elif chosen_codec == 'Vorbis':
+                            converter.run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, output_path) 
+                            extension = 'ogg'
+                        elif chosen_codec == 'WAV':
+                            converter.run_wav(chosen_file, output_path)
+                            extension = 'wav'
+                        elif chosen_codec == 'MKV':
+                            converter.run_mkv(chosen_file, output_path)
+                            extension = 'mkv'
+                        elif chosen_codec == 'MKA':
+                            converter.run_mka(chosen_file, output_path)
+                            extension = 'mka'
+                        elif chosen_codec == 'ALAC':
+                            converter.run_alac(chosen_file, output_path)
+                            extension = 'm4a'
+                        elif chosen_codec == 'AC3':
+                            converter.run_ac3(chosen_file, ac3_bitrate, output_path)
+                            extension = 'ac3'
+                        elif chosen_codec == 'CAF':
+                            converter.run_caf(chosen_file, output_path)
+                            extension = 'caf'
+                        elif chosen_codec == 'DTS':
+                            converter.run_dts(chosen_file, dts_bitrate, output_path)
+                            extension = 'dts'
+
+                        converted_file_name = output_name + "." + extension
+                        
+                        return {
+                            "message": "File converted.",
+                            "downloadFilePath": f'/download/{converted_file_name}'
+                        }
+
+                    else:
+                        i += 1
+           
 # CONTACT PAGE
 
 @app.route("/contact", methods=["GET", "POST"])
@@ -318,23 +341,27 @@ def get_score():
     user_agent = request.headers.get('User-Agent')
     score = request.form['score']
     times_missed = request.form['times_missed']
-    accuracy = request.form['accuracy']
     canvas_width = request.form['canvas_width']
     canvas_height = request.form['canvas_height']
+    try:
+        int(score)
+        int(times_missed)
+        int(canvas_width)
+        int(canvas_width)
+    except ValueError:
+        logger.info("The user was a silly billy and something for game1 to a non-int.")
+    else:
+        with open("HighScores.txt", "a") as f:
+            f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
+    finally:
+        just_scores = []
+        with open('HighScores.txt', 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                just_scores.append(line.split('|')[0].strip())
 
-    with open("HighScores.txt", "a") as f:
-        f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
-
-    just_scores = []
-
-    with open('HighScores.txt', 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            just_scores.append(line.split('|')[0].strip())
-    
-    world_record = max(just_scores, key=lambda x: int(x))
-
-    return world_record
+        world_record = max(just_scores, key=lambda x: int(x))
+        return world_record
 
 @app.route("/game2", methods=['POST'])
 def game2():
@@ -342,20 +369,23 @@ def game2():
     user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
     user_agent = request.headers.get('User-Agent')
     reaction_time = request.form['reaction_time']
+    try:
+        int(reaction_time)
+    except ValueError:
+        logger.info("The user was a silly billy and changed the reaction_time to a non-int.")
+    else:
+        with open("ReactionTimes.txt", "a") as f:
+            f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')
+    finally:
+        reaction_times = []
+        with open('ReactionTimes.txt', 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                reaction_times.append(line.split('|')[0][:-3].strip())
 
-    with open("ReactionTimes.txt", "a") as f:
-        f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')
+        reaction_record = min(reaction_times, key=lambda x: int(x))
 
-    reaction_times = []
-
-    with open('ReactionTimes.txt', 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            reaction_times.append(line.split('|')[0][:-3].strip())
-    
-    reaction_record = min(reaction_times, key=lambda x: int(x))
-
-    return reaction_record
+        return reaction_record
   
 if __name__ == "__main__":
     socketio.run(app)

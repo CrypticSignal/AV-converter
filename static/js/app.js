@@ -86,9 +86,12 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
             link.href = conversionRequest.response.downloadFilePath;
             link.click();
         } 
+        else if (conversionRequest.status == 400) {
+            show_alert(`${conversionRequest.response.message}`, "danger");
+        } 
         else {
-            show_alert("Error converting file.", "danger")
-        }        
+            show_alert("Error converting file", "danger");
+        }       
     })
 } // Closing bracket pythonHeresWhatYouNeed
 
@@ -121,8 +124,8 @@ function upload_and_convert() {
             return;    
         }
 
-        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('||')) {
-            show_alert('Output name cannot contain any of the following characters: "/?*><|:', "danger");
+        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.includes('\\') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('command') || outputNameBox.value.includes('$')) {
+            show_alert('Output name cannot contain any of the following characters: "/?*><|:$ (or the word "command")', "danger");
             return;
         }
 

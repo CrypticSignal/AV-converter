@@ -18,7 +18,7 @@
   </div>
 
 <label for="start-time">Start segment at:</label>
-<input name="start" id="start-time" value="00:00:00" type="time" step="1"><br>
+<input required pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" name="start" id="start-time" value="00:00:00" type="time" step="1"><br>
 <label for="end-time">End segment at:</label>
 <input name="end" id="end-time" value="00:00:00" type="time" step="1"><br><br>
 <button onclick="trim()" id="trim-btn" type="submit" class="btn btn-primary">Trim file</button>

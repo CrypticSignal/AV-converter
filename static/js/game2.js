@@ -83,7 +83,8 @@ async function mouseClicked() {
         const reactionTimeRaw = clickTime - changeTime;
         const averageDelay = canvasUpdateRate / 2;
         const reactionTime = Math.round(reactionTimeRaw - averageDelay);
-        const lowerRange = Math.round(reactionTime - canvasUpdateRate)
+        const lowerRange = Math.round(reactionTime - canvasUpdateRate);
+        console.log(`${lowerRange}-${reactionTimeRaw}ms`)
 
         if (localStorage.getItem('game2score') == null || reactionTime < localStorage.getItem('game2score')) {
             localStorage.setItem('game2score', reactionTime);
@@ -103,7 +104,7 @@ async function mouseClicked() {
 
         if (response.status === 200) {
 
-            if (confirm(`Reaction Time: ~${reactionTime} ms\nActually ${lowerRange}-${reactionTimeRaw} ms due to the canvas re-draw rate of ${canvasUpdateRate} ms.\nPersonal Best: ~${highScore} ms\nWorld Record: ~${responseText} ms\nTo play again, click on 'OK'`)) {
+            if (confirm(`Reaction Time: ~${reactionTime} ms\nPersonal Best: ~${highScore} ms\nWorld Record: ~${responseText} ms\nTo play again, click on 'OK'`)) {
                 location.reload();
             }
             else {
