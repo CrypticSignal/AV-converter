@@ -1,24 +1,5 @@
 import os, logging
 
-def is_integer(input):
-    try:
-        int(input)
-    except Exception as error:
-        logger.info(f'USER SUBMITTED A NON-INTEGER.')
-        return False
-    else:
-        return True
-
-not_allowed = ['command', ';', '$', '&&', '/', '"', '?', '*', '<', '>', '|', ':']
-
-# def validate_output_name(output_path):
-#     for i in not_allowed:
-#         if i in output_path:
-#             logger.info(f'The user entered {i} in the output name box. Conversion aborted.')
-#             return False
-#         else:
-#             return True:
-
 def setup_logger(name, log_file, level=logging.DEBUG):
     log_format = logging.Formatter('%(message)s')
     file_handler = logging.FileHandler(log_file)        
