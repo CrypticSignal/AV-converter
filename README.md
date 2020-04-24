@@ -1,6 +1,6 @@
 ## About
 On https://freeaudioconverter.net, you can:
-- Convert an audio file to another format - MP3, AAC, WAV, FLAC, ALAC, CAF, Opus, Vorbis, AC3, DTS or Speex.
+- Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (.ogg), FLAC, ALAC, AC3, DTS or CAF.
 - Convert a video to an audio-only file (to any of the above formats).
 - Trim a video or audio file | https://freeaudioconverter.net/file-trimmer
 - Convert a video to the MKV format (well, container).
@@ -32,4 +32,4 @@ libopus | https://github.com/xiph/opus
 
 libvorbis 1.3.6 | https://github.com/xiph/vorbis
 ## Contributing
-Contributors, especially those who are familiar with video encoding with FFmpeg because a consideration that I have is adding the ability to transcode a video (under a new Flask route (/video-encoder)) to expand on what users can do on the website. Feel free to contact me using the [contact](https://freeaudioconverter.net/contact) section of the website if you have any questions.
+Contributors are welcome (simply submit a pull request), especially those who are familiar with video encoding with FFmpeg because a consideration that I have is adding the ability to transcode a video (under a new Flask route (/video-encoder)) to expand on what users can do on the website. Feel free to contact me using the [contact](https://freeaudioconverter.net/contact) section of the website if you have any questions.
