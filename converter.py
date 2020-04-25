@@ -1,5 +1,22 @@
 import os, logging
 
+# A function that checks if a variable contains a disallowed substring.
+def variable_has_no_disallowed_substrings(variable_to_check, disallowed_substrings):
+    for substring in disallowed_substrings:
+        if substring in variable_to_check:
+            return False
+    # If we've gotten to this point, the loop has finished without the if-statement
+    # ever being True, so the variable didn't contain a disallowed substring.
+    return True
+
+# If a variable in the list contains a disallowed string, return False.
+# Otherwise, return True.
+def check_no_variable_contains_bad_string(variables_list, disallowed_strings):
+    for variable in variables_list:
+        if not variable_has_no_disallowed_substrings(variable, disallowed_strings):
+            return False
+    return True
+
 def setup_logger(name, log_file, level=logging.DEBUG):
     log_format = logging.Formatter('%(message)s')
     file_handler = logging.FileHandler(log_file)        

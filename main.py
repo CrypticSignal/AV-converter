@@ -63,7 +63,6 @@ def read_progress():
                 lines = f.readlines()
                 # This gives us the amount of the file that has been converted so far.
                 current_time = lines[-5].split('=')[-1]
-
                 # If the amount converted is the same twice in a row, that means that the conversion is complete.
                 if previous_time == current_time:
                     logger.info("Conversion complete. Progress no longer being read.")
@@ -71,18 +70,16 @@ def read_progress():
 
                 hh_mm_ss = current_time.split('.')[0]
                 milliseconds = current_time.split('.')[-1][:-4]
-
                 progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)'
                 logger.info(progress_message)
-
                 # Trigger a new event called "show progress" 
                 socketio.emit('show progress', {'progress': progress_message})
                 socketio.sleep(1)
-
                 # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
                 previous_time = current_time
+
     except Exception as error:
-        logger.info(error)
+        logger.error(f'PROGRESS FUNCTION ERROR: {error}')
 
 @socketio.on('my event') # Decorator to catch an event called "my event"
 def test_connect(): # test_connect() is the event callback function.
@@ -91,6 +88,245 @@ def test_connect(): # test_connect() is the event callback function.
 @socketio.on('disconnect')
 def test_disconnect():
     log_socket("disconnected")
+
+# After a file has been uploaded via the homepage.
+@app.route("/", methods=["POST"])
+def main():
+    if request.form["request_type"] == "uploaded":
+
+        uploaded_file = request.files["chosen_file"]
+        # Make the filename safe
+        filename_secure = secure_filename(uploaded_file.filename)
+        # Save the uploaded file to the uploads folder.
+        uploaded_file.save(os.path.join("uploads", filename_secure))
+        return '' # Something has to be returned, so I'm returning an empty string.
+
+    elif request.form["request_type"] == "convert":
+
+        try:
+            socketio.start_background_task(read_progress)
+        except Exception as error:
+            logger.error(f'start_background_task error: {error}')
+        else:
+            logger.info("Started progress reader.")
+        finally:
+            file_name = request.form["file_name"]
+            uploaded_file_path = os.path.join("uploads", secure_filename(file_name))
+            chosen_codec = request.form["chosen_codec"]
+            # MP3
+            mp3_encoding_type = request.form["mp3_encoding_type"]
+            cbr_abr_bitrate = request.form["cbr_abr_bitrate"]
+            mp3_vbr_setting = request.form["mp3_vbr_setting"]
+            is_y_switch = request.form["is_y_switch"]
+            # AAC
+            fdk_type = request.form["fdk_type"]
+            fdk_cbr = request.form["fdk_cbr"]
+            fdk_vbr = request.form["fdk_vbr"]
+            is_fdk_lowpass = request.form["is_fdk_lowpass"]
+            fdk_lowpass = request.form["fdk_lowpass"]
+            # Vorbis
+            vorbis_encoding = request.form["vorbis_encoding"]
+            vorbis_quality = request.form["vorbis_quality"]
+            # Vorbis/Opus
+            slider_value = request.form["slider_value"]
+            # AC3 
+            ac3_bitrate = request.form["ac3_bitrate"]
+            # FLAC
+            flac_compression = request.form["flac_compression"]
+            # DTS
+            dts_bitrate = request.form["dts_bitrate"]
+            # Opus
+            opus_cbr_bitrate = request.form["opus_cbr_bitrate"]
+            opus_encoding_type = request.form["opus_encoding_type"]
+            # Desired filename
+            output_name = request.form["output_name"]
+
+            variables_to_validate = [file_name, chosen_codec, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, slider_value, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name]
+
+            logger.info(variables_to_validate)
+
+            strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':']
+
+            # check_no_variable_contains_bad_string is a func defined in converter.py
+            if not converter.check_no_variable_contains_bad_string(variables_to_validate, strings_not_allowed):
+                logger.info("BAD STRING")
+                return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
+
+            else:
+                log_this(f'wants to convert "{file_name}" to a {chosen_codec} with a filename of {output_name}')
+                output_path = f'"/home/ubuntu/website/conversions/{output_name}"'
+                # Run the appropritate section of converter.py:
+                if chosen_codec == 'MP3':
+                    converter.run_mp3(uploaded_file_path, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_path)
+                    extension = 'mp3'
+                elif chosen_codec == 'AAC':
+                    converter.run_aac(uploaded_file_path, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
+                    extension = 'm4a'
+                elif chosen_codec == 'Opus':
+                    converter.run_opus(uploaded_file_path, opus_encoding_type, slider_value, opus_cbr_bitrate, output_path)
+                    extension = 'opus'                                                                     
+                elif chosen_codec == 'FLAC':
+                    converter.run_flac(uploaded_file_path, flac_compression, output_path)
+                    extension = 'flac'
+                elif chosen_codec == 'Vorbis':
+                    converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, slider_value, output_path) 
+                    extension = 'ogg'
+                elif chosen_codec == 'WAV':
+                    converter.run_wav(uploaded_file_path, output_path)
+                    extension = 'wav'
+                elif chosen_codec == 'MKV':
+                    converter.run_mkv(uploaded_file_path, output_path)
+                    extension = 'mkv'
+                elif chosen_codec == 'MKA':
+                    converter.run_mka(uploaded_file_path, output_path)
+                    extension = 'mka'
+                elif chosen_codec == 'ALAC':
+                    converter.run_alac(uploaded_file_path, output_path)
+                    extension = 'm4a'
+                elif chosen_codec == 'AC3':
+                    converter.run_ac3(uploaded_file_path, ac3_bitrate, output_path)
+                    extension = 'ac3'
+                elif chosen_codec == 'CAF':
+                    converter.run_caf(uploaded_file_path, output_path)
+                    extension = 'caf'
+                elif chosen_codec == 'DTS':
+                    converter.run_dts(uploaded_file_path, dts_bitrate, output_path)
+                    extension = 'dts'
+
+                converted_file_name = output_name + "." + extension
+                return {
+                    "message": "File converted.",
+                    "downloadFilePath": f'/download/{converted_file_name}'
+                }
+
+# FILE TRIMMER
+@app.route("/file-trimmer", methods=["POST"])
+
+def trim_file():
+    if request.form["request_type"] == "upload_complete":
+   
+        uploaded_file_path = request.files["uploaded_file_path"]
+        # Make the filename safe
+        filename_secure = secure_filename(uploaded_file_path.filename)
+        # Save the uploaded file to the uploads folder.
+        uploaded_file_path.save(os.path.join("uploads", filename_secure))
+        return ''
+
+    if request.form["request_type"] == "trim":
+
+        file_name = request.form["filename"]
+        uploaded_file_path = os.path.join("uploads", secure_filename(file_name))
+        filename = request.form["filename"]
+        start_time = request.form["start_time"]
+        end_time = request.form["end_time"]
+        ext = "." + filename.split(".")[-1]
+        just_name = filename.split(".")[0]
+        output_name = just_name + " [trimmed]" + ext
+
+        try:
+            os.system(f'ffmpeg -y -i "{uploaded_file_path}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
+        except Exception as error:
+            logger.error(f'TRIM ERROR: {error}')
+        else:
+            logger.info('Trim complete.')
+            return {
+                "message": "File trimmed. The trimmed file will now start downloading.",
+                "downloadFilePath": f'/download/{output_name}'
+            }
+
+# Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
+@app.route("/download/<filename>", methods=["GET"])
+def download_file(filename):
+    just_extension = filename.split('.')[-1]
+    try:
+        if just_extension == "m4a":
+            logger.info('Sending file to user...')
+            return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4")
+        else:
+            return send_from_directory(f'{os.getcwd()}/conversions', filename)
+    except Exception as error:
+        logger.error(error)
+    else:
+        logger.info("File sent.")
+
+# CONTACT PAGE
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if request.method == "POST":
+        send_from = "theaudiophile@outlook.com"
+        send_to = "theaudiophile@outlook.com"
+        text = MIMEMultipart()
+        text['From'] = send_from
+        text['To'] = send_to
+        text['Subject'] = "Your Website"
+        body = request.form['message']
+        text.attach(MIMEText(body, 'plain'))
+        server = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(my_email, password)
+        text = text.as_string()
+        server.sendmail(send_from, send_to, text)
+        return "Message sent!"
+    else:
+        log_visit("visited contact page")
+        return render_template("contact.html", title="Contact")
+
+# GAME 1
+@app.route("/game", methods=['POST'])
+def get_score():
+    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
+    user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    user_agent = request.headers.get('User-Agent')
+    score = request.form['score']
+    times_missed = request.form['times_missed']
+    canvas_width = request.form['canvas_width']
+    canvas_height = request.form['canvas_height']
+    try:
+        int(score)
+        int(times_missed)
+        int(canvas_width)
+        int(canvas_width)
+    except ValueError:
+        logger.error("GAME 1 ERROR: The user changed something to a non-int.")
+    else:
+        with open("HighScores.txt", "a") as f:
+            f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
+    finally:
+        just_scores = []
+        with open('HighScores.txt', 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                just_scores.append(line.split('|')[0].strip())
+
+        world_record = max(just_scores, key=lambda x: int(x))
+        return world_record
+
+# GAME 2
+@app.route("/game2", methods=['POST'])
+def game2():
+    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
+    user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    user_agent = request.headers.get('User-Agent')
+    reaction_time = request.form['reaction_time']
+    try:
+        int(reaction_time)
+    except ValueError:
+        logger.error("GAME 2 ERROR: The user changed reaction_time to a non-int.")
+    else:
+        with open("ReactionTimes.txt", "a") as f:
+            f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')
+    finally:
+        reaction_times = []
+        with open('ReactionTimes.txt', 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                reaction_times.append(line.split('|')[0][:-3].strip())
+
+        reaction_record = min(reaction_times, key=lambda x: int(x))
+
+        return reaction_record
 
 @app.route("/game2")
 def game_2():
@@ -122,270 +358,6 @@ def trimmer():
 def game():
     log_visit("visited game")  
     return render_template("game.html", title="Game")
-
-@app.route("/", methods=["POST"])
-def main():
-
-    if request.form["request_type"] == "uploaded":
-
-        chosen_file = request.files["chosen_file"]
-        # Make the filename safe
-        filename_secure = secure_filename(chosen_file.filename)
-        # Save the uploaded file to the uploads folder.
-        chosen_file.save(os.path.join("uploads", filename_secure))
-
-        return ''
-
-    elif request.form["request_type"] == "convert":
-
-        try:
-            socketio.start_background_task(read_progress)
-
-        except Exception as error:
-            logger.error(f'start_background_task error: {error}')
-
-        else:
-            logger.info("Started progress reader.")
-
-        finally:
-            file_name = request.form["file_name"]
-            chosen_file = os.path.join("uploads", secure_filename(file_name))
-            chosen_codec = request.form["chosen_codec"]
-
-            # Put the JavaSript FormData into appropriately-named variables:
-
-            # MP3
-            mp3_encoding_type = request.form["mp3_encoding_type"]
-            cbr_abr_bitrate = request.form["cbr_abr_bitrate"]
-            mp3_vbr_setting = request.form["mp3_vbr_setting"]
-            is_y_switch = request.form["is_y_switch"]
-            # AAC
-            fdk_type = request.form["fdk_type"]
-            fdk_cbr = request.form["fdk_cbr"]
-            fdk_vbr = request.form["fdk_vbr"]
-            is_fdk_lowpass = request.form["is_fdk_lowpass"]
-            fdk_lowpass = request.form["fdk_lowpass"]
-            # Vorbis
-            vorbis_encoding = request.form["vorbis_encoding"]
-            vorbis_quality = request.form["vorbis_quality"]
-            # Vorbis/Opus
-            slider_value = request.form["slider_value"]
-            # AC3 
-            ac3_bitrate = request.form["ac3_bitrate"]
-            # FLAC
-            flac_compression = request.form["flac_compression"]
-            # DTS
-            dts_bitrate = request.form["dts_bitrate"]
-            # Opus
-            opus_cbr_bitrate = request.form["opus_cbr_bitrate"]
-            opus_encoding_type = request.form["opus_encoding_type"]
-            # Desired filename
-            output_name = request.form["output_name"]
-
-            # Want to validate the contents of all variables, putting them in a list makes it easier to do so.
-            variables_to_validate = [file_name, chosen_file, chosen_codec, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, slider_value, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name]
-
-            # Do not allow the following characters in any of the above variables.
-            not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':']
-
-            i = 0
-
-            for var in variables_to_validate:
-
-                while i < len(not_allowed):
-
-                    if not_allowed[i] in variables_to_validate:
-
-                        logger.info(f'The user entered {not_allowed[i]}. Conversion aborted.')
-                        return {"message": "You thought you are so fucking smart."}, 400
-
-                    elif i == len(not_allowed) - 1:
-
-                        i += 1 # To prevent infinite loop.
-                        
-                        log_this(f'wants to convert "{file_name}" to a {chosen_codec} with a filename of {output_name}')
-                    
-                        output_path = f'"/home/ubuntu/website/conversions/{output_name}"'
-
-                        # Run the appropritate section of converter.py:
-
-                        if chosen_codec == 'MP3':
-                            converter.run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_path)
-                            extension = 'mp3'
-                        elif chosen_codec == 'AAC':
-                            converter.run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
-                            extension = 'm4a'
-                        elif chosen_codec == 'Opus':
-                            converter.run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, output_path)
-                            extension = 'opus'                                                                     
-                        elif chosen_codec == 'FLAC':
-                            converter.run_flac(chosen_file, flac_compression, output_path)
-                            extension = 'flac'
-                        elif chosen_codec == 'Vorbis':
-                            converter.run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, output_path) 
-                            extension = 'ogg'
-                        elif chosen_codec == 'WAV':
-                            converter.run_wav(chosen_file, output_path)
-                            extension = 'wav'
-                        elif chosen_codec == 'MKV':
-                            converter.run_mkv(chosen_file, output_path)
-                            extension = 'mkv'
-                        elif chosen_codec == 'MKA':
-                            converter.run_mka(chosen_file, output_path)
-                            extension = 'mka'
-                        elif chosen_codec == 'ALAC':
-                            converter.run_alac(chosen_file, output_path)
-                            extension = 'm4a'
-                        elif chosen_codec == 'AC3':
-                            converter.run_ac3(chosen_file, ac3_bitrate, output_path)
-                            extension = 'ac3'
-                        elif chosen_codec == 'CAF':
-                            converter.run_caf(chosen_file, output_path)
-                            extension = 'caf'
-                        elif chosen_codec == 'DTS':
-                            converter.run_dts(chosen_file, dts_bitrate, output_path)
-                            extension = 'dts'
-
-                        converted_file_name = output_name + "." + extension
-                        
-                        return {
-                            "message": "File converted.",
-                            "downloadFilePath": f'/download/{converted_file_name}'
-                        }
-
-                    else:
-                        i += 1
-           
-# CONTACT PAGE
-
-@app.route("/contact", methods=["GET", "POST"])
-def contact():
-    if request.method == "POST":
-        send_from = "theaudiophile@outlook.com"
-        send_to = "theaudiophile@outlook.com"
-        text = MIMEMultipart()
-        text['From'] = send_from
-        text['To'] = send_to
-        text['Subject'] = "Your Website"
-        body = request.form['message']
-        text.attach(MIMEText(body, 'plain'))
-        server = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(my_email, password)
-        text = text.as_string()
-        server.sendmail(send_from, send_to, text)
-        return "Message sent!"
-    else:
-        log_visit("visited contact page")
-        return render_template("contact.html", title="Contact")
-
-# FILE TRIMMER
-
-@app.route("/file-trimmer", methods=["POST"])
-def trim_file():
-
-    if request.form["request_type"] == "upload_complete":
-   
-        chosen_file = request.files["chosen_file"]
-        # Make the filename safe
-        filename_secure = secure_filename(chosen_file.filename)
-        # Save the uploaded file to the uploads folder.
-        chosen_file.save(os.path.join("uploads", filename_secure))
-        
-        return ''
-
-    if request.form["request_type"] == "trim":
-
-        file_name = request.form["filename"]
-        chosen_file = os.path.join("uploads", secure_filename(file_name))
-        filename = request.form["filename"]
-        start_time = request.form["start_time"]
-        end_time = request.form["end_time"]
-        ext = "." + filename.split(".")[-1]
-        just_name = filename.split(".")[0]
-        output_name = just_name + " [trimmed]" + ext
-
-        try:
-            os.system(f'ffmpeg -y -i "{chosen_file}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
-        except Exception as error:
-            logger.error(f'TRIM ERROR: {error}')
-        else:
-            logger.info('Trim complete.')
-
-        return {
-            "message": "File trimmed. The trimmed file will now start downloading.",
-            "downloadFilePath": f'/download/{output_name}'
-        }
-
-# Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
-@app.route("/download/<filename>", methods=["GET"])
-def download_file(filename):
-    just_extension = filename.split('.')[-1]
-    try:
-        if just_extension == "m4a":
-            logger.info('Sending file to user...')
-            return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4")
-        else:
-            return send_from_directory(f'{os.getcwd()}/conversions', filename)
-    except Exception as error:
-        logger.error(error)
-    else:
-        logger.info("File sent.")
-
-@app.route("/game", methods=['POST'])
-def get_score():
-    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
-    user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    user_agent = request.headers.get('User-Agent')
-    score = request.form['score']
-    times_missed = request.form['times_missed']
-    canvas_width = request.form['canvas_width']
-    canvas_height = request.form['canvas_height']
-    try:
-        int(score)
-        int(times_missed)
-        int(canvas_width)
-        int(canvas_width)
-    except ValueError:
-        logger.info("The user was a silly billy and something for game1 to a non-int.")
-    else:
-        with open("HighScores.txt", "a") as f:
-            f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
-    finally:
-        just_scores = []
-        with open('HighScores.txt', 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                just_scores.append(line.split('|')[0].strip())
-
-        world_record = max(just_scores, key=lambda x: int(x))
-        return world_record
-
-@app.route("/game2", methods=['POST'])
-def game2():
-    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
-    user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    user_agent = request.headers.get('User-Agent')
-    reaction_time = request.form['reaction_time']
-    try:
-        int(reaction_time)
-    except ValueError:
-        logger.info("The user was a silly billy and changed the reaction_time to a non-int.")
-    else:
-        with open("ReactionTimes.txt", "a") as f:
-            f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')
-    finally:
-        reaction_times = []
-        with open('ReactionTimes.txt', 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                reaction_times.append(line.split('|')[0][:-3].strip())
-
-        reaction_record = min(reaction_times, key=lambda x: int(x))
-
-        return reaction_record
   
 if __name__ == "__main__":
     socketio.run(app)
