@@ -16,18 +16,20 @@ app.jinja_env.auto_reload = True
 
 socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
 
-def setup_logger(name, log_file, level=logging.DEBUG):
-    log_format = logging.Formatter('%(message)s')
+def setup_logger(name, log_file):
+    log_format = logging.Formatter('%(levelname)s | %(message)s')
     file_handler = logging.FileHandler(log_file)        
     file_handler.setFormatter(log_format)
     logger = logging.getLogger(name)
-    logger.setLevel(level)
+    if (logger.hasHandlers()):
+        logger.handlers.clear()
+    logger.setLevel(10)
     logger.addHandler(file_handler)
     return logger
 
-logger = setup_logger('logger', 'Info.log')
-visit_logger = setup_logger('visit_logger', 'Visit.log')
-user_agent_logger = setup_logger('user_agent_logger', 'UserAgent.log')
+logger = setup_logger('logger', 'Info.txt')
+visit = setup_logger('visit', 'Visit.log')
+user_agent_logger = setup_logger('user_agent_logger', 'UserAgent.txt')
 socket_logger = setup_logger('socket_logger', 'Socket.log')
 
 # Info.log
@@ -40,7 +42,7 @@ def log_this(message):
 def log_visit(message):
     current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
     client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    visit_logger.info(f'{client} {message} on {current_datetime}')
+    visit.info(f'{client} {message} on {current_datetime}')
 
 # UserAgent.log
 def log_user_agent():
@@ -79,7 +81,7 @@ def read_progress():
                 previous_time = current_time
 
     except Exception as error:
-        logger.error(f'PROGRESS FUNCTION ERROR: {error}')
+        logger.error(f'PROGRESS FUNCTION: {error}')
 
 @socketio.on('my event') # Decorator to catch an event called "my event"
 def test_connect(): # test_connect() is the event callback function.
@@ -106,7 +108,7 @@ def main():
         try:
             socketio.start_background_task(read_progress)
         except Exception as error:
-            logger.error(f'start_background_task error: {error}')
+            logger.error(f'start_background_task: {error}')
         else:
             logger.info("Started progress reader.")
         finally:
@@ -143,17 +145,15 @@ def main():
 
             variables_to_validate = [file_name, chosen_codec, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, slider_value, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name]
 
-            logger.info(variables_to_validate)
-
-            strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':']
+            strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`']
 
             # check_no_variable_contains_bad_string is a func defined in converter.py
             if not converter.check_no_variable_contains_bad_string(variables_to_validate, strings_not_allowed):
-                logger.info("BAD STRING")
                 return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
 
             else:
-                log_this(f'wants to convert "{file_name}" to a {chosen_codec} with a filename of {output_name}')
+                log_this(f'wants to convert {file_name} to a {chosen_codec} with a filename of {output_name}')
+                logger.info(variables_to_validate)
                 output_path = f'"/home/ubuntu/website/conversions/{output_name}"'
                 # Run the appropritate section of converter.py:
                 if chosen_codec == 'MP3':
@@ -226,7 +226,7 @@ def trim_file():
         try:
             os.system(f'ffmpeg -y -i "{uploaded_file_path}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
         except Exception as error:
-            logger.error(f'TRIM ERROR: {error}')
+            logger.error(f'TRIMMER: {error}')
         else:
             logger.info('Trim complete.')
             return {
@@ -245,7 +245,7 @@ def download_file(filename):
         else:
             return send_from_directory(f'{os.getcwd()}/conversions', filename)
     except Exception as error:
-        logger.error(error)
+        logger.error(f'UNABLE TO SEND FILE: {error}')
     else:
         logger.info("File sent.")
 
@@ -289,7 +289,7 @@ def get_score():
         int(canvas_width)
         int(canvas_width)
     except ValueError:
-        logger.error("GAME 1 ERROR: The user changed something to a non-int.")
+        logger.error("GAME 1: The user changed something to a non-int.")
     else:
         with open("HighScores.txt", "a") as f:
             f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
@@ -313,7 +313,7 @@ def game2():
     try:
         int(reaction_time)
     except ValueError:
-        logger.error("GAME 2 ERROR: The user changed reaction_time to a non-int.")
+        logger.error("GAME 2: The user changed reaction_time to a non-int.")
     else:
         with open("ReactionTimes.txt", "a") as f:
             f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')

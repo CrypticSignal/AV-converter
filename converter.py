@@ -17,17 +17,19 @@ def check_no_variable_contains_bad_string(variables_list, disallowed_strings):
             return False
     return True
 
-def setup_logger(name, log_file, level=logging.DEBUG):
-    log_format = logging.Formatter('%(message)s')
+def setup_logger(name, log_file):
+    log_format = logging.Formatter('%(levelname)s | %(message)s')
     file_handler = logging.FileHandler(log_file)        
     file_handler.setFormatter(log_format)
     logger = logging.getLogger(name)
-    logger.setLevel(level)
+    if (logger.hasHandlers()):
+        logger.handlers.clear()
+    logger.setLevel(10)
     logger.addHandler(file_handler)
     return logger
 
 # Info logger
-logger = setup_logger('logger', 'Info.log')
+logger = setup_logger('logger', 'Info.txt')
 
 def run_ffmpeg(chosen_file, params):
     os.system(f'ffmpeg -hide_banner -progress progress.txt -y -i "{chosen_file}" {params}')
@@ -48,7 +50,7 @@ def run_mp3(chosen_file, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is
             else:
                 run_ffmpeg(chosen_file, f'-ac 2 -f wav - | lame --tc "Encoded using freeaudioconverter.net" -Y -V {mp3_vbr_setting} - {output_path}.mp3')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -67,7 +69,7 @@ def run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass
             else:
                 ffmpeg_pipe(chosen_file, f'fdkaac --comment "Encoded using freeaudioconverter.net" --bitrate-mode {fdk_vbr} - -o {output_path}.m4a')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -76,7 +78,7 @@ def run_wav(chosen_file, output_path):
     try:
         run_ffmpeg(chosen_file, f'{output_path}.wav')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -88,7 +90,7 @@ def run_opus(chosen_file, opus_encoding_type, slider_value, opus_cbr_bitrate, ou
         else: # CBR
             ffmpeg_pipe(chosen_file, f'opusenc --comment Comment="Encoded using freeaudioconverter.net" --hard-cbr {opus_cbr_bitrate} - {output_path}.opus')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -100,7 +102,7 @@ def run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, outpu
         elif vorbis_encoding == "vbr_quality": # True VBR
             ffmpeg_pipe(chosen_file, f'oggenc -c "Comment=Encoded using freeaudioconverter.net" -q {vorbis_quality} - -o {output_path}.ogg')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -109,7 +111,7 @@ def run_flac(chosen_file, flac_compression, output_path):
     try:
         run_ffmpeg(chosen_file, f'-c:a flac -compression_level {flac_compression} {output_path}.flac')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -118,7 +120,7 @@ def run_alac(chosen_file, output_path):
     try:
         run_ffmpeg(chosen_file, f'-c:a alac {output_path}.m4a')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -127,7 +129,7 @@ def run_ac3(chosen_file, ac3_bitrate, output_path):
     try:
         run_ffmpeg(chosen_file, f'-c:a ac3 -b:a {ac3_bitrate}k {output_path}.ac3')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -136,7 +138,7 @@ def run_dts(chosen_file, dts_bitrate, output_path):
     try:
         run_ffmpeg(chosen_file, f'-c:a dca -b:a {dts_bitrate}k -strict -2 {output_path}.dts')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -145,7 +147,7 @@ def run_caf(chosen_file, output_path):
     try:
         run_ffmpeg(chosen_file, f'{output_path}.caf')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -154,7 +156,7 @@ def run_mka(chosen_file, output_path):
     try:
         run_ffmpeg(chosen_file, f'-c:a copy {output_path}.mka')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
@@ -163,6 +165,6 @@ def run_mkv(chosen_file, output_path):
     try:
         run_ffmpeg(chosen_file, f'-c copy {output_path}.mkv')
     except Exception as error:
-        logger.error(f'CONVERTER ERROR: {error}')
+        logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')

@@ -124,7 +124,7 @@ function upload_and_convert() {
             return;    
         }
 
-        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.includes('\\') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('command') || outputNameBox.value.includes('$')) {
+        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('\\') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('command') || outputNameBox.value.includes('$')) {
             show_alert('Output name cannot contain any of the following characters: "/?*><|:$ (or the word "command")', "danger");
             return;
         }
