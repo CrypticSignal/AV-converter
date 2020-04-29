@@ -45,6 +45,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
     const dtsBitrate = document.getElementById('dts-slider').value;
     const opusBitrate = document.getElementById('opus_cbr_slider').value;
     const opusEncodingType = document.getElementById('opus-encoding-type').value;
+    const isKeepVideo = document.querySelector('input[name="is-keep-video"]:checked').value;
 
     const data = new FormData();
 
@@ -69,6 +70,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
     data.append("opus_cbr_bitrate", opusBitrate);
     data.append("opus_encoding_type", opusEncodingType);
     data.append("is_y_switch", isYSwitch);
+    data.append("is_keep_video", isKeepVideo);
 
     conversionRequest.open('POST', '/');
     conversionRequest.send(data);
@@ -98,7 +100,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_convert() {
 
-    allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf", "mov", "thd", "dtshd"]
+    allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "mts", "webm", "ADPCM", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 
     if (!input.value && document.getElementById("output_name").value == '') {
         show_alert("Perhaps in the future a website will be able to read your mind and automatically complete the required fields, but technology hasn't gotten that far yet.", "info")

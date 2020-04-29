@@ -4,48 +4,56 @@
 <div id="fb-root"></div>
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v6.0"></script>
 
-  <h1>Audio and Video tools</h1>
+  <h1>FAC</h1>
 
   <div class="tagline">
-    <p>Convert an audio file to another format, extract the audio from a video or convert a video to MKV.</p>
+    <P>Click <a href=about target="_blank">here</a> to find out what you can do on FreeAudioConverter.net (FAC).</P>
   </div>
-  <i>***If you run into any issues or bugs, please let me know by using the <a href=contact target="_blank">contact</a> page.***</i><br><br>
 
-  <h3><b>1. Select the file you wish to convert:</b></h3>
+  
+
+  <h3>1. Select the file you wish to convert:</h3>
 
   <div class="container">
 
     <div class="mb-3 mt-3">
       <div class="form-group mb-3">
         <div class="custom-file">
-          <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS, .ac3, .3gp, .dts, .webm, .ADPCM, .spx, .caf, .mov, .dtshd, .thd" type="file" class="custom-file-input" id="file_input" oninput="updateBoxes()">
+          <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS, .mts, .ac3, .3gp, .dts, .webm, .ADPCM, .adpcm, .spx, .caf, .mov, .dtshd, .thd" type="file" class="custom-file-input" id="file_input" oninput="updateBoxes()">
           <label id="file_input_label" class="custom-file-label">Select file</label>
         </div>
       </div>
     </div>
-  
+
+    <i>Max file size: 5 GB.</i>
     <p>To see the list of supported input filetypes, click <a href=filetypes target="_blank">here</a>.</p>
-    <i>Videos are converted to audio-only files, unless you select MKV as the output format. Max file size: 5 GB.</i>
   
-    <hr><h3><b>2. Desired Format:</b></h3>
+    <hr><h3>2. Desired Format:</h3>
   
     <!--List of Codecs-->
     <select id="codecs" onchange="showHide(this.value);">
       <option selected value="MP3">MP3 (.mp3) [LAME v3.100]</option>
       <option value="AAC">AAC (.m4a) [Fraunhofer FDK AAC]</option>
-      <option value="WAV">WAV (.wav)</option>
+      <option value="WAV">WAV</option>
       <option value="Opus">Opus (.opus) [libopus 1.3.1]</option>
       <option value="Vorbis">Vorbis (.ogg) [libVorbis 1.3.6]</option>
-      <option value="FLAC">FLAC (.flac)</option>
-      <option value="ALAC">ALAC (.m4a)</option>
-      <option value="AC3">AC3 (.ac3)</option>
-      <option value="DTS">DTS (.dts)</option>
+      <option value="FLAC">FLAC</option>
+      <option value="ALAC">ALAC</option>
+      <option value="AC3">AC3</option>
+      <option value="DTS">DTS</option>
       <option value="CAF">CAF (.caf)</option>
       <option value="MKA">Extract audio without converting (.mka)</option>
-      <option value="MKV">Convert video to MKV (.mkv)</option>
     </select>
+
+    <div id='keep-vid-div' style='display:none'><br>
+      <label for='is-keep-video'>Keep the video?</label>
+      <label for ="keep-vid">Yes</label>
+      <input type="radio" id="keep-vid" name="is-keep-video" value="yes">
+      <label for="not-keep-vid">No</label>
+      <input type="radio" id="not-keep-vid" checked="checked" name="is-keep-video" value="no">
+    </div>
   
-    <hr><h3><b>3. Encoder Settings:</b></h3>
+    <hr><h3>3. Encoder Settings:</h3>
 
     <!--MP3 DIV-->
     <div id="MP3">
@@ -88,10 +96,10 @@
 
       <div id=y-switch-div style='display:none'>
         <p>Enable the Y switch?</p>
-        <input type="radio" name="is-y-switch" value="yes">
-        <label for="opt2">Yes</label>
-        <input type="radio" checked="checked" name="is-y-switch" value="no">
-        <label for="opt1">No</label><br>
+        <label for="opt1">Yes</label>
+        <input type="radio" id="opt1" name="is-y-switch" value="yes">
+        <label for="opt2">No</label>
+        <input type="radio" id="opt2" checked="checked" name="is-y-switch" value="no"><br>
         <i>The Y switch tells LAME not to encode the highest frequencies accurately, if doing so causes disproportional increases in bitrate. More details <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME_Y_SWITH">here</a>.</i>
         <i>This setting only applies if V0 to V2 is selected. V3 to V6 use the Y switch and this cannot be changed.</i>
       </div>
@@ -156,10 +164,10 @@
 
       <br><div id="is-lowpass-div" style="display:none">
         <p>Change default low-pass filter?</p>
-        <input type="radio" onclick="javascript:isFDKLowpass();" name="is-lowpass" id="yes" value="yes">
         <label for="yes">Yes</label>
-        <input type="radio" onclick="javascript:isFDKLowpass();" checked="checked" name="is-lowpass" id="no" value="no">
+        <input type="radio" onclick="javascript:isFDKLowpass();" name="is-lowpass" id="yes" value="yes">
         <label for="no">No</label>
+        <input type="radio" onclick="javascript:isFDKLowpass();" checked="checked" name="is-lowpass" id="no" value="no">
         <br><i>To see the default low-pass filters, click <a href="https://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#Bandwidth"target="_blank">here</a>.</i>
       </div>
 
@@ -242,10 +250,10 @@
     </div>
     
     <form method="POST":>
-      <hr><h3><b>4. Output Filename:</b></h3>
+      <hr><h3>4. Output Filename:</h3>
       <input type="text" class="form-control" maxlength="200" id="output_name" required/><br>
     </form>
-    
+
     <button onclick="upload_and_convert()" id="convert_btn" class="btn btn-primary">Convert</button>
 
     <div class="text-center" id="converting_btn" style="display:none">

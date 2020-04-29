@@ -182,14 +182,14 @@ h1 {
 
 .tagline{
   text-align: center;
-  background: #3b5998;
+  background: darkred;
   color:white;
 }
 
 body {
     text-align: center;
     color: black;
-    background-color: #f1f1f1; 
+    background-color: lightgrey; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
 

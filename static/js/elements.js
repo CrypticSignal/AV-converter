@@ -25,6 +25,7 @@ function showHide(value) {
         document.getElementById('mp3sliderdiv').style.display = 'block';
         document.getElementById('mp3_vbr_setting_div').style.display = 'none';
         document.getElementById('y-switch-div').style.display = 'none';
+        document.getElementById('keep-vid-div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("dts-div").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
@@ -44,6 +45,7 @@ function showHide(value) {
         document.getElementById('no').checked = true;
         document.getElementById('fdk-lowpass-div').style.display = 'none';
         document.getElementById('fdk-vbr').style.display = 'none';
+        document.getElementById('keep-vid-div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("dts-div").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
@@ -53,17 +55,18 @@ function showHide(value) {
         document.getElementById('ac3-div').style.display = 'none';
         document.getElementById('wav_flac_msg').style.display = 'none';
     }
-    
-    else if (value=='AC3') {
-        document.getElementById('ac3-div').style.display = 'block';
+
+    else if (value=='WAV') {
+        document.getElementById('wav_flac_msg').style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'block';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("dts-div").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
         document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById('ac3-div').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
-        document.getElementById('wav_flac_msg').style.display = 'none';
     }
 
     else if (value=='Opus') {
@@ -71,6 +74,7 @@ function showHide(value) {
         document.getElementById("opus-encoding").style.display = 'block';
         document.getElementById('opus-encoding-type').selectedIndex = 1;
         document.getElementById("vorbis_opus_vbr_bitrate").style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'none';
         document.getElementById('opus-cbr-bitrate').style.display = 'none';
         document.getElementById("dts-div").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
@@ -86,6 +90,7 @@ function showHide(value) {
         document.getElementById('vorbis_encoding_div').style.display = 'block';
         document.getElementById("vorbis_encoding").selectedIndex = 1;
         document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("dts-div").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
@@ -98,6 +103,7 @@ function showHide(value) {
 
     else if (value=='FLAC') {
         document.getElementById('flac').style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'block';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("dts-div").style.display = 'none';
         document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
@@ -108,8 +114,35 @@ function showHide(value) {
         document.getElementById('AAC').style.display = 'none';
     }
 
+    else if (value=='ALAC') {
+        document.getElementById('wav_flac_msg').style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'block';
+        document.getElementById('flac').style.display = 'none';
+        document.getElementById("Opus").style.display = 'none';
+        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById('MP3').style.display = 'none';
+        document.getElementById('Vorbis').style.display = 'none';
+        document.getElementById('ac3-div').style.display = 'none';
+        document.getElementById('AAC').style.display = 'none';
+    }
+    
+    else if (value=='AC3') {
+        document.getElementById('ac3-div').style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'block';
+        document.getElementById("Opus").style.display = 'none';
+        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById('flac').style.display = 'none';
+        document.getElementById('MP3').style.display = 'none';
+        document.getElementById('Vorbis').style.display = 'none';
+        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById('AAC').style.display = 'none';
+        document.getElementById('wav_flac_msg').style.display = 'none';
+    }
+
     else if (value=='DTS') {
         document.getElementById("dts-div").style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'block';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
@@ -120,8 +153,35 @@ function showHide(value) {
         document.getElementById('AAC').style.display = 'none';
     }
 
-    else {
+    else if (value=='CAF') {
         document.getElementById('wav_flac_msg').style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'none';
+        document.getElementById("Opus").style.display = 'none';
+        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById('flac').style.display = 'none';
+        document.getElementById('MP3').style.display = 'none';
+        document.getElementById('Vorbis').style.display = 'none';
+        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById('ac3-div').style.display = 'none';
+        document.getElementById('AAC').style.display = 'none';
+    }
+
+    else if (value=='MKA') {
+        document.getElementById('wav_flac_msg').style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'none';
+        document.getElementById("Opus").style.display = 'none';
+        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById('flac').style.display = 'none';
+        document.getElementById('MP3').style.display = 'none';
+        document.getElementById('Vorbis').style.display = 'none';
+        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById('ac3-div').style.display = 'none';
+        document.getElementById('AAC').style.display = 'none';
+    }
+
+    else if (value=='MKV') {
+        document.getElementById('wav_flac_msg').style.display = 'block';
+        document.getElementById('keep-vid-div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("dts-div").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
@@ -132,10 +192,6 @@ function showHide(value) {
         document.getElementById('AAC').style.display = 'none';
     }
 }
-
-// Show MP3 CBR div by default
-
-
 
 // // Show Opus VBR div by default
 // if (document.getElementsByName('codecs')[0].selectedOptions[0].value === "Opus") {
@@ -170,7 +226,7 @@ function fdkEncodingType(value) {
     else {
         document.getElementById('fdk-type').style.display = 'block';
         document.getElementById('fdk-vbr').style.display = 'block';
-        document.getElementById('is-lowpass-div').style.display = 'block';
+        document.getElementById('is-lowpass-div').style.display = 'none';
         document.getElementById('no').checked = true;
         document.getElementById('fdk-lowpass-div').style.display = 'none';
         document.getElementById('fdk_cbr_div').style.display = 'none';

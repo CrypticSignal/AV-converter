@@ -74,9 +74,12 @@ def run_aac(chosen_file, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass
         logger.info(f'{chosen_file} converted.')
 
 # WAV
-def run_wav(chosen_file, output_path):
+def run_wav(chosen_file, is_keep_video, output_path):
     try:
-        run_ffmpeg(chosen_file, f'{output_path}.wav')
+        if is_keep_video == "yes":
+            run_ffmpeg(chosen_file, f'-map 0:v -map 0:a:0 -c:v copy -c:a:0 pcm_s16le {output_path}.mkv')
+        else:
+            run_ffmpeg(chosen_file, f'{output_path}.wav')
     except Exception as error:
         logger.error(f'CONVERTER: {error}')
     else:
@@ -107,36 +110,48 @@ def run_vorbis(chosen_file, vorbis_encoding, vorbis_quality, slider_value, outpu
         logger.info(f'{chosen_file} converted.')
 
 # FLAC
-def run_flac(chosen_file, flac_compression, output_path):
+def run_flac(chosen_file, is_keep_video, flac_compression, output_path):
     try:
-        run_ffmpeg(chosen_file, f'-c:a flac -compression_level {flac_compression} {output_path}.flac')
+        if is_keep_video == "yes":
+            run_ffmpeg(chosen_file, f'-map 0:v -map 0:a:0 -c:v copy -c:a:0 flac {output_path}.mkv')
+        else:
+            run_ffmpeg(chosen_file, f'-c:a flac {output_path}.flac')
     except Exception as error:
         logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
 # ALAC
-def run_alac(chosen_file, output_path):
+def run_alac(chosen_file, is_keep_video, output_path):
     try:
-        run_ffmpeg(chosen_file, f'-c:a alac {output_path}.m4a')
+        if is_keep_video == "yes":
+            run_ffmpeg(chosen_file, f'-map 0:v -map 0:a:0 -c:a:0 alac {output_path}.mkv')
+        else:
+            run_ffmpeg(chosen_file, f'-c:a alac {output_path}.m4a')
     except Exception as error:
         logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
 # AC3
-def run_ac3(chosen_file, ac3_bitrate, output_path):
+def run_ac3(chosen_file, is_keep_video, ac3_bitrate, output_path):
     try:
-        run_ffmpeg(chosen_file, f'-c:a ac3 -b:a {ac3_bitrate}k {output_path}.ac3')
+        if is_keep_video == "yes":
+            run_ffmpeg(chosen_file, f'-map 0:v -map 0:a:0 -c:a:0 ac3 -b:a:0 {ac3_bitrate}k {output_path}.mkv')
+        else:
+            run_ffmpeg(chosen_file, f'-c:a ac3 -b:a {ac3_bitrate}k {output_path}.ac3')
     except Exception as error:
         logger.error(f'CONVERTER: {error}')
     else:
         logger.info(f'{chosen_file} converted.')
 
 # DTS
-def run_dts(chosen_file, dts_bitrate, output_path):
+def run_dts(chosen_file, is_keep_video, dts_bitrate, output_path):
     try:
-        run_ffmpeg(chosen_file, f'-c:a dca -b:a {dts_bitrate}k -strict -2 {output_path}.dts')
+        if is_keep_video == "yes":
+            run_ffmpeg(chosen_file, f'-map 0:v -map 0:a:0 -c:a:0 dca -b:a:0 {dts_bitrate}k -strict -2 {output_path}.mkv')
+        else:
+            run_ffmpeg(chosen_file, f'-c:a ac3 -b:a {dts_bitrate}k -strict -2 {output_path}.dts')
     except Exception as error:
         logger.error(f'CONVERTER: {error}')
     else:
