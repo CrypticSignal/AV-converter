@@ -310,19 +310,27 @@ def get_score():
     user_agent = request.headers.get('User-Agent')
     score = request.form['score']
     times_missed = request.form['times_missed']
+    accuracy = request.form['accuracy']
     canvas_width = request.form['canvas_width']
     canvas_height = request.form['canvas_height']
+    logger.info(score)
+    logger.info(times_missed)
+    logger.info(accuracy)
+    logger.info(canvas_height)
     try:
         int(score)
         int(times_missed)
         int(canvas_width)
         int(canvas_width)
     except ValueError:
+        logger.info("HIT ERROR BLOCK")
         logger.error("GAME 1: The user changed something to a non-int.")
     else:
+        logger.info("HIT ELSE BLOCK")
         with open("HighScores.txt", "a") as f:
             f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
     finally:
+        logger.info("HIT FINALLY BLOCK")
         just_scores = []
         with open('HighScores.txt', 'r') as f:
             lines = f.readlines()
