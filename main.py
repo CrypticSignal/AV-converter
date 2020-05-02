@@ -159,23 +159,22 @@ def main():
                 # Run the appropritate section of converter.py:
 
                 if chosen_codec == 'MP3':
-                    logger.info(mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch)
+                    logger.info(f'{mp3_encoding_type}, {cbr_abr_bitrate}, {mp3_vbr_setting}, {is_y_switch}')
                     converter.run_mp3(uploaded_file_path, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_path)
-
                     extension = 'mp3'
 
                 elif chosen_codec == 'AAC':
-                    logger.info(fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass)
+                    logger.info(f'{fdk_type}, {fdk_cbr}, {fdk_vbr}, {is_fdk_lowpass}, {fdk_lowpass}')
                     converter.run_aac(uploaded_file_path, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
                     extension = 'm4a'
 
                 elif chosen_codec == 'Opus':
-                    logger.info(opus_encoding_type, slider_value, opus_cbr_bitrate)
+                    logger.info(f'{opus_encoding_type}, {slider_value}, {opus_cbr_bitrate}')
                     converter.run_opus(uploaded_file_path, opus_encoding_type, slider_value, opus_cbr_bitrate, output_path)
                     extension = 'opus'   
 
                 elif chosen_codec == 'FLAC':
-                    logger.info(is_keep_video, flac_compression)
+                    logger.info(f'{is_keep_video}, {flac_compression}')
                     converter.run_flac(uploaded_file_path, is_keep_video, flac_compression, output_path)
                     if is_keep_video == "yes":
                         extension = 'mkv'
@@ -183,7 +182,7 @@ def main():
                         extension = 'flac'
 
                 elif chosen_codec == 'Vorbis':
-                    logger.info(vorbis_encoding, vorbis_quality, slider_value)
+                    logger.info(f'{vorbis_encoding}, {vorbis_quality}, {slider_value}')
                     converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, slider_value, output_path) 
                     extension = 'ogg'
 
