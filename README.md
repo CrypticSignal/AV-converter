@@ -2,7 +2,7 @@
 On https://freeaudioconverter.net, you can:
 - Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (.ogg), FLAC, ALAC, AC3, DTS or CAF.
 - Convert a video to an audio-only file (to any of the above formats).
-- Change the audio codec of a video.
+- Change the audio codec of a video to AC3, DTS, WAV, FLAC or ALAC.
 - Trim a video or audio file | https://freeaudioconverter.net/file-trimmer
 - Play reaction-time games! https://freeaudioconverter.net/game & https://freeaudioconverter.net/game2
 ## How does it work?
