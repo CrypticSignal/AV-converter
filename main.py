@@ -153,25 +153,29 @@ def main():
                 return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
 
             else:
-                log_this(f'wants to convert {file_name} to a {chosen_codec} with a filename of {output_name}')
-                logger.info(variables_to_validate)
+                log_this(f'wants to convert {file_name}\nChosen format: {chosen_codec}\nOutput Filename: {output_name}')
                 output_path = f'"/home/ubuntu/website/conversions/{output_name}"'
 
                 # Run the appropritate section of converter.py:
 
                 if chosen_codec == 'MP3':
+                    logger.info(mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch)
                     converter.run_mp3(uploaded_file_path, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_path)
+
                     extension = 'mp3'
 
                 elif chosen_codec == 'AAC':
+                    logger.info(fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass)
                     converter.run_aac(uploaded_file_path, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
                     extension = 'm4a'
 
                 elif chosen_codec == 'Opus':
+                    logger.info(opus_encoding_type, slider_value, opus_cbr_bitrate)
                     converter.run_opus(uploaded_file_path, opus_encoding_type, slider_value, opus_cbr_bitrate, output_path)
                     extension = 'opus'   
 
                 elif chosen_codec == 'FLAC':
+                    logger.info(is_keep_video, flac_compression)
                     converter.run_flac(uploaded_file_path, is_keep_video, flac_compression, output_path)
                     if is_keep_video == "yes":
                         extension = 'mkv'
@@ -179,10 +183,12 @@ def main():
                         extension = 'flac'
 
                 elif chosen_codec == 'Vorbis':
+                    logger.info(vorbis_encoding, vorbis_quality, slider_value)
                     converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, slider_value, output_path) 
                     extension = 'ogg'
 
                 elif chosen_codec == 'WAV':
+                    logger.info(f'Keep video selected? {is_keep_video}')
                     converter.run_wav(uploaded_file_path, is_keep_video, output_path)
                     if is_keep_video == "yes":
                         extension = 'mkv'
@@ -198,6 +204,7 @@ def main():
                     extension = 'mka'
 
                 elif chosen_codec == 'ALAC':
+                    logger.info(f'Keep video selected? {is_keep_video}')
                     converter.run_alac(uploaded_file_path, is_keep_video, output_path)
                     if is_keep_video == "yes":
                         extension = 'mkv'
@@ -205,6 +212,7 @@ def main():
                         extension = 'm4a'
 
                 elif chosen_codec == 'AC3':
+                    logger.info(f'Keep video selected? {is_keep_video}')
                     converter.run_ac3(uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
                     if is_keep_video == "yes":
                         extension = 'mkv'
@@ -216,6 +224,7 @@ def main():
                     extension = 'caf'
 
                 elif chosen_codec == 'DTS':
+                    logger.info(f'Keep video selected? {is_keep_video}')
                     converter.run_dts(uploaded_file_path, is_keep_video, dts_bitrate, output_path)
                     if is_keep_video == "yes":
                         extension = 'mkv'
@@ -279,28 +288,24 @@ def download_file(filename):
         logger.info("File sent.")
 
 # CONTACT PAGE
-@app.route("/contact", methods=["GET", "POST"])
-def contact():
-    if request.method == "POST":
-        send_from = "theaudiophile@outlook.com"
-        send_to = "theaudiophile@outlook.com"
-        text = MIMEMultipart()
-        text['From'] = send_from
-        text['To'] = send_to
-        text['Subject'] = "Your Website"
-        body = request.form['message']
-        text.attach(MIMEText(body, 'plain'))
-        server = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(my_email, password)
-        text = text.as_string()
-        server.sendmail(send_from, send_to, text)
-        return "Message sent!"
-    else:
-        log_visit("visited contact page")
-        return render_template("contact.html", title="Contact")
+@app.route("/contact", methods=["POST"])
+def send_email():
+    send_from = "theaudiophile@outlook.com"
+    send_to = "theaudiophile@outlook.com"
+    text = MIMEMultipart()
+    text['From'] = send_from
+    text['To'] = send_to
+    text['Subject'] = "Your Website"
+    body = request.form['message']
+    text.attach(MIMEText(body, 'plain'))
+    server = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
+    server.ehlo()
+    server.starttls()
+    server.ehlo()
+    server.login(my_email, password)
+    text = text.as_string()
+    server.sendmail(send_from, send_to, text)
+    return "Message sent!"
 
 # GAME 1
 @app.route("/game", methods=['POST'])
@@ -323,14 +328,11 @@ def get_score():
         int(canvas_width)
         int(canvas_width)
     except ValueError:
-        logger.info("HIT ERROR BLOCK")
         logger.error("GAME 1: The user changed something to a non-int.")
     else:
-        logger.info("HIT ELSE BLOCK")
         with open("HighScores.txt", "a") as f:
             f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
     finally:
-        logger.info("HIT FINALLY BLOCK")
         just_scores = []
         with open('HighScores.txt', 'r') as f:
             lines = f.readlines()
@@ -362,13 +364,7 @@ def game2():
                 reaction_times.append(line.split('|')[0][:-3].strip())
 
         reaction_record = min(reaction_times, key=lambda x: int(x))
-
         return reaction_record
-
-@app.route("/game2")
-def game_2():
-    log_visit("visited game 2")  
-    return render_template("game2.html", title="Game 2")
 
 @app.route("/")
 def homepage():
@@ -391,10 +387,20 @@ def trimmer():
     log_visit("visited trimmer")
     return render_template("trimmer.html", title="File Trimmer")
 
+@app.route("/contact")
+def contact():
+    log_visit("visited contact page")
+    return render_template("contact.html", title="Contact")
+
 @app.route("/game")
 def game():
     log_visit("visited game")  
     return render_template("game.html", title="Game")
+
+@app.route("/game2")
+def game_2():
+    log_visit("visited game 2")  
+    return render_template("game2.html", title="Game 2")
   
 if __name__ == "__main__":
     socketio.run(app)
