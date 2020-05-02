@@ -1,17 +1,7 @@
-/* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */
-function myFunction() {
-    var x = document.getElementById("myTopnav");
-    if (x.className === "topnav") {
-      x.className += " responsive";
-    } else {
-      x.className = "topnav";
-    }
-  }
-
-// Hitting the enter key is the same thing as clicking on the upload button.
+// Hitting the enter key is the same thing as clicking on the convert button.
 document.addEventListener("keydown", function(event) {
     if (event.keyCode === 13) {
-        document.getElementById("upload_btn").click();
+        document.getElementById("convert_btn").click();
     }
 });
 
@@ -193,14 +183,6 @@ function showHide(value) {
     }
 }
 
-// // Show Opus VBR div by default
-// if (document.getElementsByName('codecs')[0].selectedOptions[0].value === "Opus") {
-//     document.getElementById('Opus').style.display = 'block';
-//     document.getElementById('opus-encoding').value === 'opus-vbr';
-//     document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'block';
-//     document.getElementById('opus-cbr-bitrate').style.display = 'none';
-// }
-
 function showHideMP3(value) {
     if (value=='cbr' || value=='abr') {
         document.getElementById('mp3sliderdiv').style.display = 'block';
@@ -317,14 +299,6 @@ slider.oninput = function () {
     output.innerHTML = this.value + "kbps";
 }
 
-// // Opus CBR.
-// const opus_cbr_slider = document.getElementById("opus_cbr_slider");
-// const opusoutput = document.getElementById("opuscbrvalue");
-// opusoutput.innerHTML = "kbps";
-// opus_cbr_slider.oninput = function () {
-//     opusoutput.innerHTML = "kbps";
-// }
-
 // Slider for FLAC
 const flacslider = document.getElementById("flac_compression");
 const flacoutput = document.getElementById("flac_value");
@@ -340,3 +314,13 @@ dtsoutput.innerHTML = dtsslider.value + "kbps";
 dtsslider.oninput = function () {
     dtsoutput.innerHTML = this.value + "kbps";
 }
+
+/* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */
+function myFunction() {
+    var x = document.getElementById("myTopnav");
+    if (x.className === "topnav") {
+      x.className += " responsive";
+    } else {
+      x.className = "topnav";
+    }
+  }

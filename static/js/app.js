@@ -21,7 +21,7 @@ function show_alert(message, type) {
     </div>`
 }
 
-function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
+function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
 
     const conversionRequest = new XMLHttpRequest();
     conversionRequest.responseType = "json";
@@ -75,9 +75,9 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
     conversionRequest.open('POST', '/');
     conversionRequest.send(data);
 
-    conversionRequest.addEventListener("load", function () { // conversionRequest is complete
+    conversionRequest.addEventListener("load", function () { // conversionRequest is complete.
 
-        reset(); // Reset the page to the default state,
+        reset(); // Reset the page to the default state.
 
         if (conversionRequest.status == 200) {
 
@@ -95,7 +95,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete
             show_alert("Error converting file", "danger");
         }       
     })
-} // Closing bracket pythonHeresWhatYouNeed
+} // Closing bracket for pythonHeresWhatYouNeed function.
 
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_convert() {
@@ -107,7 +107,7 @@ function upload_and_convert() {
         return;
     }
 
-    else if (input.value) { // If a file has been selected
+    else if (input.value) { // (If a file has been selected)
         const chosenFile = input.files[0];
         const filename = chosenFile.name;
         const filenameParts = filename.split('.');
@@ -176,7 +176,7 @@ function upload_and_convert() {
         cancelButton.classList.remove('d-none');
         progressWrapper.style.display = 'block';
     
-        // Get amount uploaded and total filesize (MB)
+        // Get amount uploaded and total filesize (MB).
         const loaded = event.loaded / 10**6;
         const total = event.total / 10**6;
 
@@ -247,7 +247,7 @@ function updateBoxes() {
     outputNameBox.value = defaultOutputName; 
 }
 
-// Function to reset the page
+// Function to reset the page.
 function reset() {
     document.getElementById("converting_btn").style.display = 'none ';
     conversionProgress.style.display = 'none';
