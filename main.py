@@ -280,6 +280,7 @@ def download_file(filename):
             logger.info('Sending file to user...')
             return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4")
         else:
+            logger.info('Sending file to user...')
             return send_from_directory(f'{os.getcwd()}/conversions', filename)
     except Exception as error:
         logger.error(f'UNABLE TO SEND FILE: {error}')
