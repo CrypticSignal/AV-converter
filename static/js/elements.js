@@ -200,7 +200,7 @@ function fdkEncodingType(value) {
     if (value=='fdk-cbr') {
         document.getElementById('fdk-type').style.display = 'block';
         document.getElementById('fdk_cbr_div').style.display = 'block';
-        document.getElementById('is-lowpass-div').style.display = 'block';
+        //document.getElementById('is-lowpass-div').style.display = 'block';
         document.getElementById('no').checked = true;
         document.getElementById('fdk-lowpass-div').style.display = 'none';
         document.getElementById('fdk-vbr').style.display = 'none';  
@@ -208,7 +208,7 @@ function fdkEncodingType(value) {
     else {
         document.getElementById('fdk-type').style.display = 'block';
         document.getElementById('fdk-vbr').style.display = 'block';
-        document.getElementById('is-lowpass-div').style.display = 'none';
+        //document.getElementById('is-lowpass-div').style.display = 'none';
         document.getElementById('no').checked = true;
         document.getElementById('fdk-lowpass-div').style.display = 'none';
         document.getElementById('fdk_cbr_div').style.display = 'none';
@@ -223,24 +223,25 @@ function isFDKLowpass() {
     }
 }
 
-function showHideAAC(value) {
-    if (value=='cbr' || value=='abr') {
-        document.getElementById('aac_cbr_div').style.display = 'block';
-        document.getElementById('fdk_cbr_div').style.display = 'none';
-        document.getElementById('fdk-vbr').style.display = 'none';
-    }
-    else if (value=='tvbr') {
-        document.getElementById('aac_tvbr_div').style.display = 'block';
-        document.getElementById('fdk_cbr_div').style.display = 'none';
-        document.getElementById('fdk-vbr').style.display = 'none';
-    }
+// // QAAC
+// function showHideAAC(value) {
+//     if (value=='cbr' || value=='abr') {
+//         document.getElementById('aac_cbr_div').style.display = 'block';
+//         document.getElementById('fdk_cbr_div').style.display = 'none';
+//         document.getElementById('fdk-vbr').style.display = 'none';
+//     }
+//     else if (value=='tvbr') {
+//         document.getElementById('aac_tvbr_div').style.display = 'block';
+//         document.getElementById('fdk_cbr_div').style.display = 'none';
+//         document.getElementById('fdk-vbr').style.display = 'none';
+//     }
 
-    else {
-        document.getElementById('aac_vbr_div').style.display = 'block';
-        document.getElementById('fdk_cbr_div').style.display = 'none';
-        document.getElementById('fdk-vbr').style.display = 'none';
-    }
-}
+//     else {
+//         document.getElementById('aac_vbr_div').style.display = 'block';
+//         document.getElementById('fdk_cbr_div').style.display = 'none';
+//         document.getElementById('fdk-vbr').style.display = 'none';
+//     }
+// }
 
 // Vorbis
 function showHideVorbis(value) {

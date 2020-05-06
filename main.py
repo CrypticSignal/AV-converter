@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, send_from_directory, escape
 from flask_socketio import SocketIO, emit
-from datetime import datetime, timedelta
+from loggers import *
 from werkzeug.utils import secure_filename
 import logging, os
 import converter
@@ -16,72 +16,26 @@ app.jinja_env.auto_reload = True
 
 socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
 
-def setup_logger(name, log_file):
-    log_format = logging.Formatter('%(levelname)s | %(message)s')
-    file_handler = logging.FileHandler(log_file)        
-    file_handler.setFormatter(log_format)
-    logger = logging.getLogger(name)
-    if (logger.hasHandlers()):
-        logger.handlers.clear()
-    logger.setLevel(10)
-    logger.addHandler(file_handler)
-    return logger
-
-logger = setup_logger('logger', 'Info.txt')
-visit = setup_logger('visit', 'Visit.log')
-user_agent_logger = setup_logger('user_agent_logger', 'UserAgent.txt')
-socket_logger = setup_logger('socket_logger', 'Socket.log')
-
-# Info.log
-def log_this(message):
-    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
-    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    logger.info(f'{current_datetime} | {client} {message}')
-
-# Visit.log
-def log_visit(message):
-    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
-    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    visit.info(f'{client} {message} on {current_datetime}')
-
-# UserAgent.log
-def log_user_agent():
-    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
-    user_agent = request.headers.get('User-Agent')
-    user_agent_logger.info(f'{current_datetime}\n{user_agent}')
-
-# Socket.log
-def log_socket(message):
-    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
-    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    socket_logger.info(f'{current_datetime} | {client} {message}.')
-
 # FFmpeg will write the conversion progress to a txt file. Read the file eery second to get the current conversion progress every second.
 def read_progress():
-    try:
-        previous_time = '00:00:00'
-        while True:
-            with open('progress.txt', 'r') as f:
-                lines = f.readlines()
-                # This gives us the amount of the file that has been converted so far.
-                current_time = lines[-5].split('=')[-1]
-                # If the amount converted is the same twice in a row, that means that the conversion is complete.
-                if previous_time == current_time:
-                    logger.info("Conversion complete. Progress no longer being read.")
-                    break
-
-                hh_mm_ss = current_time.split('.')[0]
-                milliseconds = current_time.split('.')[-1][:-4]
-                progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)'
-                logger.info(progress_message)
-                # Trigger a new event called "show progress" 
-                socketio.emit('show progress', {'progress': progress_message})
-                socketio.sleep(1)
-                # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
-                previous_time = current_time
-
-    except Exception as error:
-        logger.error(f'PROGRESS FUNCTION: {error}')
+    previous_time = '00:00:00'
+    while True:
+        with open('info/progress.txt', 'r') as f:
+            lines = f.readlines()
+            # This gives us the amount of the file that has been converted so far.
+            current_time = lines[-5].split('=')[-1]
+            # If the amount converted is the same twice in a row, that means that the conversion is complete.
+            if previous_time == current_time:
+                break
+            hh_mm_ss = current_time.split('.')[0]
+            logger.info(hh_mm_ss)
+            milliseconds = current_time.split('.')[-1][:-4]
+            progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)'
+            # Trigger a new event called "show progress" 
+            socketio.emit('show progress', {'progress': progress_message})
+            socketio.sleep(1)
+            # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
+            previous_time = current_time
 
 @socketio.on('my event') # Decorator to catch an event called "my event"
 def test_connect(): # test_connect() is the event callback function.
@@ -96,145 +50,142 @@ def test_disconnect():
 def main():
     if request.form["request_type"] == "uploaded":
 
-        uploaded_file = request.files["chosen_file"]
+        chosen_file = request.files["chosen_file"]
+        log_this('uploaded a file:')
+        logger.info(chosen_file)
         # Make the filename safe
-        filename_secure = secure_filename(uploaded_file.filename)
+        filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
-        uploaded_file.save(os.path.join("uploads", filename_secure))
+        chosen_file.save(os.path.join("uploads", filename_secure))
         return '' # Something has to be returned, so I'm returning an empty string.
 
     elif request.form["request_type"] == "convert":
 
-        try:
-            socketio.start_background_task(read_progress)
-        except Exception as error:
-            logger.error(f'start_background_task: {error}')
+        file_name = request.form["file_name"]
+        chosen_codec = request.form["chosen_codec"]
+        is_keep_video = request.form["is_keep_video"]
+        uploaded_file_path = os.path.join("uploads", secure_filename(file_name))
+        # MP3
+        mp3_encoding_type = request.form["mp3_encoding_type"]
+        cbr_abr_bitrate = request.form["cbr_abr_bitrate"]
+        mp3_vbr_setting = request.form["mp3_vbr_setting"]
+        is_y_switch = request.form["is_y_switch"]
+        # AAC
+        fdk_type = request.form["fdk_type"]
+        fdk_cbr = request.form["fdk_cbr"]
+        fdk_vbr = request.form["fdk_vbr"]
+        is_fdk_lowpass = request.form["is_fdk_lowpass"]
+        fdk_lowpass = request.form["fdk_lowpass"]
+        # Vorbis
+        vorbis_encoding = request.form["vorbis_encoding"]
+        vorbis_quality = request.form["vorbis_quality"]
+        # Vorbis/Opus
+        slider_value = request.form["slider_value"]
+        # AC3 
+        ac3_bitrate = request.form["ac3_bitrate"]
+        # FLAC
+        flac_compression = request.form["flac_compression"]
+        # DTS
+        dts_bitrate = request.form["dts_bitrate"]
+        # Opus
+        opus_cbr_bitrate = request.form["opus_cbr_bitrate"]
+        opus_encoding_type = request.form["opus_encoding_type"]
+        # Desired filename
+        output_name = request.form["output_name"]
+
+        variables_to_validate = [file_name, chosen_codec, is_keep_video, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, slider_value, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name]
+
+        strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`']
+
+        # check_no_variable_contains_bad_string is a func defined in converter.py
+        if not converter.check_no_variable_contains_bad_string(variables_to_validate, strings_not_allowed):
+            return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
+
         else:
-            logger.info("Started progress reader.")
-        finally:
-            file_name = request.form["file_name"]
-            chosen_codec = request.form["chosen_codec"]
-            is_keep_video = request.form["is_keep_video"]
-            uploaded_file_path = os.path.join("uploads", secure_filename(file_name))
-            # MP3
-            mp3_encoding_type = request.form["mp3_encoding_type"]
-            cbr_abr_bitrate = request.form["cbr_abr_bitrate"]
-            mp3_vbr_setting = request.form["mp3_vbr_setting"]
-            is_y_switch = request.form["is_y_switch"]
-            # AAC
-            fdk_type = request.form["fdk_type"]
-            fdk_cbr = request.form["fdk_cbr"]
-            fdk_vbr = request.form["fdk_vbr"]
-            is_fdk_lowpass = request.form["is_fdk_lowpass"]
-            fdk_lowpass = request.form["fdk_lowpass"]
-            # Vorbis
-            vorbis_encoding = request.form["vorbis_encoding"]
-            vorbis_quality = request.form["vorbis_quality"]
-            # Vorbis/Opus
-            slider_value = request.form["slider_value"]
-            # AC3 
-            ac3_bitrate = request.form["ac3_bitrate"]
-            # FLAC
-            flac_compression = request.form["flac_compression"]
-            # DTS
-            dts_bitrate = request.form["dts_bitrate"]
-            # Opus
-            opus_cbr_bitrate = request.form["opus_cbr_bitrate"]
-            opus_encoding_type = request.form["opus_encoding_type"]
-            # Desired filename
-            output_name = request.form["output_name"]
+            log_this(f'chose {chosen_codec}\nOutput Filename: {output_name}')
+            output_path = f'"conversions/{output_name}"'
+            # Start the read_progress function in a new thread.
+            socketio.start_background_task(read_progress)
 
-            variables_to_validate = [file_name, chosen_codec, is_keep_video, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, slider_value, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name]
+            # Run the appropritate section of converter.py:
 
-            strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`']
+            if chosen_codec == 'MP3':
+                logger.info(f'{mp3_encoding_type}, {cbr_abr_bitrate}, {mp3_vbr_setting}, {is_y_switch}')
+                converter.run_mp3(uploaded_file_path, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_path)
+                extension = 'mp3'
 
-            # check_no_variable_contains_bad_string is a func defined in converter.py
-            if not converter.check_no_variable_contains_bad_string(variables_to_validate, strings_not_allowed):
-                return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
+            elif chosen_codec == 'AAC':
+                logger.info(f'{fdk_type}, {fdk_cbr}, {fdk_vbr}, {is_fdk_lowpass}, {fdk_lowpass}')
+                converter.run_aac(uploaded_file_path, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
+                extension = 'm4a'
 
-            else:
-                log_this(f'wants to convert {file_name}\nChosen format: {chosen_codec}\nOutput Filename: {output_name}')
-                output_path = f'"/home/ubuntu/website/conversions/{output_name}"'
+            elif chosen_codec == 'Opus':
+                logger.info(f'{opus_encoding_type}, {slider_value}, {opus_cbr_bitrate}')
+                converter.run_opus(uploaded_file_path, opus_encoding_type, slider_value, opus_cbr_bitrate, output_path)
+                extension = 'opus'   
 
-                # Run the appropritate section of converter.py:
+            elif chosen_codec == 'FLAC':
+                logger.info(f'{is_keep_video}, {flac_compression}')
+                converter.run_flac(uploaded_file_path, is_keep_video, flac_compression, output_path)
+                if is_keep_video == "yes":
+                    extension = 'mkv'
+                else:
+                    extension = 'flac'
 
-                if chosen_codec == 'MP3':
-                    logger.info(f'{mp3_encoding_type}, {cbr_abr_bitrate}, {mp3_vbr_setting}, {is_y_switch}')
-                    converter.run_mp3(uploaded_file_path, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_path)
-                    extension = 'mp3'
+            elif chosen_codec == 'Vorbis':
+                logger.info(f'{vorbis_encoding}, {vorbis_quality}, {slider_value}')
+                converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, slider_value, output_path) 
+                extension = 'ogg'
 
-                elif chosen_codec == 'AAC':
-                    logger.info(f'{fdk_type}, {fdk_cbr}, {fdk_vbr}, {is_fdk_lowpass}, {fdk_lowpass}')
-                    converter.run_aac(uploaded_file_path, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
+            elif chosen_codec == 'WAV':
+                logger.info(f'Keep video selected? {is_keep_video}')
+                converter.run_wav(uploaded_file_path, is_keep_video, output_path)
+                if is_keep_video == "yes":
+                    extension = 'mkv'
+                else:
+                    extension = 'wav'
+
+            elif chosen_codec == 'MKV':
+                converter.run_mkv(uploaded_file_path, output_path)
+                extension = 'mkv'
+
+            elif chosen_codec == 'MKA':
+                converter.run_mka(uploaded_file_path, output_path)
+                extension = 'mka'
+
+            elif chosen_codec == 'ALAC':
+                logger.info(f'Keep video selected? {is_keep_video}')
+                converter.run_alac(uploaded_file_path, is_keep_video, output_path)
+                if is_keep_video == "yes":
+                    extension = 'mkv'
+                else:
                     extension = 'm4a'
 
-                elif chosen_codec == 'Opus':
-                    logger.info(f'{opus_encoding_type}, {slider_value}, {opus_cbr_bitrate}')
-                    converter.run_opus(uploaded_file_path, opus_encoding_type, slider_value, opus_cbr_bitrate, output_path)
-                    extension = 'opus'   
-
-                elif chosen_codec == 'FLAC':
-                    logger.info(f'{is_keep_video}, {flac_compression}')
-                    converter.run_flac(uploaded_file_path, is_keep_video, flac_compression, output_path)
-                    if is_keep_video == "yes":
-                        extension = 'mkv'
-                    else:
-                        extension = 'flac'
-
-                elif chosen_codec == 'Vorbis':
-                    logger.info(f'{vorbis_encoding}, {vorbis_quality}, {slider_value}')
-                    converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, slider_value, output_path) 
-                    extension = 'ogg'
-
-                elif chosen_codec == 'WAV':
-                    logger.info(f'Keep video selected? {is_keep_video}')
-                    converter.run_wav(uploaded_file_path, is_keep_video, output_path)
-                    if is_keep_video == "yes":
-                        extension = 'mkv'
-                    else:
-                        extension = 'wav'
-
-                elif chosen_codec == 'MKV':
-                    converter.run_mkv(uploaded_file_path, output_path)
+            elif chosen_codec == 'AC3':
+                logger.info(f'Keep video selected? {is_keep_video}')
+                converter.run_ac3(uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
+                if is_keep_video == "yes":
                     extension = 'mkv'
+                else:
+                    extension = 'ac3'
 
-                elif chosen_codec == 'MKA':
-                    converter.run_mka(uploaded_file_path, output_path)
-                    extension = 'mka'
+            elif chosen_codec == 'CAF':
+                converter.run_caf(uploaded_file_path, output_path)
+                extension = 'caf'
 
-                elif chosen_codec == 'ALAC':
-                    logger.info(f'Keep video selected? {is_keep_video}')
-                    converter.run_alac(uploaded_file_path, is_keep_video, output_path)
-                    if is_keep_video == "yes":
-                        extension = 'mkv'
-                    else:
-                        extension = 'm4a'
+            elif chosen_codec == 'DTS':
+                logger.info(f'Keep video selected? {is_keep_video}')
+                converter.run_dts(uploaded_file_path, is_keep_video, dts_bitrate, output_path)
+                if is_keep_video == "yes":
+                    extension = 'mkv'
+                else:
+                    extension = 'dts'
 
-                elif chosen_codec == 'AC3':
-                    logger.info(f'Keep video selected? {is_keep_video}')
-                    converter.run_ac3(uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
-                    if is_keep_video == "yes":
-                        extension = 'mkv'
-                    else:
-                        extension = 'ac3'
-
-                elif chosen_codec == 'CAF':
-                    converter.run_caf(uploaded_file_path, output_path)
-                    extension = 'caf'
-
-                elif chosen_codec == 'DTS':
-                    logger.info(f'Keep video selected? {is_keep_video}')
-                    converter.run_dts(uploaded_file_path, is_keep_video, dts_bitrate, output_path)
-                    if is_keep_video == "yes":
-                        extension = 'mkv'
-                    else:
-                        extension = 'dts'
-
-                converted_file_name = output_name + "." + extension
-                return {
-                    "message": "File converted.",
-                    "downloadFilePath": f'/download/{converted_file_name}'
-                }
+            converted_file_name = output_name + "." + extension
+            return {
+                "message": "File converted.",
+                "downloadFilePath": f'/download/{converted_file_name}'
+            }
 
 # FILE TRIMMER
 @app.route("/file-trimmer", methods=["POST"])
@@ -275,17 +226,10 @@ def trim_file():
 @app.route("/download/<filename>", methods=["GET"])
 def download_file(filename):
     just_extension = filename.split('.')[-1]
-    try:
-        if just_extension == "m4a":
-            logger.info('Sending file to user...')
-            return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4")
-        else:
-            logger.info('Sending file to user...')
-            return send_from_directory(f'{os.getcwd()}/conversions', filename)
-    except Exception as error:
-        logger.error(f'UNABLE TO SEND FILE: {error}')
+    if just_extension == "m4a":
+        return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4")
     else:
-        logger.info("File sent.")
+        return send_from_directory(f'{os.getcwd()}/conversions', filename)
 
 # CONTACT PAGE
 @app.route("/contact", methods=["POST"])

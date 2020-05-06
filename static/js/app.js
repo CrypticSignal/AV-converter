@@ -10,7 +10,6 @@ const cancelButton = document.getElementById("cancel_btn");
 const alertWrapper = document.getElementById("alert_wrapper");
 
 function show_alert(message, type) {
-
     alertWrapper.style.display = 'block';
     alertWrapper.innerHTML =
     `<div id="alert" class="alert alert-${type} alert-dismissible fade show" role="alert">
@@ -22,7 +21,6 @@ function show_alert(message, type) {
 }
 
 function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
-
     const conversionRequest = new XMLHttpRequest();
     conversionRequest.responseType = "json";
 
@@ -76,11 +74,8 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     conversionRequest.send(data);
 
     conversionRequest.addEventListener("load", function () { // conversionRequest is complete.
-
         reset(); // Reset the page to the default state.
-
         if (conversionRequest.status == 200) {
-
             show_alert(`${conversionRequest.response.message} <a href="${conversionRequest.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
 
             const link = document.createElement("a"); // Create a virtual link.
@@ -99,44 +94,37 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
 
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_convert() {
-
     allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "mts", "webm", "ADPCM", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 
     if (!input.value && document.getElementById("output_name").value == '') {
         show_alert("Perhaps in the future a website will be able to read your mind and automatically complete the required fields, but technology hasn't gotten that far yet.", "info")
         return;
     }
-
     else if (input.value) { // (If a file has been selected)
         const chosenFile = input.files[0];
         const filename = chosenFile.name;
         const filenameParts = filename.split('.');
         const fileExt = filenameParts[filenameParts.length - 1];
         const filesize = chosenFile.size;
-
         if (!allowedFiletypes.includes(fileExt)) {
             show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
                 reset();
                 return;
             }
-
         else if (filesize > 5000000000) {
             show_alert("File cannot be larger than 5 GB.", "danger")
             reset();
             return;    
         }
-
         else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('\\') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('command') || outputNameBox.value.includes('$')) {
             show_alert('Output name cannot contain any of the following characters: "/?*><|:$ (or the word "command")', "danger");
             return;
         }
-
         else if (document.getElementById("output_name").value == '') {
             show_alert("You must enter your desired filename.", "danger")
             return;
         }
     }
-
     else {
         show_alert("No file selected.", "danger")
         return;
@@ -170,18 +158,17 @@ function upload_and_convert() {
     let previousLoaded = 0;
 
     function showProgress(event) {
-
         convertButton.classList.add('d-none');
         uploadingButton.classList.remove('d-none');
         cancelButton.classList.remove('d-none');
         progressWrapper.style.display = 'block';
-    
-        // Get amount uploaded and total filesize (MB).
         const loaded = event.loaded / 10**6;
         const total = event.total / 10**6;
-
         const percentageComplete = (loaded / total) * 100;
-    
+        $('#progress_bar').html(`${Math.floor(percentageComplete)}%`);
+        // Add a style attribute to the progress div, i.e. "style=width: x%"
+        progress_bar.setAttribute("style", `width: ${Math.floor(percentageComplete)}%`);
+
         // MB loaded in this interval is (loaded - previousLoaded) and
         // (Date.now() - previousTime) will give us the time since the last time-interval.
         const speed = ((loaded - previousLoaded) / ((Date.now() / 1000) - previousTime));
@@ -191,11 +178,6 @@ function upload_and_convert() {
         const minutes = Math.floor(completionTimeSeconds / 60) % 60;
         const seconds = Math.ceil(completionTimeSeconds % 60)
         const completionTime = `${hours}:${minutes}:${seconds} [H:M:S]`
-    
-        $('#progress_bar').html(`${Math.floor(percentageComplete)}%`);
-
-        // Add a style attribute to the progress div, i.e. "style=width: x%"
-        progress_bar.setAttribute("style", `width: ${Math.floor(percentageComplete)}%`);
         
         progressStatus.innerText = `${loaded.toFixed(1)} MB of ${total.toFixed(1)} MB uploaded
         Upload Speed: ${(speed * 8).toFixed(1)} Mbps (${(speed).toFixed(1)} MB/s)
@@ -219,7 +201,6 @@ function upload_and_convert() {
 
     // When the upload is commplete:
     function uploadComplete() {
-
         uploadingButton.classList.add('d-none');
         cancelButton.classList.add('d-none');
         progressWrapper.classList.add("d-none");
@@ -241,8 +222,8 @@ function updateBoxes() {
     inputLabel.innerText = input.files[0].name; // Show name of selected file.
     console.log(input.files[0]);
     inputFilename = input.files[0].name; // Filename of the selected file.
-    removePercentageSign = inputFilename.replace(/%/g, ''); // Remove percentage sign(s) as this causes an issue due to secure_filename?
-    inputFilenameFormatted = removePercentageSign.replace(/_/g, ' '); // Replace the underscores with spaces, to make the filename look more aesthetically pleasing.
+    inputFilenameFormatted = inputFilename.replace(/%/g, ''); // Remove percentage sign(s) as this causes an issue due to secure_filename?
+    //inputFilenameFormatted = removePercentageSign.replace(/_/g, ' '); // Replace the underscores with spaces, to make the filename look more aesthetically pleasing.
     defaultOutputName = inputFilenameFormatted.substring(0, inputFilenameFormatted.lastIndexOf('.')); // Get the filename without the extension by only getting the part before the last "."
     outputNameBox.value = defaultOutputName; 
 }
