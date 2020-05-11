@@ -13,10 +13,10 @@ def setup_logger(name, log_file):
     logger.addHandler(file_handler)
     return logger
 
-logger = setup_logger('logger', 'Info.txt')
-visit = setup_logger('visit', 'Visit.log')
-user_agent_logger = setup_logger('user_agent_logger', 'UserAgent.txt')
-socket_logger = setup_logger('socket_logger', 'Socket.txt')
+logger = setup_logger('logger', 'info/Info.txt')
+visit = setup_logger('visit', 'info/Visit.log')
+user_agent_logger = setup_logger('user_agent_logger', 'info/UserAgent.txt')
+socket_logger = setup_logger('socket_logger', 'info/Socket.txt')
 
 # Socket.txt
 def log_socket(message):

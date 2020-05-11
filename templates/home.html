@@ -10,15 +10,14 @@
     <P>Click <a href=about>here</a> to find out what you can do on FreeAudioConverter.net (FAC).</P>
   </div>
 
-  
-
   <h3>1. Select the file you wish to convert:</h3>
 
-  <div class="container">
+  <div class="container"> <!-- Bootstrap class -->
 
-    <div class="mb-3 mt-3">
-      <div class="form-group mb-3">
-        <div class="custom-file">
+    <!-- Bootstrap classes used -->
+    <div class="mb-3 mt-3"> 
+      <div class="form-group mb-3"> 
+        <div class="custom-file"> 
           <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS, .mts, .ac3, .3gp, .dts, .webm, .ADPCM, .adpcm, .spx, .caf, .mov, .dtshd, .thd" type="file" class="custom-file-input" id="file_input" oninput="updateBoxes()">
           <label id="file_input_label" class="custom-file-label">Select file</label>
         </div>
@@ -94,6 +93,7 @@
         <i>For more details about the settings, click <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_settings_details">here</a>.</i>
       </div><br>
 
+      <!-- MP3 VBR Y SWITCH -->
       <div id=y-switch-div style='display:none'>
         <p>Enable the Y switch?</p>
         <label for="opt1">Yes</label>
@@ -122,16 +122,7 @@
     <!--AAC DIV-->
     <div id="AAC" style="display:none">
 
-      <br><div id="aac-encoder" style="display:none">
-        <label for="aac_encoder">Encoder:</label>
-        <select id="aac_encoder" onchange="AAC_encoder(this.value);">
-          <option disabled selected value>Select Encoder</option>
-          <option selected value="qaac">QAAC (Apple's Encoder)</option>
-          <option value="fdk">Fraunhofer FDK AAC</option>
-        </select><br>
-        <i>For more details about the encoders, click <a target="_blank" href=about>here</a> and refer to the "AAC" section.</i>
-      </div>
-
+      <!-- AAC ENCODING TYPE -->
       <div id="fdk-type" style="display:none">
         <label for="fdk-encoding">CBR or VBR:</label>
         <select id="fdk_encoding" onchange="fdkEncodingType(this.value);">
@@ -249,49 +240,53 @@
       <i>You chose a format that does not require you to specify any encoder settings.</i>
     </div>
     
+    <!--OUTPUT FILENAME (Bootstrap class)-->
     <form method="POST":>
       <hr><h3>4. Output Filename:</h3>
       <input type="text" class="form-control" maxlength="200" id="output_name" required/><br>
     </form>
 
+    <!--CONVERT BUTTON (Bootstrap class)-->
     <button onclick="upload_and_convert()" id="convert_btn" class="btn btn-primary">Convert</button>
 
+    <button class="btn btn-primary d-none" id="uploading_btn" type="button" disabled>
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      Uploading file for conversion...
+    </button>
+
+    <!--"Cancel upload" button (Bootstrap class)-->
+    <button type="button" id="cancel_btn" class="btn btn-secondary d-none">Cancel upload</button>
+
+    <!--"CONVERTING..." BUTTON (Bootstrap class)-->
     <div class="text-center" id="converting_btn" style="display:none">
       <button class="btn btn-info" disabled> 
         <span class="spinner-border spinner-border-sm"></span>
         Converting...</button>
     </div>
-
-    <p id="progress" style="display:none"></p>
-  
-    <button class="btn btn-primary d-none" id="uploading_btn" type="button" disabled>
-      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-      Uploading file for conversion...
-    </button>
-  
-    <!--Cancel upload button-->
-    <button type="button" id="cancel_btn" class="btn btn-secondary d-none">Cancel upload</button>
   
     <!--Upload-progress bar-->
     <div id="progress_wrapper" style="display:none">
       <br>
-      <div class="progress mb-3">
+      <div class="progress mb-3"> <!--Bootstrap class-->
         <div id="progress_bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
       <label id="progress_status"></label>
     </div>
 
+    <!-- ENCODER PROGRESS -->
+    <p id="progress" style="display:none"></p>
+
+    <!-- ALERTS -->
     <div id="alert_wrapper" style="display:none"></div>
 
   </div> <!--Closing tag for div class="container" div-->
 
 <hr><p>Like this website? Please share or tweet :)</p>
 
-<!--Facebook-->
+<!--Facebook buttons-->
 <div class="fb-like" data-href="https://freeaudioconverter.net" data-width="" data-layout="button_count" data-action="like" data-size="large" data-share="true"></div><br><br>
-
+<!--Twitter buttons-->
 <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-dnt="true" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 <!--My JavaScript files-->
 <script src="{{ url_for('static', filename='js/elements.js') }}"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>

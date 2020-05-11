@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="description" content="Convert a video or audio file to MP3, WAV, AAC, FLAC, and more! | Trim an audio or video file | Extract the audio from a video">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!--CSS-->
+    <!--Bootstrap CSS-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!--My CSS-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Nice font for the "Buy me a coffee" button -->
     <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
@@ -37,6 +38,7 @@
 {% block content %} {% endblock content%}
 
 </body>
+
 <script>
     function myFunction() {
     var x = document.getElementById("myTopnav");
@@ -47,4 +49,5 @@
     }
   }
 </script>
+
 </html>

@@ -274,11 +274,11 @@ def get_score():
     except ValueError:
         logger.error("GAME 1: The user changed something to a non-int.")
     else:
-        with open("HighScores.txt", "a") as f:
+        with open("info/HighScores.txt", "a") as f:
             f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
     finally:
         just_scores = []
-        with open('HighScores.txt', 'r') as f:
+        with open('info/HighScores.txt', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 just_scores.append(line.split('|')[0].strip())
@@ -298,11 +298,11 @@ def game2():
     except ValueError:
         logger.error("GAME 2: The user changed reaction_time to a non-int.")
     else:
-        with open("ReactionTimes.txt", "a") as f:
+        with open("info/ReactionTimes.txt", "a") as f:
             f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')
     finally:
         reaction_times = []
-        with open('ReactionTimes.txt', 'r') as f:
+        with open('info/ReactionTimes.txt', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 reaction_times.append(line.split('|')[0][:-3].strip())
