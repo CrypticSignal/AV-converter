@@ -25,6 +25,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     conversionRequest.responseType = "json";
 
     const chosenCodec = document.getElementById('codecs').value;
+    const encodingSpeed = document.getElementById('encoding-speed').value;
     const sliderValue = document.getElementById("slider").value;
     const outputName = document.getElementById("output_name").value;
     const mp3EncodingType = document.getElementById('mp3_encoding_type').value;
@@ -50,6 +51,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     data.append("request_type", "convert");
     data.append("file_name", filename);
     data.append("chosen_codec", chosenCodec);
+    data.append("encoding_speed", encodingSpeed);
     data.append("slider_value", sliderValue);
     data.append("output_name", outputName);
     data.append("mp3_encoding_type", mp3EncodingType);
@@ -166,7 +168,7 @@ function upload_and_convert() {
         const total = event.total / 10**6;
         const percentageComplete = (loaded / total) * 100;
         $('#progress_bar').html(`${Math.floor(percentageComplete)}%`);
-        // Add a style attribute to the progress div, i.e. "style=width: x%"
+        // Add a style attribute to the progress div, i.e. style="width: x%"
         progress_bar.setAttribute("style", `width: ${Math.floor(percentageComplete)}%`);
 
         // MB loaded in this interval is (loaded - previousLoaded) and

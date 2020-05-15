@@ -30,7 +30,7 @@ progress_file_path = 'info/progress.txt'
 
 def run_ffmpeg(uploaded_file_path, params):
     try:
-        os.system(f'ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" {params}')
+        os.system(f'/usr/local/bin/ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" {params}')
     except Exception as error:
         logger.error(f'CONVERTER ERROR: {error}')
     else:
@@ -38,7 +38,7 @@ def run_ffmpeg(uploaded_file_path, params):
 
 def ffmpeg_pipe(uploaded_file_path, params):
     try:
-        os.system(f'ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" -f wav - | {params}')
+        os.system(f'/usr/local/bin/ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" -f wav - | {params}')
     except Exception as error:
         logger.error(f'CONVERTER ERROR: {error}')
     else:
@@ -57,17 +57,33 @@ def run_mp3(uploaded_file_path, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_sett
             run_ffmpeg(uploaded_file_path, f'-ac 2 -f wav - | lame --tc "Encoded using freeaudioconverter.net" -Y -V {mp3_vbr_setting} - {output_path}.mp3')
 
 # AAC
-def run_aac(uploaded_file_path, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path):
-    if fdk_type == "fdk-cbr":
-        if is_fdk_lowpass == "yes":
-            ffmpeg_pipe(uploaded_file_path, f'fdkaac --comment "Encoded using freeaudioconverter.net" --bandwidth {fdk_lowpass} -b {fdk_cbr} - -o {output_path}.m4a')
-        else:
-            ffmpeg_pipe(uploaded_file_path, f'fdkaac --comment "Encoded using freeaudioconverter.net" -b {fdk_cbr} - -o {output_path}.m4a')
-    else: # VBR
-        if is_fdk_lowpass == "yes":
-            ffmpeg_pipe(uploaded_file_path, f'fdkaac --comment "Encoded using freeaudioconverter.net" --bandwidth {fdk_lowpass} --bitrate-mode {fdk_vbr} - -o {output_path}.m4a')
-        else:
-            ffmpeg_pipe(uploaded_file_path, f'fdkaac --comment "Encoded using freeaudioconverter.net" --bitrate-mode {fdk_vbr} - -o {output_path}.m4a')
+def run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path):
+
+    if is_keep_video == "yes":
+
+        if fdk_type == "fdk-cbr":
+            if is_fdk_lowpass == "yes":
+                run_ffmpeg(uploaded_file_path, f'-c:v copy -c:a libfdk_aac -cutoff {fdk_lowpass} -b:a {fdk_cbr}k {output_path}.mkv')
+            else:
+                run_ffmpeg(uploaded_file_path, f'-c:v copy -c:a libfdk_aac -b:a {fdk_cbr}k {output_path}.mkv')
+        else: # VBR
+            if is_fdk_lowpass == "yes":
+                run_ffmpeg(uploaded_file_path, f'-c:v copy -c:a libfdk_aac -cutoff {fdk_lowpass} -vbr {fdk_vbr} {output_path}.mkv')
+            else:
+                run_ffmpeg(uploaded_file_path, f'-c:v copy -c:a libfdk_aac -vbr {fdk_vbr} {output_path}.mkv')
+        
+    else: # Keep video not selected, use standalone fdkaac encoder.
+
+        if fdk_type == "fdk-cbr":
+            if is_fdk_lowpass == "yes":
+                ffmpeg_pipe(uploaded_file_path, f'fdkaac --comment "Encoded using freeaudioconverter.net" --bandwidth {fdk_lowpass} -b {fdk_cbr} - -o {output_path}.m4a')
+            else:
+                ffmpeg_pipe(uploaded_file_path, f'fdkaac --comment "Encoded using freeaudioconverter.net" -b {fdk_cbr} - -o {output_path}.m4a')
+        else: # VBR
+            if is_fdk_lowpass == "yes":
+                ffmpeg_pipe(uploaded_file_path, f'fdkaac --comment "Encoded using freeaudioconverter.net" --bandwidth {fdk_lowpass} --bitrate-mode {fdk_vbr} - -o {output_path}.m4a')
+            else:
+                ffmpeg_pipe(uploaded_file_path, f'fdkaac --comment "Encoded using freeaudioconverter.net" --bitrate-mode {fdk_vbr} - -o {output_path}.m4a')
 
 # WAV
 def run_wav(uploaded_file_path, is_keep_video, output_path):
@@ -75,6 +91,13 @@ def run_wav(uploaded_file_path, is_keep_video, output_path):
         run_ffmpeg(uploaded_file_path, f'-map 0:v -map 0:a:0 -c:v copy -c:a:0 pcm_s16le {output_path}.mkv')
     else:
         run_ffmpeg(uploaded_file_path, f'{output_path}.wav')
+
+# MP4
+def run_mp4(uploaded_file_path, encoding_speed, output_path):
+    if encoding_speed == "keep_codec":
+        run_ffmpeg(uploaded_file_path, f'-c:v copy -c:a libfdk_aac -vbr 5 {output_path}.mp4')
+    else:
+        run_ffmpeg(uploaded_file_path, f'-c:v libx264 -preset {encoding_speed} -c:a libfdk_aac -vbr 5 {output_path}.mp4')
 
 # Opus
 def run_opus(uploaded_file_path, opus_encoding_type, slider_value, opus_cbr_bitrate, output_path):

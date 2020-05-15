@@ -32,6 +32,7 @@
     <!--List of Codecs-->
     <select id="codecs" onchange="showHide(this.value);">
       <option selected value="MP3">MP3 (.mp3) [LAME v3.100]</option>
+      <option value="MP4">MP4 (.mp4)</option>
       <option value="AAC">AAC (.m4a) [Fraunhofer FDK AAC]</option>
       <option value="WAV">WAV</option>
       <option value="Opus">Opus (.opus) [libopus 1.3.1]</option>
@@ -42,10 +43,11 @@
       <option value="DTS">DTS</option>
       <option value="CAF">CAF (.caf)</option>
       <option value="MKA">Extract audio without converting (.mka)</option>
+      <option value="MKV">Convert video to MKV (.mkv)</option>
     </select>
 
     <div id='keep-vid-div' style='display:none'><br>
-      <label for='is-keep-video'>Keep the video?</label>
+      <label for='is-keep-video'>Keep the video (if applicable)?</label>
       <label for ="keep-vid">Yes</label>
       <input type="radio" id="keep-vid" name="is-keep-video" value="yes">
       <label for="not-keep-vid">No</label>
@@ -117,6 +119,24 @@
         <option selected value="640">640kbps</option>
       </select><br><br>
       <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
+    </div>
+
+    <!--MP4-->
+    <div id="mp4-div" style="display:none">
+      <label for="encoding-speed">Setting:</label>
+      <select id="encoding-speed">
+        <option value="keep_codec">Keep video codec as-is</option>
+        <option value="ultrafast">Ultra fast</option>
+        <option value="superfast">Super fast</option>
+        <option value="veryfast">Very fast</option>
+        <option selected value="faster">Faster</option>
+        <option value="fast">Fast</option>
+        <option value="medium">Medium</option>
+        <option value="slow">Slow</option>
+        <option value="slower">Slower</option>
+        <option value="veryslow">Very slow</option>
+      </select><br>
+      <i>If you know that the video codec of your video is supported by the MP4 container (such as H.264), I recommend the "Keep video codec as-is" option as this means no reduction in video quality. If you are unsure, choose one of the other options, where a slower speed allows for better quality, at the expense of a longer conversion time. More details <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#FAQ" target="_blank">here</a>.</i>
     </div>
   
     <!--AAC DIV-->

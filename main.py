@@ -24,11 +24,11 @@ def read_progress():
             lines = f.readlines()
             # This gives us the amount of the file that has been converted so far.
             current_time = lines[-5].split('=')[-1]
+            logger.info(current_time)
             # If the amount converted is the same twice in a row, that means that the conversion is complete.
             if previous_time == current_time:
                 break
             hh_mm_ss = current_time.split('.')[0]
-            logger.info(hh_mm_ss)
             milliseconds = current_time.split('.')[-1][:-4]
             progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)'
             # Trigger a new event called "show progress" 
@@ -63,6 +63,7 @@ def main():
 
         file_name = request.form["file_name"]
         chosen_codec = request.form["chosen_codec"]
+        encoding_speed = request.form["encoding_speed"]
         is_keep_video = request.form["is_keep_video"]
         uploaded_file_path = os.path.join("uploads", secure_filename(file_name))
         # MP3
@@ -116,8 +117,11 @@ def main():
 
             elif chosen_codec == 'AAC':
                 logger.info(f'{fdk_type}, {fdk_cbr}, {fdk_vbr}, {is_fdk_lowpass}, {fdk_lowpass}')
-                converter.run_aac(uploaded_file_path, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
-                extension = 'm4a'
+                converter.run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
+                if is_keep_video == "yes":
+                    extension = 'mkv'
+                else:
+                    extension = 'm4a'
 
             elif chosen_codec == 'Opus':
                 logger.info(f'{opus_encoding_type}, {slider_value}, {opus_cbr_bitrate}')
@@ -180,6 +184,11 @@ def main():
                     extension = 'mkv'
                 else:
                     extension = 'dts'
+
+            elif chosen_codec == 'MP4':
+                logger.info(encoding_speed)
+                converter.run_mp4(uploaded_file_path, encoding_speed, output_path)
+                extension = 'mp4'
 
             converted_file_name = output_name + "." + extension
             return {
