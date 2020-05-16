@@ -189,6 +189,10 @@ def main():
                 logger.info(encoding_speed)
                 converter.run_mp4(uploaded_file_path, encoding_speed, output_path)
                 extension = 'mp4'
+            
+            elif chosen_codec == 'MKV':
+                converter.run_mkv(uploaded_file_path, output_path)
+                extension = 'mkv'
 
             converted_file_name = output_name + "." + extension
             return {
