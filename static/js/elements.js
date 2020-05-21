@@ -12,70 +12,70 @@ function showHide(value) {
         document.getElementById('MP3').style.display = 'block';
         document.getElementById('mp3_encoding_div').style.display = 'block';
         document.getElementById("mp3_encoding_type").selectedIndex = 1;
-        document.getElementById('mp3sliderdiv').style.display = 'block';
+        document.getElementById('mp3_slider_div').style.display = 'block';
         document.getElementById('mp3_vbr_setting_div').style.display = 'none';
-        document.getElementById('y-switch-div').style.display = 'none';
-        document.getElementById('mp4-div').style.display = 'none';
-        document.getElementById('keep-vid-div').style.display = 'none';
+        document.getElementById('y_switch_div').style.display = 'none';
+        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
-        document.getElementById('wav_flac_msg').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
     
     else if (value=='AAC') {
         document.getElementById('AAC').style.display = 'block';
-        document.getElementById('fdk-type').style.display = 'block';
+        document.getElementById('FDK').style.display = 'block';
         document.getElementById('fdk_encoding').selectedIndex = 1;
         document.getElementById('fdk_cbr_div').style.display = 'block';;
-        document.getElementById('is-lowpass-div').style.display = 'block';
+        document.getElementById('is_lowpass_div').style.display = 'block';
         document.getElementById('no').checked = true;
-        document.getElementById('fdk-lowpass-div').style.display = 'none';
-        document.getElementById('fdk-vbr').style.display = 'none';
-        document.getElementById('keep-vid-div').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
+        document.getElementById('fdk_lowpass_div').style.display = 'none';
+        document.getElementById('fdk_vbr_div').style.display = 'none';
+        document.getElementById('keep_video_div').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
-        document.getElementById('wav_flac_msg').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'none';
     }
 
     else if (value=='WAV') {
-        document.getElementById('wav_flac_msg').style.display = 'block';
-        document.getElementById('keep-vid-div').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'block';
+        document.getElementById('keep_video_div').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
     
     else if (value=='Opus') {
         document.getElementById("Opus").style.display = 'block';
-        document.getElementById("opus-encoding").style.display = 'block';
-        document.getElementById('opus-encoding-type').selectedIndex = 1;
-        document.getElementById("vorbis_opus_vbr_bitrate").style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
-        document.getElementById('keep-vid-div').style.display = 'none';
-        document.getElementById('opus-cbr-bitrate').style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("opus_encoding").style.display = 'block';
+        document.getElementById('opus_encoding_type').selectedIndex = 1;
+        document.getElementById("opus_vorbis_vbr_div").style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('keep_video_div').style.display = 'none';
+        document.getElementById('opus_cbr_div').style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
-        document.getElementById('wav_flac_msg').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
 
@@ -83,127 +83,127 @@ function showHide(value) {
         document.getElementById('Vorbis').style.display = 'block';
         document.getElementById('vorbis_encoding_div').style.display = 'block';
         document.getElementById("vorbis_encoding").selectedIndex = 1;
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
-        document.getElementById('keep-vid-div').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('vorbis_quality_div').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
-        document.getElementById('wav_flac_msg').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
 
     else if (value=='FLAC') {
         document.getElementById('flac').style.display = 'block';
-        document.getElementById('keep-vid-div').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
+        document.getElementById('keep_video_div').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
-        document.getElementById('wav_flac_msg').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
 
     else if (value=='ALAC') {
-        document.getElementById('wav_flac_msg').style.display = 'block';
-        document.getElementById('keep-vid-div').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'block';
+        document.getElementById('keep_video_div').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
     
     else if (value=='AC3') {
-        document.getElementById('ac3-div').style.display = 'block';
-        document.getElementById('keep-vid-div').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
+        document.getElementById('AC3').style.display = 'block';
+        document.getElementById('keep_video_div').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
-        document.getElementById('wav_flac_msg').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'none';
     }
 
     else if (value=='DTS') {
-        document.getElementById("dts-div").style.display = 'block';
-        document.getElementById('keep-vid-div').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
+        document.getElementById("DTS").style.display = 'block';
+        document.getElementById('keep_video_div').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
-        document.getElementById('wav_flac_msg').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
 
     else if (value=='CAF') {
-        document.getElementById('wav_flac_msg').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
-        document.getElementById('keep-vid-div').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
 
     else if (value=='MKA') {
-        document.getElementById('wav_flac_msg').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
-        document.getElementById('keep-vid-div').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
 
     else if (value=='MKV') {
-        document.getElementById('wav_flac_msg').style.display = 'block';
-        document.getElementById('mp4-div').style.display = 'none';
-        document.getElementById('keep-vid-div').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'block';
+        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
     else if (value=='MP4') {
-        document.getElementById('mp4-div').style.display = 'block';
-        document.getElementById('wav_flac_msg').style.display = 'none';
-        document.getElementById('keep-vid-div').style.display = 'none';
+        document.getElementById('MP4').style.display = 'block';
+        document.getElementById('no_settings_required').style.display = 'none';
+        document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
-        document.getElementById("dts-div").style.display = 'none';
+        document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('MP3').style.display = 'none';
         document.getElementById('Vorbis').style.display = 'none';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
-        document.getElementById('ac3-div').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
+        document.getElementById('AC3').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
 }
@@ -212,41 +212,37 @@ function showHide(value) {
 
 function showHideMP3(value) {
     if (value=='cbr' || value=='abr') {
-        document.getElementById('mp3sliderdiv').style.display = 'block';
-        document.getElementById('y-switch-div').style.display = 'none';
+        document.getElementById('mp3_slider_div').style.display = 'block';
+        document.getElementById('y_switch_div').style.display = 'none';
         document.getElementById('mp3_vbr_setting_div').style.display = 'none';
 }
     else {
         document.getElementById('mp3_vbr_setting_div').style.display = 'block';
-        document.getElementById('y-switch-div').style.display = 'block';
-        document.getElementById('mp3sliderdiv').style.display = 'none';
+        document.getElementById('y_switch_div').style.display = 'block';
+        document.getElementById('mp3_slider_div').style.display = 'none';
     }
 }
 
 function fdkEncodingType(value) {
-    if (value=='fdk-cbr') {
-        document.getElementById('fdk-type').style.display = 'block';
+    if (value=='fdk_cbr') {
         document.getElementById('fdk_cbr_div').style.display = 'block';
-        //document.getElementById('is-lowpass-div').style.display = 'block';
         document.getElementById('no').checked = true;
-        document.getElementById('fdk-lowpass-div').style.display = 'none';
-        document.getElementById('fdk-vbr').style.display = 'none';  
+        document.getElementById('fdk_lowpass_div').style.display = 'none';
+        document.getElementById('fdk_vbr_div').style.display = 'none';  
     }
     else {
-        document.getElementById('fdk-type').style.display = 'block';
-        document.getElementById('fdk-vbr').style.display = 'block';
-        //document.getElementById('is-lowpass-div').style.display = 'none';
+        document.getElementById('fdk_vbr_div').style.display = 'block';
         document.getElementById('no').checked = true;
-        document.getElementById('fdk-lowpass-div').style.display = 'none';
+        document.getElementById('fdk_lowpass_div').style.display = 'none';
         document.getElementById('fdk_cbr_div').style.display = 'none';
     }
 }
 
 function isFDKLowpass() {
     if (document.getElementById('yes').checked) {
-        document.getElementById('fdk-lowpass-div').style.display = 'block';
+        document.getElementById('fdk_lowpass_div').style.display = 'block';
     } else {
-        document.getElementById('fdk-lowpass-div').style.display = 'none';
+        document.getElementById('fdk_lowpass_div').style.display = 'none';
     }
 }
 
@@ -255,47 +251,56 @@ function isFDKLowpass() {
 //     if (value=='cbr' || value=='abr') {
 //         document.getElementById('aac_cbr_div').style.display = 'block';
 //         document.getElementById('fdk_cbr_div').style.display = 'none';
-//         document.getElementById('fdk-vbr').style.display = 'none';
+//         document.getElementById('fdk_vbr_div').style.display = 'none';
 //     }
 //     else if (value=='tvbr') {
 //         document.getElementById('aac_tvbr_div').style.display = 'block';
 //         document.getElementById('fdk_cbr_div').style.display = 'none';
-//         document.getElementById('fdk-vbr').style.display = 'none';
+//         document.getElementById('fdk_vbr_div').style.display = 'none';
 //     }
 
 //     else {
 //         document.getElementById('aac_vbr_div').style.display = 'block';
 //         document.getElementById('fdk_cbr_div').style.display = 'none';
-//         document.getElementById('fdk-vbr').style.display = 'none';
+//         document.getElementById('fdk_vbr_div').style.display = 'none';
 //     }
 // }
 
 // Vorbis
 function showHideVorbis(value) {
     if (value=='vbr_bitrate') {
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'block';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'block';
         document.getElementById('vorbis_quality_div').style.display = 'none';
 }
     else {
         document.getElementById('vorbis_quality_div').style.display = 'block';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
     }
 }
 
 // Opus
 function opusEncodingType(value) {
-    if (value=='opus-cbr') {
-        document.getElementById('opus-cbr-bitrate').style.display = 'block';
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'none';
+    if (value=='opus_cbr') {
+        document.getElementById('opus_cbr_div').style.display = 'block';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
 }
     else {
-        document.getElementById('vorbis_opus_vbr_bitrate').style.display = 'block';
-        document.getElementById('opus-cbr-bitrate').style.display = 'none';
+        document.getElementById('opus_vorbis_vbr_div').style.display = 'block';
+        document.getElementById('opus_cbr_div').style.display = 'none';
+    }
+}
+
+function mp4Mode(value) {
+    if (value=='keep_video_codec') {
+        document.getElementById('crf_div').style.display = 'none';
+}
+    else {
+        document.getElementById('crf_div').style.display = 'block';
     }
 }
 
 // Slider for MP3
-const mp3slider = document.getElementById("cbr_abr_bitrate");
+const mp3slider = document.getElementById("mp3_bitrate");
 const mp3output = document.getElementById("mp3value");
 mp3output.innerHTML = mp3slider.value + " kbps";
 // Update the current slider value (each time you drag the slider handle)
@@ -304,7 +309,7 @@ mp3slider.oninput = function () {
 }
 
 // Slider for FDK CBR
-const fdkslider = document.getElementById("fdk-slider-aac");
+const fdkslider = document.getElementById("fdk_slider");
 const fdkoutput = document.getElementById("fdkvalue");
 fdkoutput.innerHTML = fdkslider.value + "kbps";
 fdkslider.oninput = function () {
@@ -320,7 +325,7 @@ vorbisslider.oninput = function () {
 }
 
 // Target VBR bitrate slider for Vorbis/Opus.
-const slider = document.getElementById("slider");
+const slider = document.getElementById("opus_vorbis_slider");
 const output = document.getElementById("value");
 output.innerHTML = slider.value + "kbps";
 slider.oninput = function () {
@@ -336,11 +341,19 @@ flacslider.oninput = function () {
 }
 
 // Slider for DTS
-const dtsslider = document.getElementById("dts-slider");
+const dtsslider = document.getElementById("dts_slider");
 const dtsoutput = document.getElementById("dtsvalue");
 dtsoutput.innerHTML = dtsslider.value + "kbps";
 dtsslider.oninput = function () {
     dtsoutput.innerHTML = this.value + "kbps";
+}
+
+// CRF value slider
+const CRF_slider = document.getElementById("crf_slider");
+const CRF_value = document.getElementById("crf_value");
+CRF_value.innerHTML = CRF_slider.value;
+CRF_slider.oninput = function () {
+    CRF_value.innerHTML = this.value;
 }
 
 /* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */

@@ -25,37 +25,38 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     conversionRequest.responseType = "json";
 
     const chosenCodec = document.getElementById('codecs').value;
-    const encodingSpeed = document.getElementById('encoding-speed').value;
-    const sliderValue = document.getElementById("slider").value;
+    const encodingMode = document.getElementById('encoding_mode').value;
+    const opusVorbisSlider = document.getElementById("opus_vorbis_slider").value;
     const outputName = document.getElementById("output_name").value;
     const mp3EncodingType = document.getElementById('mp3_encoding_type').value;
-    const cbr_abr_Bitrate = document.getElementById('cbr_abr_bitrate').value; 
+    const mp3Bitrate = document.getElementById('mp3_bitrate').value; 
     const vbrSettingMP3 = document.getElementById('mp3_vbr_setting').value;
-    const isYSwitch = document.querySelector('input[name="is-y-switch"]:checked').value;
-    const ac3Bitrate = document.getElementById('ac3-bitrate').value;
+    const isYSwitch = document.querySelector('input[name="is_y_switch"]:checked').value;
+    const ac3Bitrate = document.getElementById('ac3_bitrate').value;
     const vorbisQuality = document.getElementById('vorbis_quality').value
     const vorbisEncoding = document.getElementById('vorbis_encoding').value;
     const flacCompression = document.getElementById('flac_compression').value;
     const fdkType = document.getElementById('fdk_encoding').value;
-    const fdkCBR = document.getElementById('fdk-slider-aac').value;
-    const fdkVBR = document.getElementById('fdk-vbr-value').value;
-    const isFDKLowpass = document.querySelector('input[name="is-lowpass"]:checked').value;
-    const FDKLowpass = document.getElementById('fdk-lowpass').value;
-    const dtsBitrate = document.getElementById('dts-slider').value;
-    const opusBitrate = document.getElementById('opus_cbr_slider').value;
-    const opusEncodingType = document.getElementById('opus-encoding-type').value;
-    const isKeepVideo = document.querySelector('input[name="is-keep-video"]:checked').value;
+    const fdkCBR = document.getElementById('fdk_slider').value;
+    const fdkVBR = document.getElementById('fdk_vbr_value').value;
+    const isFDKLowpass = document.querySelector('input[name="is_lowpass"]:checked').value;
+    const FDKLowpass = document.getElementById('fdk_lowpass').value;
+    const dtsBitrate = document.getElementById('dts_slider').value;
+    const opusBitrate = document.getElementById('opus_cbr_bitrate').value;
+    const opusEncodingType = document.getElementById('opus_encoding_type').value;
+    const isKeepVideo = document.querySelector('input[name="is_keep_video"]:checked').value;
+    const crfValue = document.getElementById('crf_slider').value;
 
     const data = new FormData();
 
     data.append("request_type", "convert");
     data.append("file_name", filename);
     data.append("chosen_codec", chosenCodec);
-    data.append("encoding_speed", encodingSpeed);
-    data.append("slider_value", sliderValue);
+    data.append("encoding_mode", encodingMode);
+    data.append("opus_vorbis_slider", opusVorbisSlider);
     data.append("output_name", outputName);
     data.append("mp3_encoding_type", mp3EncodingType);
-    data.append("cbr_abr_bitrate", cbr_abr_Bitrate);
+    data.append("mp3_bitrate", mp3Bitrate);
     data.append("mp3_vbr_setting", vbrSettingMP3);
     data.append("ac3_bitrate", ac3Bitrate);
     data.append("vorbis_quality", vorbisQuality);
@@ -71,6 +72,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     data.append("opus_encoding_type", opusEncodingType);
     data.append("is_y_switch", isYSwitch);
     data.append("is_keep_video", isKeepVideo);
+    data.append("crf_value", crfValue);
 
     conversionRequest.open('POST', '/');
     conversionRequest.send(data);

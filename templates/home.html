@@ -4,13 +4,13 @@
 <div id="fb-root"></div>
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v6.0"></script>
 
-  <h1>FAC</h1>
+  <h1>Audio and Video Converter</h1>
 
   <div class="tagline">
-    <P>Click <a href=about>here</a> to find out what you can do on FreeAudioConverter.net (FAC).</P>
+    <P>Easy to use. Open source. Ad-free.</P>
   </div>
 
-  <h3>1. Select the file you wish to convert:</h3>
+  <h4>1. Select the file you wish to convert:</h4>
 
   <div class="container"> <!-- Bootstrap class -->
 
@@ -27,7 +27,7 @@
     <i>Max file size: 5 GB.</i>
     <p>To see the list of supported input filetypes, click <a href=filetypes target="_blank">here</a>.</p>
   
-    <hr><h3>2. Desired Format:</h3>
+    <hr><h4>2. Desired Format:</h4>
   
     <!--List of Codecs-->
     <select id="codecs" onchange="showHide(this.value);">
@@ -46,15 +46,15 @@
       <option value="MKV">Convert video to MKV (.mkv)</option>
     </select>
 
-    <div id='keep-vid-div' style='display:none'><br>
-      <label for='is-keep-video'>Keep the video (if applicable)?</label>
-      <label for ="keep-vid">Yes</label>
-      <input type="radio" id="keep-vid" name="is-keep-video" value="yes">
-      <label for="not-keep-vid">No</label>
-      <input type="radio" id="not-keep-vid" checked="checked" name="is-keep-video" value="no">
+    <div id='keep_video_div' style='display:none'><br>
+      <label for='is_keep_video'>Keep the video (if applicable)?</label>
+      <label for ="keep_vid">Yes</label>
+      <input type="radio" id="keep_vid" name="is_keep_video" value="yes">
+      <label for="not_keep_vid">No</label>
+      <input type="radio" id="not_keep_vid" checked="checked" name="is_keep_video" value="no">
     </div>
   
-    <hr><h3>3. Encoder Settings:</h3>
+    <hr><h4>3. Encoder Settings:</h4>
 
     <!--MP3 DIV-->
     <div id="MP3">
@@ -72,9 +72,9 @@
       </div><br>
 
       <!--Bitrate slider for MP3 CBR and ABR-->
-      <div id="mp3sliderdiv">
+      <div id="mp3_slider_div">
         <p>Set your desired bitrate via the slider:</p>
-        <input type="range" min="64" max="320" step="64" value="192" id="cbr_abr_bitrate" class="slider"/>
+        <input type="range" min="64" max="320" step="64" value="192" id="mp3_bitrate" class="slider"/>
         <span id="mp3value"></span><br><br>
         <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
       </div>
@@ -96,12 +96,12 @@
       </div><br>
 
       <!-- MP3 VBR Y SWITCH -->
-      <div id=y-switch-div style='display:none'>
+      <div id=y_switch_div style='display:none'>
         <p>Enable the Y switch?</p>
-        <label for="opt1">Yes</label>
-        <input type="radio" id="opt1" name="is-y-switch" value="yes">
-        <label for="opt2">No</label>
-        <input type="radio" id="opt2" checked="checked" name="is-y-switch" value="no"><br>
+        <label for="y_switch_on">Yes</label>
+        <input type="radio" id="y_switch_on" name="is_y_switch" value="yes">
+        <label for="y_switch_off">No</label>
+        <input type="radio" id="y_switch_off" checked="checked" name="is_y_switch" value="no"><br>
         <i>The Y switch tells LAME not to encode the highest frequencies accurately, if doing so causes disproportional increases in bitrate. More details <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME_Y_SWITH">here</a>.</i>
         <i>This setting only applies if V0 to V2 is selected. V3 to V6 use the Y switch and this cannot be changed.</i>
       </div>
@@ -109,9 +109,9 @@
     </div> <!--Closing tag for MP3 div-->
   
     <!--Bitrate settings for AC3-->
-    <div id="ac3-div" style="display:none">
-      <label for="ac3-bitrate">Bitrate:</label>
-      <select id="ac3-bitrate">
+    <div id="AC3" style="display:none">
+      <label for="ac3_bitrate">Bitrate:</label>
+      <select id="ac3_bitrate">
         <option disabled value>Select a Bitrate</option>
         <option value="192">192kbps</option>
         <option value="384">384kbps</option>
@@ -122,47 +122,59 @@
     </div>
 
     <!--MP4-->
-    <div id="mp4-div" style="display:none">
-      <label for="encoding-speed">Setting:</label>
-      <select id="encoding-speed">
-        <option value="keep_codec">Keep video codec as-is</option>
-        <option value="ultrafast">Ultra fast</option>
-        <option value="superfast">Super fast</option>
-        <option value="veryfast">Very fast</option>
-        <option selected value="faster">Faster</option>
-        <option value="fast">Fast</option>
-        <option value="medium">Medium</option>
-        <option value="slow">Slow</option>
-        <option value="slower">Slower</option>
-        <option value="veryslow">Very slow</option>
+    <div id="MP4" style="display:none">
+      
+      <label for="encoding_mode">FFmpeg setting:</label>
+      <select id="encoding_mode" onchange="mp4Mode(this.value);">
+        <option value="keep_video_codec">[1] -c:v copy -c:a libfdk_aac -vbr 5</option>
+        <option value="convert_video_keep_audio">[2] -c:v libx264 -c:a copy</option>
+        <option disabled>Or choose a preset:</option>
+        <option value="ultrafast">[3] Ultra fast</option>
+        <option value="superfast">[4] Super fast</option>
+        <option selected value="veryfast">[5] Very fast</option>
+        <option value="faster">[6] Faster</option>
+        <option value="fast">[7] Fast</option>
+        <option value="medium">[8] Medium</option>
+        <option value="slow">[9] Slow</option>
+        <option value="slower">[10] Slower</option>
+        <option value="veryslow">[11] Very slow</option>
       </select><br>
-      <i>If you know that the video codec of your video is supported by the MP4 container (such as H.264), I recommend the "Keep video codec as-is" option as this means no reduction in video quality. If you are unsure, choose one of the other options, where a slower speed allows for better quality, at the expense of a longer conversion time. More details <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#FAQ" target="_blank">here</a>.</i>
-    </div>
+      <strong>Unless you know that the video and/or audio codec in your video is supported by the MP4 container, you should choose a preset (options 3 to 11). When using a preset, the video codec is converted to H.264 and the audio codec is converted to AAC, using libfdk_aac at VBR mode 5. More details about the presets can be found <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf" target="_blank">here</a>.</strong><br><br>
+
+      <!--CRF-->
+      <div id=crf_div>
+        <p>Constant Rate Factor (CRF):</p>
+          <input type="range" min="0" max="51" step="1" value="18" id="crf_slider" class="slider"/>
+          <span id="crf_value"></span><br><br>
+        <i>A lower CRF means a higher video quality, at the expense of a larger file size. A CRF of 17 or 18 is considered to be visually lossless or nearly so. More details <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf" target="_blank">here</a>.</i>
+      </div>
+        
+    </div> <!--Closing tag for MP4 div-->
   
     <!--AAC DIV-->
     <div id="AAC" style="display:none">
 
       <!-- AAC ENCODING TYPE -->
-      <div id="fdk-type" style="display:none">
-        <label for="fdk-encoding">CBR or VBR:</label>
+      <div id="FDK" style="display:none">
+        <label for="fdk_encoding">CBR or VBR:</label>
         <select id="fdk_encoding" onchange="fdkEncodingType(this.value);">
           <option disabled value>Select Encoding Type</option>
-          <option value="fdk-cbr">CBR (Constant Bitrate)</option>
-          <option selected value="fdk-vbr">VBR (Variable Bitrate)</option>
+          <option value="fdk_cbr">CBR (Constant Bitrate)</option>
+          <option selected value="fdk_vbr">VBR (Variable Bitrate)</option>
         </select>
       </div><br>
 
       <!--Bitrate slider for FDK CBR-->
       <div id="fdk_cbr_div" style="display:none">
         <p>Set your desired bitrate via the slider:</p>
-          <input type="range" min="32" max="512" step="32" value="256" id="fdk-slider-aac" class="slider"/>
+          <input type="range" min="32" max="512" step="32" value="256" id="fdk_slider" class="slider"/>
           <span id="fdkvalue"></span><br><br>
         <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
       </div>
 
-      <div id="fdk-vbr" style="display:none">
-        <label for="fdk-vbr-value">VBR mode:</label>
-        <select id="fdk-vbr-value">
+      <div id="fdk_vbr_div" style="display:none">
+        <label for="fdk_vbr_value">VBR mode:</label>
+        <select id="fdk_vbr_value">
           <option disabled value>Select VBR mode</option>
           <option value="1">1</option>
           <option value="2">2</option>
@@ -173,18 +185,18 @@
         <i>Quality range is from 1 (lowest) to 5 (highest).</i>
       </div>
 
-      <br><div id="is-lowpass-div" style="display:none">
+      <br><div id="is_lowpass_div" style="display:none">
         <p>Change default low-pass filter?</p>
         <label for="yes">Yes</label>
-        <input type="radio" onclick="javascript:isFDKLowpass();" name="is-lowpass" id="yes" value="yes">
+        <input type="radio" onclick="javascript:isFDKLowpass();" name="is_lowpass" id="yes" value="yes">
         <label for="no">No</label>
-        <input type="radio" onclick="javascript:isFDKLowpass();" checked="checked" name="is-lowpass" id="no" value="no">
+        <input type="radio" onclick="javascript:isFDKLowpass();" checked="checked" name="is_lowpass" id="no" value="no">
         <br><i>To see the default low-pass filters, click <a href="https://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#Bandwidth"target="_blank">here</a>. VBR mode 5 has no low-pass filter by default.</i>
       </div>
 
-      <br><div id="fdk-lowpass-div" style="display:none">
-        <label for="fdk-lowpass">Low-pass filter (Hz):  </label>
-        <input onclick="this.select();" type="tel" maxlength="5" value="17000" id="fdk-lowpass"/>
+      <br><div id="fdk_lowpass_div" style="display:none">
+        <label for="fdk_lowpass">Low-pass filter (Hz):  </label>
+        <input onclick="this.select();" type="tel" maxlength="5" value="17000" id="fdk_lowpass"/>
         <span></span><br><br>
       <i>Max value: 20000</i>
       </div>
@@ -192,9 +204,9 @@
     </div> <!--Closing tag for AAC div-->
 
     <!--Bitrate slider for DTS-->
-    <div id="dts-div" style="display:none">
+    <div id="DTS" style="display:none">
       <p>Set your desired bitrate via the slider:</p>
-        <input type="range" min="768" max="3840" step="256" value="768" id="dts-slider" class="slider">
+        <input type="range" min="768" max="3840" step="256" value="768" id="dts_slider" class="slider">
         <span id="dtsvalue"></span><br><br>
       <i>A higher bitrate allows for potentially higher audio quality, at the expense of a larger file size.</i>
     </div>
@@ -232,37 +244,37 @@
     <!--OPUS DIV-->
     <div id="Opus" style="display:none">
 
-      <div id="opus-encoding" style="display:none">
-        <label for="opus-encoding-type">Encoding Type</label>
-        <select id="opus-encoding-type" onchange="opusEncodingType(this.value);">
+      <div id="opus_encoding" style="display:none">
+        <label for="opus_encoding_type">Encoding Type</label>
+        <select id="opus_encoding_type" onchange="opusEncodingType(this.value);">
           <option disabled value>Select Encoding Type</option>
-          <option selected value="opus-vbr">VBR (Variable Bitrate)</option>
-          <option value="opus-cbr">CBR (Constant Bitrate)</option>
+          <option selected value="opus_vbr">VBR (Variable Bitrate)</option>
+          <option value="opus_cbr">CBR (Constant Bitrate)</option>
         </select>
       </div><br>
 
-    <div id="opus-cbr-bitrate" style="display:none">
+    <div id="opus_cbr_div" style="display:none">
       <p>Please enter your desired bitrate:</p>
-        <input onclick="this.select();" type="tel" maxlength="3" value="192" id="opus_cbr_slider"/><br>
+        <input onclick="this.select();" type="tel" maxlength="3" value="192" id="opus_cbr_bitrate"/><br>
       <i>You must enter an integer between 6 and 512.</i>
     </div>
   
     </div> <!--Closing tag for Opus div-->
 
     <!--Bitrate slider for Opus/Vorbis VBR-->
-    <div id="vorbis_opus_vbr_bitrate" style="display:none">
-      <input type="range" min="32" max="512" step="32" value="256" id="slider" class="slider"/>
+    <div id="opus_vorbis_vbr_div" style="display:none">
+      <input type="range" min="32" max="512" step="32" value="256" id="opus_vorbis_slider" class="slider"/>
       <span id="value"></span><br><br>
       <i>VBR selected, so this is just the bitrate that the encoder will usually stay around.</i>
     </div>
 
-    <div id="wav_flac_msg" style="display:none">
+    <div id="no_settings_required" style="display:none">
       <i>You chose a format that does not require you to specify any encoder settings.</i>
     </div>
     
     <!--OUTPUT FILENAME (Bootstrap class)-->
     <form method="POST":>
-      <hr><h3>4. Output Filename:</h3>
+      <hr><h4>4. Output Filename:</h4>
       <input type="text" class="form-control" maxlength="200" id="output_name" required/><br>
     </form>
 

@@ -63,12 +63,13 @@ def main():
 
         file_name = request.form["file_name"]
         chosen_codec = request.form["chosen_codec"]
-        encoding_speed = request.form["encoding_speed"]
+        crf_value = request.form["crf_value"]
+        encoding_mode = request.form["encoding_mode"]
         is_keep_video = request.form["is_keep_video"]
         uploaded_file_path = os.path.join("uploads", secure_filename(file_name))
         # MP3
         mp3_encoding_type = request.form["mp3_encoding_type"]
-        cbr_abr_bitrate = request.form["cbr_abr_bitrate"]
+        mp3_bitrate = request.form["mp3_bitrate"]
         mp3_vbr_setting = request.form["mp3_vbr_setting"]
         is_y_switch = request.form["is_y_switch"]
         # AAC
@@ -81,7 +82,7 @@ def main():
         vorbis_encoding = request.form["vorbis_encoding"]
         vorbis_quality = request.form["vorbis_quality"]
         # Vorbis/Opus
-        slider_value = request.form["slider_value"]
+        opus_vorbis_slider = request.form["opus_vorbis_slider"]
         # AC3 
         ac3_bitrate = request.form["ac3_bitrate"]
         # FLAC
@@ -94,7 +95,7 @@ def main():
         # Desired filename
         output_name = request.form["output_name"]
 
-        variables_to_validate = [file_name, chosen_codec, is_keep_video, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, slider_value, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name]
+        variables_to_validate = [file_name, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name]
 
         strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`']
 
@@ -111,21 +112,25 @@ def main():
             # Run the appropritate section of converter.py:
 
             if chosen_codec == 'MP3':
-                logger.info(f'{mp3_encoding_type}, {cbr_abr_bitrate}, {mp3_vbr_setting}, {is_y_switch}')
-                converter.run_mp3(uploaded_file_path, mp3_encoding_type, cbr_abr_bitrate, mp3_vbr_setting, is_y_switch, output_path)
+                logger.info(f'{mp3_encoding_type}, {mp3_bitrate}, {mp3_vbr_setting}, {is_y_switch}')
+                converter.run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, output_path)
                 extension = 'mp3'
 
             elif chosen_codec == 'AAC':
                 logger.info(f'{fdk_type}, {fdk_cbr}, {fdk_vbr}, {is_fdk_lowpass}, {fdk_lowpass}')
                 converter.run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
                 if is_keep_video == "yes":
-                    extension = 'mkv'
+                    just_ext = uploaded_file_path.split('.')[-1]
+                    if just_ext == 'mp4':
+                        extension = 'mp4'
+                    else:
+                        extension = 'mkv'
                 else:
                     extension = 'm4a'
 
             elif chosen_codec == 'Opus':
-                logger.info(f'{opus_encoding_type}, {slider_value}, {opus_cbr_bitrate}')
-                converter.run_opus(uploaded_file_path, opus_encoding_type, slider_value, opus_cbr_bitrate, output_path)
+                logger.info(f'{opus_encoding_type}, {opus_vorbis_slider}, {opus_cbr_bitrate}')
+                converter.run_opus(uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, output_path)
                 extension = 'opus'   
 
             elif chosen_codec == 'FLAC':
@@ -137,8 +142,8 @@ def main():
                     extension = 'flac'
 
             elif chosen_codec == 'Vorbis':
-                logger.info(f'{vorbis_encoding}, {vorbis_quality}, {slider_value}')
-                converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, slider_value, output_path) 
+                logger.info(f'{vorbis_encoding}, {vorbis_quality}, {opus_vorbis_slider}')
+                converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path) 
                 extension = 'ogg'
 
             elif chosen_codec == 'WAV':
@@ -186,8 +191,8 @@ def main():
                     extension = 'dts'
 
             elif chosen_codec == 'MP4':
-                logger.info(encoding_speed)
-                converter.run_mp4(uploaded_file_path, encoding_speed, output_path)
+                logger.info(encoding_mode)
+                converter.run_mp4(uploaded_file_path, encoding_mode, crf_value, output_path)
                 extension = 'mp4'
             
             elif chosen_codec == 'MKV':
@@ -225,7 +230,7 @@ def trim_file():
         output_name = just_name + " [trimmed]" + ext
 
         try:
-            os.system(f'ffmpeg -y -i "{uploaded_file_path}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
+            os.system(f'/usr/local/bin/ffmpeg -y -i "{uploaded_file_path}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
         except Exception as error:
             logger.error(f'TRIMMER: {error}')
         else:
