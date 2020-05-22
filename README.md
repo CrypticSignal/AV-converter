@@ -25,7 +25,7 @@ fdkaac (https://github.com/nu774/fdkaac) which is a command line encoder fronten
 
 opusenc opus-tools 0.2 (using libopus 1.3.1) | https://opus-codec.org/downloads/
 
-oggenc from vorbis-tools 1.4.0 by the Xiph.Org Foundation | http://www.xiph.org/
+oggenc from vorbis-tools 1.4.0 by the Xiph.Org Foundation | https://www.xiph.org/downloads/
 ## FFmpeg configuration:
 ```
   --enable-gpl
