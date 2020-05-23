@@ -4,17 +4,13 @@ On https://freeaudioconverter.net, you can:
 - Convert a video to an audio-only file (to any of the above formats).
 - Convert a video to the MP4 or MKV format.
 - Change the audio codec of a video to AAC, AC3, DTS, WAV, FLAC or ALAC.
-- Trim a video or audio file (will not work if using the Safari browser) - https://freeaudioconverter.net/file-trimmer
-- Play reaction-time games! https://freeaudioconverter.net/game & https://freeaudioconverter.net/game2
+- Trim a video or audio file (will not work if using the Safari browser).
 ## How does it work?
 Your file is uploaded to a server, where the conversion/file trimming takes place. On completion, the file is sent to your browser and is automatically downloaded.
-## Features [converter]:
+## Features:
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
 - Whilst the file is being converted, you can see how far into the file the encoder currently is. This information is updated every second.
-## Features [the games]:
-- See your high score.
-- See the world record.
 ## Supported filetypes:
 Many filetypes are supported, click [here](https://freeaudioconverter.net/filetypes) for details. Support for other filetypes may be added, feel free to [contact me](https://freeaudioconverter.net/contact) to enquire. 
 ## To-do:
@@ -27,9 +23,9 @@ LAME v3.100 | https://lame.sourceforge.io/
 
 fdkaac (https://github.com/nu774/fdkaac) which is a command line encoder frontend for fdk-aac (https://github.com/mstorsjo/fdk-aac).
 
-libopus | https://github.com/xiph/opus
+opusenc opus-tools 0.2 (using libopus 1.3.1) | https://opus-codec.org/downloads/
 
-libvorbis 1.3.6 | https://github.com/xiph/vorbis
+oggenc from vorbis-tools 1.4.0 by the Xiph.Org Foundation | https://www.xiph.org/downloads/
 ## FFmpeg configuration:
 ```
   --enable-gpl
