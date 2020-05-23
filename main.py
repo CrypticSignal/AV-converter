@@ -24,9 +24,9 @@ def read_progress():
             lines = f.readlines()
             # This gives us the amount of the file that has been converted so far.
             current_time = lines[-5].split('=')[-1]
-            logger.info(current_time)
             # If the amount converted is the same twice in a row, that means that the conversion is complete.
             if previous_time == current_time:
+                log.info(current_time)
                 break
             hh_mm_ss = current_time.split('.')[0]
             milliseconds = current_time.split('.')[-1][:-4]
@@ -52,7 +52,7 @@ def main():
 
         chosen_file = request.files["chosen_file"]
         log_this('uploaded a file:')
-        logger.info(chosen_file)
+        log.info(chosen_file)
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
@@ -104,7 +104,7 @@ def main():
             return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
 
         else:
-            log_this(f'chose {chosen_codec}\nOutput Filename: {output_name}')
+            log.info(f'They chose {chosen_codec}\nOutput Filename: {output_name}')
             output_path = f'"conversions/{output_name}"'
             # Start the read_progress function in a new thread.
             socketio.start_background_task(read_progress)
@@ -112,12 +112,12 @@ def main():
             # Run the appropritate section of converter.py:
 
             if chosen_codec == 'MP3':
-                logger.info(f'{mp3_encoding_type}, {mp3_bitrate}, {mp3_vbr_setting}, {is_y_switch}')
+                log.info(f'{mp3_encoding_type}, {mp3_bitrate}, {mp3_vbr_setting}, {is_y_switch}')
                 converter.run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, output_path)
                 extension = 'mp3'
 
             elif chosen_codec == 'AAC':
-                logger.info(f'{fdk_type}, {fdk_cbr}, {fdk_vbr}, {is_fdk_lowpass}, {fdk_lowpass}')
+                log.info(f'{fdk_type}, {fdk_cbr}, {fdk_vbr}, {is_fdk_lowpass}, {fdk_lowpass}')
                 converter.run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
                 if is_keep_video == "yes":
                     just_ext = uploaded_file_path.split('.')[-1]
@@ -129,12 +129,12 @@ def main():
                     extension = 'm4a'
 
             elif chosen_codec == 'Opus':
-                logger.info(f'{opus_encoding_type}, {opus_vorbis_slider}, {opus_cbr_bitrate}')
+                log.info(f'{opus_encoding_type}, {opus_vorbis_slider}, {opus_cbr_bitrate}')
                 converter.run_opus(uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, output_path)
                 extension = 'opus'   
 
             elif chosen_codec == 'FLAC':
-                logger.info(f'{is_keep_video}, {flac_compression}')
+                log.info(f'{is_keep_video}, {flac_compression}')
                 converter.run_flac(uploaded_file_path, is_keep_video, flac_compression, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -142,12 +142,12 @@ def main():
                     extension = 'flac'
 
             elif chosen_codec == 'Vorbis':
-                logger.info(f'{vorbis_encoding}, {vorbis_quality}, {opus_vorbis_slider}')
+                log.info(f'{vorbis_encoding}, {vorbis_quality}, {opus_vorbis_slider}')
                 converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path) 
                 extension = 'ogg'
 
             elif chosen_codec == 'WAV':
-                logger.info(f'Keep video selected? {is_keep_video}')
+                log.info(f'Keep video selected? {is_keep_video}')
                 converter.run_wav(uploaded_file_path, is_keep_video, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -163,7 +163,7 @@ def main():
                 extension = 'mka'
 
             elif chosen_codec == 'ALAC':
-                logger.info(f'Keep video selected? {is_keep_video}')
+                log.info(f'Keep video selected? {is_keep_video}')
                 converter.run_alac(uploaded_file_path, is_keep_video, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -171,7 +171,7 @@ def main():
                     extension = 'm4a'
 
             elif chosen_codec == 'AC3':
-                logger.info(f'Keep video selected? {is_keep_video}')
+                log.info(f'Keep video selected? {is_keep_video}')
                 converter.run_ac3(uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -183,7 +183,7 @@ def main():
                 extension = 'caf'
 
             elif chosen_codec == 'DTS':
-                logger.info(f'Keep video selected? {is_keep_video}')
+                log.info(f'Keep video selected? {is_keep_video}')
                 converter.run_dts(uploaded_file_path, is_keep_video, dts_bitrate, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -191,7 +191,7 @@ def main():
                     extension = 'dts'
 
             elif chosen_codec == 'MP4':
-                logger.info(encoding_mode)
+                log.info(encoding_mode)
                 converter.run_mp4(uploaded_file_path, encoding_mode, crf_value, output_path)
                 extension = 'mp4'
             
@@ -234,7 +234,7 @@ def trim_file():
         except Exception as error:
             logger.error(f'TRIMMER: {error}')
         else:
-            logger.info('Trim complete.')
+            log.info('Trim complete.')
             return {
                 "message": "File trimmed. The trimmed file will now start downloading.",
                 "downloadFilePath": f'/download/{output_name}'
@@ -280,10 +280,10 @@ def get_score():
     accuracy = request.form['accuracy']
     canvas_width = request.form['canvas_width']
     canvas_height = request.form['canvas_height']
-    logger.info(score)
-    logger.info(times_missed)
-    logger.info(accuracy)
-    logger.info(canvas_height)
+    log.info(score)
+    log.info(times_missed)
+    log.info(accuracy)
+    log.info(canvas_height)
     try:
         int(score)
         int(times_missed)

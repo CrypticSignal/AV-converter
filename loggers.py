@@ -13,7 +13,7 @@ def setup_logger(name, log_file):
     logger.addHandler(file_handler)
     return logger
 
-logger = setup_logger('logger', 'info/Info.txt')
+log = setup_logger('log', 'info/Info.txt')
 visit = setup_logger('visit', 'info/Visit.log')
 user_agent_logger = setup_logger('user_agent_logger', 'info/UserAgent.txt')
 socket_logger = setup_logger('socket_logger', 'info/Socket.txt')
@@ -28,7 +28,7 @@ def log_socket(message):
 def log_this(message):
     current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
     client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    logger.info(f'\n[{current_datetime}] {client} {message}')
+    log.info(f'[{current_datetime}] {client} {message}')
 
 # UserAgent.txt
 def log_user_agent():

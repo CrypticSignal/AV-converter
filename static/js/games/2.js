@@ -104,7 +104,7 @@ async function mouseClicked() {
 
         if (response.status === 200) {
 
-            if (confirm(`Reaction Time: ~${reactionTime} ms\nPersonal Best: ~${highScore} ms\nWorld Record: ~${responseText} ms\nTo play again, click on 'OK'`)) {
+            if (confirm(`Reaction Time: ~${reactionTime} ms\nPersonal Best: ~${highScore} ms\nTo play again, click on 'OK'`)) {
                 location.reload();
             }
             else {
