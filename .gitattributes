@@ -1,4 +1,3 @@
-
+static/js/games/* linguist-vendored
 *.html linguist-detectable=false
 *.py linguist-detectable=true
-
