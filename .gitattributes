@@ -1,4 +1,4 @@
 *.js linguist-detectable=false
 *.py linguist-detectable=true
-game.html -linguist-vendored
-game2.html -linguist-vendored
+templates/game.html -linguist-vendored
+templates/game2.html -linguist-vendored
