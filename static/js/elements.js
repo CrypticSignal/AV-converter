@@ -296,26 +296,6 @@ function isFDKLowpass() {
     }
 }
 
-// // QAAC
-// function showHideAAC(value) {
-//     if (value=='cbr' || value=='abr') {
-//         document.getElementById('aac_cbr_div').style.display = 'block';
-//         document.getElementById('fdk_cbr_div').style.display = 'none';
-//         document.getElementById('fdk_vbr_div').style.display = 'none';
-//     }
-//     else if (value=='tvbr') {
-//         document.getElementById('aac_tvbr_div').style.display = 'block';
-//         document.getElementById('fdk_cbr_div').style.display = 'none';
-//         document.getElementById('fdk_vbr_div').style.display = 'none';
-//     }
-
-//     else {
-//         document.getElementById('aac_vbr_div').style.display = 'block';
-//         document.getElementById('fdk_cbr_div').style.display = 'none';
-//         document.getElementById('fdk_vbr_div').style.display = 'none';
-//     }
-// }
-
 // Vorbis
 function showHideVorbis(value) {
     if (value=='vbr_bitrate') {
