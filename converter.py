@@ -102,7 +102,7 @@ def run_wav(uploaded_file_path, is_keep_video, output_path):
     if is_keep_video == "yes":
         run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a:0 pcm_s16le {output_path}.mkv')
     else:
-        run_ffmpeg(uploaded_file_path, f'{output_path}.wav')
+        run_ffmpeg(uploaded_file_path, f'-map 0:a {output_path}.wav')
 
 # MP4
 def run_mp4(uploaded_file_path, encoding_mode, crf_value, output_path):
@@ -134,37 +134,37 @@ def run_flac(uploaded_file_path, is_keep_video, flac_compression, output_path):
     if is_keep_video == "yes":
         run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a flac {output_path}.mkv')
     else:
-        run_ffmpeg(uploaded_file_path, f'-c:a flac {output_path}.flac')
+        run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a flac {output_path}.flac')
 
 # ALAC
 def run_alac(uploaded_file_path, is_keep_video, output_path):
     if is_keep_video == "yes":
         run_ffmpeg(uploaded_file_path, f'-map 0 -c:a alac {output_path}.mkv')
     else:
-        run_ffmpeg(uploaded_file_path, f'-c:a alac {output_path}.m4a')
+        run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a alac {output_path}.m4a')
 
 # AC3
 def run_ac3(uploaded_file_path, is_keep_video, ac3_bitrate, output_path):
     if is_keep_video == "yes":
         run_ffmpeg(uploaded_file_path, f'-map 0 -c:a ac3 -b:a {ac3_bitrate}k {output_path}.mkv')
     else:
-        run_ffmpeg(uploaded_file_path, f'-c:a ac3 -b:a {ac3_bitrate}k {output_path}.ac3')
+        run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a ac3 -b:a {ac3_bitrate}k {output_path}.ac3')
 
 # DTS
 def run_dts(uploaded_file_path, is_keep_video, dts_bitrate, output_path):
     if is_keep_video == "yes":
         run_ffmpeg(uploaded_file_path, f'-map 0 -c:a dca -b:a {dts_bitrate}k -strict -2 {output_path}.mkv')
     else:
-        run_ffmpeg(uploaded_file_path, f'-c:a dca -b:a {dts_bitrate}k -strict -2 {output_path}.dts')
+        run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a dca -b:a {dts_bitrate}k -strict -2 {output_path}.dts')
 
 # CAF
 def run_caf(uploaded_file_path, output_path):
-    run_ffmpeg(uploaded_file_path, f'{output_path}.caf')
+    run_ffmpeg(uploaded_file_path, f'-map 0 {output_path}.caf')
 
 # MKA
 def run_mka(uploaded_file_path, output_path):
-    run_ffmpeg(uploaded_file_path, f'-c:a copy {output_path}.mka')
+    run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a copy {output_path}.mka')
 
 # MKV
 def run_mkv(uploaded_file_path, output_path):
-    run_ffmpeg(uploaded_file_path, f'-c copy {output_path}.mkv')
+    run_ffmpeg(uploaded_file_path, f'-map 0 -c copy {output_path}.mkv')

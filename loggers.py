@@ -28,7 +28,7 @@ def log_socket(message):
 def log_this(message):
     current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
     client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    log.info(f'[{current_datetime}] {client} {message}')
+    log.info(f'\n[{current_datetime}] {client} {message}')
 
 # UserAgent.txt
 def log_user_agent():

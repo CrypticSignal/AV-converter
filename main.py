@@ -280,10 +280,6 @@ def get_score():
     accuracy = request.form['accuracy']
     canvas_width = request.form['canvas_width']
     canvas_height = request.form['canvas_height']
-    log.info(score)
-    log.info(times_missed)
-    log.info(accuracy)
-    log.info(canvas_height)
     try:
         int(score)
         int(times_missed)
