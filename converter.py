@@ -98,22 +98,22 @@ def run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fd
                 ffmpeg_pipe(uploaded_file_path, f'fdkaac --comment "Encoded using freeaudioconverter.net" --bitrate-mode {fdk_vbr} - -o {output_path}.m4a')
 
 # WAV
-def run_wav(uploaded_file_path, is_keep_video, output_path):
+def run_wav(uploaded_file_path, is_keep_video, wav_bit_depth, output_path):
     if is_keep_video == "yes":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a:0 pcm_s16le {output_path}.mkv')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a:0 pcm_s{wav_bit_depth}le {output_path}.mkv')
     else:
-        run_ffmpeg(uploaded_file_path, f'-map 0:a {output_path}.wav')
+        run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a pcm_s{wav_bit_depth}le {output_path}.wav')
 
 # MP4
-def run_mp4(uploaded_file_path, encoding_mode, crf_value, output_path):
-    if encoding_mode == "keep_codecs":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c copy {output_path}.mp4')
-    elif encoding_mode == "keep_video_codec":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a libfdk_aac -vbr 5 {output_path}.mp4')
-    elif encoding_mode == 'convert_video_keep_audio':
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v libx264 -preset {encoding_mode} -crf {crf_value} -c:a copy {output_path}.mp4')
+def run_mp4(uploaded_file_path, mp4_encoding_mode, crf_value, output_path):
+    if mp4_encoding_mode == "keep_codecs":
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c copy -f mp4 -movflags faststart {output_path}.mp4')
+    elif mp4_encoding_mode == "keep_video_codec":
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a libfdk_aac -vbr 5 -f mp4 -movflags faststart {output_path}.mp4')
+    elif mp4_encoding_mode == 'convert_video_keep_audio':
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v libx264 -preset {mp4_encoding_mode} -crf {crf_value} -c:a copy -f mp4 -movflags faststart {output_path}.mp4')
     else:
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v libx264 -preset {encoding_mode} -crf {crf_value} -c:a libfdk_aac -vbr 5 {output_path}.mp4')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v libx264 -preset {mp4_encoding_mode} -crf {crf_value} -c:a libfdk_aac -vbr 5 -f mp4 -movflags faststart {output_path}.mp4')
 
 # Opus
 def run_opus(uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, output_path):
@@ -167,4 +167,4 @@ def run_mka(uploaded_file_path, output_path):
 
 # MKV
 def run_mkv(uploaded_file_path, output_path):
-    run_ffmpeg(uploaded_file_path, f'-map 0 -c copy {output_path}.mkv')
+    run_ffmpeg(uploaded_file_path, f'-map 0 -c copy -f matroska {output_path}.mkv')
