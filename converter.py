@@ -159,7 +159,7 @@ def run_dts(uploaded_file_path, is_keep_video, dts_bitrate, output_path):
 
 # CAF
 def run_caf(uploaded_file_path, output_path):
-    run_ffmpeg(uploaded_file_path, f'-map 0 {output_path}.caf')
+    run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a alac {output_path}.caf')
 
 # MKA
 def run_mka(uploaded_file_path, output_path):
