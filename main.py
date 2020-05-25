@@ -98,7 +98,7 @@ def main():
         # Desired filename
         output_name = request.form["output_name"]
 
-        variables_to_validate = [file_name, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name, wav_bit_depth, mp4_encoding_mode]
+        variables_to_validate = [file_name, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name, wav_bit_depth, mp4_encoding_mode, crf_value]
 
         strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`']
 
@@ -194,7 +194,7 @@ def main():
                     extension = 'dts'
 
             elif chosen_codec == 'MP4':
-                log.info(encoding_mode)
+                log.info(mp4_encoding_mode)
                 converter.run_mp4(uploaded_file_path, mp4_encoding_mode, crf_value, output_path)
                 extension = 'mp4'
             
