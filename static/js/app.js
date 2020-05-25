@@ -25,7 +25,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     conversionRequest.responseType = "json";
 
     const chosenCodec = document.getElementById('codecs').value;
-    const encodingMode = document.getElementById('encoding_mode').value;
+    const mp4EncodingMode = document.getElementById('mp4_encoding_mode').value;
     const opusVorbisSlider = document.getElementById("opus_vorbis_slider").value;
     const outputName = document.getElementById("output_name").value;
     const mp3EncodingType = document.getElementById('mp3_encoding_type').value;
@@ -46,13 +46,14 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     const opusEncodingType = document.getElementById('opus_encoding_type').value;
     const isKeepVideo = document.querySelector('input[name="is_keep_video"]:checked').value;
     const crfValue = document.getElementById('crf_slider').value;
+    const wavBitDepth = document.querySelector('input[name="wav_bit_depth"]:checked').value;
 
     const data = new FormData();
 
     data.append("request_type", "convert");
     data.append("file_name", filename);
     data.append("chosen_codec", chosenCodec);
-    data.append("encoding_mode", encodingMode);
+    data.append("mp4_encoding_mode", mp4EncodingMode);
     data.append("opus_vorbis_slider", opusVorbisSlider);
     data.append("output_name", outputName);
     data.append("mp3_encoding_type", mp3EncodingType);
@@ -73,6 +74,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     data.append("is_y_switch", isYSwitch);
     data.append("is_keep_video", isKeepVideo);
     data.append("crf_value", crfValue);
+    data.append("wav_bit_depth", wavBitDepth);
 
     conversionRequest.open('POST', '/');
     conversionRequest.send(data);
@@ -91,7 +93,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
             show_alert(`${conversionRequest.response.message}`, "danger");
         } 
         else {
-            show_alert("Error converting file", "danger");
+            show_alert(`Error converting file (${conversionRequest.responseText})`, "danger");
         }       
     })
 } // Closing bracket for pythonHeresWhatYouNeed function.

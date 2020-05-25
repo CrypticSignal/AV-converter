@@ -61,6 +61,16 @@
   
     <hr><h4>3. Encoder Settings:</h4>
 
+    <div id='wav_bit_depth_div' style='display:none'>
+      <label for='wav_bit_depth'>Output Bit Depth (audio):</label>
+      <label for ="16_bit">16</label>
+      <input type="radio" id="16_bit" checked="checked" name="wav_bit_depth" value="16">
+      <label for="24_bit">24</label>
+      <input type="radio" id="24_bit" name="wav_bit_depth" value="24">
+      <label for="32_bit">32</label>
+      <input type="radio" id="32_bit" name="wav_bit_depth" value="32">
+    </div>
+
     <!--MP3 DIV-->
     <div id="MP3">
 
@@ -115,6 +125,7 @@
   
     <!--Bitrate settings for AC3-->
     <div id="AC3" style="display:none">
+      <p>The maximum number of output channels is six. For example, if the audio of your file is 7.1, it will get downmixed to 5.1</p>
       <label for="ac3_bitrate">Bitrate:</label>
       <select id="ac3_bitrate">
         <option disabled value>Select a Bitrate</option>
@@ -129,8 +140,8 @@
     <!--MP4-->
     <div id="MP4" style="display:none">
       
-      <label for="encoding_mode">FFmpeg setting:</label>
-      <select id="encoding_mode" onchange="mp4Mode(this.value);">
+      <label for="mp4_encoding_mode">FFmpeg setting:</label>
+      <select id="mp4_encoding_mode" onchange="mp4Mode(this.value);">
         <option value="keep_codecs">[1] -c copy</option>
         <option value="keep_video_codec">[2] -c:v copy -c:a libfdk_aac -vbr 5</option>
         <option value="convert_video_keep_audio">[3] -c:v libx264 -c:a copy</option>
@@ -211,6 +222,7 @@
 
     <!--Bitrate slider for DTS-->
     <div id="DTS" style="display:none">
+      <p>The maximum number of output channels is six. For example, if the audio of your file is 7.1, it will get downmixed to 5.1</p>
       <p>Set your desired bitrate via the slider:</p>
         <input type="range" min="384" max="1536" step="128" value="768" id="dts_slider" class="slider">
         <span id="dtsvalue"></span><br><br>

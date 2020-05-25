@@ -24,13 +24,15 @@ def read_progress():
             lines = f.readlines()
             # This gives us the amount of the file that has been converted so far.
             current_time = lines[-5].split('=')[-1]
+            # FFmpeg also shows the encoding speed.
+            speed = lines[-2].split('=')[-1]
             # If the amount converted is the same twice in a row, that means that the conversion is complete.
             if previous_time == current_time:
                 log.info(current_time)
                 break
             hh_mm_ss = current_time.split('.')[0]
             milliseconds = current_time.split('.')[-1][:-4]
-            progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)'
+            progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)<br>Encoding Speed: {speed}'
             # Trigger a new event called "show progress" 
             socketio.emit('show progress', {'progress': progress_message})
             socketio.sleep(1)
@@ -61,10 +63,11 @@ def main():
 
     elif request.form["request_type"] == "convert":
 
+        wav_bit_depth = request.form["wav_bit_depth"]
         file_name = request.form["file_name"]
         chosen_codec = request.form["chosen_codec"]
         crf_value = request.form["crf_value"]
-        encoding_mode = request.form["encoding_mode"]
+        mp4_encoding_mode = request.form["mp4_encoding_mode"]
         is_keep_video = request.form["is_keep_video"]
         uploaded_file_path = os.path.join("uploads", secure_filename(file_name))
         # MP3
@@ -95,7 +98,7 @@ def main():
         # Desired filename
         output_name = request.form["output_name"]
 
-        variables_to_validate = [file_name, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name]
+        variables_to_validate = [file_name, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name, wav_bit_depth, mp4_encoding_mode]
 
         strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`']
 
@@ -147,8 +150,8 @@ def main():
                 extension = 'ogg'
 
             elif chosen_codec == 'WAV':
-                log.info(f'Keep video selected? {is_keep_video}')
-                converter.run_wav(uploaded_file_path, is_keep_video, output_path)
+                log.info(f'Keep video selected? {is_keep_video}\nBit Depth: {wav_bit_depth}')
+                converter.run_wav(uploaded_file_path, is_keep_video, wav_bit_depth, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
                 else:
@@ -192,7 +195,7 @@ def main():
 
             elif chosen_codec == 'MP4':
                 log.info(encoding_mode)
-                converter.run_mp4(uploaded_file_path, encoding_mode, crf_value, output_path)
+                converter.run_mp4(uploaded_file_path, mp4_encoding_mode, crf_value, output_path)
                 extension = 'mp4'
             
             elif chosen_codec == 'MKV':

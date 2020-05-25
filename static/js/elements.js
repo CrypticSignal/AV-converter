@@ -9,6 +9,7 @@ document.addEventListener("keydown", function(event) {
 function showHide(value) {
     
     if (value=='MP3') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('mp3_encoder').style.display = 'block';
@@ -32,6 +33,7 @@ function showHide(value) {
     }
     
     else if (value=='AAC') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('mp3_encoder').style.display = 'none';
@@ -57,11 +59,12 @@ function showHide(value) {
     }
 
     else if (value=='WAV') {
+        document.getElementById('wav_bit_depth_div').style.display = 'block';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
         document.getElementById('mp3_encoder').style.display = 'none';
-        document.getElementById('no_settings_required').style.display = 'block';
+        document.getElementById('no_settings_required').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'block';
         document.getElementById('MP4').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
@@ -75,6 +78,7 @@ function showHide(value) {
     }
     
     else if (value=='Opus') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'block';
         document.getElementById('aac_encoder').style.display = 'none';
@@ -96,6 +100,7 @@ function showHide(value) {
     }
 
     else if (value=='Vorbis') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'block';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
@@ -117,6 +122,7 @@ function showHide(value) {
     }
 
     else if (value=='FLAC') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
@@ -135,6 +141,7 @@ function showHide(value) {
     }
 
     else if (value=='ALAC') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
@@ -153,6 +160,7 @@ function showHide(value) {
     }
     
     else if (value=='AC3') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
@@ -171,6 +179,7 @@ function showHide(value) {
     }
 
     else if (value=='DTS') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
@@ -189,6 +198,7 @@ function showHide(value) {
     }
 
     else if (value=='CAF') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
@@ -207,6 +217,7 @@ function showHide(value) {
     }
 
     else if (value=='MKA') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
@@ -225,6 +236,7 @@ function showHide(value) {
     }
 
     else if (value=='MKV') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
@@ -242,6 +254,7 @@ function showHide(value) {
         document.getElementById('AAC').style.display = 'none';
     }
     else if (value=='MP4') {
+        document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('vorbis_encoder').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('aac_encoder').style.display = 'none';
