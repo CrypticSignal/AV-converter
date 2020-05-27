@@ -115,12 +115,10 @@ def main():
             # Run the appropritate section of converter.py:
 
             if chosen_codec == 'MP3':
-                log.info(f'{mp3_encoding_type}, {mp3_bitrate}, {mp3_vbr_setting}, {is_y_switch}')
                 converter.run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, output_path)
                 extension = 'mp3'
 
             elif chosen_codec == 'AAC':
-                log.info(f'{fdk_type}, {fdk_cbr}, {fdk_vbr}, {is_fdk_lowpass}, {fdk_lowpass}')
                 converter.run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
                 if is_keep_video == "yes":
                     just_ext = uploaded_file_path.split('.')[-1]
@@ -132,12 +130,10 @@ def main():
                     extension = 'm4a'
 
             elif chosen_codec == 'Opus':
-                log.info(f'{opus_encoding_type}, {opus_vorbis_slider}, {opus_cbr_bitrate}')
                 converter.run_opus(uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, output_path)
                 extension = 'opus'   
 
             elif chosen_codec == 'FLAC':
-                log.info(f'{is_keep_video}, {flac_compression}')
                 converter.run_flac(uploaded_file_path, is_keep_video, flac_compression, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -145,12 +141,10 @@ def main():
                     extension = 'flac'
 
             elif chosen_codec == 'Vorbis':
-                log.info(f'{vorbis_encoding}, {vorbis_quality}, {opus_vorbis_slider}')
                 converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path) 
                 extension = 'ogg'
 
             elif chosen_codec == 'WAV':
-                log.info(f'Keep video selected? {is_keep_video}\nBit Depth: {wav_bit_depth}')
                 converter.run_wav(uploaded_file_path, is_keep_video, wav_bit_depth, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -166,7 +160,6 @@ def main():
                 extension = 'mka'
 
             elif chosen_codec == 'ALAC':
-                log.info(f'Keep video selected? {is_keep_video}')
                 converter.run_alac(uploaded_file_path, is_keep_video, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -174,7 +167,6 @@ def main():
                     extension = 'm4a'
 
             elif chosen_codec == 'AC3':
-                log.info(f'Keep video selected? {is_keep_video}')
                 converter.run_ac3(uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -186,7 +178,6 @@ def main():
                 extension = 'caf'
 
             elif chosen_codec == 'DTS':
-                log.info(f'Keep video selected? {is_keep_video}')
                 converter.run_dts(uploaded_file_path, is_keep_video, dts_bitrate, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
@@ -194,7 +185,6 @@ def main():
                     extension = 'dts'
 
             elif chosen_codec == 'MP4':
-                log.info(mp4_encoding_mode)
                 converter.run_mp4(uploaded_file_path, mp4_encoding_mode, crf_value, output_path)
                 extension = 'mp4'
             
