@@ -73,14 +73,14 @@ def run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fd
 
         if fdk_type == "fdk_cbr":
             if is_fdk_lowpass == "yes":
-                run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a libfdk_aac -cutoff {fdk_lowpass} -b:a {fdk_cbr}k {output_path}.{output_ext}')
+                run_ffmpeg(uploaded_file_path, f'-map 0 -c:s copy -c:v copy -c:a libfdk_aac -cutoff {fdk_lowpass} -b:a {fdk_cbr}k {output_path}.{output_ext}')
             else:
-                run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a libfdk_aac -b:a {fdk_cbr}k {output_path}.{output_ext}')
+                run_ffmpeg(uploaded_file_path, f'-map 0 -c:s copy -c:v copy -c:a libfdk_aac -b:a {fdk_cbr}k {output_path}.{output_ext}')
         else: # VBR
             if is_fdk_lowpass == "yes":
-                run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a libfdk_aac -cutoff {fdk_lowpass} -vbr {fdk_vbr} {output_path}.{output_ext}')
+                run_ffmpeg(uploaded_file_path, f'-map 0 -c:s copy -c:v copy -c:a libfdk_aac -cutoff {fdk_lowpass} -vbr {fdk_vbr} {output_path}.{output_ext}')
             else:
-                run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a libfdk_aac -vbr {fdk_vbr} {output_path}.{output_ext}')
+                run_ffmpeg(uploaded_file_path, f'-map 0 -c:s copy -c:v copy -c:a libfdk_aac -vbr {fdk_vbr} {output_path}.{output_ext}')
 
         return output_ext
         
@@ -100,20 +100,20 @@ def run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fd
 # WAV
 def run_wav(uploaded_file_path, is_keep_video, wav_bit_depth, output_path):
     if is_keep_video == "yes":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a:0 pcm_s{wav_bit_depth}le {output_path}.mkv')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c:s copy -c:v copy -c:a:0 pcm_s{wav_bit_depth}le {output_path}.mkv')
     else:
         run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a pcm_s{wav_bit_depth}le {output_path}.wav')
 
 # MP4
 def run_mp4(uploaded_file_path, mp4_encoding_mode, crf_value, output_path):
     if mp4_encoding_mode == "keep_codecs":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c copy -f mp4 -movflags faststart {output_path}.mp4')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -sn -c copy -f mp4 -movflags faststart {output_path}.mp4')
     elif mp4_encoding_mode == "keep_video_codec":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a libfdk_aac -vbr 5 -f mp4 -movflags faststart {output_path}.mp4')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -sn -c:v copy -c:a libfdk_aac -vbr 5 -f mp4 -movflags faststart {output_path}.mp4')
     elif mp4_encoding_mode == 'convert_video_keep_audio':
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v libx264 -preset {mp4_encoding_mode} -crf {crf_value} -c:a copy -f mp4 -movflags faststart {output_path}.mp4')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -sn -c:v libx264 -preset {mp4_encoding_mode} -crf {crf_value} -c:a copy -f mp4 -movflags faststart {output_path}.mp4')
     else:
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v libx264 -preset {mp4_encoding_mode} -crf {crf_value} -c:a libfdk_aac -vbr 5 -f mp4 -movflags faststart {output_path}.mp4')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -sn -c:v libx264 -preset {mp4_encoding_mode} -crf {crf_value} -c:a libfdk_aac -vbr 5 -f mp4 -movflags faststart {output_path}.mp4')
 
 # Opus
 def run_opus(uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, output_path):
@@ -132,28 +132,28 @@ def run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_
 # FLAC
 def run_flac(uploaded_file_path, is_keep_video, flac_compression, output_path):
     if is_keep_video == "yes":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:v copy -c:a flac {output_path}.mkv')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c:s copy -c:v copy -c:a flac {output_path}.mkv')
     else:
         run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a flac {output_path}.flac')
 
 # ALAC
 def run_alac(uploaded_file_path, is_keep_video, output_path):
     if is_keep_video == "yes":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:a alac {output_path}.mkv')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c:s copy -c:a alac {output_path}.mkv')
     else:
         run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a alac {output_path}.m4a')
 
 # AC3
 def run_ac3(uploaded_file_path, is_keep_video, ac3_bitrate, output_path):
     if is_keep_video == "yes":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:a ac3 -b:a {ac3_bitrate}k {output_path}.mkv')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c:s copy -c:a ac3 -b:a {ac3_bitrate}k {output_path}.mkv')
     else:
         run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a ac3 -b:a {ac3_bitrate}k {output_path}.ac3')
 
 # DTS
 def run_dts(uploaded_file_path, is_keep_video, dts_bitrate, output_path):
     if is_keep_video == "yes":
-        run_ffmpeg(uploaded_file_path, f'-map 0 -c:a dca -b:a {dts_bitrate}k -strict -2 {output_path}.mkv')
+        run_ffmpeg(uploaded_file_path, f'-map 0 -c:s copy -c:a dca -b:a {dts_bitrate}k -strict -2 {output_path}.mkv')
     else:
         run_ffmpeg(uploaded_file_path, f'-map 0:a -c:a dca -b:a {dts_bitrate}k -strict -2 {output_path}.dts')
 
