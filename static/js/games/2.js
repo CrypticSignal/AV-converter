@@ -100,7 +100,7 @@ async function mouseClicked() {
             body: data
         });
 
-        const responseText = await response.text();
+        //const responseText = await response.text();
 
         if (response.status === 200) {
 

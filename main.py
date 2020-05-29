@@ -20,7 +20,7 @@ socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
 def read_progress():
     previous_time = '00:00:00'
     while True:
-        with open('info/progress.txt', 'r') as f:
+        with open('progress.txt', 'r') as f:
             lines = f.readlines()
             # This gives us the amount of the file that has been converted so far.
             current_time = lines[-5].split('=')[-1]
@@ -39,15 +39,7 @@ def read_progress():
             # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
             previous_time = current_time
 
-@socketio.on('my event') # Decorator to catch an event called "my event"
-def test_connect(): # test_connect() is the event callback function.
-    log_socket("connected")
-
-@socketio.on('disconnect')
-def test_disconnect():
-    log_socket("disconnected")
-
-# After a file has been uploaded via the homepage.
+# When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
 def main():
     if request.form["request_type"] == "uploaded":
@@ -64,12 +56,13 @@ def main():
     elif request.form["request_type"] == "convert":
 
         wav_bit_depth = request.form["wav_bit_depth"]
-        file_name = request.form["file_name"]
+        filename = request.form["filename"]
+        filename_without_ext = filename.split('.')[0]
         chosen_codec = request.form["chosen_codec"]
         crf_value = request.form["crf_value"]
         mp4_encoding_mode = request.form["mp4_encoding_mode"]
         is_keep_video = request.form["is_keep_video"]
-        uploaded_file_path = os.path.join("uploads", secure_filename(file_name))
+        uploaded_file_path = os.path.join("uploads", secure_filename(filename))
         # MP3
         mp3_encoding_type = request.form["mp3_encoding_type"]
         mp3_bitrate = request.form["mp3_bitrate"]
@@ -98,9 +91,9 @@ def main():
         # Desired filename
         output_name = request.form["output_name"]
 
-        variables_to_validate = [file_name, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name, wav_bit_depth, mp4_encoding_mode, crf_value]
+        variables_to_validate = [filename_without_ext, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name, wav_bit_depth, mp4_encoding_mode, crf_value]
 
-        strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`']
+        strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`', '.']
 
         # check_no_variable_contains_bad_string is a func defined in converter.py
         if not converter.check_no_variable_contains_bad_string(variables_to_validate, strings_not_allowed):
@@ -169,7 +162,11 @@ def main():
             elif chosen_codec == 'AC3':
                 converter.run_ac3(uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
                 if is_keep_video == "yes":
-                    extension = 'mkv'
+                    just_ext = uploaded_file_path.split('.')[-1]
+                    if just_ext == 'mp4':
+                        extension = 'mp4'
+                    else:
+                        extension = 'mkv'
                 else:
                     extension = 'ac3'
 
@@ -270,7 +267,6 @@ def get_score():
     user_agent = request.headers.get('User-Agent')
     score = request.form['score']
     times_missed = request.form['times_missed']
-    accuracy = request.form['accuracy']
     canvas_width = request.form['canvas_width']
     canvas_height = request.form['canvas_height']
     try:
@@ -281,16 +277,17 @@ def get_score():
     except ValueError:
         logger.error("GAME 1: The user changed something to a non-int.")
     else:
-        with open("info/HighScores.txt", "a") as f:
-            f.write(f'{score} | {times_missed} | {accuracy} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
+        with open("Game Scores/HighScores.txt", "a") as f:
+            f.write(f'{score} | {times_missed} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
     finally:
         just_scores = []
-        with open('info/HighScores.txt', 'r') as f:
+        with open('Game Scores/HighScores.txt', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 just_scores.append(line.split('|')[0].strip())
 
-        world_record = max(just_scores, key=lambda x: int(x))
+        valid_scores = [x for x in just_scores if int(x) < 100]
+        world_record = max(valid_scores, key=lambda x: int(x))
         return world_record
 
 # GAME 2
@@ -305,22 +302,21 @@ def game2():
     except ValueError:
         logger.error("GAME 2: The user changed reaction_time to a non-int.")
     else:
-        with open("info/ReactionTimes.txt", "a") as f:
+        with open("Game Scores/ReactionTimes.txt", "a") as f:
             f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')
     finally:
         reaction_times = []
-        with open('info/ReactionTimes.txt', 'r') as f:
+        with open('Game Scores/ReactionTimes.txt', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 reaction_times.append(line.split('|')[0][:-3].strip())
 
-        reaction_record = min(reaction_times, key=lambda x: int(x))
-        return reaction_record
+        # reaction_record = min(reaction_times, key=lambda x: int(x))
+        return ''
 
 @app.route("/")
 def homepage():
     log_visit("visited homepage")
-    log_user_agent()
     return render_template("home.html", title="FreeAudioConverter.net")
 
 @app.route("/about")
@@ -352,6 +348,6 @@ def game():
 def game_2():
     log_visit("visited game 2")  
     return render_template("game2.html", title="Game 2")
-  
+
 if __name__ == "__main__":
     socketio.run(app)

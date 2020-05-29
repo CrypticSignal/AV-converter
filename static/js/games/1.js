@@ -112,7 +112,6 @@ async function showTimer() {
         const data = new FormData();
         data.append('score', timesHit);
         data.append('times_missed', timesMissed);
-        data.append('accuracy', accuracy);
         data.append('canvas_width', canvas.width);
         data.append('canvas_height', canvas.height);
         

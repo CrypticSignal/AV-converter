@@ -51,7 +51,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     const data = new FormData();
 
     data.append("request_type", "convert");
-    data.append("file_name", filename);
+    data.append("filename", filename);
     data.append("chosen_codec", chosenCodec);
     data.append("mp4_encoding_mode", mp4EncodingMode);
     data.append("opus_vorbis_slider", opusVorbisSlider);
@@ -118,12 +118,12 @@ function upload_and_convert() {
                 return;
             }
         else if (filesize > 5000000000) {
-            show_alert("File cannot be larger than 5 GB.", "danger")
+            show_alert("Max file size: 5 GB", "danger")
             reset();
             return;    
         }
-        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('\\') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('command') || outputNameBox.value.includes('$')) {
-            show_alert('Output name cannot contain any of the following characters: "/?*><|:$ (or the word "command")', "danger");
+        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('\\') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('command') || outputNameBox.value.includes('$') || outputNameBox.value.includes('.')) {
+            show_alert('Characters not allowed: ., ", /, ?, *, >, <, |, :, $ or the word "command"', "danger");
             return;
         }
         else if (document.getElementById("output_name").value == '') {
