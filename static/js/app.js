@@ -145,6 +145,7 @@ function upload_and_convert() {
     progressWrapper.classList.remove("d-none");
 
     const chosenFile = input.files[0];
+    const filesizeMB = ((chosenFile.size / 1000000).toFixed(2)).toString();
    
     const uploadRequest = new XMLHttpRequest();
     
@@ -158,6 +159,7 @@ function upload_and_convert() {
     const data = new FormData();
     data.append("request_type", "uploaded");
     data.append("chosen_file", chosenFile);
+    data.append("filesize", filesizeMB);
     uploadRequest.send(data);
 
     let previousTime = Date.now() / 1000;
@@ -226,11 +228,10 @@ function upload_and_convert() {
 // This function runs when a file is selected.
 function updateBoxes() {
     inputLabel.innerText = input.files[0].name; // Show name of selected file.
-    console.log(input.files[0]);
-    inputFilename = input.files[0].name; // Filename of the selected file.
-    inputFilenameFormatted = inputFilename.replace(/%/g, ''); // Remove percentage sign(s) as this causes an issue due to secure_filename?
-    //inputFilenameFormatted = removePercentageSign.replace(/_/g, ' '); // Replace the underscores with spaces, to make the filename look more aesthetically pleasing.
-    defaultOutputName = inputFilenameFormatted.substring(0, inputFilenameFormatted.lastIndexOf('.')); // Get the filename without the extension by only getting the part before the last "."
+    const inputFilename = input.files[0].name; // Filename of the selected file.
+    const nameWithoutExt = inputFilename.split('.').slice(0, -1).join('.')
+    const withoutPercentageSigns = nameWithoutExt.replace(/%/g, ''); // Remove percentage sign(s) as this causes an issue due to secure_filename
+    defaultOutputName = withoutPercentageSigns.replace(/\./g, ' '); // Replace the dots with spaces.
     outputNameBox.value = defaultOutputName; 
 }
 

@@ -8,6 +8,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 from confidential import *
+import urllib
+from bs4 import BeautifulSoup
+import time
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -45,8 +48,10 @@ def main():
     if request.form["request_type"] == "uploaded":
 
         chosen_file = request.files["chosen_file"]
+        filesize = request.form["filesize"]
         log_this('uploaded a file:')
         log.info(chosen_file)
+        log.info(f'Size: {filesize} MB')
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
@@ -348,6 +353,93 @@ def game():
 def game_2():
     log_visit("visited game 2")  
     return render_template("game2.html", title="Game 2")
+
+# YOUTUBE DOWNLOADER:
+
+# def output():
+#     previous_line = ''
+#     while True:
+#         with open("output.txt", "r") as f:
+#             line = f.readlines()
+#             #line = str(line[-2:])
+#             log.info(line)
+#             if previous_time == line:
+#                 log.info('prev line same')
+#                 break
+            
+#             # Trigger a new event called "show progress" 
+#             socketio.emit('yt progress', {'progress': line})
+#             socketio.sleep(1)
+#             previous_time = line
+
+@app.route("/yt", methods=["GET", "POST"])
+def yt():
+    media_extensions = ["mp4", "webm", "opus", "mkv", "aac", "m4a", "mp3"]
+    strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
+    
+    if request.method == "POST": # One of the buttons has been clicked.
+
+        link = request.form.getlist("link")[0]
+
+        # check_no_variable_contains_bad_string is a func defined in converter.py
+        if not converter.check_no_variable_contains_bad_string(link, strings_not_allowed):
+            return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
+       
+       # Delete the videos that have already been downloaded so send_from_directory does
+        for file in os.listdir():
+            if file.split(".")[-1] in media_extensions:
+                os.remove(file)
+            else:
+                pass
+        
+        source = urllib.request.urlopen(f'{link}').read()
+        soup = BeautifulSoup(source, features="html.parser")
+        title = soup.title.string[:-10]
+
+        if request.form['submit'] == 'Download Video':
+            os.system(f'youtube-dl --newline -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
+
+            with open('static/output.txt','w'): pass
+           
+            for file in os.listdir():
+                if file.split(".")[-1] in media_extensions:
+                    return send_from_directory(os.getcwd(), file, as_attachment=True)
+
+        elif request.form['submit'] == 'Download Video [iOS]':
+
+            os.system(f'youtube-dl --newline -f mp4 -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
+
+            with open("downloaded-files.txt", "a") as f:
+                f.write("\n" + title + " Downloaded.") 
+           
+            for file in os.listdir():
+                if file.split(".")[-1] in media_extensions:
+                    return send_from_directory(os.getcwd(), file, as_attachment=True)
+
+        elif request.form['submit'] == 'Download Audio (best quality)':
+
+            os.system(f'youtube-dl --newline -x -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
+
+            with open("downloaded-files.txt", "a") as f:
+                f.write("\n" + title + " Downloaded.") 
+           
+            for file in os.listdir():
+                if file.split(".")[-1] in media_extensions:
+                    return send_from_directory(os.getcwd(), file, as_attachment=True)
+
+        elif request.form['submit'] == 'Download as an MP3 file':
+
+            os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 --embed-thumbnail -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
+
+            with open("downloaded-files.txt", "a") as f:
+                f.write("\n" + title + " Downloaded.") 
+           
+            for file in os.listdir():
+                if file.split(".")[-1] in media_extensions:
+                    return send_from_directory(os.getcwd(), file, as_attachment=True)
+    else:
+        log_visit("visited YT")
+        return render_template("yt.html")
 
 if __name__ == "__main__":
     socketio.run(app)
