@@ -2,15 +2,15 @@
 {% block content %}
 
 <div id="fb-root"></div>
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v6.0"></script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v6.0">
+</script>
 
   <h1>Audio and Video Converter</h1>
 
   <div class="tagline">
-    <P>Easy to use. <a href="https://github.com/BassThatHertz/AudioAndVideoConverter" target="_blank" style="color: lightgreen">Open source</a>. Ad-free.</P>
+    <P>Easy to use. <a href="https://github.com/BassThatHertz/AudioAndVideoConverter" target="_blank"
+    style="color: lightgreen">Open source</a>. Ad-free.</P>
   </div>
-
-  <!-- <h6>***If you run any issues/failed conversions, please use the contact page to send me a message. I will respond within 24 hours, as long as you provide a method of contacting you.***</h6> -->
   
   <h4>1. Select the file you wish to convert:</h4>
 
@@ -20,7 +20,9 @@
     <div class="mb-3 mt-3"> 
       <div class="form-group mb-3"> 
         <div class="custom-file"> 
-          <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS, .mts, .ac3, .3gp, .dts, .webm, .ADPCM, .adpcm, .spx, .caf, .mov, .dtshd, .thd" type="file" class="custom-file-input" id="file_input" oninput="updateBoxes()">
+          <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS,
+          .mts, .ac3, .3gp, .dts, .webm, .ADPCM, .adpcm, .spx, .caf, .mov, .dtshd, .thd" 
+          type="file" class="custom-file-input" id="file_input" oninput="updateBoxes()">
           <label id="file_input_label" class="custom-file-label">Select file</label>
         </div>
       </div>
@@ -49,9 +51,11 @@
     </select><br><br>
       
     <p id="mp3_encoder">Encoder: <a href="https://lame.sourceforge.io/" target="_blank">LAME v3.100</a></p>
-    <p id="aac_encoder" style="display:none">Encoder: <a href="https://github.com/nu774/fdkaac" target="_blank">fdkaac</a> (Fraunhofer FDK AAC)</p>
+    <p id="aac_encoder" style="display:none">Encoder: <a href="https://github.com/nu774/fdkaac" target="_blank">
+    fdkaac</a> (Fraunhofer FDK AAC)</p>
     <p id="opus_encoder" style="display:none">Encoder: libopus 1.3.1</p>
-    <p id="vorbis_encoder" style="display:none">Encoder: <a href="https://xiph.org/downloads/" target="_blank">libvorbis 1.3.6</a></p>
+    <p id="vorbis_encoder" style="display:none">Encoder: <a href="https://xiph.org/downloads/" target="_blank">
+    libvorbis 1.3.6</a></p>
 
     <div id='keep_video_div' style='display:none'>
       <label for='is_keep_video'>Keep the video (if applicable)?</label>
@@ -85,7 +89,8 @@
           <option value="vbr">VBR (Variable Bitrate)</option>
           <option value="abr">ABR (Average Bitrate)</option>
         </select><br>
-        <i>Click <a href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_encoder_settings" target="_blank">here</a> for recommendations.</i>
+        <i>Click <a href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_encoder_settings" target="_blank">
+        here</a> for recommendations.</i>
       </div><br>
 
       <!--Bitrate slider for MP3 CBR and ABR-->
@@ -109,7 +114,9 @@
           <option value="5">-V 5 (~130kbps)</option>
           <option value="6">-V 6 (~120kbps)</option>
         </select><br>
-        <i>For more details about the settings, click <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_settings_details">here</a>.</i>
+        <i>For more details about the settings, click 
+        <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_settings_details">here</a>.
+        </i>
       </div><br>
 
       <!-- MP3 VBR Y SWITCH -->
@@ -119,7 +126,9 @@
         <input type="radio" id="y_switch_on" name="is_y_switch" value="yes">
         <label for="y_switch_off">No</label>
         <input type="radio" id="y_switch_off" checked="checked" name="is_y_switch" value="no"><br>
-        <i>The Y switch tells LAME not to encode the highest frequencies accurately, if doing so causes disproportional increases in bitrate. More details <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME_Y_SWITH">here</a>.</i>
+        <i>The Y switch tells LAME not to encode the highest frequencies accurately, if doing so causes 
+        disproportional increases in bitrate.
+        More details <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME_Y_SWITH">here</a>.</i>
         <i>This setting only applies if V0 to V2 is selected. V3 to V6 use the Y switch and this cannot be changed.</i>
       </div>
     
@@ -127,7 +136,8 @@
   
     <!--Bitrate settings for AC3-->
     <div id="AC3" style="display:none">
-      <p>The maximum number of output channels is 6. Therefore, audio with more than 6 channels (such as 7.1 surround) will get downmixed to 5.1</p>
+      <p>The maximum number of output channels is 6. Therefore, audio with more than 6 channels (such as 7.1 surround) 
+      will get downmixed to 5.1</p>
       <label for="ac3_bitrate">Bitrate:</label>
       <select id="ac3_bitrate">
         <option disabled value>Select a Bitrate</option>
@@ -158,14 +168,19 @@
         <option value="slower">[11] Slower</option>
         <option value="veryslow">[12] Very slow</option>
       </select><br>
-      <strong>Unless you know that the video and/or audio codec in your video is supported by the MP4 container, you should choose a preset (options 4 to 12). When using a preset, the video codec is converted to H.264 and the audio codec is converted to AAC, using libfdk_aac at VBR mode 5. More details about the presets can be found <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf" target="_blank">here</a>.</strong><br><br>
+      <strong>Unless you know that the video and/or audio codec in your video is supported by the MP4 container, 
+      you should choose a preset (options 4 to 12). When using a preset, the video codec is converted to H.264 and the
+      audio codec is converted to AAC, using libfdk_aac at VBR mode 5. More details about the presets can be found 
+      <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf" target="_blank">here</a>.</strong><br><br>
 
       <!--CRF-->
       <div id=crf_div>
         <p>Constant Rate Factor (CRF):</p>
           <input type="range" min="0" max="51" step="1" value="18" id="crf_slider" class="slider"/>
           <span id="crf_value"></span><br><br>
-        <i>A lower CRF means higher video quality, at the expense of a larger file size. A CRF of 17 or 18 is considered to be visually lossless or nearly so. More details <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf" target="_blank">here</a>.</i>
+        <i>A lower CRF means higher video quality, at the expense of a larger file size. A CRF of 17 or 18 is
+        considered to be visually lossless or nearly so. 
+        More details <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf" target="_blank">here</a>.</i>
       </div>
         
     </div> <!--Closing tag for MP4 div-->
@@ -210,7 +225,9 @@
         <input type="radio" onclick="javascript:isFDKLowpass();" name="is_lowpass" id="yes" value="yes">
         <label for="no">No</label>
         <input type="radio" onclick="javascript:isFDKLowpass();" checked="checked" name="is_lowpass" id="no" value="no">
-        <br><i>To see the default low-pass filters, click <a href="https://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#Bandwidth"target="_blank">here</a>. VBR mode 5 has no low-pass filter by default.</i>
+        <br><i>To see the default low-pass filters, 
+        click <a href="https://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#Bandwidth"target="_blank">here</a>
+        . VBR mode 5 has no low-pass filter by default.</i>
       </div>
 
       <br><div id="fdk_lowpass_div" style="display:none">
@@ -224,7 +241,8 @@
 
     <!--Bitrate slider for DTS-->
     <div id="DTS" style="display:none">
-      <p>The maximum number of output channels is 6. Therefore, audio with more than 6 channels (such as 7.1 surround) will get downmixed to 5.1</p>
+      <p>The maximum number of output channels is 6. Therefore, audio with more than 6 channels (such as 7.1 surround) 
+      will get downmixed to 5.1</p>
       <p>Set your desired bitrate via the slider:</p>
         <input type="range" min="384" max="1536" step="128" value="768" id="dts_slider" class="slider">
         <span id="dtsvalue"></span><br><br>
@@ -256,7 +274,9 @@
         <p>Set your desired quality setting via the slider:</p>
           <input type="range" min="0" max="10" step="1" value="6" id="vorbis_quality" class="slider"/>
           <span id="vorbisvalue"></span><br><br>
-        <i>Quality range is from "-q 0" (lowest) to "-q 10" (highest). For more details, click <a target="_blank" href="https://wiki.hydrogenaud.io/index.php?title=Recommended_Ogg_Vorbis#Recommended_Encoder_Settings">here</a>.</i>
+        <i>Quality range is from "-q 0" (lowest) to "-q 10" (highest). For more details, click <a target="_blank"
+        href="https://wiki.hydrogenaud.io/index.php?title=Recommended_Ogg_Vorbis#Recommended_Encoder_Settings">here</a>.
+        </i>
       </div>
 
     </div> <!--Closing tag for Vorbis div-->
@@ -323,7 +343,8 @@
     <div id="progress_wrapper" style="display:none">
       <br>
       <div class="progress mb-3"> <!--Bootstrap class-->
-        <div id="progress_bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        <div id="progress_bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+        aria-valuemax="100"></div>
       </div>
       <label id="progress_status"></label>
     </div>
@@ -339,9 +360,11 @@
 <hr><p>Like this website? Please share or tweet :)</p>
 
 <!--Facebook buttons-->
-<div class="fb-like" data-href="https://freeaudioconverter.net" data-width="" data-layout="button_count" data-action="like" data-size="large" data-share="true"></div><br><br>
+<div class="fb-like" data-href="https://freeaudioconverter.net" data-width="" data-layout="button_count"
+data-action="like" data-size="large" data-share="true"></div><br><br>
 <!--Twitter buttons-->
-<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-dnt="true" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-dnt="true"
+data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <!--My JavaScript files-->
 <script src="{{ url_for('static', filename='js/elements.js') }}"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>

@@ -82,10 +82,12 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     conversionRequest.addEventListener("load", function () { // conversionRequest is complete.
         reset(); // Reset the page to the default state.
         if (conversionRequest.status == 200) {
-            show_alert(`${conversionRequest.response.message} <a href="${conversionRequest.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
+            show_alert(`File converted. <a href="${conversionRequest.response.downloadFilePath}">Click here</a> \
+            if the download does not begin automatically.`, "success");
 
             const link = document.createElement("a"); // Create a virtual link.
-            link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
+            link.download = ''; // The download attribute specifies that the target will be downloaded when the user
+            // clicks on the hyperlink. As we have set an empty value, it means use the original filename.
             link.href = conversionRequest.response.downloadFilePath;
             link.click();
         } 
@@ -100,10 +102,12 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
 
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_convert() {
-    allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "mts", "webm", "ADPCM", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd"]
+    allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv",
+    "avi", "ac3", "3gp", "MTS", "mts", "webm", "ADPCM", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 
     if (!input.value && document.getElementById("output_name").value == '') {
-        show_alert("Perhaps in the future a website will be able to read your mind and automatically complete the required fields, but technology hasn't gotten that far yet.", "info")
+        show_alert("Perhaps in the future a website will be able to read your mind and automatically complete the \
+        required fields, but technology hasn't gotten that far yet.", "info")
         return;
     }
     else if (input.value) { // (If a file has been selected)
@@ -113,7 +117,8 @@ function upload_and_convert() {
         const fileExt = filenameParts[filenameParts.length - 1];
         const filesize = chosenFile.size;
         if (!allowedFiletypes.includes(fileExt)) {
-            show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
+            show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" \
+            target="_blank">here</a> to see the list of compatible filetypes.', "danger");
                 reset();
                 return;
             }
@@ -122,7 +127,12 @@ function upload_and_convert() {
             reset();
             return;    
         }
-        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') || outputNameBox.value.includes('\\') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') || outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') || outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') || outputNameBox.value.includes('command') || outputNameBox.value.includes('$') || outputNameBox.value.includes('.')) {
+        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') ||
+        outputNameBox.value.includes('\\')|| outputNameBox.value.includes('?') || outputNameBox.value.includes('*') ||
+        outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') ||
+        outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') ||
+        outputNameBox.value.includes('command') || outputNameBox.value.includes('$') ||
+        outputNameBox.value.includes('.')) {
             show_alert('Characters not allowed: ., ", /, ?, *, >, <, |, :, $ or the word "command"', "danger");
             return;
         }
@@ -230,7 +240,8 @@ function updateBoxes() {
     inputLabel.innerText = input.files[0].name; // Show name of selected file.
     const inputFilename = input.files[0].name; // Filename of the selected file.
     const nameWithoutExt = inputFilename.split('.').slice(0, -1).join('.')
-    const withoutPercentageSigns = nameWithoutExt.replace(/%/g, ''); // Remove percentage sign(s) as this causes an issue due to secure_filename
+    const withoutPercentageSigns = nameWithoutExt.replace(/%/g, ''); // Remove percentage sign(s) as this causes
+    // an issue with secure_filename
     defaultOutputName = withoutPercentageSigns.replace(/\./g, ' '); // Replace the dots with spaces.
     outputNameBox.value = defaultOutputName; 
 }

@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_from_directory, escape
+from flask import Flask, request, render_template, send_from_directory
 from flask_socketio import SocketIO, emit
 from loggers import *
 from werkzeug.utils import secure_filename
@@ -8,9 +8,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 from confidential import *
-import urllib
-from bs4 import BeautifulSoup
-import time
+import urllib # For YT downloader.
+from bs4 import BeautifulSoup # For YT downloader.
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -19,7 +18,48 @@ app.jinja_env.auto_reload = True
 
 socketio = SocketIO(app) # Turn the flask app into a SocketIO app.
 
-# FFmpeg will write the conversion progress to a txt file. Read the file eery second to get the current conversion progress every second.
+@app.route("/")
+def homepage_visited():
+    log_visit("visited homepage")
+    return render_template("home.html", title="FreeAudioConverter.net")
+
+@app.route("/about")
+def about_page_visited():
+    log_visit("visited about page")
+    return render_template("about.html", title="About")
+
+@app.route("/filetypes")
+def filetypes_visited():
+    log_visit("visited filetypes")
+    return render_template("filetypes.html", title="Filetypes")
+
+@app.route("/yt")
+def yt_page_visited():
+    log_visit("visited YT")
+    return render_template("yt.html")
+
+@app.route("/file-trimmer")
+def trimmer_visited():
+    log_visit("visited trimmer")
+    return render_template("trimmer.html", title="File Trimmer")
+
+@app.route("/contact")
+def contact_page_visited():
+    log_visit("visited contact page")
+    return render_template("contact.html", title="Contact")
+
+@app.route("/game")
+def game_visited():
+    log_visit("visited game")  
+    return render_template("game.html", title="Game")
+
+@app.route("/game2")
+def game2_visited():
+    log_visit("visited game 2")  
+    return render_template("game2.html", title="Game 2")
+
+# FFmpeg will write the conversion progress to a txt file. Read the file every second to get the
+# current conversion progress every second.
 def read_progress():
     previous_time = '00:00:00'
     while True:
@@ -35,16 +75,18 @@ def read_progress():
                 break
             hh_mm_ss = current_time.split('.')[0]
             milliseconds = current_time.split('.')[-1][:-4]
-            progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>(and {milliseconds} millseconds)<br>Encoding Speed: {speed}'
+            progress_message = f'{hh_mm_ss} [HH:MM:SS] of the file has been converted so far...<br>'
+            f'(and {milliseconds} millseconds)<br>Encoding Speed: {speed}'
             # Trigger a new event called "show progress" 
             socketio.emit('show progress', {'progress': progress_message})
             socketio.sleep(1)
-            # Set the value of previous_time to current_time, so we can check if the value of previous_time is the same as the value of current_time in the next iteration of the loop.
+            # Set the value of previous_time to current_time, so we can check if the value of previous_time is
+            # the same as the value of current_time in the next iteration of the loop.
             previous_time = current_time
 
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
-def main():
+def homepage():
     if request.form["request_type"] == "uploaded":
 
         chosen_file = request.files["chosen_file"]
@@ -96,7 +138,10 @@ def main():
         # Desired filename
         output_name = request.form["output_name"]
 
-        variables_to_validate = [filename_without_ext, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality, opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type, output_name, wav_bit_depth, mp4_encoding_mode, crf_value]
+        variables_to_validate = [filename_without_ext, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate,
+        mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality,
+        opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type,
+        output_name, wav_bit_depth, mp4_encoding_mode, crf_value]
 
         strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`', '.']
 
@@ -113,11 +158,13 @@ def main():
             # Run the appropritate section of converter.py:
 
             if chosen_codec == 'MP3':
-                converter.run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, output_path)
+                converter.run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch,
+                output_path)
                 extension = 'mp3'
 
             elif chosen_codec == 'AAC':
-                converter.run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
+                converter.run_aac(uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass,
+                fdk_lowpass, output_path)
                 if is_keep_video == "yes":
                     just_ext = uploaded_file_path.split('.')[-1]
                     if just_ext == 'mp4':
@@ -128,7 +175,8 @@ def main():
                     extension = 'm4a'
 
             elif chosen_codec == 'Opus':
-                converter.run_opus(uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, output_path)
+                converter.run_opus(uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate,
+                output_path)
                 extension = 'opus'   
 
             elif chosen_codec == 'FLAC':
@@ -139,7 +187,8 @@ def main():
                     extension = 'flac'
 
             elif chosen_codec == 'Vorbis':
-                converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path) 
+                converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider,
+                output_path) 
                 extension = 'ogg'
 
             elif chosen_codec == 'WAV':
@@ -200,9 +249,8 @@ def main():
                 "downloadFilePath": f'/download/{converted_file_name}'
             }
 
-# FILE TRIMMER
+# FILE TRIMMER:
 @app.route("/file-trimmer", methods=["POST"])
-
 def trim_file():
     if request.form["request_type"] == "upload_complete":
    
@@ -225,7 +273,8 @@ def trim_file():
         output_name = just_name + " [trimmed]" + ext
 
         try:
-            os.system(f'/usr/local/bin/ffmpeg -y -i "{uploaded_file_path}" -ss {start_time} -to {end_time} -c copy "{output_name}"')
+            os.system(f'/usr/local/bin/ffmpeg -y -i "{uploaded_file_path}" -ss {start_time} '
+            f'-to {end_time} -c copy "{output_name}"')
         except Exception as error:
             logger.error(f'TRIMMER: {error}')
         else:
@@ -266,7 +315,7 @@ def send_email():
 
 # GAME 1
 @app.route("/game", methods=['POST'])
-def get_score():
+def return_world_record():
     current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
     user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
     user_agent = request.headers.get('User-Agent')
@@ -283,7 +332,8 @@ def get_score():
         logger.error("GAME 1: The user changed something to a non-int.")
     else:
         with open("Game Scores/HighScores.txt", "a") as f:
-            f.write(f'{score} | {times_missed} | {user} | {user_agent} | {canvas_width}x{canvas_height} | {current_datetime}\n')
+            f.write(f'{score} | {times_missed} | {user} | {user_agent} | {canvas_width}'
+            f'x{canvas_height} | {current_datetime}\n')
     finally:
         just_scores = []
         with open('Game Scores/HighScores.txt', 'r') as f:
@@ -297,7 +347,7 @@ def get_score():
 
 # GAME 2
 @app.route("/game2", methods=['POST'])
-def game2():
+def save_game2_stats():
     current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
     user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
     user_agent = request.headers.get('User-Agent')
@@ -319,127 +369,71 @@ def game2():
         # reaction_record = min(reaction_times, key=lambda x: int(x))
         return ''
 
-@app.route("/")
-def homepage():
-    log_visit("visited homepage")
-    return render_template("home.html", title="FreeAudioConverter.net")
-
-@app.route("/about")
-def about():
-    log_visit("visited about page")
-    return render_template("about.html", title="About")
-
-@app.route("/filetypes")
-def filetypes():
-    log_visit("visited filetypes")
-    return render_template("filetypes.html", title="Filetypes")
-
-@app.route("/file-trimmer")
-def trimmer():
-    log_visit("visited trimmer")
-    return render_template("trimmer.html", title="File Trimmer")
-
-@app.route("/contact")
-def contact():
-    log_visit("visited contact page")
-    return render_template("contact.html", title="Contact")
-
-@app.route("/game")
-def game():
-    log_visit("visited game")  
-    return render_template("game.html", title="Game")
-
-@app.route("/game2")
-def game_2():
-    log_visit("visited game 2")  
-    return render_template("game2.html", title="Game 2")
-
 # YOUTUBE DOWNLOADER:
-
-# def output():
-#     previous_line = ''
-#     while True:
-#         with open("output.txt", "r") as f:
-#             line = f.readlines()
-#             #line = str(line[-2:])
-#             log.info(line)
-#             if previous_time == line:
-#                 log.info('prev line same')
-#                 break
-            
-#             # Trigger a new event called "show progress" 
-#             socketio.emit('yt progress', {'progress': line})
-#             socketio.sleep(1)
-#             previous_time = line
-
-@app.route("/yt", methods=["GET", "POST"])
-def yt():
+@app.route("/yt", methods=["POST"])
+def yt_downloader():
     media_extensions = ["mp4", "webm", "opus", "mkv", "aac", "m4a", "mp3"]
     strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
+
+    link = request.form.getlist("link")[0]
+
+    # check_no_variable_contains_bad_string is a func defined in converter.py
+    if not converter.check_no_variable_contains_bad_string(link, strings_not_allowed):
+        return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
     
-    if request.method == "POST": # One of the buttons has been clicked.
+    # Delete the videos that have already been downloaded so send_from_directory does not send back the wrong file.
+    for file in os.listdir():
+        if file.split(".")[-1] in media_extensions:
+            os.remove(file)
+        else:
+            pass
+    
+    source = urllib.request.urlopen(f'{link}').read()
+    soup = BeautifulSoup(source, features="html.parser")
+    title = soup.title.string[:-10]
 
-        link = request.form.getlist("link")[0]
+    if request.form['submit'] == 'Download Video':
+        os.system(f'youtube-dl --newline -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
-        # check_no_variable_contains_bad_string is a func defined in converter.py
-        if not converter.check_no_variable_contains_bad_string(link, strings_not_allowed):
-            return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
-       
-       # Delete the videos that have already been downloaded so send_from_directory does
+        with open('static/output.txt','w'): pass
+        
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:
-                os.remove(file)
-            else:
-                pass
+                return send_from_directory(os.getcwd(), file, as_attachment=True)
+
+    elif request.form['submit'] == 'Download Video [iOS]':
+
+        os.system(f'youtube-dl --newline -f mp4 -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
+
+        with open("downloaded-files.txt", "a") as f:
+            f.write("\n" + title + " Downloaded.") 
         
-        source = urllib.request.urlopen(f'{link}').read()
-        soup = BeautifulSoup(source, features="html.parser")
-        title = soup.title.string[:-10]
+        for file in os.listdir():
+            if file.split(".")[-1] in media_extensions:
+                return send_from_directory(os.getcwd(), file, as_attachment=True)
 
-        if request.form['submit'] == 'Download Video':
-            os.system(f'youtube-dl --newline -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
+    elif request.form['submit'] == 'Download Audio (best quality)':
 
-            with open('static/output.txt','w'): pass
-           
-            for file in os.listdir():
-                if file.split(".")[-1] in media_extensions:
-                    return send_from_directory(os.getcwd(), file, as_attachment=True)
+        os.system(f'youtube-dl --newline -x -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
-        elif request.form['submit'] == 'Download Video [iOS]':
+        with open("downloaded-files.txt", "a") as f:
+            f.write("\n" + title + " Downloaded.") 
+        
+        for file in os.listdir():
+            if file.split(".")[-1] in media_extensions:
+                return send_from_directory(os.getcwd(), file, as_attachment=True)
 
-            os.system(f'youtube-dl --newline -f mp4 -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
+    elif request.form['submit'] == 'Download as an MP3 file':
 
-            with open("downloaded-files.txt", "a") as f:
-                f.write("\n" + title + " Downloaded.") 
-           
-            for file in os.listdir():
-                if file.split(".")[-1] in media_extensions:
-                    return send_from_directory(os.getcwd(), file, as_attachment=True)
+        os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 '
+        f'--embed-thumbnail -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
-        elif request.form['submit'] == 'Download Audio (best quality)':
-
-            os.system(f'youtube-dl --newline -x -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
-
-            with open("downloaded-files.txt", "a") as f:
-                f.write("\n" + title + " Downloaded.") 
-           
-            for file in os.listdir():
-                if file.split(".")[-1] in media_extensions:
-                    return send_from_directory(os.getcwd(), file, as_attachment=True)
-
-        elif request.form['submit'] == 'Download as an MP3 file':
-
-            os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 --embed-thumbnail -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
-
-            with open("downloaded-files.txt", "a") as f:
-                f.write("\n" + title + " Downloaded.") 
-           
-            for file in os.listdir():
-                if file.split(".")[-1] in media_extensions:
-                    return send_from_directory(os.getcwd(), file, as_attachment=True)
-    else:
-        log_visit("visited YT")
-        return render_template("yt.html")
+        with open("downloaded-files.txt", "a") as f:
+            f.write("\n" + title + " Downloaded.") 
+        
+        for file in os.listdir():
+            if file.split(".")[-1] in media_extensions:
+                return send_from_directory(os.getcwd(), file, as_attachment=True)
 
 if __name__ == "__main__":
     socketio.run(app)
