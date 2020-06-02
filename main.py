@@ -252,35 +252,33 @@ def homepage():
 def trim_file():
     if request.form["request_type"] == "upload_complete":
    
-        uploaded_file_path = request.files["uploaded_file_path"]
+        chosen_file = request.files["chosen_file"]
         # Make the filename safe
-        filename_secure = secure_filename(uploaded_file_path.filename)
+        filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
-        uploaded_file_path.save(os.path.join("uploads", filename_secure))
+        chosen_file.save(os.path.join("uploads", filename_secure))
         return ''
 
     if request.form["request_type"] == "trim":
 
-        file_name = request.form["filename"]
-        uploaded_file_path = os.path.join("uploads", secure_filename(file_name))
         filename = request.form["filename"]
+        uploaded_file_path = os.path.join("uploads", secure_filename(filename))
         start_time = request.form["start_time"]
         end_time = request.form["end_time"]
         ext = "." + filename.split(".")[-1]
         just_name = filename.split(".")[0]
         output_name = just_name + " [trimmed]" + ext
 
-        try:
-            os.system(f'/usr/local/bin/ffmpeg -y -i "{uploaded_file_path}" -ss {start_time} '
-            f'-to {end_time} -c copy "{output_name}"')
-        except Exception as error:
-            logger.error(f'TRIMMER: {error}')
-        else:
-            log.info('Trim complete.')
-            return {
-                "message": "File trimmed. The trimmed file will now start downloading.",
-                "downloadFilePath": f'/download/{output_name}'
-            }
+        log.info(f'/usr/local/bin/ffmpeg -y -i "{uploaded_file_path}" -ss {start_time} '
+        f'-to {end_time} -c copy "conversions/{output_name}"')
+
+        os.system(f'/usr/local/bin/ffmpeg -y -i "{uploaded_file_path}" -ss {start_time} '
+        f'-to {end_time} -map 0:v? -map 0:a? -map 0:s? -c:v copy -c:a copy -c:s copy "conversions/{output_name}"')
+
+        return {
+            "message": "File trimmed. The trimmed file will now start downloading.",
+            "downloadFilePath": f'/download/{output_name}'
+        }
 
 # Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
 @app.route("/download/<filename>", methods=["GET"])

@@ -30,8 +30,8 @@ progress_file_path = 'progress.txt'
 def run_ffmpeg(uploaded_file_path, params):
     logger.info(params)
     os.system(f'/usr/local/bin/ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" '
-    f'-metadata comment="Encoded using freeaudioconverter.net" '
-    f'-metadata description="Encoded using freeaudioconverter.net" {params}')
+    f'-id3v2_version 3 -write_id3v1 true -metadata comment="freeaudioconverter.net" '
+    f'-metadata encoded_by="freeaudioconverter.net" {params}')
 
 # MP3
 def run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path):

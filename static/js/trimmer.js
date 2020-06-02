@@ -2,7 +2,7 @@ const input = document.getElementById("file_input");
 const inputLabel = document.getElementById("file_input_label");
 const trimButton = document.getElementById("trim-btn");
 
-function trim_file() {
+function send_trim_request() {
 
     inputFilename = input.files[0].name;
 
@@ -42,7 +42,7 @@ function trim_file() {
 }
 
 // Run this function when the user clicks on the "Trim file" button
-function upload_and_trim() {
+function upload_and_send_trim_request() {
     
     if (!input.value) {
         show_alert("No file selected.", "danger")
@@ -130,8 +130,8 @@ function upload_and_trim() {
     request.addEventListener("load", function (e) {
 
         if (request.status == 200) {
-            document.getElementById('spinner').style.display = 'block';
-            trim_file();
+            //document.getElementById('spinner').style.display = 'block';
+            send_trim_request();
         }
          else if (request.status == 415) {
             show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");

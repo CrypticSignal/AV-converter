@@ -18,10 +18,11 @@
   </div>
 
 <label for="start-time">Start segment at:</label>
-<input required pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" name="start" id="start-time" value="00:00:00" type="time" step="1"><br>
+<input required pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" name="start" id="start-time" value="00:00:00" type="time" step="1">
+<br>
 <label for="end-time">End segment at:</label>
 <input name="end" id="end-time" value="00:00:00" type="time" step="1"><br><br>
-<button onclick="trim()" id="trim-btn" type="submit" class="btn btn-primary">Trim file</button>
+<button onclick="upload_and_send_trim_request()" id="trim-btn" type="submit" class="btn btn-primary">Trim file</button>
 
 <button class="btn btn-primary d-none" id="loading_btn" type="button" disabled>
     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -34,7 +35,9 @@
   <!--Upload-progress bar-->
   <div id="progress_wrapper" class="d-none">
     <div class="progress mb-3">
-      <div id="progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      <div
+        id="progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      </div>
     </div>
     <label id="progress_status"></label>
   </div>

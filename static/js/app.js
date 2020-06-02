@@ -99,7 +99,7 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
 } // Closing bracket for pythonHeresWhatYouNeed function.
 
 // Run this function when the user clicks on the "Convert" button.
-function upload_and_convert() {
+function upload_and_send_conversion_request() {
     allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv",
     "avi", "ac3", "3gp", "MTS", "mts", "webm", "ADPCM", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 

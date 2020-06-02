@@ -303,7 +303,7 @@
     </form>
 
     <!--CONVERT BUTTON (Bootstrap class)-->
-    <button onclick="upload_and_convert()" id="convert_btn" class="btn btn-primary">Convert</button>
+    <button onclick="upload_and_send_conversion_request()" id="convert_btn" class="btn btn-primary">Convert</button>
 
     <!--Show command button (Bootstrap class)-->
     <!-- <button onclick="getValuesForCommand()" id="command_btn" class="btn btn-primary">Show Command</button> -->
@@ -352,6 +352,7 @@ data-show-count="false">Tweet</a><script async src="https://platform.twitter.com
 <!--My JavaScript files-->
 <script src="{{ url_for('static', filename='js/elements.js') }}"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <!--For socket.io-->
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
