@@ -22,11 +22,11 @@ I may try to find another user-friendly way to allow the user to input their des
 ## External encoders used:
 LAME v3.100 | https://lame.sourceforge.io/
 
-fdkaac (https://github.com/nu774/fdkaac) which is a command line encoder frontend for fdk-aac (https://github.com/mstorsjo/fdk-aac).
+fdk-aac | https://github.com/mstorsjo/fdk-aac
 
-opusenc opus-tools 0.2 (using libopus 1.3.1) | https://opus-codec.org/downloads/
+libopus 1.3.1 | https://github.com/xiph/opus
 
-oggenc from vorbis-tools 1.4.0 by the Xiph.Org Foundation | https://www.xiph.org/downloads/
+libvorbis
 ## FFmpeg configuration:
 ```
   --enable-gpl
