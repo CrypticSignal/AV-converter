@@ -145,7 +145,7 @@ function upload_and_convert() {
     }
 
     alertWrapper.innerHTML = "";
-    //input.disabled = true;
+    input.disabled = true;
     outputNameBox.disabled = true;
     convertButton.classList.add("d-none");
     uploadingButton.classList.remove("d-none");

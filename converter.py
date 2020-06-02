@@ -34,7 +34,7 @@ def run_ffmpeg(uploaded_file_path, params):
     f'-metadata description="Encoded using freeaudioconverter.net" {params}')
 
 # MP3
-def run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch, output_path):
+def run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path):
 
     if mp3_encoding_type == "cbr":
         run_ffmpeg(uploaded_file_path, f'-c:v copy -c:a libmp3lame -b:a {mp3_bitrate}k {output_path}.mp3')

@@ -114,7 +114,6 @@ def homepage():
         mp3_encoding_type = request.form["mp3_encoding_type"]
         mp3_bitrate = request.form["mp3_bitrate"]
         mp3_vbr_setting = request.form["mp3_vbr_setting"]
-        is_y_switch = request.form["is_y_switch"]
         # AAC
         fdk_type = request.form["fdk_type"]
         fdk_cbr = request.form["fdk_cbr"]
@@ -139,7 +138,7 @@ def homepage():
         output_name = request.form["output_name"]
 
         variables_to_validate = [filename_without_ext, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate,
-        mp3_vbr_setting, is_y_switch, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality,
+        mp3_vbr_setting, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality,
         opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type,
         output_name, wav_bit_depth, mp4_encoding_mode, crf_value]
 
@@ -158,8 +157,7 @@ def homepage():
             # Run the appropritate section of converter.py:
 
             if chosen_codec == 'MP3':
-                converter.run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, is_y_switch,
-                output_path)
+                converter.run_mp3(uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path)
                 extension = 'mp3'
 
             elif chosen_codec == 'AAC':

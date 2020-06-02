@@ -295,7 +295,7 @@ function isFDKLowpass() {
 
 // Vorbis
 function showHideVorbis(value) {
-    if (value=='vbr_bitrate') {
+    if (value=='abr') {
         document.getElementById('opus_vorbis_vbr_div').style.display = 'block';
         document.getElementById('vorbis_quality_div').style.display = 'none';
 }
