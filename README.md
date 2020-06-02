@@ -5,6 +5,7 @@ On https://freeaudioconverter.net, you can:
 - Convert a video to the MP4 or MKV format.
 - Change the audio codec of a video to AAC, AC3, DTS, WAV, FLAC or ALAC.
 - Trim a video or audio file (will not work if using the Safari browser).
+- NEW: Download a YouTube video or the audio only. https://freeaudioconverter.net/yt
 ## How does it work?
 Your file is uploaded to a server, where the conversion/file trimming takes place. On completion, the file is sent to your browser and is automatically downloaded.
 ## Features:
