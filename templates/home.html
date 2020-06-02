@@ -46,16 +46,13 @@
       <option selected value="MP3">MP3 (.mp3)</option>
       <option value="MP4">MP4 (.mp4)</option>
       <option value="Opus">Opus (.opus)</option>
-      <option value="Vorbis">Vorbis (.ogg)</option>
+      <option value="Vorbis">Vorbis</option>
       <option value="WAV">WAV</option>
     </select><br><br>
       
     <p id="mp3_encoder">Encoder: <a href="https://lame.sourceforge.io/" target="_blank">LAME v3.100</a></p>
-    <p id="aac_encoder" style="display:none">Encoder: <a href="https://github.com/nu774/fdkaac" target="_blank">
-    fdkaac</a> (Fraunhofer FDK AAC)</p>
+    <p id="aac_encoder" style="display:none">Encoder: <a href="https://github.com/mstorsjo/fdk-aac" target="_blank">fdk-aac</a> (Fraunhofer FDK AAC)</p>
     <p id="opus_encoder" style="display:none">Encoder: libopus 1.3.1</p>
-    <p id="vorbis_encoder" style="display:none">Encoder: <a href="https://xiph.org/downloads/" target="_blank">
-    libvorbis 1.3.6</a></p>
 
     <div id='keep_video_div' style='display:none'>
       <label for='is_keep_video'>Keep the video (if applicable)?</label>
@@ -118,19 +115,6 @@
         <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_settings_details">here</a>.
         </i>
       </div><br>
-
-      <!-- MP3 VBR Y SWITCH -->
-      <div id=y_switch_div style='display:none'>
-        <p>Enable the Y switch?</p>
-        <label for="y_switch_on">Yes</label>
-        <input type="radio" id="y_switch_on" name="is_y_switch" value="yes">
-        <label for="y_switch_off">No</label>
-        <input type="radio" id="y_switch_off" checked="checked" name="is_y_switch" value="no"><br>
-        <i>The Y switch tells LAME not to encode the highest frequencies accurately, if doing so causes 
-        disproportional increases in bitrate.
-        More details <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME_Y_SWITH">here</a>.</i>
-        <i>This setting only applies if V0 to V2 is selected. V3 to V6 use the Y switch and this cannot be changed.</i>
-      </div>
     
     </div> <!--Closing tag for MP3 div-->
   
@@ -212,7 +196,7 @@
           <option disabled value>Select VBR mode</option>
           <option value="1">1</option>
           <option value="2">2</option>
-          <option value="3">2</option>
+          <option value="3">3</option>
           <option selected value="4">4</option>
           <option value="5">5</option>
         </select><br>
@@ -264,8 +248,8 @@
         <label>VBR setting:</label>
         <select id="vorbis_encoding" onchange="showHideVorbis(this.value);">
           <option disabled value>Select encoding type</option>
-          <option value="vbr_bitrate">VBR (with a nominal bitrate)</option>
-          <option value="vbr_quality">VBR (target a quality level)</option>
+          <option value="abr">ABR (Average Bitrate)</option>
+          <option value="vbr">VBR (target a quality level)</option>
         </select><br><br>
       </div>
   

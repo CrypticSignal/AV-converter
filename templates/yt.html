@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container">
-    <p>If using an iOS device and you wish to download the video, select the "Download Video [iOS]" option
+    <p>If using an iOS device, select "Download Video [iOS]" (which downloads the video as an MP4 file) or "Download as an MP3 file" as iOS does not support all media formats natively.</p>
     which downloads the video as an MP4 and can be played on your iOS device.</p><hr>
     <form action="https://freeaudioconverter.net/yt" name="link" method="POST">
         <h5><b>Paste YouTube link:</b></h5>
         <input type="text" class="form-control" maxlength="200" name="link" id="link" required/>
-        <i>Characters not allowed: ", *, >, <, |, $ or the word "command"</i><br><br>
+        <i>Characters not allowed: ", *, >, <, |, $</i><br><br>
         <input type="submit" id="test" name="submit" onclick="read_progress()" value="Download Video"><br><br>
         <input type="submit" name="submit" onclick="read_progress()" value="Download Video [iOS]"><br><br>
         <input type="submit" name="submit" onclick="read_progress()" value="Download Audio (best quality)"><br><br>

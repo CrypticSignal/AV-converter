@@ -71,7 +71,7 @@ def read_progress():
             speed = lines[-2].split('=')[-1]
             # If the amount converted is the same twice in a row, that means that the conversion is complete.
             if previous_time == current_time:
-                log.info(current_time)
+                log.info(f'File Length: {current_time}')
                 break
             hh_mm_ss = current_time.split('.')[0]
             milliseconds = current_time.split('.')[-1][:-4]
@@ -189,7 +189,7 @@ def homepage():
             elif chosen_codec == 'Vorbis':
                 converter.run_vorbis(uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider,
                 output_path) 
-                extension = 'ogg'
+                extension = 'mka'
 
             elif chosen_codec == 'WAV':
                 converter.run_wav(uploaded_file_path, is_keep_video, wav_bit_depth, output_path)
@@ -374,8 +374,10 @@ def save_game2_stats():
 def yt_downloader():
     media_extensions = ["mp4", "webm", "opus", "mkv", "aac", "m4a", "mp3"]
     strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
-
     link = request.form.getlist("link")[0]
+    source = urllib.request.urlopen(f'{link}').read()
+    soup = BeautifulSoup(source, features="html.parser")
+    title = soup.title.string[:-10]
 
     # check_no_variable_contains_bad_string is a func defined in converter.py
     if not converter.check_no_variable_contains_bad_string(link, strings_not_allowed):
@@ -387,15 +389,13 @@ def yt_downloader():
             os.remove(file)
         else:
             pass
-    
-    source = urllib.request.urlopen(f'{link}').read()
-    soup = BeautifulSoup(source, features="html.parser")
-    title = soup.title.string[:-10]
 
     if request.form['submit'] == 'Download Video':
+
         os.system(f'youtube-dl --newline -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
-        with open('static/output.txt','w'): pass
+        with open("downloaded-files.txt", "a") as f:
+            f.write("\n" + title + " downloaded.") 
         
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:
@@ -406,7 +406,7 @@ def yt_downloader():
         os.system(f'youtube-dl --newline -f mp4 -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
         with open("downloaded-files.txt", "a") as f:
-            f.write("\n" + title + " Downloaded.") 
+            f.write("\n" + title + " downloaded.") 
         
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:
@@ -417,7 +417,7 @@ def yt_downloader():
         os.system(f'youtube-dl --newline -x -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
         with open("downloaded-files.txt", "a") as f:
-            f.write("\n" + title + " Downloaded.") 
+            f.write("\n" + title + " downloaded.") 
         
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:
@@ -429,7 +429,7 @@ def yt_downloader():
         f'--embed-thumbnail -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
         with open("downloaded-files.txt", "a") as f:
-            f.write("\n" + title + " Downloaded.") 
+            f.write("\n" + title + " downloaded.") 
         
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:

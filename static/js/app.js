@@ -31,7 +31,6 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     const mp3EncodingType = document.getElementById('mp3_encoding_type').value;
     const mp3Bitrate = document.getElementById('mp3_bitrate').value; 
     const vbrSettingMP3 = document.getElementById('mp3_vbr_setting').value;
-    const isYSwitch = document.querySelector('input[name="is_y_switch"]:checked').value;
     const ac3Bitrate = document.getElementById('ac3_bitrate').value;
     const vorbisQuality = document.getElementById('vorbis_quality').value
     const vorbisEncoding = document.getElementById('vorbis_encoding').value;
@@ -71,7 +70,6 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     data.append("dts_bitrate", dtsBitrate);
     data.append("opus_cbr_bitrate", opusBitrate);
     data.append("opus_encoding_type", opusEncodingType);
-    data.append("is_y_switch", isYSwitch);
     data.append("is_keep_video", isKeepVideo);
     data.append("crf_value", crfValue);
     data.append("wav_bit_depth", wavBitDepth);
@@ -147,7 +145,7 @@ function upload_and_convert() {
     }
 
     alertWrapper.innerHTML = "";
-    input.disabled = true;
+    //input.disabled = true;
     outputNameBox.disabled = true;
     convertButton.classList.add("d-none");
     uploadingButton.classList.remove("d-none");
