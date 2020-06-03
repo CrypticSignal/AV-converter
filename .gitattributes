@@ -1,4 +1,3 @@
-static/js/elements.js linguist-vendored
 static/js/games/* linguist-vendored
 templates/game.html linguist-vendored
 templates/game2.html linguist-vendored
