@@ -368,9 +368,12 @@ def save_game2_stats():
 # YOUTUBE DOWNLOADER:
 @app.route("/yt", methods=["POST"])
 def yt_downloader():
+
+    open('static/output.txt', 'w').close()
+
     media_extensions = ["mp4", "webm", "opus", "mkv", "aac", "m4a", "mp3"]
     strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
-    link = request.form.getlist("link")[0]
+    link = request.form['link']
     source = urllib.request.urlopen(f'{link}').read()
     soup = BeautifulSoup(source, features="html.parser")
     title = soup.title.string[:-10]
@@ -386,50 +389,67 @@ def yt_downloader():
         else:
             pass
 
-    if request.form['submit'] == 'Download Video':
+    if request.form['button_clicked'] == 'Download Video':
 
         os.system(f'youtube-dl --newline -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
+        open('static/output.txt', 'w').close()
+
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
-        
+
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:
-                return send_from_directory(os.getcwd(), file, as_attachment=True)
+                return f'/yt/{file}'
 
-    elif request.form['submit'] == 'Download Video [iOS]':
+    elif request.form['button_clicked'] == 'Download Video [iOS]':
 
         os.system(f'youtube-dl --newline -f mp4 -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
+        open('static/output.txt', 'w').close()
+
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
         
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:
-                return send_from_directory(os.getcwd(), file, as_attachment=True)
+                return f'/yt/{file}'
 
-    elif request.form['submit'] == 'Download Audio (best quality)':
+    elif request.form['button_clicked'] == 'Download Audio (best quality)':
 
         os.system(f'youtube-dl --newline -x -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
+        open('static/output.txt', 'w').close()
+
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
         
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:
-                return send_from_directory(os.getcwd(), file, as_attachment=True)
+                return f'/yt/{file}'
 
-    elif request.form['submit'] == 'Download as an MP3 file':
+    elif request.form['button_clicked'] == 'Download as an MP3 file':
 
         os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 '
         f'--embed-thumbnail -o "%(title)s.%(ext)s" {link} | tee static/output.txt')
 
+        open('static/output.txt', 'w').close()
+
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
         
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:
-                return send_from_directory(os.getcwd(), file, as_attachment=True)
+                return f'/yt/{file}'
+
+# Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
+@app.route("/yt/<filename>", methods=["GET"])
+def download_yt_file(filename):
+    just_extension = filename.split('.')[-1]
+    if just_extension == "m4a":
+        return send_from_directory(os.getcwd(), filename, mimetype="audio/mp4")
+    else:
+        return send_from_directory(os.getcwd(), filename)
 
 if __name__ == "__main__":
     socketio.run(app)

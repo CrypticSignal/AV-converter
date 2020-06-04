@@ -3,16 +3,15 @@
 <div class="container">
     <p>If using an iOS device, select "Download Video [iOS]" (which downloads the video as an MP4 file) or "Download as an MP3 file" as iOS does not support all media formats natively.</p>
     <strong>"Download Audio (best quality)" is usually of the Opus (.opus) format. If you're unable to play the file, use the "Download as an MP3 file" option.</strong><hr>    
-    <form action="https://freeaudioconverter.net/yt" name="link" method="POST">
-        <h5><b>Paste YouTube link:</b></h5>
-        <input type="text" class="form-control" maxlength="200" name="link" id="link" required/>
-        <i>Characters not allowed: ", *, >, <, |, $</i><br><br>
-        <input type="submit" id="test" name="submit" onclick="read_progress()" value="Download Video"><br><br>
-        <input type="submit" name="submit" onclick="read_progress()" value="Download Video [iOS]"><br><br>
-        <input type="submit" name="submit" onclick="read_progress()" value="Download Audio (best quality)"><br><br>
-        <input type="submit" name="submit" onclick="read_progress()" value="Download as an MP3 file">
-    </form>
-    <p id="progress"></p>
+    
+    <h5><b>Paste YouTube link:</b></h5>
+    <input type="text" class="form-control" maxlength="200" name="link" id="link" required/>
+    <i>Characters not allowed: ", *, >, <, |, $</i></button><br><br>
+    <button onclick="buttonClicked(this.value)" value="Download Video">Download Video</button><br><br>
+    <button onclick="buttonClicked(this.value)" value="Download Video [iOS]">Download Video [iOS]</button><br><br>
+    <button onclick="buttonClicked(this.value)" value="Download Audio (best quality)">Download Audio (best quality)</button><br><br>
+    <button onclick="buttonClicked(this.value)" value="Download as an MP3 file">Download as an MP3 file</button><br><br>
+    <div id="alert_wrapper" style="display:none"></div>
 </div>
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="{{ url_for('static', filename='js/yt.js') }}"></script>

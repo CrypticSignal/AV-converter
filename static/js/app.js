@@ -12,7 +12,7 @@ const alertWrapper = document.getElementById("alert_wrapper");
 function show_alert(message, type) {
     alertWrapper.style.display = 'block';
     alertWrapper.innerHTML =
-    `<div id="alert" class="alert alert-${type} alert-dismissible fade show" role="alert">
+    `<br><div class="alert alert-${type} alert-dismissible fade show" role="alert">
       <span>${message}</span>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -82,10 +82,8 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
         if (conversionRequest.status == 200) {
             show_alert(`File converted. <a href="${conversionRequest.response.downloadFilePath}">Click here</a> \
             if the download does not begin automatically.`, "success");
-
-            const link = document.createElement("a"); // Create a virtual link.
-            link.download = ''; // The download attribute specifies that the target will be downloaded when the user
-            // clicks on the hyperlink. As we have set an empty value, it means use the original filename.
+            link.download = ''; // The download attribute specifies that the file will be downloaded
+            // when the link is visited. As we have set an empty value, it means use the original filename.
             link.href = conversionRequest.response.downloadFilePath;
             link.click();
         } 
