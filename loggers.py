@@ -13,8 +13,8 @@ def setup_logger(name, log_file):
     logger.addHandler(file_handler)
     return logger
 
-log = setup_logger('log', 'info/Info.txt')
-visit = setup_logger('visit', 'info/Visit.log')
+log = setup_logger('log', 'logs/Info.txt')
+visit = setup_logger('visit', 'logs/Visit.log')
 
 # Info.txt
 def log_this(message):

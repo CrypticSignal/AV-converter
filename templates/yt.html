@@ -1,16 +1,24 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container">
-    <p>If using an iOS device, select "Download Video [iOS]" (which downloads the video as an MP4 file) or "Download as an MP3 file" as iOS does not support all media formats natively.</p>
-    <strong>"Download Audio (best quality)" is usually of the Opus (.opus) format. If you're unable to play the file, use the "Download as an MP3 file" option.</strong><hr>    
+    <p>If using an <strong>iOS device</strong>, select <strong>Video [MP4]</strong> or <strong>Audio [MP3]</strong> as iOS does not support all media formats natively.</p>
+    <i><strong>Audio [best]</strong> is usually of the Opus (.opus) format. If you're unable to play the file, use the <strong>Audio [MP3]</strong> option.</i><hr>
     
-    <h5><b>Paste YouTube link:</b></h5>
-    <input type="text" class="form-control" maxlength="200" name="link" id="link" required/>
-    <i>Characters not allowed: ", *, >, <, |, $</i></button><br><br>
-    <button onclick="buttonClicked(this.value)" value="Download Video">Download Video</button><br><br>
-    <button onclick="buttonClicked(this.value)" value="Download Video [iOS]">Download Video [iOS]</button><br><br>
-    <button onclick="buttonClicked(this.value)" value="Download Audio (best quality)">Download Audio (best quality)</button><br><br>
-    <button onclick="buttonClicked(this.value)" value="Download as an MP3 file">Download as an MP3 file</button><br><br>
+    <h5><b>Paste YouTube link (URL):</b></h5>
+    <input type="text" onclick="paste()" class="form-control" maxlength="200" name="link" id="link" required/>
+    <br>
+    <div class="btn-group">
+        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="Download Video">Video [best]</button>   
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="Download Audio (best quality)">Audio [best]</button>
+    </div><br><br>
+    <div class="btn-group">
+        <button class="btn btn-secondary" onclick="buttonClicked(this.value)" value="Download Video [iOS]">Video [MP4]</button>
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-secondary" onclick="buttonClicked(this.value)" value="Download as an MP3 file">Audio [MP3]</button>
+    </div>
     <div id="alert_wrapper" style="display:none"></div>
 </div>
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>

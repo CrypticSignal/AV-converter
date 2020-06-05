@@ -1,4 +1,5 @@
-import os, logging
+from loggers import log
+import os
 
 # A function that checks if a variable contains a disallowed substring.
 def variable_has_no_disallowed_substrings(variable_to_check, disallowed_substrings):
@@ -16,19 +17,10 @@ def check_no_variable_contains_bad_string(variables_list, disallowed_strings):
             return False
     return True
 
-log_format = logging.Formatter('%(message)s')
-file_handler = logging.FileHandler('info/Info.txt')        
-file_handler.setFormatter(log_format)
-logger = logging.getLogger('logger')
-if (logger.hasHandlers()):
-    logger.handlers.clear()
-logger.setLevel(10)
-logger.addHandler(file_handler)
-
-progress_file_path = 'progress.txt'
+progress_file_path = 'static/progress/converter.txt'
 
 def run_ffmpeg(uploaded_file_path, params):
-    logger.info(params)
+    log.info(params)
     os.system(f'/usr/local/bin/ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" '
     f'-id3v2_version 3 -write_id3v1 true -metadata comment="freeaudioconverter.net" '
     f'-metadata encoded_by="freeaudioconverter.net" {params}')

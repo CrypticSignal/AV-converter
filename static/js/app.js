@@ -8,6 +8,14 @@ const convertButton = document.getElementById("convert_btn");
 const uploadingButton = document.getElementById("uploading_btn");
 const cancelButton = document.getElementById("cancel_btn");
 const alertWrapper = document.getElementById("alert_wrapper");
+const progressParagraph = document.getElementById('progress');
+
+// A function that creates a synchronous sleep.
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 
 function show_alert(message, type) {
     alertWrapper.style.display = 'block';
@@ -19,10 +27,26 @@ function show_alert(message, type) {
       </button>
     </div>`
 }
+let shouldLog = true;
 
-function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
-    const conversionRequest = new XMLHttpRequest();
-    conversionRequest.responseType = "json";
+async function showConversionProgress() {
+    while (shouldLog) {
+        const response = await fetch('static/progress/converter.txt');
+        const textInFile = await response.text();
+        const lines = textInFile.split('\n');
+        const fifthLastLine = lines[lines.length - 6].split('=');
+        const justProgressTime = fifthLastLine.slice(-1)[0];
+        const withoutMicroseconds = justProgressTime.slice(0, -7);
+        const milliseconds = justProgressTime.substring(9, 12);
+        progressParagraph.innerHTML = `${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
+        (and ${milliseconds} milliseconds)`;
+        await sleep(1000); // Using the sleep function defined above.
+    }
+}
+
+async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
+
+    showConversionProgress();
 
     const chosenCodec = document.getElementById('codecs').value;
     const mp4EncodingMode = document.getElementById('mp4_encoding_mode').value;
@@ -73,27 +97,29 @@ function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
     data.append("is_keep_video", isKeepVideo);
     data.append("crf_value", crfValue);
     data.append("wav_bit_depth", wavBitDepth);
+    
+    try {
+        const conversionRequest = await fetch("/", {
+            method: 'POST',
+            body: data,
+        })
+        shouldLog = false;
+        progressParagraph.style.display = 'none';
+        document.getElementById("converting_btn").style.display = 'none';
 
-    conversionRequest.open('POST', '/');
-    conversionRequest.send(data);
+        const downloadLink = await conversionRequest.text()
+        show_alert(`File converted. <a href="${downloadLink}">Click here</a> \
+        if the download does not begin automatically.`, "success");
 
-    conversionRequest.addEventListener("load", function () { // conversionRequest is complete.
-        reset(); // Reset the page to the default state.
-        if (conversionRequest.status == 200) {
-            show_alert(`File converted. <a href="${conversionRequest.response.downloadFilePath}">Click here</a> \
-            if the download does not begin automatically.`, "success");
-            link.download = ''; // The download attribute specifies that the file will be downloaded
-            // when the link is visited. As we have set an empty value, it means use the original filename.
-            link.href = conversionRequest.response.downloadFilePath;
-            link.click();
-        } 
-        else if (conversionRequest.status == 400) {
-            show_alert(`${conversionRequest.response.message}`, "danger");
-        } 
-        else {
-            show_alert(`Error converting file (${conversionRequest.responseText})`, "danger");
-        }       
-    })
+        const createLink = document.createElement("a"); // Create a virtual link.
+        createLink.download = ''; // The download attribute specifies that the file will be downloaded
+        // when the link is visited. As we have set an empty value, it means use the original filename.
+        createLink.href = downloadLink; // Setting the URL of createLink to downloadLink
+        createLink.click();
+    }
+    catch (error) {
+        show_alert(error, 'danger');
+    }
 } // Closing bracket for pythonHeresWhatYouNeed function.
 
 // Run this function when the user clicks on the "Convert" button.
@@ -221,8 +247,8 @@ function upload_and_send_conversion_request() {
         progress_bar.setAttribute("style", "width: 0%");
 
         if (uploadRequest.status == 200) {
+            progressParagraph.style.display = 'block';
             document.getElementById("converting_btn").style.display = 'block';
-            conversionProgress.style.display = 'block';
             pythonHeresWhatYouNeed(chosenFile.name);
         }
         else {

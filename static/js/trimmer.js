@@ -17,7 +17,7 @@ function send_trim_request() {
 
     const request = new XMLHttpRequest();
     request.responseType = "json";
-    request.open("POST", "/file-trimmer");
+    request.open("POST", "/trimmer");
     
     const data = new FormData();
     data.append("request_type", "trim");
@@ -71,7 +71,7 @@ function upload_and_send_trim_request() {
 
     const request = new XMLHttpRequest();
     request.responseType = "json";
-    request.open("POST", "/file-trimmer");
+    request.open("POST", "/trimmer");
 
     const data = new FormData();
     data.append("request_type", "upload_complete");
