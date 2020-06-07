@@ -7,7 +7,6 @@ document.addEventListener("keydown", function(event) {
 
 // Only show the div relevant to the selected codec.
 function showHide(value) {
-    
     if (value=='MP3') {
         document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';

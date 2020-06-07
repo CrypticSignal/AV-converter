@@ -1,0 +1,19 @@
+3 requests are made
+
+(1) When user clicks Convert button
+(2) When file has uploaded
+(3) When file has converted
+
+In Python code we are trying to access request.form['is_convert_clicked']
+
+This works fine for request (1) because we are sending this value over.
+
+But it crashes when request (2) is received because it tries to access request.form['is_convert_clicked'] and it's non-existent.
+
+---
+
+Summary:
+can't do request.form['blah'] if blah doesn't actually exist.
+need to check it exists first with:
+
+'blah' in request.form and request.form['blah'] == ...

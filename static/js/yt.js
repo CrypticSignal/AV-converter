@@ -3,7 +3,6 @@ linkBox.addEventListener('touchstart', paste);
 
 async function paste() {
     const text = await navigator.clipboard.readText();
-    //alert(await navigator.clipboard.readText())
     document.getElementById("link").value = text;
   }
 
@@ -22,9 +21,10 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-let shouldLog = true;
-
 async function showDownloadProgress() {
+
+    shouldLog = true;
+
     while (shouldLog) {
         const response = await fetch('static/progress/yt.txt');
         const textInFile = await response.text();
@@ -49,34 +49,31 @@ async function buttonClicked(whichButton) {
         return;
     }
     const url = linkBox.value;
-        if (url != undefined || url != '') {
-            const regExp = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-            if (url.match(regExp)) {
-                const link = document.getElementById('link').value;
-                const data = new FormData();
-                data.append("link", link);
-                data.append("button_clicked", whichButton);
-                shouldLog = true;
-                showDownloadProgress();
-                // The "await" word means wait for a response to be received before executing the rest of the code (lines 48+)
-                const responseWithDownloadLink = await fetch("/yt", {
-                    method: 'POST',
-                    body: data,
-                })
-                // As we're using await fetch, if we reach this line, it means that we've received a response from the server,
-                // so the download has completed.
-                show_alert("Done!", "success");
-                shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
-                const downloadLink = await responseWithDownloadLink.text()
-                const createLink = document.createElement("a"); // Create a virtual link.
-                createLink.download = ''; // The download attribute specifies that the file will be downloaded
-                // when the link is visited. As we have set an empty value, it means use the original filename.
-                createLink.href = downloadLink; // Setting the URL of createLink to downloadLink
-                createLink.click();
-            } 
-            else {
-                show_alert(`Invalid URL provided.`, 'danger')
-
-            }
-        }
+    const regExp = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+    if (url.match(regExp)) {
+        const link = document.getElementById('link').value;
+        const data = new FormData();
+        data.append("link", link);
+        data.append("button_clicked", whichButton);
+        shouldLog = true;
+        showDownloadProgress();
+        // The "await" word means wait for a response to be received before executing the rest of the code (lines 48+)
+        const responseWithDownloadLink = await fetch("/yt", {
+            method: 'POST',
+            body: data
+        })
+        // As we're using await fetch, if we reach this line, it means that we've received a response from the server,
+        // so the download has completed.
+        show_alert("Done!", "success");
+        shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
+        const downloadLink = await responseWithDownloadLink.text()
+        const createLink = document.createElement("a"); // Create a virtual link.
+        createLink.download = ''; // The download attribute specifies that the file will be downloaded
+        // when the link is visited. As we have set an empty value, it means use the original filename.
+        createLink.href = downloadLink; // Setting the URL of createLink to downloadLink
+        createLink.click();
+    }
+    else {
+        show_alert(`Invalid URL provided.`, 'danger')
+    }
 }
