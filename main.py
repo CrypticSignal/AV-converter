@@ -4,6 +4,7 @@ from trimmer import trimmer # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
 from werkzeug.utils import secure_filename
 import time
+from datetime import datetime, timedelta
 import os
 import converter
 from email.mime.multipart import MIMEMultipart
@@ -31,12 +32,12 @@ def homepage():
         log_this('uploaded a file:')
         global progress_filename
         progress_filename = str(time.time())[:-8]
-
+        
         chosen_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
         log.info(chosen_file)
         log.info(f'Size: {filesize} MB')
-        log.info(progress_filename)
+        
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
@@ -231,7 +232,7 @@ def return_world_record():
         int(canvas_width)
         int(canvas_width)
     except ValueError:
-        logger.error("GAME 1: The user changed something to a non-int.")
+        log.error("GAME 1: The user changed something to a non-int.")
     else:
         with open("Game Scores/HighScores.txt", "a") as f:
             f.write(f'{score} | {times_missed} | {user} | {user_agent} | {canvas_width}'
@@ -257,7 +258,7 @@ def save_game2_stats():
     try:
         int(reaction_time)
     except ValueError:
-        logger.error("GAME 2: The user changed reaction_time to a non-int.")
+        log.error("GAME 2: The user changed reaction_time to a non-int.")
     else:
         with open("Game Scores/ReactionTimes.txt", "a") as f:
             f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')

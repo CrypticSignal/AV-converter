@@ -33,7 +33,7 @@ function sleep(ms) {
 function show_alert(message, type) {
     alertWrapper.style.display = 'block';
     alertWrapper.innerHTML =
-    `<br><div class="alert alert-${type} alert-dismissible fade show" role="alert">
+    `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
       <span>${message}</span>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
@@ -54,8 +54,8 @@ async function showConversionProgress() {
         console.log(justProgressTime);
         const withoutMicroseconds = justProgressTime.slice(0, -7);
         const milliseconds = justProgressTime.substring(9, 12);
-        progressParagraph.innerHTML = `${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
-        (and ${milliseconds} milliseconds)`;
+        show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
+        (and ${milliseconds} milliseconds)`, 'info');
         await sleep(1000); // Using the sleep function defined above.
     }
 }
