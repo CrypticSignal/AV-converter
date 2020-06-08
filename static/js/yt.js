@@ -26,19 +26,27 @@ async function showDownloadProgress() {
     shouldLog = true;
 
     while (shouldLog) {
-        const response = await fetch('static/progress/yt.txt');
-        const textInFile = await response.text();
-        lines = textInFile.split('\n');
-        secondLastLine = lines[lines.length - 2];
-        console.log(secondLastLine)
-        if (typeof secondLastLine === 'undefined') {
-            secondLastLine = 'Starting download...';
+        try {
+            const response = await fetch(`static/progress/${progressFilename}.txt`);
+            const textInFile = await response.text();
+            console.log(`TextInFile: ${textInFile}`)
+            lines = textInFile.split('\n');
+            secondLastLine = lines[lines.length - 2];
+            console.log(secondLastLine)
+            if (typeof secondLastLine === 'undefined') {
+                secondLastLine = 'Starting download...';
+            }
+            else if (secondLastLine.includes('[ffmpeg] Destination:')) {
+                secondLastLine = 'Just a moment...';
+            }
+            else if (secondLastLine.includes('<p>The')) {
+                secondLastLine = 'Done!'
+            }
+            show_alert(secondLastLine, "info");
+            await sleep(100); // Using the sleep function defined above.
+        } catch(error) {
+            console.log(error)
         }
-        else if (secondLastLine.includes('[ffmpeg] Destination:')) {
-            secondLastLine = 'Just a moment...';
-        }
-        show_alert(secondLastLine, "info");
-        await sleep(100); // Using the sleep function defined above.
     }
 }
   
@@ -51,6 +59,19 @@ async function buttonClicked(whichButton) {
     const url = linkBox.value;
     const regExp = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
     if (url.match(regExp)) {
+        try {
+            const logButtonClicked = new FormData();
+            logButtonClicked.append('button_clicked', 'yes')
+            filenameResponse = await fetch('/yt', {
+                method: 'POST',
+                body: logButtonClicked
+            });
+        } catch(error) {
+            show_alert(error, 'danger')
+        }
+        
+        progressFilename = await filenameResponse.text()
+
         const link = document.getElementById('link').value;
         const data = new FormData();
         data.append("link", link);
@@ -58,22 +79,27 @@ async function buttonClicked(whichButton) {
         shouldLog = true;
         showDownloadProgress();
         // The "await" word means wait for a response to be received before executing the rest of the code (lines 48+)
-        const responseWithDownloadLink = await fetch("/yt", {
-            method: 'POST',
-            body: data
-        })
-        // As we're using await fetch, if we reach this line, it means that we've received a response from the server,
-        // so the download has completed.
-        show_alert("Done!", "success");
-        shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
-        const downloadLink = await responseWithDownloadLink.text()
-        const createLink = document.createElement("a"); // Create a virtual link.
-        createLink.download = ''; // The download attribute specifies that the file will be downloaded
-        // when the link is visited. As we have set an empty value, it means use the original filename.
-        createLink.href = downloadLink; // Setting the URL of createLink to downloadLink
-        createLink.click();
+        try {
+            const responseWithDownloadLink = await fetch("/yt", {
+                method: 'POST',
+                body: data
+            });
+            // As we're using await fetch, if we reach this line, it means that we've received a response from the server,
+            // so the download has completed.
+            show_alert("Done!", "success");
+            shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
+            const downloadLink = await responseWithDownloadLink.text();
+            const createLink = document.createElement("a"); // Create a virtual link.
+            createLink.download = ''; // The download attribute specifies that the file will be downloaded
+            // when the link is visited. As we have set an empty value, it means use the original filename.
+            createLink.href = downloadLink; // Setting the URL of createLink to downloadLink
+            createLink.click();
+        } 
+        catch(error) {
+            show_alert(error, 'danger');
+        }
     }
     else {
-        show_alert(`Invalid URL provided.`, 'danger')
+        show_alert(`Invalid URL provided.`, 'danger');
     }
 }

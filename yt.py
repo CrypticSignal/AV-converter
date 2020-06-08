@@ -1,16 +1,29 @@
 from flask import Blueprint, request, send_from_directory
+import time
 import urllib # For YT downloader.
 from bs4 import BeautifulSoup # For YT downloader.
 import converter
-import os
-from loggers import *
+import shutil, os
+from loggers import log_this, log
 
 yt = Blueprint('yt',__name__)
 
+def delete_progress_files():
+    shutil.rmtree('static/progress')
+    os.mkdir('static/progress')
+
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
+    progress_filename = str(time.time())[:-8]
 
-    open('static/progress/yt.txt', 'w').close()
+    if request.form['button_clicked'] == 'yes':
+
+        with open(f'static/progress/{progress_filename}.txt', "w"):
+            pass
+
+        return str(progress_filename)
+
+    path_to_progress_file = f'static/progress/{progress_filename}.txt'
 
     media_extensions = ["mp4", "webm", "opus", "mkv", "aac", "m4a", "mp3"]
     strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
@@ -35,7 +48,8 @@ def yt_downloader():
         log_this('chose Download Video')
         log.info(title)
 
-        os.system(f'youtube-dl --newline -o "%(title)s.%(ext)s" {link} | tee static/progress/yt.txt')
+        os.system(f'youtube-dl --newline -o "%(title)s.%(ext)s" {link} | tee {path_to_progress_file}')
+        delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
@@ -49,7 +63,8 @@ def yt_downloader():
         log_this('chose Video [MP4]')
         log.info(title)
 
-        os.system(f'youtube-dl --newline -f mp4 -o "%(title)s.%(ext)s" {link} | tee static/progress/yt.txt')
+        os.system(f'youtube-dl --newline -f mp4 -o "%(title)s.%(ext)s" {link} | tee {path_to_progress_file}')
+        delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
@@ -63,7 +78,8 @@ def yt_downloader():
         log_this('chose Audio [best]')
         log.info(title)
 
-        os.system(f'youtube-dl --newline -x -o "%(title)s.%(ext)s" {link} | tee static/progress/yt.txt')
+        os.system(f'youtube-dl --newline -x -o "%(title)s.%(ext)s" {link} | tee {path_to_progress_file}')
+        delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
@@ -78,7 +94,8 @@ def yt_downloader():
         log.info(title)
 
         os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 '
-        f'--embed-thumbnail -o "%(title)s.%(ext)s" {link} | tee static/progress/yt.txt')
+        f'--embed-thumbnail -o "%(title)s.%(ext)s" {link} | tee {path_to_progress_file}')
+        delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
