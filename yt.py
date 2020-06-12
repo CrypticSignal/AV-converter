@@ -1,7 +1,8 @@
 from flask import Blueprint, request, send_from_directory
+from werkzeug.utils import secure_filename
 import time
-import urllib # For YT downloader.
-from bs4 import BeautifulSoup # For YT downloader.
+import urllib 
+from bs4 import BeautifulSoup 
 import converter
 import shutil, os
 from loggers import log_this, log
@@ -18,10 +19,9 @@ def yt_downloader():
 
     if request.form['button_clicked'] == 'yes':
 
-        with open(f'static/progress/{progress_filename}.txt', "w"):
-            pass
+        with open(f'static/progress/{progress_filename}.txt', "w"): pass
 
-        return str(progress_filename)
+        return progress_filename
 
     path_to_progress_file = f'static/progress/{progress_filename}.txt'
 
@@ -30,7 +30,7 @@ def yt_downloader():
     link = request.form['link']
     source = urllib.request.urlopen(f'{link}').read()
     soup = BeautifulSoup(source, features="html.parser")
-    title = soup.title.string[:-10]
+    title = (soup.title.string[:-10]).replace('#', '')
 
     # check_no_variable_contains_bad_string is a func defined in converter.py
     if not converter.check_no_variable_contains_bad_string(link, strings_not_allowed):
@@ -43,12 +43,12 @@ def yt_downloader():
         else:
             pass
 
-    if request.form['button_clicked'] == 'Download Video':
+    if request.form['button_clicked'] == 'Video [best]':
 
         log_this('chose Download Video')
         log.info(title)
-
-        os.system(f'youtube-dl --newline -o "%(title)s.%(ext)s" {link} | tee {path_to_progress_file}')
+        os.system(f'youtube-dl --newline -o "{title}" {link} | tee {path_to_progress_file}')
+        log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
@@ -58,12 +58,12 @@ def yt_downloader():
             if file.split(".")[-1] in media_extensions:
                 return f'/yt/{file}'
 
-    elif request.form['button_clicked'] == 'Download Video [iOS]':
+    elif request.form['button_clicked'] == 'Video [MP4]':
 
         log_this('chose Video [MP4]')
         log.info(title)
-
-        os.system(f'youtube-dl --newline -f mp4 -o "%(title)s.%(ext)s" {link} | tee {path_to_progress_file}')
+        os.system(f'youtube-dl --newline -f mp4 -o "{title}" {link} | tee {path_to_progress_file}')
+        log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
@@ -73,12 +73,12 @@ def yt_downloader():
             if file.split(".")[-1] in media_extensions:
                 return f'/yt/{file}'
 
-    elif request.form['button_clicked'] == 'Download Audio (best quality)':
+    elif request.form['button_clicked'] == 'Audio [best]':
 
         log_this('chose Audio [best]')
         log.info(title)
-
-        os.system(f'youtube-dl --newline -x -o "%(title)s.%(ext)s" {link} | tee {path_to_progress_file}')
+        os.system(f'youtube-dl --newline -x -o "{title}" {link} | tee {path_to_progress_file}')
+        log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
@@ -88,13 +88,13 @@ def yt_downloader():
             if file.split(".")[-1] in media_extensions:
                 return f'/yt/{file}'
 
-    elif request.form['button_clicked'] == 'Download as an MP3 file':
+    elif request.form['button_clicked'] == 'MP3':
 
         log_this('chose Audio [MP3]')
         log.info(title)
-
         os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 '
-        f'--embed-thumbnail -o "%(title)s.%(ext)s" {link} | tee {path_to_progress_file}')
+        f'--embed-thumbnail -o "{title}" {link} | tee {path_to_progress_file}')
+        log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:

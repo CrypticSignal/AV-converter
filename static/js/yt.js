@@ -37,11 +37,11 @@ async function showDownloadProgress() {
                 secondLastLine = 'Starting download...';
             }
             else if (secondLastLine.includes('[ffmpeg] Destination:')) {
-                secondLastLine = 'Just a moment...';
+                secondLastLine = 'Finishing up...';
             }
-            else if (secondLastLine.includes('<p>The')) {
-                secondLastLine = 'Done!'
-            }
+            // else if (secondLastLine.includes('<p>The')) {
+            //     secondLastLine = 'Done!'
+            // }
             show_alert(secondLastLine, "info");
             await sleep(100); // Using the sleep function defined above.
         } catch(error) {
@@ -84,11 +84,12 @@ async function buttonClicked(whichButton) {
                 method: 'POST',
                 body: data
             });
-            // As we're using await fetch, if we reach this line, it means that we've received a response from the server,
+            // As we're using await fetch, if we reach this line, it means that we've received a response,
             // so the download has completed.
-            show_alert("Done!", "success");
             shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
-            const downloadLink = await responseWithDownloadLink.text();
+            downloadLink = await responseWithDownloadLink.text();
+            show_alert(`Your browser should have started downloading the file. If it hasn't, click \
+            <a href="${downloadLink}">here</a>.`, "success");
             const createLink = document.createElement("a"); // Create a virtual link.
             createLink.download = ''; // The download attribute specifies that the file will be downloaded
             // when the link is visited. As we have set an empty value, it means use the original filename.

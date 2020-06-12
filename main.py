@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_from_directory, jsonify
+from flask import Flask, request, render_template, send_from_directory
 from yt import yt # Importing the blueprint in yt.py
 from trimmer import trimmer # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
