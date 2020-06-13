@@ -7,7 +7,7 @@ On https://freeaudioconverter.net, you can:
 - Trim a video or audio file (will not work if using the Safari browser).
 - NEW: Download a YouTube video or the audio only. https://freeaudioconverter.net/yt
 ## How does it work?
-Your file is uploaded to a server, where the conversion/file trimming takes place. On completion, the file is sent to your browser and is automatically downloaded.
+Your file is uploaded to a server, where the conversion/file trimming takes place. On completion, the file is sent to your browser to be downloaded.
 ## Features:
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
