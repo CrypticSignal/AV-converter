@@ -39,7 +39,6 @@
   <a href="contact">Contact</a>
   <a href="game">Game 1</a>
   <a href="game2">Game 2</a>
-  
   <div id='github'>
     <!-- GH follow -->
     <a class="github-button" href="https://github.com/BassThatHertz/AudioAndVideoConverter" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-size="large" aria-label="Follow @BassThatHertz on GitHub">GitHub</a>
@@ -59,9 +58,11 @@
   function myFunction() {
     var x = document.getElementById("top_bar");
     if (x.className === "top") {
-      x.className += " responsive";
+      x.className += " mobile";
+      document.getElementById('github').style.display = 'none';
     } else {
       x.className = "top";
+      document.getElementById('github').style.display = 'block';
     }
   }
 </script>
