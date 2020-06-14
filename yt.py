@@ -45,7 +45,7 @@ def yt_downloader():
 
     if request.form['button_clicked'] == 'Video [best]':
 
-        log_this('chose Download Video')
+        log_this('chose Video [best]')
         log.info(title)
         os.system(f'youtube-dl --newline -o "{title}" {link} | tee {path_to_progress_file}')
         log.info('DOWNLOAD COMPLETE.')
@@ -62,7 +62,8 @@ def yt_downloader():
 
         log_this('chose Video [MP4]')
         log.info(title)
-        os.system(f'youtube-dl --newline -f mp4 -o "{title}" {link} | tee {path_to_progress_file}')
+        os.system(f'youtube-dl --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "{title}" '
+        f'{link} | tee {path_to_progress_file}')
         log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 

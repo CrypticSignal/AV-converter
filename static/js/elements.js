@@ -381,13 +381,3 @@ CRF_value.innerHTML = CRF_slider.value;
 CRF_slider.oninput = function () {
     CRF_value.innerHTML = this.value;
 }
-
-/* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */
-function myFunction() {
-    var x = document.getElementById("myTopnav");
-    if (x.className === "topnav") {
-      x.className += " responsive";
-    } else {
-      x.className = "topnav";
-    }
-  }

@@ -26,36 +26,42 @@
 
 <body>
 
-<div class="topnav" id="myTopnav">
-    <!-- Navbar -->
-    <a href="/">Home</a>
-    <a href="about">About</a>
-    <a href="filetypes">Filetypes</a>
-    <a href="yt">YT downloader</a>
-    <a href="trimmer">File Trimmer</a>
-    <a href="contact">Contact</a>
-    <a href="game">Game 1</a>
-    <a href="game2">Game 2</a>
-        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-        <i class="fa fa-bars"></i>
-    </a>
-    <!-- Buy me a coffee -->
-    <div id="coffee">
-        <a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/fezCGRFkb"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span><br><br></a>
-    </div>
+<div class="top" id=top_bar>
+  <!-- Navbar -->
+  <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+    <i class="fa fa-bars"></i>
+  </a>
+  <a href="/">Home</a>
+  <a href="about">About</a>
+  <a href="filetypes">Filetypes</a>
+  <a href="yt">YT downloader</a>
+  <a href="trimmer">File Trimmer</a>
+  <a href="contact">Contact</a>
+  <a href="game">Game 1</a>
+  <a href="game2">Game 2</a>
+  
+  <div id='github'>
+    <!-- GH follow -->
+    <a class="github-button" href="https://github.com/BassThatHertz/AudioAndVideoConverter" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-size="large" aria-label="Follow @BassThatHertz on GitHub">GitHub</a>
+    <!-- Star -->
+    <a class="github-button" href="https://github.com/BassThatHertz/AudioAndVideoConverter" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star BassThatHertz/AudioAndVideoConverter on GitHub">Star</a>
+  </div>
 </div>
 
 {% block content %} {% endblock content%}
 
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
 </body>
 
 <script>
-    function myFunction() {
-    var x = document.getElementById("myTopnav");
-    if (x.className === "topnav") {
+  function myFunction() {
+    var x = document.getElementById("top_bar");
+    if (x.className === "top") {
       x.className += " responsive";
     } else {
-      x.className = "topnav";
+      x.className = "top";
     }
   }
 </script>
