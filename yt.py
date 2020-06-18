@@ -47,7 +47,7 @@ def yt_downloader():
 
         log_this('chose Video [best]')
         log.info(title)
-        os.system(f'youtube-dl --newline -o "{title}" {link} | tee {path_to_progress_file}')
+        os.system(f'youtube-dl --newline {link} | tee {path_to_progress_file}')
         log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 
@@ -62,7 +62,7 @@ def yt_downloader():
 
         log_this('chose Video [MP4]')
         log.info(title)
-        os.system(f'youtube-dl --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "{title}" '
+        os.system(f'youtube-dl --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
         f'{link} | tee {path_to_progress_file}')
         log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
@@ -78,7 +78,7 @@ def yt_downloader():
 
         log_this('chose Audio [best]')
         log.info(title)
-        os.system(f'youtube-dl --newline -x -o "{title}" {link} | tee {path_to_progress_file}')
+        os.system(f'youtube-dl --newline -x {link} | tee {path_to_progress_file}')
         log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 
@@ -94,7 +94,7 @@ def yt_downloader():
         log_this('chose Audio [MP3]')
         log.info(title)
         os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 '
-        f'--embed-thumbnail -o "{title}" {link} | tee {path_to_progress_file}')
+        f'--embed-thumbnail {link} | tee {path_to_progress_file}')
         log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 

@@ -29,10 +29,8 @@ async function showDownloadProgress() {
         try {
             const response = await fetch(`static/progress/${progressFilename}.txt`);
             const textInFile = await response.text();
-            console.log(`TextInFile: ${textInFile}`)
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
-            console.log(secondLastLine)
             if (typeof secondLastLine === 'undefined') {
                 secondLastLine = 'Starting download...';
             }
@@ -43,9 +41,11 @@ async function showDownloadProgress() {
             //     secondLastLine = 'Done!'
             // }
             show_alert(secondLastLine, "info");
+            console.log(secondLastLine);
             await sleep(100); // Using the sleep function defined above.
         } catch(error) {
-            console.log(error)
+            show_alert(error, 'danger');
+            console.log(error);
         }
     }
 }
@@ -71,6 +71,7 @@ async function buttonClicked(whichButton) {
         }
         
         progressFilename = await filenameResponse.text()
+        console.log(`progressFilename: ${progressFilename}`)
 
         const link = document.getElementById('link').value;
         const data = new FormData();
