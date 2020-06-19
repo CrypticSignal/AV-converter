@@ -3,7 +3,7 @@ On https://freeaudioconverter.net, you can:
 - Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (.ogg), FLAC, ALAC, AC3, DTS or CAF.
 - Convert a video to an audio-only file (to any of the above formats).
 - Convert a video to the MP4 or MKV format.
-- Change the audio codec of a video to AAC, AC3, DTS, WAV, FLAC or ALAC.
+- Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
 - Trim a video or audio file (will not work if using the Safari browser).
 - NEW: Download a YouTube video or the audio only. https://freeaudioconverter.net/yt
 ## How does it work?
