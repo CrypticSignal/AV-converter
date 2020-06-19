@@ -32,7 +32,7 @@ async function showDownloadProgress() {
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
             if (typeof secondLastLine === 'undefined') {
-                secondLastLine = 'Starting download...';
+                secondLastLine = 'Getting video info...';
             }
             else if (secondLastLine.includes('[ffmpeg] Destination:')) {
                 secondLastLine = 'Finishing up...';
@@ -91,9 +91,9 @@ async function buttonClicked(whichButton) {
             show_alert(`Your browser should have started downloading the file. If it hasn't, click \
             <a href="${downloadLink}">here</a>.`, "success");
             const createLink = document.createElement("a"); // Create a virtual link.
-            createLink.download = ''; // The download attribute specifies that the file will be downloaded
             // when the link is visited. As we have set an empty value, it means use the original filename.
             createLink.href = downloadLink; // Setting the URL of createLink to downloadLink
+            createLink.download = ''; // The download attribute specifies that the file will be downloaded
             createLink.click();
         } 
         catch(error) {
