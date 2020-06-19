@@ -116,7 +116,8 @@ def run_opus(progress_filename, uploaded_file_path, opus_encoding_type, opus_vor
     if opus_encoding_type == "opus_vbr":
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libopus -b:a {opus_vorbis_slider}k {output_path}.opus')
     else: # CBR
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libopus -vbr off -b:a {opus_vorbis_slider}k {output_path}.opus')
+        log.info("vbr off")
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libopus -vbr off -b:a {opus_cbr_bitrate}k {output_path}.opus')
 
 # Vorbis
 def run_vorbis(progress_filename, uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path):
