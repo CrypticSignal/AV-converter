@@ -1,3 +1,10 @@
+h5 {
+  /* font-family: Arial; */
+  /* font-family: "Times New Roman", Times, serif; */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* font-weight: bold; */
+}
+
 /* Add a black background color to the top div. */
 .top {
   background-color: black;
@@ -22,6 +29,7 @@
   float: right;
 }
 h1 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 200%;
   text-align: center;
   background: black;
@@ -36,10 +44,13 @@ h1 {
   color:white;
 }
 body {
-    text-align: center;
-    color: black;
-    background-color: #F5F5E0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+  color: black;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: lighter;
+  /* font-family: "Lucida Console", Courier, monospace; */
+  /* font-family: "Times New Roman", Times, serif; */
+  /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif */
 }
 /* The slider. */
 .slider {

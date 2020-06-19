@@ -19,11 +19,11 @@ visit = setup_logger('visit', 'logs/Visit.log')
 # Info.txt
 def log_this(message):
     current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
-    #client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    log.info(f'\n[{current_datetime}] {message}')
+    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    log.info(f'\n[{current_datetime}] {client} {message}')
 
 # Visit.log
 def log_visit(message):
     current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H.%M.%S')
-    #client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
-    visit.info(f'{message} on {current_datetime}')
+    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    visit.info(f'{client} {message} on {current_datetime}')

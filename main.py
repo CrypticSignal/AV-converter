@@ -100,8 +100,15 @@ def homepage():
             # Run the appropritate section of converter.py:
 
             if chosen_codec == 'MP3':
-                converter.run_mp3(progress_filename, uploaded_file_path, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path)
-                extension = 'mp3'
+                converter.run_mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path)
+                if is_keep_video == "yes":
+                    just_ext = uploaded_file_path.split('.')[-1]
+                    if just_ext == 'mp4':
+                        extension = 'mp4'
+                    else:
+                        extension = 'mkv'
+                else:
+                    extension = 'mp3'
 
             elif chosen_codec == 'AAC':
                 converter.run_aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass,

@@ -85,7 +85,7 @@ async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complet
     const opusEncodingType = document.getElementById('opus_encoding_type').value;
     const isKeepVideo = document.querySelector('input[name="is_keep_video"]:checked').value;
     const crfValue = document.getElementById('crf_slider').value;
-    const wavBitDepth = document.querySelector('input[name="wav_bit_depth"]:checked').value;
+    const wavBitDepth = document.getElementById('wav_bit_depth').value;
 
     const data = new FormData();
 
@@ -146,8 +146,7 @@ async function upload_and_send_conversion_request() {
     "avi", "ac3", "3gp", "MTS", "mts", "webm", "ADPCM", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 
     if (!input.value && document.getElementById("output_name").value == '') {
-        show_alert("Perhaps in the future a website will be able to read your mind and automatically complete the \
-        required fields, but technology hasn't gotten that far yet.", "info")
+        show_alert("It helps if you select the file that you want to convert.", "info")
         return;
     }
     else if (input.value) { // (If a file has been selected)

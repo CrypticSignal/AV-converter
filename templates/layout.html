@@ -14,11 +14,11 @@
     <meta name="description" content="Convert a video or audio file to MP3, WAV, AAC, FLAC, and more! | Trim an audio or video file | Extract the audio from a video">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!--Bootstrap CSS-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sketchy.css') }}">
     <!--My CSS-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Nice font for the "Buy me a coffee" button -->
-    <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
+    <!-- GitHub -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Needed for hamburger icon on mobile -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>{{ title }}</title>
@@ -49,14 +49,11 @@
 
 {% block content %} {% endblock content%}
 
-<!-- Place this tag in your head or just before your close body tag. -->
-<script async defer src="https://buttons.github.io/buttons.js"></script>
-
 </body>
 
 <script>
   function myFunction() {
-    var x = document.getElementById("top_bar");
+    const x = document.getElementById("top_bar");
     if (x.className === "top") {
       x.className += " mobile";
       document.getElementById('github').style.display = 'none';
@@ -66,5 +63,4 @@
     }
   }
 </script>
-
 </html>

@@ -44,7 +44,6 @@ async function showDownloadProgress() {
             console.log(secondLastLine);
             await sleep(100); // Using the sleep function defined above.
         } catch(error) {
-            show_alert(error, 'danger');
             console.log(error);
         }
     }
