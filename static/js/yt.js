@@ -32,25 +32,23 @@ async function showDownloadProgress() {
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
             if (typeof secondLastLine === 'undefined') {
-                secondLastLine = 'Getting video info...';
+                secondLastLine = 'Initialising...';
             }
             else if (secondLastLine.includes('[ffmpeg] Destination:')) {
                 secondLastLine = 'Finishing up...';
             }
-            // else if (secondLastLine.includes('<p>The')) {
-            //     secondLastLine = 'Done!'
-            // }
             show_alert(secondLastLine, "info");
             console.log(secondLastLine);
             await sleep(100); // Using the sleep function defined above.
         } catch(error) {
+            show_alert(error, 'danger');
             console.log(error);
         }
     }
 }
   
 // This function runs when one of the download buttons is clicked.
-async function buttonClicked(whichButton) {
+async function buttonClicked(whichButton) { // whichButton is this.value in yt.html
     if (linkBox.value == '') {
         show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
         return;
@@ -61,16 +59,18 @@ async function buttonClicked(whichButton) {
         try {
             const logButtonClicked = new FormData();
             logButtonClicked.append('button_clicked', 'yes')
+            // Python will return the filename for the youtube-dl progress file.
             filenameResponse = await fetch('/yt', {
                 method: 'POST',
                 body: logButtonClicked
             });
         } catch(error) {
-            show_alert(error, 'danger')
+            show_alert(error, 'danger');
+            console.log(error);
         }
         
-        progressFilename = await filenameResponse.text()
-        console.log(`progressFilename: ${progressFilename}`)
+        progressFilename = await filenameResponse.text();
+        console.log(`progressFilename: ${progressFilename}`);
 
         const link = document.getElementById('link').value;
         const data = new FormData();
@@ -98,6 +98,7 @@ async function buttonClicked(whichButton) {
         } 
         catch(error) {
             show_alert(error, 'danger');
+            console.log(error);
         }
     }
     else {

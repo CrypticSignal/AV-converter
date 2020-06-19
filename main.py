@@ -199,9 +199,9 @@ def homepage():
 def download_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4")
+        return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        return send_from_directory(f'{os.getcwd()}/conversions', filename)
+        return send_from_directory(f'{os.getcwd()}/conversions', filename, as_attachment=True)
 
 # CONTACT PAGE
 @app.route("/contact", methods=["POST"])

@@ -13,20 +13,20 @@ def delete_progress_files():
     shutil.rmtree('static/progress')
     os.mkdir('static/progress')
 
+strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
+media_extensions = ["mp4", "webm", "opus", "mkv", "aac", "m4a", "mp3"]
+
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
+
     progress_filename = str(time.time())[:-8]
+    with open(f'static/progress/{progress_filename}.txt', "w"): pass
 
     if request.form['button_clicked'] == 'yes':
-
-        with open(f'static/progress/{progress_filename}.txt', "w"): pass
-
         return progress_filename
 
     path_to_progress_file = f'static/progress/{progress_filename}.txt'
 
-    media_extensions = ["mp4", "webm", "opus", "mkv", "aac", "m4a", "mp3"]
-    strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
     link = request.form['link']
     source = urllib.request.urlopen(f'{link}').read()
     soup = BeautifulSoup(source, features="html.parser")
@@ -46,63 +46,78 @@ def yt_downloader():
     if request.form['button_clicked'] == 'Video [best]':
 
         log_this('chose Video [best]')
-        log.info(title)
-        os.system(f'youtube-dl --newline {link} | tee {path_to_progress_file}')
-        log.info('DOWNLOAD COMPLETE.')
-        delete_progress_files()
+        log.info(f'They want to download {title}')
 
-        with open("downloaded-files.txt", "a") as f:
-            f.write("\n" + title + " downloaded.") 
+        os.system(f'youtube-dl --newline {link} | tee {path_to_progress_file}')
+        delete_progress_files()
 
         for file in os.listdir():
             if file.split(".")[-1] in media_extensions:
-                return f'/yt/{file}'
 
+                log.info(f'{file} downloaded')
+
+                with open("downloaded-files.txt", "a") as f:
+                    f.write(f'\n{file} downloaded.')
+
+                return f'/yt/{file}'
+                
     elif request.form['button_clicked'] == 'Video [MP4]':
 
         log_this('chose Video [MP4]')
-        log.info(title)
+        log.info(f'They want to download {title}')
+
         os.system(f'youtube-dl --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
         f'{link} | tee {path_to_progress_file}')
-        log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 
-        with open("downloaded-files.txt", "a") as f:
-            f.write("\n" + title + " downloaded.") 
-        
         for file in os.listdir():
+
             if file.split(".")[-1] in media_extensions:
+
+                log.info(f'{file} downloaded')
+
+                with open("downloaded-files.txt", "a") as f:
+                    f.write(f'\n{file} downloaded.')
+
                 return f'/yt/{file}'
 
     elif request.form['button_clicked'] == 'Audio [best]':
 
         log_this('chose Audio [best]')
-        log.info(title)
+        log.info(f'They want to download {title}')
+
         os.system(f'youtube-dl --newline -x {link} | tee {path_to_progress_file}')
-        log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 
-        with open("downloaded-files.txt", "a") as f:
-            f.write("\n" + title + " downloaded.") 
-        
         for file in os.listdir():
+
             if file.split(".")[-1] in media_extensions:
+
+                log.info(f'{file} downloaded')
+
+                with open("downloaded-files.txt", "a") as f:
+                    f.write(f'\n{file} downloaded.')
+
                 return f'/yt/{file}'
 
     elif request.form['button_clicked'] == 'MP3':
 
         log_this('chose Audio [MP3]')
-        log.info(title)
+        log.info(f'They want to download {title}')
+
         os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 '
         f'--embed-thumbnail {link} | tee {path_to_progress_file}')
-        log.info('DOWNLOAD COMPLETE.')
         delete_progress_files()
 
-        with open("downloaded-files.txt", "a") as f:
-            f.write("\n" + title + " downloaded.") 
-        
         for file in os.listdir():
+
             if file.split(".")[-1] in media_extensions:
+
+                log.info(f'{file} downloaded')
+
+                with open("downloaded-files.txt", "a") as f:
+                    f.write(f'\n{file} downloaded.')
+
                 return f'/yt/{file}'
 
 # Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
@@ -110,6 +125,6 @@ def yt_downloader():
 def download_yt_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        return send_from_directory(os.getcwd(), filename, mimetype="audio/mp4")
+        return send_from_directory(os.getcwd(), filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        return send_from_directory(os.getcwd(), filename)
+        return send_from_directory(os.getcwd(), filename, as_attachment=True)
