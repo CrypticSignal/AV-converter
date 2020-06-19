@@ -1,1 +1,5 @@
 static/js/elements.js linguist-vendored
+static/js/games/1.js linguist-vendored
+static/js/games/2.js linguist-vendored
+templates/game.html linguist-vendored
+templates/game2.html linguist-vendored
