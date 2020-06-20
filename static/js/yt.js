@@ -34,6 +34,7 @@ async function showDownloadProgress() {
             else if (secondLastLine.includes('[ffmpeg] Destination:')) {
                 secondLastLine = 'Finishing up...';
             }
+            
             else if (secondLastLine.includes('Deleting original file ')) {
                 secondLastLine = 'Almost done...';
             }

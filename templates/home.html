@@ -37,7 +37,7 @@
       <option value="FLAC">FLAC</option>
       <option value="MKA">MKA (extract audio without encoding it)</option>
       <option value="MKV">MKV (.mkv)</option>
-      <option selected value="MP3">MP3 (.mp3)</option>
+      <option selected value="MP3">MP3</option>
       <option value="MP4">MP4 (.mp4)</option>
       <option value="Opus">Opus (.opus)</option>
       <option value="Vorbis">Vorbis</option>
@@ -304,8 +304,8 @@
 
     <div id="opus_cbr_div" style="display:none">
       <p>Please enter your desired bitrate:</p>
-        <input onclick="this.select();" type="tel" maxlength="3" value="192" id="opus_cbr_bitrate"/><br>
-      <i>You must enter an integer between 6 and 512.</i>
+        <input onclick="this.select();" type="tel" maxlength="3" min="6" max="512" value="192" id="opus_cbr_bitrate"/>kbps<br>
+      <i>Range: 6 to 512. Mono files are capped at 256 kbps.</i>
     </div>
   
     </div> <!--Closing tag for Opus div-->

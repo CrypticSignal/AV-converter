@@ -45,7 +45,7 @@ def yt_downloader():
         log_this('chose Video [best]')
         log.info(f'They chose {title}')
         os.system(f'youtube-dl --newline {link} | tee {path_to_progress_file}')
-        delete_progress_files()
+        #delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
@@ -61,7 +61,7 @@ def yt_downloader():
         log.info(f'They chose {title}')
         os.system(f'youtube-dl --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
         f'{link} | tee {path_to_progress_file}')
-        delete_progress_files()
+        #delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
@@ -76,7 +76,7 @@ def yt_downloader():
         log_this('chose Audio [best]')
         log.info(f'They chose {title}')
         os.system(f'youtube-dl --newline -x {link} | tee {path_to_progress_file}')
-        delete_progress_files()
+        #delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
@@ -92,7 +92,7 @@ def yt_downloader():
         log.info(f'They chose {title}')
         os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 '
         f'--embed-thumbnail {link} | tee {path_to_progress_file}')
-        delete_progress_files()
+        #delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
             f.write("\n" + title + " downloaded.") 
