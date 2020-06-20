@@ -37,11 +37,17 @@ async function showDownloadProgress() {
             else if (secondLastLine.includes('[ffmpeg] Destination:')) {
                 secondLastLine = 'Finishing up...';
             }
+            else if (secondLastLine.includes('Deleting original file ')) {
+                secondLastLine = 'Almost done...';
+            }
+            else if (secondLastLine.includes('[ffmpeg] Adding thumbnail')) {
+                secondLastLine = 'Setting video thumnail as convert art...';
+            }
+
             show_alert(secondLastLine, "info");
             console.log(secondLastLine);
-            await sleep(100); // Using the sleep function defined above.
+            await sleep(500); // Using the sleep function defined above.
         } catch(error) {
-            show_alert(error, 'danger');
             console.log(error);
         }
     }
@@ -65,11 +71,12 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
                 body: logButtonClicked
             });
         } catch(error) {
-            show_alert(error, 'danger');
             console.log(error);
         }
         
         progressFilename = await filenameResponse.text();
+
+
         console.log(`progressFilename: ${progressFilename}`);
 
         const link = document.getElementById('link').value;
@@ -97,7 +104,6 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             createLink.click();
         } 
         catch(error) {
-            show_alert(error, 'danger');
             console.log(error);
         }
     }
