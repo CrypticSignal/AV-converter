@@ -24,7 +24,7 @@ function sleep(ms) {
 async function showDownloadProgress() {
     while (shouldLog) {
         try {
-            const response = await fetch(`static/progress/${progressFilename}.txt`);
+            const response = await fetch(`static/progress/${responseFromServer}.txt`);
             const textInFile = await response.text();
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
@@ -34,17 +34,15 @@ async function showDownloadProgress() {
             else if (secondLastLine.includes('[ffmpeg] Destination:')) {
                 secondLastLine = 'Finishing up...';
             }
-            
+
             else if (secondLastLine.includes('Deleting original file ')) {
                 secondLastLine = 'Almost done...';
-            }
-            else if (secondLastLine.includes('[ffmpeg] Adding thumbnail')) {
-                secondLastLine = 'Setting video thumnail as cover art...';
             }
             show_alert(secondLastLine, "info");
             console.log(secondLastLine);
             await sleep(500); // Using the sleep function defined above.
         } catch(error) {
+            show_alert(error, 'danger');
             console.log(error);
         }
     }
@@ -56,56 +54,69 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
         return;
     }
-    const url = linkBox.value;
+    const contentsOfLinkBox = linkBox.value;
     const regExp = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-    if (url.match(regExp)) {
+
+    if (contentsOfLinkBox.match(regExp)) {
+
         try {
             const firstFormData = new FormData();
-            firstFormData.append('button_clicked', 'yes')
-            // First POST request
-            filenameResponse = await fetch('/yt', {
+            firstFormData.append('link', contentsOfLinkBox);
+            firstFormData.append('button_clicked', 'yes');
+
+            // First POST request to get the name of the progress file.
+            response = await fetch('/yt', {
                 method: 'POST',
                 body: firstFormData
             });
-        } catch(error) {
-            console.log(error);
-        }
-        // Python will return the filename for the youtube-dl progress file.
-        progressFilename = await filenameResponse.text();
 
-        // The data for the 2nd POST request.
-        const link = document.getElementById('link').value;
-        const data = new FormData();
-        data.append("link", link);
-        data.append("button_clicked", whichButton);
+            // Python will return the filename for the youtube-dl progress file, 
+            // or an error message if the user enters a disallowed string.
+            responseFromServer = await response.text();
 
-        // Set shouldLog to true so the loop in showDownloadProgress keeps repeating.
-        shouldLog = true;
-        showDownloadProgress();
-        
-        try {
-            // 2nd POST request
-            const responseWithDownloadLink = await fetch("/yt", {
-                method: 'POST',
-                body: data
-            });
-            // As we're using await fetch, if we reach this line, it means that we've received a response,
-            // so the download has completed.
-            shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
-            downloadLink = await responseWithDownloadLink.text();
-            show_alert(`Your browser should have started downloading the file. If it hasn't, click \
-            <a href="${downloadLink}">here</a>.`, "success");
-            const createLink = document.createElement("a"); // Create a virtual link.
-            // when the link is visited. As we have set an empty value, it means use the original filename.
-            createLink.href = downloadLink; // Setting the URL of createLink to downloadLink
-            createLink.download = ''; // The download attribute specifies that the file will be downloaded
-            createLink.click();
+            if (!response.ok) {
+                show_alert(responseFromServer, 'danger');
+            }
+            else {
+                // The FormData for the 2nd POST request.
+                const data = new FormData();
+                data.append("link", linkBox.value);
+                data.append("button_clicked", whichButton);
+
+                // Set shouldLog to true so the loop in showDownloadProgress keeps repeating.
+                shouldLog = true;
+                showDownloadProgress();
+                
+                try {
+                    // 2nd POST request to get the download link.
+                    const responseWithDownloadLink = await fetch("/yt", {
+                        method: 'POST',
+                        body: data
+                    });
+                    // As we're using await fetch, if we reach this line, it means that we've received a response,
+                    // so the download has completed.
+                    shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
+                    downloadLink = await responseWithDownloadLink.text();
+                    show_alert(`Your browser should have started downloading the file. If it hasn't, click \
+                    <a href="${downloadLink}">here</a>.`, "success");
+                    const createLink = document.createElement("a"); // Create a virtual link.
+                    // when the link is visited. As we have set an empty value, it means use the original filename.
+                    createLink.href = downloadLink; // Setting the URL of createLink to downloadLink
+                    createLink.download = ''; // The download attribute specifies that the file will be downloaded
+                    createLink.click();
+                } 
+                catch(error) { // 2nd POST request.
+                    show_alert(error, 'danger');
+                    console.log(error);
+                }
+            } // Closing bracket for the else block.
         } 
-        catch(error) {
+        catch(error) { // First POST request.
+            show_alert(error, 'danger');
             console.log(error);
         }
     }
-    else {
+    else { // If the contents of the link box don't match the regex.
         show_alert(`Invalid URL provided.`, 'danger');
     }
 }

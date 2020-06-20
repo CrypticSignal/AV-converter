@@ -1,4 +1,5 @@
 from flask import Blueprint, request, send_from_directory
+import converter
 from werkzeug.utils import secure_filename
 import time
 import urllib 
@@ -12,6 +13,8 @@ def delete_progress_files():
     shutil.rmtree('static/progress')
     os.mkdir('static/progress')
 
+strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
+
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
     
@@ -21,15 +24,22 @@ def yt_downloader():
 
     if request.form['button_clicked'] == 'yes':
 
-        with open(f'static/progress/{progress_filename}.txt', "w"): pass
+        link = request.form['link']
 
-        media_extensions = ["mp4", "webm", "opus", "mkv", "aac", "m4a", "mp3"]
-        # Delete the videos that have already been downloaded so send_from_directory does not send back the wrong file.
-        for file in os.listdir():
-            if file.split(".")[-1] in media_extensions:
-                os.remove(file)
+        if converter.does_variable_contain_bad_string(link, strings_not_allowed):
+            return 'You tried being clever, but there is a server-side check for disallowed strings.', 400
 
-        return progress_filename
+        else:
+            # Create the progress file.
+            with open(f'static/progress/{progress_filename}.txt', "w"): pass
+
+            media_extensions = ["mp4", "webm", "opus", "mkv", "aac", "m4a", "mp3"]
+            # Delete the videos that have already been downloaded so send_from_directory does not send back the wrong file.
+            for file in os.listdir():
+                if file.split(".")[-1] in media_extensions:
+                    os.remove(file)
+
+            return progress_filename
 
     # The rest of the code runs on the 2nd POST request:
 
@@ -43,7 +53,7 @@ def yt_downloader():
     if request.form['button_clicked'] == 'Video [best]':
 
         log_this('chose Video [best]')
-        log.info(f'They chose {title}')
+        log.info(f'They want to download {title}')
         os.system(f'youtube-dl --newline {link} | tee {path_to_progress_file}')
         #delete_progress_files()
 
@@ -58,7 +68,7 @@ def yt_downloader():
     elif request.form['button_clicked'] == 'Video [MP4]':
 
         log_this('chose Video [MP4]')
-        log.info(f'They chose {title}')
+        log.info(f'They want to download {title}')
         os.system(f'youtube-dl --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
         f'{link} | tee {path_to_progress_file}')
         #delete_progress_files()
@@ -74,7 +84,7 @@ def yt_downloader():
     elif request.form['button_clicked'] == 'Audio [best]':
 
         log_this('chose Audio [best]')
-        log.info(f'They chose {title}')
+        log.info(f'They want to download {title}')
         os.system(f'youtube-dl --newline -x {link} | tee {path_to_progress_file}')
         #delete_progress_files()
 
@@ -89,7 +99,7 @@ def yt_downloader():
     elif request.form['button_clicked'] == 'MP3':
 
         log_this('chose MP3')
-        log.info(f'They chose {title}')
+        log.info(f'They want to download {title}')
         os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 '
         f'--embed-thumbnail {link} | tee {path_to_progress_file}')
         #delete_progress_files()

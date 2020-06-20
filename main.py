@@ -90,8 +90,8 @@ def homepage():
         strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`', '.']
 
         # check_no_variable_contains_bad_string is a func defined in converter.py
-        if not converter.check_no_variable_contains_bad_string(variables_to_validate, strings_not_allowed):
-            return {"message": "You tried being clever, but there's a server-side check for disallowed strings."}, 400
+        if converter.is_bad_string_in_variables(variables_to_validate, strings_not_allowed):
+            return 'You tried being clever, but there\'s a server-side check for disallowed strings', 400
 
         else:
             log.info(f'They chose {chosen_codec}\nOutput Filename: {output_name}')

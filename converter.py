@@ -2,20 +2,20 @@ from loggers import log
 import os, shutil
 
 # A function that checks if a variable contains a disallowed substring.
-def variable_has_no_disallowed_substrings(variable_to_check, disallowed_substrings):
-    for substring in disallowed_substrings:
-        if substring in variable_to_check:
-            return False
+def does_variable_contain_bad_string(variable, disallowed_strings):
+    for string in disallowed_strings:
+        if string in variable:
+            return True
     # If we've gotten to this point, the loop has finished without the if-statement ever being True, 
-    # so the variable didn't contain a disallowed substring.
-    return True
+    # so the variable didn't contain a disallowed string.
+    return False
 
-# If a variable in the list contains a disallowed string, return False. Otherwise, return True.
-def check_no_variable_contains_bad_string(variables_list, disallowed_strings):
+# If a variable in the list contains a disallowed string, return True. Otherwise, return False.
+def is_bad_string_in_variables(variables_list, disallowed_strings):
     for variable in variables_list:
-        if not variable_has_no_disallowed_substrings(variable, disallowed_strings):
-            return False
-    return True
+        if does_variable_contain_bad_string(variable, disallowed_strings):
+            return True
+    return False
     
 def run_ffmpeg(progress_filename, uploaded_file_path, params):
     progress_file_path = f'static/progress/"{progress_filename}".txt'
