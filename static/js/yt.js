@@ -1,5 +1,5 @@
 linkBox = document.getElementById('link');
-linkBox.addEventListener('touchstart', paste);
+linkBox.addEventListener('mousedown', paste);
 
 async function paste() {
     const text = await navigator.clipboard.readText();
@@ -22,9 +22,6 @@ function sleep(ms) {
 }
 
 async function showDownloadProgress() {
-
-    shouldLog = true;
-
     while (shouldLog) {
         try {
             const response = await fetch(`static/progress/${progressFilename}.txt`);
@@ -41,9 +38,8 @@ async function showDownloadProgress() {
                 secondLastLine = 'Almost done...';
             }
             else if (secondLastLine.includes('[ffmpeg] Adding thumbnail')) {
-                secondLastLine = 'Setting video thumnail as convert art...';
+                secondLastLine = 'Setting video thumnail as cover art...';
             }
-
             show_alert(secondLastLine, "info");
             console.log(secondLastLine);
             await sleep(500); // Using the sleep function defined above.
@@ -63,30 +59,31 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
     const regExp = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
     if (url.match(regExp)) {
         try {
-            const logButtonClicked = new FormData();
-            logButtonClicked.append('button_clicked', 'yes')
-            // Python will return the filename for the youtube-dl progress file.
+            const firstFormData = new FormData();
+            firstFormData.append('button_clicked', 'yes')
+            // First POST request
             filenameResponse = await fetch('/yt', {
                 method: 'POST',
-                body: logButtonClicked
+                body: firstFormData
             });
         } catch(error) {
             console.log(error);
         }
-        
+        // Python will return the filename for the youtube-dl progress file.
         progressFilename = await filenameResponse.text();
 
-
-        console.log(`progressFilename: ${progressFilename}`);
-
+        // The data for the 2nd POST request.
         const link = document.getElementById('link').value;
         const data = new FormData();
         data.append("link", link);
         data.append("button_clicked", whichButton);
+
+        // Set shouldLog to true so the loop in showDownloadProgress keeps repeating.
         shouldLog = true;
         showDownloadProgress();
-        // The "await" word means wait for a response to be received before executing the rest of the code (lines 48+)
+        
         try {
+            // 2nd POST request
             const responseWithDownloadLink = await fetch("/yt", {
                 method: 'POST',
                 body: data
