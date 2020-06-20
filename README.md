@@ -24,7 +24,7 @@ LAME v3.100 | https://lame.sourceforge.io/
 
 fdk-aac | https://github.com/mstorsjo/fdk-aac
 
-libopus 1.3.1 | https://github.com/xiph/opus
+opusenc opus-tools 0.2 (using libopus 1.3.1) | https://github.com/xiph/opus
 
 libvorbis
 ## FFmpeg configuration:
