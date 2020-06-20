@@ -113,11 +113,13 @@ def run_mp4(progress_filename, uploaded_file_path, mp4_encoding_mode, crf_value,
 
 # Opus
 def run_opus(progress_filename, uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, output_path):
+    progress_file_path = f'static/progress/"{progress_filename}".txt'
     if opus_encoding_type == "opus_vbr":
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libopus -b:a {opus_vorbis_slider}k {output_path}.opus')
+        os.system(f'ffmpeg -y -i "{uploaded_file_path}" -progress {progress_file_path} -f wav - | opusenc --comment '
+        f'Comment="Encoded using freeaudioconverter.net" --bitrate {opus_vorbis_slider} - {output_path}.opus')
     else: # CBR
-        log.info("vbr off")
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libopus -vbr off -b:a {opus_cbr_bitrate}k {output_path}.opus')
+        os.system(f'ffmpeg -y -i "{uploaded_file_path}" -progress {progress_file_path} -f wav - | opusenc --comment '
+        f'Comment="Encoded using freeaudioconverter.net" --hard-cbr --bitrate {opus_cbr_bitrate} - {output_path}.opus')
 
 # Vorbis
 def run_vorbis(progress_filename, uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path):
