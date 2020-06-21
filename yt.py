@@ -14,6 +14,7 @@ def delete_progress_files():
     os.mkdir('static/progress')
 
 strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
+youtube_dl_path = '/home/pi/.local/bin/youtube-dl'
 
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
@@ -54,7 +55,7 @@ def yt_downloader():
 
         log_this('chose Video [best]')
         log.info(f'They want to download {title}')
-        os.system(f'youtube-dl --newline {link} | tee {path_to_progress_file}')
+        os.system(f'{youtube_dl_path} --newline {link} | tee {path_to_progress_file}')
         #delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
@@ -69,7 +70,7 @@ def yt_downloader():
 
         log_this('chose Video [MP4]')
         log.info(f'They want to download {title}')
-        os.system(f'youtube-dl --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
+        os.system(f'{youtube_dl_path} --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
         f'{link} | tee {path_to_progress_file}')
         #delete_progress_files()
 
@@ -85,7 +86,7 @@ def yt_downloader():
 
         log_this('chose Audio [best]')
         log.info(f'They want to download {title}')
-        os.system(f'youtube-dl --newline -x {link} | tee {path_to_progress_file}')
+        os.system(f'{youtube_dl_path} --embed-thumbnail --newline -x {link} | tee {path_to_progress_file}')
         #delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
@@ -100,8 +101,10 @@ def yt_downloader():
 
         log_this('chose MP3')
         log.info(f'They want to download {title}')
-        os.system(f'youtube-dl --newline -x --audio-format mp3 --audio-quality 0 '
-        f'--embed-thumbnail {link} | tee {path_to_progress_file}')
+
+        os.system(f'{youtube_dl_path} --newline -x --audio-format mp3 --audio-quality 0 {link} | '
+        f'tee {path_to_progress_file}')
+
         #delete_progress_files()
 
         with open("downloaded-files.txt", "a") as f:
