@@ -20,7 +20,7 @@ def is_bad_string_in_variables(variables_list, disallowed_strings):
 def run_ffmpeg(progress_filename, uploaded_file_path, params):
     progress_file_path = f'static/progress/"{progress_filename}".txt'
     log.info(params)
-    os.system(f'/usr/local/bin/ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" '
+    os.system(f'ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" '
     f'-id3v2_version 3 -write_id3v1 true -metadata comment="freeaudioconverter.net" '
     f'-metadata encoded_by="freeaudioconverter.net" {params}')
     shutil.rmtree('static/progress')
@@ -110,16 +110,13 @@ def run_mp4(progress_filename, uploaded_file_path, mp4_encoding_mode, crf_value,
     else: # Preset selected
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v libx264 -preset {mp4_encoding_mode} -crf {crf_value} '
         f'-c:a libfdk_aac -vbr 5 -f mp4 -movflags faststart {output_path}.mp4')
-
+    
 # Opus
 def run_opus(progress_filename, uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, output_path):
-    progress_file_path = f'static/progress/"{progress_filename}".txt'
     if opus_encoding_type == "opus_vbr":
-        os.system(f'ffmpeg -y -i "{uploaded_file_path}" -progress {progress_file_path} -f wav - | opusenc --comment '
-        f'Comment="Encoded using freeaudioconverter.net" --bitrate {opus_vorbis_slider} - {output_path}.opus')
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libopus -b:a {opus_vorbis_slider}k {output_path}.opus')
     else: # CBR
-        os.system(f'ffmpeg -y -i "{uploaded_file_path}" -progress {progress_file_path} -f wav - | opusenc --comment '
-        f'Comment="Encoded using freeaudioconverter.net" --hard-cbr --bitrate {opus_cbr_bitrate} - {output_path}.opus')
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libopus -vbr off -b:a {opus_cbr_bitrate}k {output_path}.opus')
 
 # Vorbis
 def run_vorbis(progress_filename, uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path):
