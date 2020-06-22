@@ -226,7 +226,7 @@ def send_email():
 # GAME 1
 @app.route("/game", methods=['POST'])
 def return_world_record():
-    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
+    current_datetime = datetime.now().strftime('%d-%m-%y at %H:%M:%S')
     user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
     user_agent = request.headers.get('User-Agent')
     score = request.form['score']
@@ -258,7 +258,7 @@ def return_world_record():
 # GAME 2
 @app.route("/game2", methods=['POST'])
 def save_game2_stats():
-    current_datetime = (datetime.now() + timedelta(hours=1)).strftime('%d-%m-%y at %H:%M:%S')
+    current_datetime = datetime.now().strftime('%d-%m-%y at %H:%M:%S')
     user = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
     user_agent = request.headers.get('User-Agent')
     reaction_time = request.form['reaction_time']
