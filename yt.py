@@ -36,7 +36,12 @@ def return_download_link(video_id):
             with open("downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}') 
             log.info(f'freeaudioconverter.net/yt/{file}')
-            return f'/yt/{file}'
+            # Links containing a # result in a 404 error.
+            if '#' in file:
+                os.rename(file, file.replace('#', ''))
+            for file in os.listdir():
+                if file.split('.')[-1] in relevant_extensions and video_id in file:
+                    return f'/yt/{file}'
     
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
@@ -110,12 +115,12 @@ def yt_downloader():
 # Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
 @yt.route("/yt/<filename>", methods=["GET"])
 def send_file(filename):
-    shutil.rmtree('static/progress')
-    os.mkdir('static/progress')
+    # shutil.rmtree('static/progress')
+    # os.mkdir('static/progress')
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        log.info('[M4A] Sending the file to the user.')
+        log.info(f'[M4A] Sending {filename}')
         return send_from_directory(os.getcwd(), filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info('Sending the file to the user.')
+        log.info(f'Sending{filename}')
         return send_from_directory(os.getcwd(), filename, as_attachment=True)
