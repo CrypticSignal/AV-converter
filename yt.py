@@ -10,7 +10,7 @@ from loggers import log_this, log
 
 yt = Blueprint('yt', __name__)
 
-relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "webp", "mp3"]
+relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
 strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
 youtube_dl = 'python3 -m youtube_dl'
 
