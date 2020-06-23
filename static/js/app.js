@@ -177,8 +177,7 @@ function sleep(ms) {
 }
 
 async function showConversionProgress() {
-    shouldLog = true;
-    // If you start reading the file straight away, .split('=') won't work as FFmpeg hasn't started writing to the file
+    // If you start reading the file straight away, .split('=') won't work as FFmpeg hasn't started writing to the file.
     await sleep(1000)
     while (shouldLog) {
         const response = await fetch(`static/progress/${progressFilename}.txt`);
@@ -186,7 +185,6 @@ async function showConversionProgress() {
         const lines = textInFile.split('\n');
         const fifthLastLine = lines[lines.length - 6].split('=');
         const justProgressTime = fifthLastLine.slice(-1)[0];
-        console.log(justProgressTime);
         const withoutMicroseconds = justProgressTime.slice(0, -7);
         const milliseconds = justProgressTime.substring(9, 12);
         show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
@@ -196,9 +194,6 @@ async function showConversionProgress() {
 }
 
 async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
-    shouldLog = true;
-    showConversionProgress();
-
     const chosenCodec = document.getElementById('codecs').value;
     const mp4EncodingMode = document.getElementById('mp4_encoding_mode').value;
     const opusVorbisSlider = document.getElementById("opus_vorbis_slider").value;
@@ -248,6 +243,9 @@ async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complet
     data.append("is_keep_video", isKeepVideo);
     data.append("crf_value", crfValue);
     data.append("wav_bit_depth", wavBitDepth);
+
+    shouldLog = true;
+    showConversionProgress();
 
     try {
         const conversionRequest = await fetch("/", {

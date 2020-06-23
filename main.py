@@ -4,7 +4,7 @@ from trimmer import trimmer # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
 from werkzeug.utils import secure_filename
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 import converter
 from email.mime.multipart import MIMEMultipart
@@ -29,9 +29,11 @@ def homepage():
         return ''
 
     elif request.form["request_type"] == "uploaded":
-        log_this('uploaded a file:')
+
         global progress_filename
         progress_filename = str(time.time())[:-8]
+        log.info(progress_filename)
+        log_this('uploaded a file:')
         
         chosen_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
@@ -46,6 +48,8 @@ def homepage():
         return str(progress_filename)
     
     elif request.form["request_type"] == "convert":
+
+        log.info(f'CONVERT BLOCK: {progress_filename}')
 
         wav_bit_depth = request.form["wav_bit_depth"]
         filename = request.form["filename"]
@@ -196,11 +200,13 @@ def homepage():
             return f'/download/{converted_file_name}'
 
 @app.route("/download/<filename>", methods=["GET"])
-def download_file(filename):
+def send_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
+        log.info('Sending the file to the user.')
         return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4", as_attachment=True)
     else:
+        log.info('Sending the file to the user.')
         return send_from_directory(f'{os.getcwd()}/conversions', filename, as_attachment=True)
 
 # CONTACT PAGE

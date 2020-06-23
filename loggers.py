@@ -1,6 +1,6 @@
 import logging
-from datetime import datetime, timedelta
-from flask import request 
+from flask import request
+from datetime import datetime
 
 def setup_logger(name, log_file):
     log_format = logging.Formatter('%(message)s')

@@ -31,10 +31,19 @@ async function showDownloadProgress() {
             if (typeof secondLastLine === 'undefined') {
                 secondLastLine = 'Initialising...';
             }
+            else if (secondLastLine.includes('Downloading webpage')) {
+                secondLastLine = 'Video found';
+            }
+            else if (secondLastLine.includes('[download] ')) {
+                secondLastLine = secondLastLine.substring(11);
+                //secondLastLine = `Progress: ${secondLastLine.split('%')[0].substring(12)}%`
+            }
             else if (secondLastLine.includes('[ffmpeg] Destination:')) {
                 secondLastLine = 'Finishing up...';
             }
-
+            else if (secondLastLine.includes('[ffmpeg] Merging ')) {
+                secondLastLine = 'Merging audio and video...'
+            }
             else if (secondLastLine.includes('Deleting original file ')) {
                 secondLastLine = 'Almost done...';
             }

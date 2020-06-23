@@ -18,13 +18,14 @@ def is_bad_string_in_variables(variables_list, disallowed_strings):
     return False
     
 def run_ffmpeg(progress_filename, uploaded_file_path, params):
+    log.info(f'Converter: {progress_filename}')
     progress_file_path = f'static/progress/"{progress_filename}".txt'
     log.info(params)
     os.system(f'ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" '
     f'-id3v2_version 3 -write_id3v1 true -metadata comment="freeaudioconverter.net" '
     f'-metadata encoded_by="freeaudioconverter.net" {params}')
-    shutil.rmtree('static/progress')
-    os.mkdir('static/progress')
+    # shutil.rmtree('static/converter')
+    # os.mkdir('static/converter')
 
 # MP3
 def run_mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path):
