@@ -106,6 +106,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
                     // so the download has completed.
                     shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
                     downloadLink = await responseWithDownloadLink.text();
+                    console.log(`Download Link: ${downloadLink}`)
                     show_alert(`Your browser should have started downloading the file. If it hasn't, click \
                     <a href="${downloadLink}">here</a>.`, "success");
                     const createLink = document.createElement("a"); // Create a virtual link.

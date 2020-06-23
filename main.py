@@ -1,4 +1,5 @@
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, render_template, send_from_directory, session
+from flask_session import Session
 from yt import yt # Importing the blueprint in yt.py
 from trimmer import trimmer # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
@@ -13,13 +14,18 @@ from smtplib import SMTP
 from confidential import *
 
 app = Flask(__name__)
+secret_key = str(os.urandom(16))
+app.secret_key = secret_key
+SESSION_TYPE = 'filesystem'
+app.config.from_object(__name__)
+Session(app)
+
 app.register_blueprint(trimmer)
 app.register_blueprint(yt)
+
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000 * 1000 # 5 GB max upload size.
 app.jinja_env.auto_reload = True
-
-progress_filename = ''
 
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
@@ -30,11 +36,9 @@ def homepage():
 
     elif request.form["request_type"] == "uploaded":
 
-        global progress_filename
-        progress_filename = str(time.time())[:-8]
-        log.info(progress_filename)
+        session['progress_filename'] = str(time.time())[:-8]
+    
         log_this('uploaded a file:')
-        
         chosen_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
         log.info(chosen_file)
@@ -45,11 +49,9 @@ def homepage():
         # Save the uploaded file to the uploads folder.
         chosen_file.save(os.path.join("uploads", filename_secure))
         
-        return str(progress_filename)
+        return session['progress_filename']
     
     elif request.form["request_type"] == "convert":
-
-        log.info(f'CONVERT BLOCK: {progress_filename}')
 
         wav_bit_depth = request.form["wav_bit_depth"]
         filename = request.form["filename"]
@@ -104,7 +106,7 @@ def homepage():
             # Run the appropritate section of converter.py:
 
             if chosen_codec == 'MP3':
-                converter.run_mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path)
+                converter.run_mp3(session['progress_filename'], uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path)
                 if is_keep_video == "yes":
                     just_ext = uploaded_file_path.split('.')[-1]
                     if just_ext == 'mp4':
@@ -115,7 +117,7 @@ def homepage():
                     extension = 'mp3'
 
             elif chosen_codec == 'AAC':
-                converter.run_aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass,
+                converter.run_aac(session['progress_filename'], uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass,
                 fdk_lowpass, output_path)
                 if is_keep_video == "yes":
                     just_ext = uploaded_file_path.split('.')[-1]
@@ -127,46 +129,46 @@ def homepage():
                     extension = 'm4a'
 
             elif chosen_codec == 'Opus':
-                converter.run_opus(progress_filename, uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate,
+                converter.run_opus(session['progress_filename'], uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate,
                 output_path)
                 extension = 'opus'   
 
             elif chosen_codec == 'FLAC':
-                converter.run_flac(progress_filename, uploaded_file_path, is_keep_video, flac_compression, output_path)
+                converter.run_flac(session['progress_filename'], uploaded_file_path, is_keep_video, flac_compression, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
                 else:
                     extension = 'flac'
 
             elif chosen_codec == 'Vorbis':
-                converter.run_vorbis(progress_filename, uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider,
+                converter.run_vorbis(session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider,
                 output_path) 
                 extension = 'mka'
 
             elif chosen_codec == 'WAV':
-                converter.run_wav(progress_filename, uploaded_file_path, is_keep_video, wav_bit_depth, output_path)
+                converter.run_wav(session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
                 else:
                     extension = 'wav'
 
             elif chosen_codec == 'MKV':
-                converter.run_mkv(progress_filename, uploaded_file_path, output_path)
+                converter.run_mkv(session['progress_filename'], uploaded_file_path, output_path)
                 extension = 'mkv'
 
             elif chosen_codec == 'MKA':
-                converter.run_mka(progress_filename, uploaded_file_path, output_path)
+                converter.run_mka(session['progress_filename'], uploaded_file_path, output_path)
                 extension = 'mka'
 
             elif chosen_codec == 'ALAC':
-                converter.run_alac(progress_filename, uploaded_file_path, is_keep_video, output_path)
+                converter.run_alac(session['progress_filename'], uploaded_file_path, is_keep_video, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
                 else:
                     extension = 'm4a'
 
             elif chosen_codec == 'AC3':
-                converter.run_ac3(progress_filename, uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
+                converter.run_ac3(session['progress_filename'], uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
                 if is_keep_video == "yes":
                     just_ext = uploaded_file_path.split('.')[-1]
                     if just_ext == 'mp4':
@@ -177,22 +179,22 @@ def homepage():
                     extension = 'ac3'
 
             elif chosen_codec == 'CAF':
-                converter.run_caf(progress_filename, uploaded_file_path, output_path)
+                converter.run_caf(session['progress_filename'], uploaded_file_path, output_path)
                 extension = 'caf'
 
             elif chosen_codec == 'DTS':
-                converter.run_dts(progress_filename, uploaded_file_path, is_keep_video, dts_bitrate, output_path)
+                converter.run_dts(session['progress_filename'], uploaded_file_path, is_keep_video, dts_bitrate, output_path)
                 if is_keep_video == "yes":
                     extension = 'mkv'
                 else:
                     extension = 'dts'
 
             elif chosen_codec == 'MP4':
-                converter.run_mp4(progress_filename, uploaded_file_path, mp4_encoding_mode, crf_value, output_path)
+                converter.run_mp4(session['progress_filename'], uploaded_file_path, mp4_encoding_mode, crf_value, output_path)
                 extension = 'mp4'
             
             elif chosen_codec == 'MKV':
-                converter.run_mkv(progress_filename, uploaded_file_path, output_path)
+                converter.run_mkv(session['progress_filename'], uploaded_file_path, output_path)
                 extension = 'mkv'
 
             converted_file_name = output_name + "." + extension

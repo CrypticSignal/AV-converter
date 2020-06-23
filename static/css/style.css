@@ -1,3 +1,27 @@
+/* Style all font awesome icons */
+.fa {
+  padding: 20px;
+  font-size: 30px;
+  width: 50px;
+  text-align: center;
+  text-decoration: none;
+}
+.fa:hover {
+  opacity: 0.7;
+}
+.fa-snapchat-ghost {
+  background: #fffc00;
+  color: black;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+.fa-twitter {
+  background: #55ACEE;
+  color: white;
+}
+.fa-instagram {
+  background: #e4405f;
+  color: white;
+}
 h5 {
   /* font-family: Arial; */
   /* font-family: "Times New Roman", Times, serif; */
