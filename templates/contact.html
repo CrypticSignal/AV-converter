@@ -1,9 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h1>Contact</h1><br>
-<h5>Use this page to easily send me a message.</h5>
-<i>Please include your email address in your message if you would like me to get back to you.</i>
+<h1>Contact</h1>
+<h5>If you run into any bugs or issues, please contact me via one of my socials:</h5>
+<a href="https://twitter.com/Audio_Converter" class="fa fa-twitter"></a>
+<a href="https://www.instagram.com/freeaudioconverter/" class="fa fa-instagram"></a>
+<a href="https://snapchat.com/add/c0smic_epiphany" class="fa fa-snapchat-ghost"></a><br><br>
+
+<i>Alternatively, you can send me an email using the box below, but you must include your email address in your message if you would like me to get back to you.</i>
 <form action="/contact" method="POST">
     <textarea name='message' rows="4" cols="50" placeholder="Enter your message"></textarea><br>
 <button class="btn btn-primary">Send</button>
