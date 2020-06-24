@@ -1,9 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
+<script data-name="BMC-Widget" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="fezCGRFkb" data-description="You can send a donation as little as $3" data-color="#5F7FFF" data-position="bottom" data-x_margin="18" data-y_margin="18"></script>
 <div class="container">
     <p>If using an <strong>iOS device</strong>, select <strong>Video [MP4]</strong> or <strong>Audio [MP3]</strong> as iOS does not support all media formats natively.</p>
-    <p>Don't select <strong>Audio [best]</strong> unless you know that you're able to play Opus (.opus) files as that's usually the format of Audio [best].</p>
-    <i>If you run into any issues, you can contact me via one of my socials by using the <a href="/contact">contact<a/> page.</i><hr>
+    <p>Don't select <strong>Audio [best]</strong> unless you know that you're able to play Opus (.opus) files as that's usually the format of <strong>Audio [best]</strong>.</p>
+    <hr>
     <h5><b>Paste YouTube link (URL):</b></h5>
     <input type="text" onclick="paste()" class="form-control" maxlength="200" name="link" id="link" required/>
     <br>
@@ -18,8 +19,15 @@
     </div>
     <div class="btn-group">
         <button class="btn btn-primary" onclick="buttonClicked(this.value)" value="Audio [best]">Audio [best]</button>
-    </div>
+    </div><br><br>
     <div id="alert_wrapper" style="display:none"></div>
+    <!-- <p>If you want to support my non-profit website, click on the coffee cup on the bottom-right :)</p> -->
+    <!-- <div id='socials'>
+        <p>If you run into any issues, contact me via one of the following socials:</p>
+        <a href="https://twitter.com/Audio_Converter" class="fa fa-twitter"></a>
+        <a href="https://www.instagram.com/freeaudioconverter/" class="fa fa-instagram"></a>
+        <a href="https://snapchat.com/add/c0smic_epiphany" class="fa fa-snapchat-ghost"></a>
+    </div> -->
 </div>
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="{{ url_for('static', filename='js/yt.js') }}"></script>

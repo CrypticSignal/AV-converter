@@ -47,6 +47,10 @@ async function showDownloadProgress() {
             else if (secondLastLine.includes('Deleting original file ')) {
                 secondLastLine = 'Almost done...';
             }
+            else if (secondLastLine.includes('[ffmpeg] Adding thumbnail')) {
+                secondLastLine = `Your browser should have started downloading the file. If it hasn't, click \
+                <a href="${downloadLink}">here</a>.`
+            }
             show_alert(secondLastLine, "info");
             console.log(secondLastLine);
             await sleep(500); // Using the sleep function defined above.

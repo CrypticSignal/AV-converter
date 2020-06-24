@@ -13,6 +13,7 @@ yt = Blueprint('yt', __name__)
 relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
 strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
 youtube_dl = 'python3 -m youtube_dl'
+download_dir = '/home/pi/website/downloads'
 
 def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/13231825
     # Examples:
@@ -30,21 +31,37 @@ def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/1323
     return None
 
 def return_download_link(video_id):
-    for file in os.listdir():
+    for file in os.listdir(download_dir):
+        #log.info('IN OSLISTDIR')
         if file.split('.')[-1] in relevant_extensions and video_id in file:
-            log.info(f'Downloaded {file}')
+            log.info(f'DOWNLOADED {file}')
             with open("downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}') 
-            log.info(f'freeaudioconverter.net/yt/{file}')
-            # Links containing a # result in a 404 error.
-            if '#' in file:
-                os.rename(file, file.replace('#', ''))
-            for file in os.listdir():
-                if file.split('.')[-1] in relevant_extensions and video_id in file:
-                    return f'/yt/{file}'
+            new_filename = file.replace(f'-{video_id}', '')
+            log.info(f'NEW FILENAME: {new_filename}')
+            os.rename(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
+            if '#' in file: # Links containing a # result in a 404 error.
+                os.rename(new_filename, new_filename.replace('#', ''))
     
+            return f'/yt/{new_filename}'
+
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
+    size_of_media_files = 0
+    # Get the total size of the media files in the download folder.
+    for file in os.listdir(download_dir):
+        if file.split('.')[-1] in relevant_extensions:
+            size = os.path.getsize(f'{download_dir}/{file}') / 1000000
+            size_of_media_files += size
+            
+    log.info(f'SIZE OF MEDIA FILES: {size_of_media_files} MB')
+    # If there's more than 10 GB of media files, delete them:
+    if size_of_media_files > 10000:
+        log.info(f'More than 10 GB worth of media files found.')
+        for file in os.listdir(download_dir):
+            if file.split('.')[-1] in relevant_extensions:
+                os.remove(file)
+                log.info(f'DELETED {file}')
 
     progress_filename = str(time.time())[:-8]
     path_to_progress_file = f'static/progress/{progress_filename}.txt'
@@ -59,39 +76,27 @@ def yt_downloader():
             return 'You tried being clever, but there is a server-side check for disallowed strings.', 400
 
         else:
-            log.info('String doesn\'t seem malicious.')
             # Create the progress file.
             with open(path_to_progress_file, "w"): pass
-            # Delete the pre-existing downloads.
-            for file in os.listdir():
-                if file.split(".")[-1] in relevant_extensions:
-                    os.remove(file)
-                    log.info(f'Deleted {file}')
-
             return progress_filename
 
-    log.info('2nd POST request received...')
+    # The rest runs after the 2nd POST request:
 
     link = request.form['link']
-    # # Getting the video title using BeautifulSoup:
-    # source = urllib.request.urlopen(f'{link}').read()
-    # soup = BeautifulSoup(source, features="html.parser")
-    # title = (soup.title.string)[:-10] # [:-10] removes the " - YouTube" at the end.
-    # title = (soup.title.string[:-10]).replace('#', '') # If using the title for the filename as # causes an issue.
-
+    download_template = '/home/pi/website/downloads/%(title)s-%(id)s.%(ext)s'
     video_id = get_video_id(link)
 
     if request.form['button_clicked'] == 'Video [best]':
 
         log.info(f'Video [best] was chosen. {link}')
-        os.system(f'{youtube_dl} --newline {video_id} | tee {path_to_progress_file}')
+        os.system(f'{youtube_dl} -o "{download_template}" --newline {video_id} | tee {path_to_progress_file}')
         download_link = return_download_link(video_id)
         return download_link
 
     elif request.form['button_clicked'] == 'Video [MP4]':
 
         log.info(f'MP4 was chosen. {link}')
-        os.system(f'{youtube_dl} --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
+        os.system(f'{youtube_dl} -o "{download_template}" --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
         f'{video_id} | tee {path_to_progress_file}')
         download_link = return_download_link(video_id)
         return download_link
@@ -99,7 +104,7 @@ def yt_downloader():
     elif request.form['button_clicked'] == 'Audio [best]':
 
         log.info(f'Audio [best] was chosen. {link}')
-        os.system(f'{youtube_dl} --newline -x {video_id} | tee {path_to_progress_file}')
+        os.system(f'{youtube_dl} -o "{download_template}" --newline -x {video_id} | tee {path_to_progress_file}')
         download_link = return_download_link(video_id)
         return download_link
 
@@ -107,7 +112,7 @@ def yt_downloader():
 
         log.info('MP3 was chosen.')
         log.info(link)
-        os.system(f'{youtube_dl} --newline -x --embed-thumbnail --audio-format mp3 --audio-quality 0 {video_id} | '
+        os.system(f'{youtube_dl} -o "{download_template}" --newline -x --embed-thumbnail --audio-format mp3 --audio-quality 0 {video_id} | '
         f'tee {path_to_progress_file}')
         download_link = return_download_link(video_id)
         return download_link
@@ -115,12 +120,12 @@ def yt_downloader():
 # Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
 @yt.route("/yt/<filename>", methods=["GET"])
 def send_file(filename):
-    # shutil.rmtree('static/progress')
-    # os.mkdir('static/progress')
+    shutil.rmtree('static/progress')
+    os.mkdir('static/progress')
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
         log.info(f'[M4A] Sending {filename}')
-        return send_from_directory(os.getcwd(), filename, mimetype="audio/mp4", as_attachment=True)
+        return send_from_directory(f'{os.getcwd()}/downloads', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'Sending{filename}')
-        return send_from_directory(os.getcwd(), filename, as_attachment=True)
+        log.info(f'Sending {filename}')
+        return send_from_directory(f'{os.getcwd()}/downloads', filename, as_attachment=True)
