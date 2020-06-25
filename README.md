@@ -5,13 +5,15 @@ On https://freeaudioconverter.net, you can:
 - Convert a video to the MP4 or MKV format.
 - Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
 - Trim a video or audio file (will not work if using the Safari browser).
-- NEW: Download a YouTube video or the audio only. https://freeaudioconverter.net/yt
-## How does it work?
-Your file is uploaded to a server, where the conversion/file trimming takes place. On completion, the file is sent to your browser to be downloaded.
-## Features:
+- Download a YouTube video or the audio only. The [webpage](https://freeaudioconverter.net/yt) is a [youtube-dl](https://github.com/ytdl-org/youtube-dl) wrapper.
+## Features (audio/video converter):
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
 - Whilst the file is being converted, you can see how far into the file the encoder currently is. This information is updated every second.
+## Features (YouTube downloader):
+- Download as an MP3 or MP4 file.
+- If you choose to download as an MP3, the thumbnail of the video gets embedded as the cover art.
+- Download the best quality audio stream without encoding it, so no lossy-to-lossy encoding is done (only applicable if you use the "Audio [best]" button.
 ## Supported filetypes:
 Many filetypes are supported, click [here](https://freeaudioconverter.net/filetypes) for details. Support for other filetypes may be added, feel free to [contact me](https://freeaudioconverter.net/contact) to enquire. 
 ## To-do:
@@ -27,6 +29,8 @@ fdk-aac | https://github.com/mstorsjo/fdk-aac
 opusenc opus-tools 0.2 (using libopus 1.3.1) | https://github.com/xiph/opus
 
 libvorbis
+## External tool(s) used:
+youtube-dl | https://github.com/ytdl-org/youtube-dl
 ## FFmpeg configuration:
 ```
   --enable-gpl

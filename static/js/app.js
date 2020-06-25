@@ -268,8 +268,8 @@ async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complet
 
             const createLink = document.createElement("a"); // Create a virtual link.
             createLink.href = response;
-            createLink.download = ''; // The download attribute specifies that the file will be downloaded
-            // when the link is visited. As we have set an empty value, it means use the original filename.
+            // createLink.download = ''; // The download attribute specifies that the file will be downloaded
+            // // when the link is visited. As we have set an empty value, it means use the original filename.
             createLink.click();
         }
     }

@@ -4,7 +4,6 @@ import converter
 from werkzeug.utils import secure_filename
 import time
 import urllib 
-from bs4 import BeautifulSoup
 import shutil, os
 from loggers import log_this, log
 
@@ -43,7 +42,7 @@ def return_download_link(video_id):
             if '#' in file: # Links containing a # result in a 404 error.
                 os.rename(new_filename, new_filename.replace('#', ''))
     
-            return f'/yt/{new_filename}'
+            return f'/downloads/{new_filename}'
 
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
@@ -118,10 +117,10 @@ def yt_downloader():
         return download_link
 
 # Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
-@yt.route("/yt/<filename>", methods=["GET"])
+@yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    shutil.rmtree('static/progress')
-    os.mkdir('static/progress')
+    # shutil.rmtree('static/progress')
+    # os.mkdir('static/progress')
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
         log.info(f'[M4A] SENDING "{filename}"')

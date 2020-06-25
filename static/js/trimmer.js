@@ -35,7 +35,7 @@ function send_trim_request() {
         show_alert(`${request.response.message} <a href="${request.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
 
         const link = document.createElement("a"); // Create a virtual link.
-        link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
+        //link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
         link.href = request.response.downloadFilePath;
         link.click();
     });

@@ -1,4 +1,4 @@
-/* Style all font awesome icons */
+/* "fa" are the social media buttons. */
 .fa {
   padding: 20px;
   font-size: 30px;
@@ -28,7 +28,6 @@ h5 {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   /* font-weight: bold; */
 }
-
 /* Add a black background color to the top div. */
 .top {
   background-color: black;

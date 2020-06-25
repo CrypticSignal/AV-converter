@@ -199,9 +199,9 @@ def homepage():
 
             converted_file_name = output_name + "." + extension
 
-            return f'/download/{converted_file_name}'
+            return f'/conversions/{converted_file_name}'
 
-@app.route("/download/<filename>", methods=["GET"])
+@app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
