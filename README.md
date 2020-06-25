@@ -45,6 +45,7 @@ youtube-dl | https://github.com/ytdl-org/youtube-dl
 ```
 ## Requirements for development/running locally:
 Python **3.6+**
+
 `pip install youtube-dl`
 
 `pip install -r requirements.txt`
