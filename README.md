@@ -11,7 +11,7 @@ On https://freeaudioconverter.net, you can:
 - Upload completion time is shown in realtime.
 - Whilst the file is being converted, you can see how far into the file the encoder currently is. This information is updated every second.
 ## Features (YouTube downloader):
-- Download as an MP3 or MP4 file.
+- Download as an MP3 or MP4 file, or simply the best quality video/audio stream that is available.
 - If you choose to download as an MP3, the thumbnail of the video gets embedded as the cover art.
 - Download the best quality audio stream without encoding it, so no lossy-to-lossy encoding is done (only applicable if you use the "Audio [best]" button.
 ## Supported filetypes:
