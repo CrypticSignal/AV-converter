@@ -32,11 +32,13 @@ libvorbis
 ## External tool(s) used:
 youtube-dl | https://github.com/ytdl-org/youtube-dl
 ## youtube-dl configuration for each download button:
-Video [MP4] | `-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"`
-Video [best quality] | youtube-dl <video_id>
-Audio [MP3] | `-x --embed-thumbnail --audio-format mp3 --audio-quality 0`
-Audio [best] | `-x <video_id>`
+**Video [MP4]** `-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"`
 
+**Video [best quality]** youtube-dl <video_id>
+
+**Audio [MP3]** `-x --embed-thumbnail --audio-format mp3 --audio-quality 0`
+
+**Audio [best]** `-x <video_id>`
 ## FFmpeg configuration:
 ```
   --enable-gpl
