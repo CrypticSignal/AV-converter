@@ -52,14 +52,8 @@ Audio [best] | `-x <video_id>`
 ## Requirements for development/running locally:
 Python **3.6+**
 
-[1] `pip install youtube-dl`
+`pip install youtube-dl`
 
-[2] Werkzeug
-
-[3] Flask
-
-[4] beautifulsoup4
-
-[2] to [4] can be installed with `pip install -r requirements.txt`
+`pip install -r requirements.txt`
 ## Contributing
 Contributors are welcome, simply submit a pull request.
