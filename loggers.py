@@ -14,16 +14,16 @@ def setup_logger(name, log_file):
     return logger
 
 log = setup_logger('log', 'logs/info.txt')
-visit = setup_logger('visit', 'logs/Visit.log')
+visit = setup_logger('visit', 'logs/visit.log')
 
 # Info.txt
 def log_this(message):
     current_datetime = datetime.now().strftime('%d-%m-%y at %H:%M:%S')
-    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    client = request.environ.get("HTTP_X_REAL_IP", request.remote_addr)
     log.info(f'\n[{current_datetime}] {client} {message}')
 
 # Visit.log
 def log_visit(message):
     current_datetime = datetime.now().strftime('%d-%m-%y at %H.%M.%S')
-    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    client = request.environ.get("HTTP_X_REAL_IP", request.remote_addr)
     visit.info(f'{client} {message} on {current_datetime}')
