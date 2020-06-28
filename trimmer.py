@@ -29,10 +29,10 @@ def trim_file():
         output_name = just_name + " [trimmed]" + ext
 
         log.info(f'ffmpeg -y -ss {start_time} -i "{uploaded_file_path}" '
-        f'-to {end_time} -c copy "trims/{output_name}"')
+        f'-to {end_time} -map 0 -c copy "trims/{output_name}"')
 
         os.system(f'ffmpeg -y -ss {start_time} -i "{uploaded_file_path}" '
-        f'-to {end_time} -map 0:v? -map 0:a? -map 0:s? -c:v copy -c:a copy -c:s copy "trims/{output_name}"')
+        f'-to {end_time} -map 0 -c copy "trims/{output_name}"')
 
         return {
             "message": "File trimmed. The trimmed file will now start downloading.",
@@ -44,6 +44,8 @@ def trim_file():
 def download_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
+        log.info(f'[M4A] SENDING {filename}')
         return send_from_directory(f'{os.getcwd()}/trims', filename, mimetype="audio/mp4", as_attachment=True)
     else:
+        log.info(f'SENDING {filename}')
         return send_from_directory(f'{os.getcwd()}/trims', filename, as_attachment=True)

@@ -12,7 +12,7 @@ yt = Blueprint('yt', __name__)
 relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
 strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
 youtube_dl = 'python3 -m youtube_dl'
-download_dir = '/home/pi/website/downloads'
+download_dir = f'/home/pi/website/downloads'
 
 def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/13231825
     # Examples:
@@ -34,6 +34,8 @@ def return_download_link(video_id):
         #log.info('IN OSLISTDIR')
         if file.split('.')[-1] in relevant_extensions and video_id in file:
             log.info(f'DOWNLOADED "{file}"')
+            filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
+            log.info(f'{filesize} MB')
             with open("downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}') 
             new_filename = file.replace(f'-{video_id}', '')
@@ -68,51 +70,61 @@ def yt_downloader():
     size_of_media_files = 0
     # Get the total size of the media files in the download folder.
     for file in os.listdir(download_dir):
-        if file.split('.')[-1] in relevant_extensions:
-            size = os.path.getsize(f'{download_dir}/{file}') / 1000_000
-            size_of_media_files += size
+        size_of_file = os.path.getsize(f'{download_dir}/{file}') / 1_000_000
+        size_of_media_files += size_of_file
             
-    log.info(f'SIZE OF MEDIA FILES: {size_of_media_files} MB')
+    log.info(f'SIZE OF MEDIA FILES: {round(size_of_media_files, 2)} MB')
     # If there's more than 10 GB of media files, delete them:
     if size_of_media_files > 10_000:
         log.info(f'More than 10 GB worth of media files found.')
         for file in os.listdir(download_dir):
             if file.split('.')[-1] in relevant_extensions:
-                os.remove(file)
+                os.remove(f'{download_dir}/{file}')
                 log.info(f'DELETED {file}')
 
     link = request.form['link']
-    download_template = '/home/pi/website/downloads/%(title)s-%(id)s.%(ext)s'
+    download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
     video_id = get_video_id(link)
 
     if request.form['button_clicked'] == 'Video [best]':
 
         log.info(f'Video [best] was chosen. {link}')
+        download_start_time = time.time()
         os.system(f'{youtube_dl} -o "{download_template}" --newline {video_id} | tee {path_to_progress_file}')
+        download_complete_time = time.time()
+        log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
         return download_link
 
     elif request.form['button_clicked'] == 'Video [MP4]':
 
         log.info(f'MP4 was chosen. {link}')
-        os.system(f'{youtube_dl} -o "{download_template}" --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
+        download_start_time = time.time()
+        os.system(f'{youtube_dl} -o "{download_template}" --embed-thumbnail --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
         f'{video_id} | tee {path_to_progress_file}')
+        download_complete_time = time.time()
+        log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
         return download_link
 
     elif request.form['button_clicked'] == 'Audio [best]':
 
         log.info(f'Audio [best] was chosen. {link}')
+        download_start_time = time.time()
         os.system(f'{youtube_dl} -o "{download_template}" --newline -x {video_id} | tee {path_to_progress_file}')
+        download_complete_time = time.time()
+        log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
         return download_link
 
     elif request.form['button_clicked'] == 'MP3':
 
-        log.info('MP3 was chosen.')
-        log.info(link)
+        log.info(f'MP3 was chosen. {link}')
+        download_start_time = time.time()
         os.system(f'{youtube_dl} -o "{download_template}" --newline -x --embed-thumbnail --audio-format mp3 --audio-quality 0 {video_id} | '
         f'tee {path_to_progress_file}')
+        download_complete_time = time.time()
+        log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
         return download_link
 
@@ -123,8 +135,8 @@ def send_file(filename):
     # os.mkdir('static/progress')
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        log.info(f'[M4A] SENDING "{filename}"')
+        log.info(f'[M4A] SENDING freeaudioconverter.net/downloads/{filename}')
         return send_from_directory(f'{os.getcwd()}/downloads', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'SENDING "{filename}"')
+        log.info(f'SENDING freeaudioconverter.net/downloads/{filename}')
         return send_from_directory(f'{os.getcwd()}/downloads', filename, as_attachment=True)

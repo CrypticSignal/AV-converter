@@ -31,6 +31,12 @@ opusenc opus-tools 0.2 (using libopus 1.3.1) | https://github.com/xiph/opus
 libvorbis
 ## External tool(s) used:
 youtube-dl | https://github.com/ytdl-org/youtube-dl
+## youtube-dl configuration for each download button:
+Video [MP4] | `-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"`
+Video [best quality] | youtube-dl <video_id>
+Audio [MP3] | `-x --embed-thumbnail --audio-format mp3 --audio-quality 0`
+Audio [best] | `-x <video_id>`
+
 ## FFmpeg configuration:
 ```
   --enable-gpl

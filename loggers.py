@@ -13,7 +13,7 @@ def setup_logger(name, log_file):
     logger.addHandler(file_handler)
     return logger
 
-log = setup_logger('log', 'logs/Info.txt')
+log = setup_logger('log', 'logs/info.txt')
 visit = setup_logger('visit', 'logs/Visit.log')
 
 # Info.txt

@@ -29,7 +29,7 @@ async function showDownloadProgress() {
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
             if (typeof secondLastLine === 'undefined') {
-                show_alert('Initialising...', 'dark');
+                show_alert('Initialising...', 'info');
             }
             else if (secondLastLine.includes('Downloading webpage')) {
                 show_alert('Video found', 'success');
