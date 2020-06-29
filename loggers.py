@@ -12,7 +12,7 @@ def setup_logger(name, log_file):
     logger.setLevel(10)
     logger.addHandler(file_handler)
     return logger
-
+    
 def get_ip(): # The contents of this function is from https://stackoverflow.com/a/49760261/13231825
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
         return request.environ['REMOTE_ADDR']
