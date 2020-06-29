@@ -1,6 +1,6 @@
 ## About
 On https://freeaudioconverter.net, you can:
-- Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (.ogg), FLAC, ALAC, AC3, DTS or CAF.
+- Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (in the .mka container), FLAC, ALAC, AC3, DTS or CAF.
 - Convert a video to an audio-only file (to any of the above formats).
 - Convert a video to the MP4 or MKV format.
 - Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
@@ -11,7 +11,7 @@ On https://freeaudioconverter.net, you can:
 - Upload completion time is shown in realtime.
 - Whilst the file is being converted, you can see how far into the file the encoder currently is. This information is updated every second.
 ## Features (YouTube downloader):
-- Download as an MP3 or MP4 file.
+- Download as an MP3 or MP4 file, or simply the best quality video/audio stream that is available.
 - If you choose to download as an MP3, the thumbnail of the video gets embedded as the cover art.
 - Download the best quality audio stream without encoding it, so no lossy-to-lossy encoding is done (only applicable if you use the "Audio [best]" button.
 ## Supported filetypes:
@@ -32,11 +32,13 @@ libvorbis
 ## External tool(s) used:
 youtube-dl | https://github.com/ytdl-org/youtube-dl
 ## youtube-dl configuration for each download button:
-Video [MP4] | `-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"`
-Video [best quality] | youtube-dl <video_id>
-Audio [MP3] | `-x --embed-thumbnail --audio-format mp3 --audio-quality 0`
-Audio [best] | `-x <video_id>`
+**Video [MP4]** `-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"`
 
+**Video [best quality]** youtube-dl <video_id>
+
+**Audio [MP3]** `-x --embed-thumbnail --audio-format mp3 --audio-quality 0`
+
+**Audio [best]** `-x <video_id>`
 ## FFmpeg configuration:
 ```
   --enable-gpl
