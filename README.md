@@ -34,7 +34,7 @@ youtube-dl | https://github.com/ytdl-org/youtube-dl
 ## youtube-dl configuration for each download button:
 **Video [MP4]** `-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"`
 
-**Video [best quality]** youtube-dl <video_id>
+**Video [best quality]** `youtube-dl <video_id>`
 
 **Audio [MP3]** `-x --embed-thumbnail --audio-format mp3 --audio-quality 0`
 
@@ -51,11 +51,15 @@ youtube-dl | https://github.com/ytdl-org/youtube-dl
   --enable-libx264 
   --enable-libx265
 ```
-## Requirements for development/running locally:
-Python **3.6+**
-
-`pip install youtube-dl`
-
-`pip install -r requirements.txt`
+## Requirements for running locally:
+You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
+- Python **3.6+**
+- FFmpeg
+(Note: conversions to AAC will not work locally unless you [compile FFmpeg](https://trac.ffmpeg.org/wiki/CompilationGuide) with `--enable-libfdk-aac` in the configuration.
+- `pip install Flask-Session`
+- `pip install youtube-dl`
+- `pip install -r requirements.txt`
+- Extract the cloned .zip file, cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
+- Enter localhost:5000 in the address bar of your web browser and hit enter.
 ## Contributing
 Contributors are welcome, simply submit a pull request.
