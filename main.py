@@ -23,10 +23,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000 * 1000 # 5 GB max upload size.
 app.jinja_env.auto_reload = True
 
-if not os.path.isdir('uploads'):
-    log.info('./uploads directory does not exist. Creating...')
-    os.mkdir('uploads')
-    log.info('./uploads directory created.')
+os.makedirs('uploads', exist_ok=True)  
 
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
@@ -102,11 +99,7 @@ def homepage():
 
         else:
             log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
-            
-            if not os.path.isdir('./conversions'):
-                log.info('/conversions directory does not exist. Creating...')
-                os.mkdir('conversions')
-
+            os.makedirs('conversions', exist_ok=True)
             output_path = f'"conversions/{output_name}"'
 
             # Run the appropritate section of converter.py:
@@ -212,10 +205,10 @@ def send_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
         log.info(f'freeaudioconverter.net/conversions/{filename}')
-        return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4", as_attachment=True)
+        return send_from_directory('conversions', filename, mimetype="audio/mp4", as_attachment=True)
     else:
         log.info(f'freeaudioconverter.net/conversions/{filename}')
-        return send_from_directory(f'{os.getcwd()}/conversions', filename, as_attachment=True)
+        return send_from_directory('conversions', filename, as_attachment=True)
 
 # GAME 1
 @app.route("/game", methods=['POST'])
@@ -314,4 +307,4 @@ def game2_visited():
     return render_template("game2.html", title="Game 2")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run()
