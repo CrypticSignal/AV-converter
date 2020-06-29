@@ -86,16 +86,16 @@ def run_aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_
 
         if fdk_type == "fdk_cbr":
             if is_fdk_lowpass == "yes":
-                run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libfdk_aac -cutoff {fdk_lowpass} -b:a {fdk_cbr}k '
+                run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac -cutoff {fdk_lowpass} -b:a {fdk_cbr}k '
                 f'{output_path}.m4a')
             else:
-                run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libfdk_aac -b:a {fdk_cbr}k {output_path}.m4a')
+                run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac -b:a {fdk_cbr}k {output_path}.m4a')
         else: # VBR
             if is_fdk_lowpass == "yes":
-                run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libfdk_aac -cutoff {fdk_lowpass} -vbr {fdk_vbr} '
+                run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac -cutoff {fdk_lowpass} -vbr {fdk_vbr} '
                 f'{output_path}.m4a')
             else:
-                run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libfdk_aac -vbr {fdk_vbr} {output_path}.m4a')
+                run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac -vbr {fdk_vbr} {output_path}.m4a')
 
 # WAV
 def run_wav(progress_filename, uploaded_file_path, is_keep_video, wav_bit_depth, output_path):

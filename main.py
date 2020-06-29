@@ -215,10 +215,10 @@ def homepage():
 def send_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        log.info(f'/conversions/{filename} visited.')
+        log.info(f'freeaudioconverter.net/conversions/{filename}')
         return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'/conversions/{filename} visited.')
+        log.info(f'freeaudioconverter.net/conversions/{filename}')
         return send_from_directory(f'{os.getcwd()}/conversions', filename, as_attachment=True)
 
 # CONTACT PAGE
@@ -338,4 +338,4 @@ def game2_visited():
     return render_template("game2.html", title="Game 2")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0')

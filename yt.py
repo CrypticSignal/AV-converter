@@ -14,9 +14,9 @@ strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', 
 youtube_dl = 'python3 -m youtube_dl'
 
 if not os.path.isdir('static/yt-progress'):
-    log.info('./static/yt-progress doesn\'t exist. Creating...')
+    log.info('./static/yt-progress directory does not exist. Creating...')
     os.mkdir('static/yt-progress')
-    log.info('./static/yt-progress created.')
+    log.info('./static/yt-progress directory created.')
 
 if not os.path.isdir('downloads'):
     log.info('./downloads directory does not exist. Creating...')
@@ -119,8 +119,8 @@ def yt_downloader():
 
         log.info(f'MP4 was chosen. {link}')
         download_start_time = time.time()
-        os.system(f'{youtube_dl} -o "{download_template}" --embed-thumbnail --newline -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" '
-        f'{video_id} | tee {path_to_progress_file}')
+        os.system(f'{youtube_dl} -o "{download_template}" --embed-thumbnail --newline -f '
+        f'"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" {video_id} > {path_to_progress_file}')
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
@@ -131,7 +131,7 @@ def yt_downloader():
         log.info(f'Audio [best] was chosen. {link}')
         download_start_time = time.time()
         #subprocess.run(['youtube-dl', '-o', f'"{download_template}"', '--newline', '-x', '|', 'tee', path_to_progress_file], shell=False)
-        os.system(f'{youtube_dl} -o "{download_template}" --newline -x {video_id} | tee {path_to_progress_file}')
+        os.system(f'{youtube_dl} -o "{download_template}" --newline -x {video_id} > {path_to_progress_file}')
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
@@ -141,8 +141,8 @@ def yt_downloader():
 
         log.info(f'MP3 was chosen. {link}')
         download_start_time = time.time()
-        os.system(f'{youtube_dl} -o "{download_template}" --newline -x --embed-thumbnail --audio-format mp3 --audio-quality 0 {video_id} | '
-        f'tee {path_to_progress_file}')
+        os.system(f'{youtube_dl} -o "{download_template}" --newline -x --embed-thumbnail --audio-format mp3 '
+        f'--audio-quality 0 {video_id} > {path_to_progress_file}')
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
@@ -153,8 +153,8 @@ def yt_downloader():
 def send_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        log.info(f'[M4A] SENDING freeaudioconverter.net/downloads/{filename}')
+        log.info(f'freeaudioconverter.net/downloads/{filename}')
         return send_from_directory(f'{os.getcwd()}/downloads', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'SENDING freeaudioconverter.net/downloads/{filename}')
+        log.info(f'freeaudioconverter.net/downloads/{filename}')
         return send_from_directory(f'{os.getcwd()}/downloads', filename, as_attachment=True)
