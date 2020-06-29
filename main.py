@@ -23,8 +23,10 @@ Session(app)
 app.register_blueprint(trimmer)
 app.register_blueprint(yt)
 
+max_upload_size = 5 # in GB.
+
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000 * 1000 # 5 GB max upload size.
+app.config['MAX_CONTENT_LENGTH'] = max_upload_size * 1000 * 1000 * 1000 # GB max upload size.
 app.jinja_env.auto_reload = True
 
 # When a file has been uploaded, a POST request is sent to the homepage.
@@ -290,7 +292,7 @@ def save_game2_stats():
 @app.route("/")
 def homepage_visited():
     log_visit("visited homepage")
-    return render_template("home.html", title="FreeAudioConverter.net")
+    return render_template("home.html", title="FreeAudioConverter.net", upload_size='{}'.format(max_upload_size))
 
 @app.route("/about")
 def about_page_visited():
