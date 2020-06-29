@@ -1,5 +1,4 @@
-import os
-import logging
+import os, logging
 from flask import request
 from datetime import datetime
 
@@ -20,7 +19,7 @@ def get_ip(): # The contents of this function is from https://stackoverflow.com/
     else:
         return request.environ['HTTP_X_FORWARDED_FOR'] # if behind a proxy
 
-# Creating log dirs if they don't exist
+# Create the ./logs directory if it does not already exist.
 os.makedirs('logs', exist_ok=True)   
 
 log = setup_logger('log', 'logs/info.txt')
