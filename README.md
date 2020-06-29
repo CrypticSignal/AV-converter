@@ -98,7 +98,8 @@ You can run the Flask app locally for development purposes or if you want audio/
 - `pip install Flask-Session`
 - `pip install youtube-dl`
 - `pip install -r requirements.txt`
-- Extract the cloned .zip file, cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
+- Clone this repository.
+- cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
 - Enter localhost:5000 in the address bar of your web browser and hit enter.
 ## Notes for contributors
 Contributors are welcome, simply submit a pull request.
