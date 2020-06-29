@@ -7,17 +7,17 @@
 
 **[4]** [Supported Filetypes](https://github.com/BassThatHertz/AudioAndVideoConverter#supported-filetypes)
 
-**[5]** [Audio and Video Decoder](https://github.com/BassThatHertz/AudioAndVideoConverter#supported-filetypes)
+**[5]** [Audio and Video Decoder](https://github.com/BassThatHertz/AudioAndVideoConverter#notes-for-contributors)
 
 **[6]** [External encoders used](https://github.com/BassThatHertz/AudioAndVideoConverter#external-encoders-used)
 
-**[7]** [Other tool(s) used](https://github.com/BassThatHertz/AudioAndVideoConverter#external-encoders-used)
+**[7]** [Other tool(s) used](https://github.com/BassThatHertz/AudioAndVideoConverter#other-tools-used)
 
 **[8]** [FFmpeg configuration](https://github.com/BassThatHertz/AudioAndVideoConverter#ffmpeg-configuration)
 
-**[9]** [Requirements for developers/running locally](Requirements for developers/running locally)
+**[9]** [Requirements for developers/running locally](https://github.com/BassThatHertz/AudioAndVideoConverter#requirements-for-developersrunning-locally)
 
-**[10]** [Notes for contributors](https://github.com/BassThatHertz/AudioAndVideoConverter#contributing)
+**[10]** [Notes for contributors](https://github.com/BassThatHertz/AudioAndVideoConverter#notes-for-contributors)
 ## About
 On https://freeaudioconverter.net, you can:
 - Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (in the .mka container), FLAC, ALAC, AC3, DTS or CAF.
