@@ -4,14 +4,10 @@ from yt import yt # Importing the blueprint in yt.py
 from trimmer import trimmer # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
 from werkzeug.utils import secure_filename
-import time
+from time import time
 from datetime import datetime
 import os
 import converter
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from smtplib import SMTP
-from confidential import *
 
 app = Flask(__name__)
 secret_key = str(os.urandom(16))
@@ -41,7 +37,7 @@ def homepage():
 
     elif request.form["request_type"] == "uploaded":
 
-        session['progress_filename'] = str(time.time())[:-8]
+        session['progress_filename'] = str(time())[:-8]
     
         log_this('uploaded a file:')
         chosen_file = request.files["chosen_file"]
@@ -220,26 +216,6 @@ def send_file(filename):
     else:
         log.info(f'freeaudioconverter.net/conversions/{filename}')
         return send_from_directory(f'{os.getcwd()}/conversions', filename, as_attachment=True)
-
-# CONTACT PAGE
-@app.route("/contact", methods=["POST"])
-def send_email():
-    send_from = "theaudiophile@outlook.com"
-    send_to = "theaudiophile@outlook.com"
-    text = MIMEMultipart()
-    text['From'] = send_from
-    text['To'] = send_to
-    text['Subject'] = "Your Website"
-    body = request.form['message']
-    text.attach(MIMEText(body, 'plain'))
-    server = SMTP(host='smtp-mail.outlook.com', port=587)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-    server.login(my_email, password)
-    text = text.as_string()
-    server.sendmail(send_from, send_to, text)
-    return "Message sent!"
 
 # GAME 1
 @app.route("/game", methods=['POST'])
