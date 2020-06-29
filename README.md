@@ -1,3 +1,23 @@
+## Table of Contents:
+**[1]** [About](https://github.com/BassThatHertz/AudioAndVideoConverter#about)
+
+**[2]** [Features (audio/video converter)](https://github.com/BassThatHertz/AudioAndVideoConverter#features-audiovideo-converter)
+
+**[3]** [Features (YouTube downloader)](https://github.com/BassThatHertz/AudioAndVideoConverter#features-youtube-downloader)
+
+**[4]** [Supported Filetypes](https://github.com/BassThatHertz/AudioAndVideoConverter#supported-filetypes)
+
+**[5]** [Audio and Video Decoder](https://github.com/BassThatHertz/AudioAndVideoConverter#supported-filetypes)
+
+**[6]** [External encoders used](https://github.com/BassThatHertz/AudioAndVideoConverter#external-encoders-used)
+
+**[7]** [Other tool(s) used](https://github.com/BassThatHertz/AudioAndVideoConverter#external-encoders-used)
+
+**[8]** [FFmpeg configuration](https://github.com/BassThatHertz/AudioAndVideoConverter#ffmpeg-configuration)
+
+**[9]** [Requirements for developers/running locally](Requirements for developers/running locally)
+
+**[10]** [Notes for contributors](https://github.com/BassThatHertz/AudioAndVideoConverter#contributing)
 ## About
 On https://freeaudioconverter.net, you can:
 - Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (in the .mka container), FLAC, ALAC, AC3, DTS or CAF.
@@ -14,12 +34,9 @@ On https://freeaudioconverter.net, you can:
 - Download as an MP3 or MP4 file, or simply the best quality video/audio stream that is available.
 - If you choose to download as an MP3, the thumbnail of the video gets embedded as the cover art.
 - Download the best quality audio stream without encoding it, so no lossy-to-lossy encoding is done (only applicable if you use the "Audio [best]" button.
-## Supported filetypes:
+## Supported Filetypes:
 Many filetypes are supported, click [here](https://freeaudioconverter.net/filetypes) for details. Support for other filetypes may be added, feel free to [contact me](https://freeaudioconverter.net/contact) to enquire. 
-## To-do:
-The file trimmer will not work when using the Safari browser as it does not support the HTML `<input type="time">`.
-I may try to find another user-friendly way to allow the user to input their desired start and end time that is compatible with all browsers. Feel free to submit a pull request if you know of a good alternative implementation that is compatible with all browsers.
-## Audio and video decoder:
+## Audio and Video Decoder:
 [FFmpeg](https://github.com/FFmpeg/FFmpeg)
 ## External encoders used:
 LAME v3.100 | https://lame.sourceforge.io/
@@ -29,7 +46,7 @@ fdk-aac | https://github.com/mstorsjo/fdk-aac
 opusenc opus-tools 0.2 (using libopus 1.3.1) | https://github.com/xiph/opus
 
 libvorbis
-## External tool(s) used:
+## Other tool(s) used:
 youtube-dl | https://github.com/ytdl-org/youtube-dl
 ## youtube-dl configuration for each download button:
 **Video [MP4]** `-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"`
@@ -41,17 +58,41 @@ youtube-dl | https://github.com/ytdl-org/youtube-dl
 **Audio [best]** `-x <video_id>`
 ## FFmpeg configuration:
 ```
-  --enable-gpl
-  --enable-libfdk-aac 
-  --enable-nonfree 
-  --enable-libmp3lame 
-  --enable-libopus 
-  --enable-libvorbis 
-  --enable-libvpx 
-  --enable-libx264 
-  --enable-libx265
+    --enable-gmp 
+    --enable-gpl 
+    --enable-libaom 
+    --enable-libass 
+    --enable-libdav1d 
+    --enable-libdrm 
+    --enable-libfdk-aac 
+    --enable-libfreetype 
+    --enable-libkvazaar 
+    --enable-libmp3lame 
+    --enable-libopencore-amrnb 
+    --enable-libopencore-amrwb 
+    --enable-libopus 
+    --enable-librtmp 
+    --enable-libsnappy 
+    --enable-libsoxr 
+    --enable-libssh 
+    --enable-libvorbis 
+    --enable-libvpx 
+    --enable-libzimg 
+    --enable-libwebp 
+    --enable-libx264 
+    --enable-libx265 
+    --enable-libxml2 
+    --enable-mmal 
+    --enable-nonfree 
+    --enable-omx 
+    --enable-omx-rpi 
+    --enable-version3 
+    --target-os=linux 
+    --enable-pthreads 
+    --enable-openssl 
+    --enable-hardcoded-tables                                                                                                           
 ```
-## Requirements for running locally:
+## Requirements for developers/running locally:
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
 - Python **3.6+**
 - FFmpeg
@@ -62,5 +103,7 @@ You can run the Flask app locally for development purposes or if you want audio/
 - `pip install -r requirements.txt`
 - Extract the cloned .zip file, cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
 - Enter localhost:5000 in the address bar of your web browser and hit enter.
-## Contributing
+## Notes for contributors
 Contributors are welcome, simply submit a pull request.
+
+If you know how to, use f-strings rather than `.format()`.
