@@ -55,7 +55,8 @@ youtube-dl | https://github.com/ytdl-org/youtube-dl
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
 - Python **3.6+**
 - FFmpeg
-(Note: conversions to AAC will not work locally unless you [compile FFmpeg](https://trac.ffmpeg.org/wiki/CompilationGuide) with `--enable-libfdk-aac` in the configuration.
+
+*When running locally, you will not be able to convert to AAC unless you [compile FFmpeg](https://trac.ffmpeg.org/wiki/CompilationGuide) with `--enable-libfdk-aac` in the configuration. Or, if you know what you're doing, you can edit the code in converter.py to use FFmpeg's native AAC encoder instead.*
 - `pip install Flask-Session`
 - `pip install youtube-dl`
 - `pip install -r requirements.txt`
