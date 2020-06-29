@@ -20,13 +20,8 @@ def get_ip(): # The contents of this function is from https://stackoverflow.com/
         return request.environ['HTTP_X_FORWARDED_FOR'] # if behind a proxy
 
 # Create the ./logs directory if it does not already exist.
-<<<<<<< HEAD
-os.makedirs('logs', exist_ok=True)
-    
-=======
 os.makedirs('logs', exist_ok=True)   
 
->>>>>>> 778ffc882f331d5fc307b5282c5d98eabbf73249
 log = setup_logger('log', 'logs/info.txt')
 visit = setup_logger('visit', 'logs/visit.log')
 
