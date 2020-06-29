@@ -49,12 +49,13 @@ def return_download_link(video_id):
             log.info(f'{filesize} MB')
             with open("downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}') 
-            new_filename = file.replace(f'-{video_id}', '')
-            log.info(type(new_filename))
+            new_filename = file.replace(f'-{video_id}', '') # Removes the video ID from the filename.
             log.info(f'NEW FILENAME: {new_filename}')
 
+            # Without the if-statement, when running locally on Windows, the os.rename line causes an error saying
+            # that the file already exists (if you try downloading the same video again). Interestingly, I don't get
+            # this error on my Raspberry Pi 4 (running Raspberry Pi OS) when downloading the same video again.
             if not os.path.isfile(f'{download_dir}/{new_filename}'):
-                log.info('Path does not exist')
                 os.rename(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
                 
             if '#' in file: # Links containing a # result in a 404 error.
