@@ -9,21 +9,13 @@ from loggers import log_this, log
 
 yt = Blueprint('yt', __name__)
 
+os.makedirs('static/yt-progress', exist_ok=True)
+os.makedirs('downloads', exist_ok=True)    
+download_dir = './downloads'
+
 relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
 strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
 youtube_dl = 'python3 -m youtube_dl'
-
-if not os.path.isdir('static/yt-progress'):
-    log.info('./static/yt-progress directory does not exist. Creating...')
-    os.mkdir('static/yt-progress')
-    log.info('./static/yt-progress directory created.')
-
-if not os.path.isdir('downloads'):
-    log.info('./downloads directory does not exist. Creating...')
-    os.mkdir('downloads')
-    log.info('./downloads directory created.')
-
-download_dir = './downloads'
 
 def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/13231825
     # Examples:

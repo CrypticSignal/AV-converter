@@ -14,6 +14,7 @@
 *.opus
 *.wav
 # Video Files
+*.avi
 *.mov
 *.mp4
 *.webm
