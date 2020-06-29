@@ -124,7 +124,7 @@ async function showTimer() {
 
         if (response.status === 200) { 
 
-            if (confirm(`You hit the circle ${timesHit} times\nYour high score: ${highScore}\nWorld Record: ${responseText}\nTo play again, click on 'OK'`)) {
+            if (confirm(`You hit the circle ${timesHit} times\nYour high score: ${highScore}\nTo play again, click on 'OK'`)) {
                 location.reload();
             }
             else {

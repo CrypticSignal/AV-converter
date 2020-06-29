@@ -42,7 +42,7 @@ function upload_and_send_conversion_request() {
     "avi", "ac3", "3gp", "MTS", "mts", "webm", "ADPCM", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 
     if (!input.value && document.getElementById("output_name").value == '') {
-        show_alert("It helps if you select the file that you want to convert.", "info")
+        show_alert("It helps if you select the file that you want to convert.", "danger")
         return;
     }
     else if (input.value) { // (If a file has been selected)
@@ -180,7 +180,7 @@ async function showConversionProgress() {
     // If you start reading the file straight away, .split('=') won't work as FFmpeg hasn't started writing to the file.
     await sleep(1000)
     while (shouldLog) {
-        const response = await fetch(`static/progress/${progressFilename}.txt`);
+        const response = await fetch(`static/ffmpeg-progress/${progressFilename}.txt`);
         const textInFile = await response.text();
         const lines = textInFile.split('\n');
         const fifthLastLine = lines[lines.length - 6].split('=');
@@ -188,7 +188,7 @@ async function showConversionProgress() {
         const withoutMicroseconds = justProgressTime.slice(0, -7);
         const milliseconds = justProgressTime.substring(9, 12);
         show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
-        (and ${milliseconds} milliseconds)`, 'info');
+        (and ${milliseconds} milliseconds)`, 'dark');
         await sleep(1000); // Using the sleep function defined above.
     }
 }

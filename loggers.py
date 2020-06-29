@@ -12,18 +12,24 @@ def setup_logger(name, log_file):
     logger.setLevel(10)
     logger.addHandler(file_handler)
     return logger
-
+    
+def get_ip(): # The contents of this function is from https://stackoverflow.com/a/49760261/13231825
+    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+        return request.environ['REMOTE_ADDR']
+    else:
+        return request.environ['HTTP_X_FORWARDED_FOR'] # if behind a proxy
+        
 log = setup_logger('log', 'logs/info.txt')
-visit = setup_logger('visit', 'logs/Visit.log')
+visit = setup_logger('visit', 'logs/visit.log')
 
-# Info.txt
+# info.txt
 def log_this(message):
     current_datetime = datetime.now().strftime('%d-%m-%y at %H:%M:%S')
-    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    client = get_ip()
     log.info(f'\n[{current_datetime}] {client} {message}')
 
-# Visit.log
+# visit.log
 def log_visit(message):
     current_datetime = datetime.now().strftime('%d-%m-%y at %H.%M.%S')
-    client = request.environ.get("HTTP_X_REAL_IP").split(',')[0]
+    client = get_ip()
     visit.info(f'{client} {message} on {current_datetime}')

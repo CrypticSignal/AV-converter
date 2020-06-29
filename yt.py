@@ -4,7 +4,7 @@ import converter
 from werkzeug.utils import secure_filename
 import time
 import urllib 
-import shutil, os
+import shutil, os, subprocess
 from loggers import log_this, log
 
 yt = Blueprint('yt', __name__)
@@ -12,7 +12,18 @@ yt = Blueprint('yt', __name__)
 relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
 strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
 youtube_dl = 'python3 -m youtube_dl'
-download_dir = f'/home/pi/website/downloads'
+
+if not os.path.isdir('static/yt-progress'):
+    log.info('./static/yt-progress doesn\'t exist. Creating...')
+    os.mkdir('static/yt-progress')
+    log.info('./static/yt-progress created.')
+
+if not os.path.isdir('downloads'):
+    log.info('./downloads directory does not exist. Creating...')
+    os.mkdir('downloads')
+    log.info('./downloads directory created.')
+
+download_dir = './downloads'
 
 def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/13231825
     # Examples:
@@ -39,8 +50,13 @@ def return_download_link(video_id):
             with open("downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}') 
             new_filename = file.replace(f'-{video_id}', '')
+            log.info(type(new_filename))
             log.info(f'NEW FILENAME: {new_filename}')
-            os.rename(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
+
+            if not os.path.isfile(f'{download_dir}/{new_filename}'):
+                log.info('Path does not exist')
+                os.rename(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
+                
             if '#' in file: # Links containing a # result in a 404 error.
                 os.rename(new_filename, new_filename.replace('#', ''))
     
@@ -49,7 +65,7 @@ def return_download_link(video_id):
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
     progress_filename = str(time.time())[:-8]
-    path_to_progress_file = f'static/progress/{progress_filename}.txt'
+    path_to_progress_file = f'static/yt-progress/{progress_filename}.txt'
 
     if request.form['button_clicked'] == 'yes':
 
@@ -63,6 +79,7 @@ def yt_downloader():
         else:
             # Create the progress file.
             with open(path_to_progress_file, "w"): pass
+            log.info(f'Progress will be saved to: {path_to_progress_file}')
             return progress_filename
 
     # The rest runs after the 2nd POST request:
@@ -74,6 +91,7 @@ def yt_downloader():
         size_of_media_files += size_of_file
             
     log.info(f'SIZE OF MEDIA FILES: {round(size_of_media_files, 2)} MB')
+
     # If there's more than 10 GB of media files, delete them:
     if size_of_media_files > 10_000:
         log.info(f'More than 10 GB worth of media files found.')
@@ -90,7 +108,7 @@ def yt_downloader():
 
         log.info(f'Video [best] was chosen. {link}')
         download_start_time = time.time()
-        os.system(f'{youtube_dl} -o "{download_template}" --newline {video_id} | tee {path_to_progress_file}')
+        os.system(f'{youtube_dl} -o "{download_template}" --newline {video_id} > {path_to_progress_file}')
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
@@ -111,6 +129,7 @@ def yt_downloader():
 
         log.info(f'Audio [best] was chosen. {link}')
         download_start_time = time.time()
+        #subprocess.run(['youtube-dl', '-o', f'"{download_template}"', '--newline', '-x', '|', 'tee', path_to_progress_file], shell=False)
         os.system(f'{youtube_dl} -o "{download_template}" --newline -x {video_id} | tee {path_to_progress_file}')
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -131,8 +150,6 @@ def yt_downloader():
 # Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    # shutil.rmtree('static/progress')
-    # os.mkdir('static/progress')
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
         log.info(f'[M4A] SENDING freeaudioconverter.net/downloads/{filename}')

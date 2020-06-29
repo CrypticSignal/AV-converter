@@ -24,34 +24,34 @@ function sleep(ms) {
 async function showDownloadProgress() {
     while (shouldLog) {
         try {
-            const response = await fetch(`static/progress/${responseFromServer}.txt`);
+            const response = await fetch(`static/yt-progress/${responseFromServer}.txt`);
             const textInFile = await response.text();
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
             if (typeof secondLastLine === 'undefined') {
-                show_alert('Initialising...', 'info');
+                show_alert('Initialising...', 'dark');
             }
             else if (secondLastLine.includes('Downloading webpage')) {
                 show_alert('Video found', 'success');
             }
             else if (secondLastLine.includes('[download] ')) {
-                show_alert(secondLastLine.substring(11), 'info');
+                show_alert(secondLastLine.substring(11), 'dark');
                 //secondLastLine = `Progress: ${secondLastLine.split('%')[0].substring(12)}%`
             }
             else if (secondLastLine.includes('[ffmpeg] Destination:')) {
-                show_alert('Finishing up...', 'info');
+                show_alert('Finishing up...', 'dark');
             }
             else if (secondLastLine.includes('[ffmpeg] Merging ')) {
-                show_alert('Merging audio and video...', 'info');
+                show_alert('Merging audio and video...', 'dark');
             }
             else if (secondLastLine.includes('Deleting original file ')) {
-                show_alert('Almost done...', 'info');
+                show_alert('Almost done...', 'dark');
             }
             else if (secondLastLine.includes('[ffmpeg] Adding thumbnail')) {
                 show_alert( `Your browser should have started downloading the file. If it hasn't, click \
                 <a href="${downloadLink}">here</a>.`, 'success');
             }
-            await sleep(500); // Using the sleep function defined above.
+            await sleep(1000); // Using the sleep function defined above.
         } catch(error) {
             show_alert(error, 'danger');
             console.log(error);

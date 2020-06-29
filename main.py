@@ -27,6 +27,11 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000 * 1000 # 5 GB max upload size.
 app.jinja_env.auto_reload = True
 
+if not os.path.isdir('uploads'):
+    log.info('./uploads directory does not exist. Creating...')
+    os.mkdir('uploads')
+    log.info('./uploads directory created.')
+
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
 def homepage():
@@ -100,7 +105,12 @@ def homepage():
             return 'You tried being clever, but there\'s a server-side check for disallowed strings', 400
 
         else:
-            log.info(f'They chose {chosen_codec}\nOutput Filename: {output_name}')
+            log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
+            
+            if not os.path.isdir('./conversions'):
+                log.info('/conversions directory does not exist. Creating...')
+                os.mkdir('conversions')
+
             output_path = f'"conversions/{output_name}"'
 
             # Run the appropritate section of converter.py:
@@ -205,10 +215,10 @@ def homepage():
 def send_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        log.info('Sending the file to the user.')
+        log.info(f'/conversions/{filename} visited.')
         return send_from_directory(f'{os.getcwd()}/conversions', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info('Sending the file to the user.')
+        log.info(f'/conversions/{filename} visited.')
         return send_from_directory(f'{os.getcwd()}/conversions', filename, as_attachment=True)
 
 # CONTACT PAGE
@@ -259,9 +269,9 @@ def return_world_record():
             for line in lines:
                 just_scores.append(line.split('|')[0].strip())
 
-        valid_scores = [x for x in just_scores if int(x) < 100]
-        world_record = max(valid_scores, key=lambda x: int(x))
-        return world_record
+        #valid_scores = [x for x in just_scores if int(x) < 100]
+        #world_record = max(valid_scores, key=lambda x: int(x))
+        return ''
 
 # GAME 2
 @app.route("/game2", methods=['POST'])
@@ -328,4 +338,4 @@ def game2_visited():
     return render_template("game2.html", title="Game 2")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)

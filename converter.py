@@ -1,5 +1,6 @@
 from loggers import log
 import os, shutil
+# import subprocess
 
 # A function that checks if a variable contains a disallowed substring.
 def does_variable_contain_bad_string(variable, disallowed_strings):
@@ -18,14 +19,17 @@ def is_bad_string_in_variables(variables_list, disallowed_strings):
     return False
     
 def run_ffmpeg(progress_filename, uploaded_file_path, params):
-    log.info(f'Converter: {progress_filename}')
-    progress_file_path = f'static/progress/"{progress_filename}".txt'
+    if not os.path.isdir('static/ffmpeg-progress'):
+        os.mkdir('static/ffmpeg-progress')
+        
+    progress_file_path = f'static/ffmpeg-progress/"{progress_filename}".txt'
     log.info(params)
+    # subprocess.run(['ffmpeg', '-hide_banner', '-progress', progress_file_path, '-y', '-i', f'"{uploaded_file_path}"',
+    # '-metadata comment="freeaudioconverter.net"', 
+    # '-metadata encoded_by="freeaudioconverter.net"', params], shell=False)
     os.system(f'ffmpeg -hide_banner -progress {progress_file_path} -y -i "{uploaded_file_path}" '
     f'-id3v2_version 3 -write_id3v1 true -metadata comment="freeaudioconverter.net" '
     f'-metadata encoded_by="freeaudioconverter.net" {params}')
-    # shutil.rmtree('static/converter')
-    # os.mkdir('static/converter')
 
 # MP3
 def run_mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path):
@@ -43,7 +47,8 @@ def run_mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_t
             run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libmp3lame --abr 1 -b:a {mp3_bitrate}k {output_path}.{output_ext}')
         elif mp3_encoding_type == "vbr": 
             run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libmp3lame -q:a {mp3_vbr_setting} {output_path}.{output_ext}')
-    else:
+
+    else: # User wants an audio-only file.
 
         if mp3_encoding_type == "cbr":
             run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libmp3lame -b:a {mp3_bitrate}k {output_path}.mp3')
