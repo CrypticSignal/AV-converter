@@ -1,8 +1,34 @@
-# Files
+# Audio files
+*.3gp
+*.aac
+*.ac3
+*.ADPCM
+*.caf
+*.dts
+*.flac
+*.m4a
+*.mka
+*.mp3
+*.MTS
+*.ogg
+*.opus
+*.wav
+# Video Files
+*.mov
+*.mp4
+*.webm
+*.mkv
+# Image Files
+*.jpg
+*jpeg
+*.png
+*.webp
+# Misc
+*.json
 *.log
-
+*.part
+*.sh
+*.txt
 # Folders
-logs
 __pycache__
-.vscode
 flask_session
