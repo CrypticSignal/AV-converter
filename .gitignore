@@ -1,0 +1,8 @@
+# Files
+*.log
+
+# Folders
+logs
+__pycache__
+.vscode
+flask_session

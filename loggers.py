@@ -1,3 +1,4 @@
+import os
 import logging
 from flask import request
 from datetime import datetime
@@ -12,13 +13,16 @@ def setup_logger(name, log_file):
     logger.setLevel(10)
     logger.addHandler(file_handler)
     return logger
-    
+ 
 def get_ip(): # The contents of this function is from https://stackoverflow.com/a/49760261/13231825
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
         return request.environ['REMOTE_ADDR']
     else:
         return request.environ['HTTP_X_FORWARDED_FOR'] # if behind a proxy
-        
+
+# Creating log dirs if they don't exist
+os.makedirs('logs', exist_ok=True)   
+
 log = setup_logger('log', 'logs/info.txt')
 visit = setup_logger('visit', 'logs/visit.log')
 
