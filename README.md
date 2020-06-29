@@ -1,24 +1,3 @@
-## Table of Contents:
-**[1]** [About](https://github.com/BassThatHertz/AudioAndVideoConverter#about)
-
-**[2]** [Features (audio/video converter)](https://github.com/BassThatHertz/AudioAndVideoConverter#features-audiovideo-converter)
-
-**[3]** [Features (YouTube downloader)](https://github.com/BassThatHertz/AudioAndVideoConverter#features-youtube-downloader)
-
-**[4]** [Supported Filetypes](https://github.com/BassThatHertz/AudioAndVideoConverter#supported-filetypes)
-
-**[5]** [Audio and Video Decoder](https://github.com/BassThatHertz/AudioAndVideoConverter#notes-for-contributors)
-
-**[6]** [External encoders used](https://github.com/BassThatHertz/AudioAndVideoConverter#external-encoders-used)
-
-**[7]** [Other tool(s) used](https://github.com/BassThatHertz/AudioAndVideoConverter#other-tools-used)
-
-**[8]** [FFmpeg configuration](https://github.com/BassThatHertz/AudioAndVideoConverter#ffmpeg-configuration)
-
-**[9]** [Requirements for developers/running locally](https://github.com/BassThatHertz/AudioAndVideoConverter#requirements-for-developersrunning-locally)
-
-**[10]** [Notes for contributors](https://github.com/BassThatHertz/AudioAndVideoConverter#notes-for-contributors)
-## About
 On https://freeaudioconverter.net, you can:
 - Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (in the .mka container), FLAC, ALAC, AC3, DTS or CAF.
 - Convert a video to an audio-only file (to any of the above formats).
@@ -26,6 +5,24 @@ On https://freeaudioconverter.net, you can:
 - Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
 - Trim a video or audio file (will not work if using the Safari browser).
 - Download a YouTube video or the audio only. The [webpage](https://freeaudioconverter.net/yt) is a [youtube-dl](https://github.com/ytdl-org/youtube-dl) wrapper.
+## Table of Contents:
+**[1]** [Features (audio/video converter)](https://github.com/BassThatHertz/AudioAndVideoConverter#features-audiovideo-converter)
+
+**[2]** [Features (YouTube downloader)](https://github.com/BassThatHertz/AudioAndVideoConverter#features-youtube-downloader)
+
+**[3]** [Supported Filetypes](https://github.com/BassThatHertz/AudioAndVideoConverter#supported-filetypes)
+
+**[4]** [Audio and Video Decoder](https://github.com/BassThatHertz/AudioAndVideoConverter#notes-for-contributors)
+
+**[5]** [External encoders used](https://github.com/BassThatHertz/AudioAndVideoConverter#external-encoders-used)
+
+**[6]** [Other tool(s) used](https://github.com/BassThatHertz/AudioAndVideoConverter#other-tools-used)
+
+**[7]** [FFmpeg configuration](https://github.com/BassThatHertz/AudioAndVideoConverter#ffmpeg-configuration)
+
+**[8]** [Requirements for developers/running locally](https://github.com/BassThatHertz/AudioAndVideoConverter#requirements-for-developersrunning-locally)
+
+**[9]** [Notes for contributors](https://github.com/BassThatHertz/AudioAndVideoConverter#notes-for-contributors)
 ## Features (audio/video converter):
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
