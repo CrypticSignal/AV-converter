@@ -16,7 +16,6 @@ function send_trim_request() {
     }
 
     const request = new XMLHttpRequest();
-    request.responseType = "json";
     request.open("POST", "/trimmer");
     
     const data = new FormData();
@@ -29,15 +28,21 @@ function send_trim_request() {
 
     request.addEventListener("load", function () {
 
-        alert_wrapper.innerHTML = ""; // Clear any existing alerts.
-        document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
-
-        show_alert(`${request.response.message} <a href="${request.response.downloadFilePath}" download />Click here</a> if the download does not begin automatically.`, "success");
-
-        const link = document.createElement("a"); // Create a virtual link.
-        //link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
-        link.href = request.response.downloadFilePath;
-        link.click();
+        if (request.status == 400) {
+            console.log('djfdjfsjjg')
+            show_alert(request.responseText, 'danger');
+            return;
+        }
+        else {
+            console.log(request.response.downloadFilePath);
+            alert_wrapper.innerHTML = ""; // Clear any existing alerts.
+            document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
+            show_alert(`File trimmed. <a href="${request.responseText}" download />Click here</a> if the download does not begin automatically.`, "success");
+            const link = document.createElement("a"); // Create a virtual link.
+            //link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
+            link.href = request.responseText;
+            link.click();
+        }
     });
 }
 
@@ -70,7 +75,6 @@ function upload_and_send_trim_request() {
     }
 
     const request = new XMLHttpRequest();
-    request.responseType = "json";
     request.open("POST", "/trimmer");
 
     const data = new FormData();
@@ -130,10 +134,9 @@ function upload_and_send_trim_request() {
     request.addEventListener("load", function (e) {
 
         if (request.status == 200) {
-            //document.getElementById('spinner').style.display = 'block';
             send_trim_request();
         }
-         else if (request.status == 415) {
+        else if (request.status == 415) {
             show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" target="_blank">here</a> to see the list of compatible filetypes.', "danger");
         }
         else {
@@ -191,15 +194,3 @@ function reset() {
     // Reset the input placeholder
     inputLabel.innerText = "Select file";
 }
-
-// // create the video element but don't add it to the page
-// var vid = document.createElement('video');
-// document.querySelector('#file_input').addEventListener('change', function() {
-//   // create url to use as the src of the video
-//   var fileURL = URL.createObjectURL(this.files[0]);
-//   vid.src = fileURL;
-//   // wait for duration to change from NaN to the actual duration
-//   vid.ondurationchange = function() {
-//     alert(this.duration);
-//   };
-// });
