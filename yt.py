@@ -15,7 +15,8 @@ download_dir = './downloads'
 
 relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
 strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
-youtube_dl = 'python3 -m youtube_dl'
+
+youtube_dl_path = '/home/pi/.local/bin/youtube-dl' # If testing locally, change this to the correct path.
 
 def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/13231825
     # Examples:
@@ -34,13 +35,15 @@ def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/1323
 
 def return_download_link(video_id):
     for file in os.listdir(download_dir):
-        #log.info('IN OSLISTDIR')
         if file.split('.')[-1] in relevant_extensions and video_id in file:
             log.info(f'DOWNLOADED "{file}"')
+
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
             log.info(f'{filesize} MB')
+
             with open("downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}') 
+
             new_filename = file.replace(f'-{video_id}', '') # Removes the video ID from the filename.
             log.info(f'NEW FILENAME: {new_filename}')
 
@@ -52,7 +55,7 @@ def return_download_link(video_id):
                 
             if '#' in file: # Links containing a # result in a 404 error.
                 os.rename(new_filename, new_filename.replace('#', ''))
-    
+
             return f'/downloads/{new_filename}'
 
 @yt.route("/yt", methods=["POST"])
@@ -101,7 +104,11 @@ def yt_downloader():
 
         log.info(f'Video [best] was chosen. {link}')
         download_start_time = time.time()
-        os.system(f'{youtube_dl} -o "{download_template}" --newline {video_id} > {path_to_progress_file}')
+
+        with open(path_to_progress_file, 'w') as f:
+            subprocess.run([youtube_dl_path, '-o', download_template, '--embed-thumbnail', '--newline', video_id],
+            stdout=f, shell=False)
+
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
@@ -111,8 +118,11 @@ def yt_downloader():
 
         log.info(f'MP4 was chosen. {link}')
         download_start_time = time.time()
-        os.system(f'{youtube_dl} -o "{download_template}" --embed-thumbnail --newline -f '
-        f'"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" {video_id} > {path_to_progress_file}')
+
+        with open(path_to_progress_file, 'w') as f:
+            subprocess.run([youtube_dl_path, '-o', download_template, '--embed-thumbnail', '--newline', '-f',
+            'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', video_id], stdout=f, shell=False)
+
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
@@ -122,8 +132,10 @@ def yt_downloader():
 
         log.info(f'Audio [best] was chosen. {link}')
         download_start_time = time.time()
-        #subprocess.run(['youtube-dl', '-o', f'"{download_template}"', '--newline', '-x', '|', 'tee', path_to_progress_file], shell=False)
-        os.system(f'{youtube_dl} -o "{download_template}" --newline -x {video_id} > {path_to_progress_file}')
+
+        with open(path_to_progress_file, 'w') as f:
+            subprocess.run([youtube_dl_path, '-o', download_template, '--newline', '-x', video_id], stdout=f, shell=False)
+
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
@@ -133,8 +145,11 @@ def yt_downloader():
 
         log.info(f'MP3 was chosen. {link}')
         download_start_time = time.time()
-        os.system(f'{youtube_dl} -o "{download_template}" --newline -x --embed-thumbnail --audio-format mp3 '
-        f'--audio-quality 0 {video_id} > {path_to_progress_file}')
+
+        with open(path_to_progress_file, 'w') as f:
+            subprocess.run([youtube_dl_path, '-o', download_template, '--newline', '-x',
+            '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0', video_id], stdout=f, shell=False)
+
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
