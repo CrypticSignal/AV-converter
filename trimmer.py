@@ -1,7 +1,8 @@
 from flask import Blueprint, request, send_from_directory
 from werkzeug.utils import secure_filename
-import os
+import os, subprocess
 from loggers import log_this, log
+import converter
 
 trimmer = Blueprint('trimmer',__name__)
 
@@ -28,16 +29,24 @@ def trim_file():
         just_name = filename.split(".")[0]
         output_name = just_name + " [trimmed]" + ext
 
-        log.info(f'ffmpeg -y -ss {start_time} -i "{uploaded_file_path}" '
-        f'-to {end_time} -map 0 -c copy "trims/{output_name}"')
+        variables_to_validate = [filename, start_time, end_time]
+        strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`', '.']
 
-        os.system(f'ffmpeg -y -ss {start_time} -i "{uploaded_file_path}" '
-        f'-to {end_time} -map 0 -c copy "trims/{output_name}"')
+        # check_no_variable_contains_bad_string is a func defined in converter.py
+        if converter.is_bad_string_in_variables(variables_to_validate, strings_not_allowed):
+            return 'You tried being clever, but there\'s a server-side check for disallowed strings', 400
 
-        return {
-            "message": "File trimmed. The trimmed file will now start downloading.",
-            "downloadFilePath": f'/trims/{output_name}'
-        }
+        else:
+            log.info(f'ffmpeg -y -ss {start_time} -i "{uploaded_file_path}" '
+            f'-to {end_time} -map 0 -c copy "trims/{output_name}"')
+
+            subprocess.run(['ffmpeg', '-y', '-ss', start_time, '-i', uploaded_file_path, '-to', end_time,
+            '-map', '0', '-c', 'copy', f'trims/{output_name}'])
+
+            return {
+                "message": "File trimmed. The trimmed file will now start downloading.",
+                "downloadFilePath": f'/trims/{output_name}'
+            }
 
 # Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
 @trimmer.route("/trims/<filename>", methods=["GET"])
