@@ -5,4 +5,4 @@ pycryptodome==3.9.8
 pycryptodomex==3.9.8
 xattr==0.9.7
 confidential==2.3.1
-git+https://github.com/ytdl-org/youtube-dl.git@refs/pull/25717/merge
+git+https://github.com/ytdl-org/youtube-dl.git@refs/pull/25717/head
