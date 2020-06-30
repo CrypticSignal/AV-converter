@@ -5,6 +5,7 @@ On https://freeaudioconverter.net, you can:
 - Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
 - Trim a video or audio file (will not work if using the Safari browser).
 - Download a YouTube video or the audio only. The [webpage](https://freeaudioconverter.net/yt) is a [youtube-dl](https://github.com/ytdl-org/youtube-dl) wrapper.
+
 ## Table of Contents:
 **[1]** [Features (audio/video converter)](https://github.com/BassThatHertz/AudioAndVideoConverter#features-audiovideo-converter)
 
@@ -18,23 +19,26 @@ On https://freeaudioconverter.net, you can:
 
 **[6]** [Other tool(s) used](https://github.com/BassThatHertz/AudioAndVideoConverter#other-tools-used)
 
-**[7]** [FFmpeg configuration](https://github.com/BassThatHertz/AudioAndVideoConverter#ffmpeg-configuration)
+**[7]** [Requirements for developers/running locally](https://github.com/BassThatHertz/AudioAndVideoConverter#requirements-for-developersrunning-locally)
 
-**[8]** [Requirements for developers/running locally](https://github.com/BassThatHertz/AudioAndVideoConverter#requirements-for-developersrunning-locally)
+**[8]** [Notes for contributors](https://github.com/BassThatHertz/AudioAndVideoConverter#notes-for-contributors)
 
-**[9]** [Notes for contributors](https://github.com/BassThatHertz/AudioAndVideoConverter#notes-for-contributors)
 ## Features (audio/video converter):
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
 - Whilst the file is being converted, you can see how far into the file the encoder currently is. This information is updated every second.
+
 ## Features (YouTube downloader):
 - Download as an MP3 or MP4 file, or simply the best quality video/audio stream that is available.
 - If you choose to download as an MP3, the thumbnail of the video gets embedded as the cover art.
 - Download the best quality audio stream without encoding it, so no lossy-to-lossy encoding is done (only applicable if you use the "Audio [best]" button.
+
 ## Supported Filetypes:
 Many filetypes are supported, click [here](https://freeaudioconverter.net/filetypes) for details. Support for other filetypes may be added, feel free to [contact me](https://freeaudioconverter.net/contact) to enquire. 
+
 ## Audio and Video Decoder:
 [FFmpeg](https://github.com/FFmpeg/FFmpeg)
+
 ## External encoders used:
 LAME v3.100 | https://lame.sourceforge.io/
 
@@ -53,42 +57,6 @@ youtube-dl | https://github.com/ytdl-org/youtube-dl
 **Audio [MP3]** `-x --embed-thumbnail --audio-format mp3 --audio-quality 0`
 
 **Audio [best]** `-x <video_id>`
-## FFmpeg configuration:
-```
-    --enable-gmp 
-    --enable-gpl 
-    --enable-libaom 
-    --enable-libass 
-    --enable-libdav1d 
-    --enable-libdrm 
-    --enable-libfdk-aac 
-    --enable-libfreetype 
-    --enable-libkvazaar 
-    --enable-libmp3lame 
-    --enable-libopencore-amrnb 
-    --enable-libopencore-amrwb 
-    --enable-libopus 
-    --enable-librtmp 
-    --enable-libsnappy 
-    --enable-libsoxr 
-    --enable-libssh 
-    --enable-libvorbis 
-    --enable-libvpx 
-    --enable-libzimg 
-    --enable-libwebp 
-    --enable-libx264 
-    --enable-libx265 
-    --enable-libxml2 
-    --enable-mmal 
-    --enable-nonfree 
-    --enable-omx 
-    --enable-omx-rpi 
-    --enable-version3 
-    --target-os=linux 
-    --enable-pthreads 
-    --enable-openssl 
-    --enable-hardcoded-tables                                                                                                           
-```
 ## Requirements for developers/running locally:
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
 - Python **3.6+**
@@ -98,6 +66,7 @@ You can run the Flask app locally for development purposes or if you want audio/
 - `pip install Flask-Session`
 - `pip install -r requirements.txt`
 - Clone this repository.
+- Change the value of `youtube_dl_path` in yt.py to the correct path. On Raspberry Pi OS, even though youtube-dl is in the PATH, you have to specify the full path to youtube-dl when using it with `subprocess.run()`. On Windows, if youtube-dl is in your PATH, you can set the value of `youtube_dl_path` to 'youtube-dl'.
 - cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
 - Enter localhost:5000 in the address bar of your web browser and hit enter.
 
@@ -111,4 +80,4 @@ docker run -p 5000:5000 audio-and-video-converter
 ## Notes for contributors
 Contributors are welcome, simply submit a pull request.
 
-If you know how to, use f-strings rather than `.format()`.
+use f-strings rather than `.format()` if you know how to do so.
