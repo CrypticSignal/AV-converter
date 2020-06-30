@@ -30,6 +30,7 @@
 *.part
 *.sh
 *.txt
+*.ytdl
 # Folders
 __pycache__
 flask_session

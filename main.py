@@ -20,7 +20,7 @@ app.register_blueprint(trimmer)
 app.register_blueprint(yt)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-max_upload_size = 5 # in GB.
+max_upload_size = 4 # in GB.
 app.config['MAX_CONTENT_LENGTH'] = max_upload_size * 1000 * 1000 * 1000 # Max upload size.
 app.jinja_env.auto_reload = True
 
@@ -101,7 +101,7 @@ def homepage():
         else:
             log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
             os.makedirs('conversions', exist_ok=True)
-            output_path = f'"conversions/{output_name}"'
+            output_path = f'conversions/{output_name}'
 
             # Run the appropritate section of converter.py:
 
@@ -308,4 +308,4 @@ def game2_visited():
     return render_template("game2.html", title="Game 2")
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0")
