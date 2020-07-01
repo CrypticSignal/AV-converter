@@ -2,48 +2,9 @@ const input = document.getElementById("file_input");
 const inputLabel = document.getElementById("file_input_label");
 const trimButton = document.getElementById("trim-btn");
 
-function send_trim_request() {
-
-    inputFilename = input.files[0].name;
-
-    let startTime = document.getElementById('start-time').value;
-    let endTime = document.getElementById('end-time').value;
-    if (startTime.length == 5) { 
-        startTime += ':00';
-    }
-    if (endTime.length == 5){
-        endTime += ':00'
-    }
-
-    const request = new XMLHttpRequest();
-    request.open("POST", "/trimmer");
-    
-    const data = new FormData();
-    data.append("request_type", "trim");
-    data.append("filename", inputFilename);
-    data.append("start_time", startTime);
-    data.append("end_time", endTime);
-
-    request.send(data);
-
-    request.addEventListener("load", function () {
-
-        if (request.status == 400) {
-            console.log('djfdjfsjjg')
-            show_alert(request.responseText, 'danger');
-            return;
-        }
-        else {
-            console.log(request.response.downloadFilePath);
-            alert_wrapper.innerHTML = ""; // Clear any existing alerts.
-            document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
-            show_alert(`File trimmed. <a href="${request.responseText}" download />Click here</a> if the download does not begin automatically.`, "success");
-            const link = document.createElement("a"); // Create a virtual link.
-            //link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
-            link.href = request.responseText;
-            link.click();
-        }
-    });
+// This function runs when the user selects a file.
+function updatePlaceholder() {
+    inputLabel.innerText = input.files[0].name;
 }
 
 // Run this function when the user clicks on the "Trim file" button
@@ -74,6 +35,7 @@ function upload_and_send_trim_request() {
         return;    
     }
 
+    // First POST request to send the chosen file to the server.
     const request = new XMLHttpRequest();
     request.open("POST", "/trimmer");
 
@@ -99,7 +61,7 @@ function upload_and_send_trim_request() {
     let previousTime = Date.now() / 1000;
     let previousLoaded = 0;
     
-    request.upload.addEventListener("progress", function (event) {
+    request.upload.addEventListener("progress", (event) => {
 
         // Get the uploaded amount and total filesize (MB)
         const loaded = event.loaded / 10**6;
@@ -123,15 +85,13 @@ function upload_and_send_trim_request() {
         previousTime = Date.now() / 1000;
     });
 
-    cancel_btn.addEventListener("click", function () {
-        request.abort();
-    })
+    cancel_btn.addEventListener("click", () => request.abort());
 
     // Send the request.
     request.send(data);
 
     // Upload complete
-    request.addEventListener("load", function (e) {
+    request.addEventListener("load", () => {
 
         if (request.status == 200) {
             send_trim_request();
@@ -146,22 +106,64 @@ function upload_and_send_trim_request() {
     });
 
     // Request error handler
-    request.addEventListener("error", function (e) {
+    request.addEventListener("error", () => {
         reset();
         show_alert(`${request.response.message}`, "danger");
     });
 
     // Request abort handler
-    request.addEventListener("abort", function (e) {
+    request.addEventListener("abort", () => {
         reset();
-        show_alert(`Upload cancelled`, "primary");
+        show_alert("Upload cancelled", "primary");
     });
  
 } // Closing bracket for upload_and_trim function.
 
-// This function runs when the user selects a file.
-function updatePlaceholder() {
-    inputLabel.innerText = input.files[0].name;
+// Runs when upload is complete and 200 status received from server.
+function send_trim_request() {
+
+    inputFilename = input.files[0].name;
+
+    let startTime = document.getElementById('start-time').value;
+    let endTime = document.getElementById('end-time').value;
+    
+    if (startTime.length == 5) { 
+        startTime += ':00';
+    }
+    if (endTime.length == 5){
+        endTime += ':00'
+    }
+
+    // Second POST request to give the server the data it needs to trim the file.
+    const request = new XMLHttpRequest();
+    request.open("POST", "/trimmer");
+    
+    const data = new FormData();
+    data.append("request_type", "trim");
+    data.append("filename", inputFilename);
+    data.append("start_time", startTime);
+    data.append("end_time", endTime);
+
+    request.send(data);
+
+    request.addEventListener("load", () => {
+
+        if (request.status !== 200) {
+            console.log(request.responseText);
+            show_alert(request.responseText, 'danger');
+            return;
+        }
+        else {
+            console.log(request.response.downloadFilePath);
+            alert_wrapper.innerHTML = ""; // Clear any existing alerts.
+            document.getElementById('spinner').style.display = 'none'; // Hide the converting msg.
+            show_alert(`File trimmed. <a href="${request.responseText}" download />Click here</a> if the download does not begin automatically.`, "success");
+            const link = document.createElement("a"); // Create a virtual link.
+            //link.download = ''; //The download attribute specifies that the target will be downloaded when a user clicks on the hyperlink. As we have set an empty value, it means use the original filename.
+            link.href = request.responseText;
+            link.click();
+        }
+    });
 }
 
 // Function to show alerts

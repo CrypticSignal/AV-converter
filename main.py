@@ -30,7 +30,7 @@ os.makedirs('uploads', exist_ok=True)
 @app.route("/", methods=["POST"])
 def homepage():
     if request.form['request_type'] == 'log_convert_clicked':
-        log_this('clicked Convert Button')
+        log_this('clicked on the convert button.')
         return ''
 
     elif request.form["request_type"] == "uploaded":
@@ -54,7 +54,6 @@ def homepage():
 
         wav_bit_depth = request.form["wav_bit_depth"]
         filename = request.form["filename"]
-        filename_without_ext = filename.split('.')[0]
         chosen_codec = request.form["chosen_codec"]
         crf_value = request.form["crf_value"]
         mp4_encoding_mode = request.form["mp4_encoding_mode"]
@@ -86,120 +85,110 @@ def homepage():
         opus_encoding_type = request.form["opus_encoding_type"]
         # Desired filename
         output_name = request.form["output_name"]
+ 
+        log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
+        os.makedirs('conversions', exist_ok=True)
+        output_path = f'conversions/{output_name}'
 
-        variables_to_validate = [filename_without_ext, chosen_codec, is_keep_video, mp3_encoding_type, mp3_bitrate,
-        mp3_vbr_setting, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass, vorbis_encoding, vorbis_quality,
-        opus_vorbis_slider, ac3_bitrate, flac_compression, dts_bitrate, opus_cbr_bitrate, opus_encoding_type,
-        output_name, wav_bit_depth, mp4_encoding_mode, crf_value]
+        # Run the appropriate section of converter.py:
 
-        strings_not_allowed = ['command', ';', '$', '&&', '/', '\\' '"', '?', '*', '<', '>', '|', ':', '`', '.']
-
-        # check_no_variable_contains_bad_string is a func defined in converter.py
-        if converter.is_bad_string_in_variables(variables_to_validate, strings_not_allowed):
-            return 'You tried being clever, but there\'s a server-side check for disallowed strings', 400
-
-        else:
-            log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
-            os.makedirs('conversions', exist_ok=True)
-            output_path = f'"conversions/{output_name}"'
-
-            # Run the appropritate section of converter.py:
-
-            if chosen_codec == 'MP3':
-                converter.run_mp3(session['progress_filename'], uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path)
-                if is_keep_video == "yes":
-                    just_ext = uploaded_file_path.split('.')[-1]
-                    if just_ext == 'mp4':
-                        extension = 'mp4'
-                    else:
-                        extension = 'mkv'
+        if chosen_codec == 'MP3':
+            converter.run_mp3(session['progress_filename'], uploaded_file_path, is_keep_video, mp3_encoding_type,
+            mp3_bitrate, mp3_vbr_setting, output_path)
+            if is_keep_video == "yes":
+                just_ext = uploaded_file_path.split('.')[-1]
+                if just_ext == 'mp4':
+                    extension = 'mp4'
                 else:
-                    extension = 'mp3'
-
-            elif chosen_codec == 'AAC':
-                converter.run_aac(session['progress_filename'], uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass,
-                fdk_lowpass, output_path)
-                if is_keep_video == "yes":
-                    just_ext = uploaded_file_path.split('.')[-1]
-                    if just_ext == 'mp4':
-                        extension = 'mp4'
-                    else:
-                        extension = 'mkv'
-                else:
-                    extension = 'm4a'
-
-            elif chosen_codec == 'Opus':
-                converter.run_opus(session['progress_filename'], uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate,
-                output_path)
-                extension = 'opus'   
-
-            elif chosen_codec == 'FLAC':
-                converter.run_flac(session['progress_filename'], uploaded_file_path, is_keep_video, flac_compression, output_path)
-                if is_keep_video == "yes":
                     extension = 'mkv'
+            else:
+                extension = 'mp3'
+
+        elif chosen_codec == 'AAC':
+            converter.run_aac(session['progress_filename'], uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
+            fdk_vbr, is_fdk_lowpass,
+            fdk_lowpass, output_path)
+            if is_keep_video == "yes":
+                just_ext = uploaded_file_path.split('.')[-1]
+                if just_ext == 'mp4':
+                    extension = 'mp4'
                 else:
-                    extension = 'flac'
-
-            elif chosen_codec == 'Vorbis':
-                converter.run_vorbis(session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider,
-                output_path) 
-                extension = 'mka'
-
-            elif chosen_codec == 'WAV':
-                converter.run_wav(session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth, output_path)
-                if is_keep_video == "yes":
                     extension = 'mkv'
-                else:
-                    extension = 'wav'
+            else:
+                extension = 'm4a'
 
-            elif chosen_codec == 'MKV':
-                converter.run_mkv(session['progress_filename'], uploaded_file_path, output_path)
+        elif chosen_codec == 'Opus':
+            converter.run_opus(session['progress_filename'], uploaded_file_path, opus_encoding_type, opus_vorbis_slider,
+            opus_cbr_bitrate, output_path)
+            extension = 'opus'   
+
+        elif chosen_codec == 'FLAC':
+            converter.run_flac(session['progress_filename'], uploaded_file_path, is_keep_video, flac_compression,
+            output_path)
+            if is_keep_video == "yes":
                 extension = 'mkv'
+            else:
+                extension = 'flac'
 
-            elif chosen_codec == 'MKA':
-                converter.run_mka(session['progress_filename'], uploaded_file_path, output_path)
-                extension = 'mka'
+        elif chosen_codec == 'Vorbis':
+            converter.run_vorbis(session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality,
+            opus_vorbis_slider, output_path) 
+            extension = 'mka'
 
-            elif chosen_codec == 'ALAC':
-                converter.run_alac(session['progress_filename'], uploaded_file_path, is_keep_video, output_path)
-                if is_keep_video == "yes":
-                    extension = 'mkv'
-                else:
-                    extension = 'm4a'
-
-            elif chosen_codec == 'AC3':
-                converter.run_ac3(session['progress_filename'], uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
-                if is_keep_video == "yes":
-                    just_ext = uploaded_file_path.split('.')[-1]
-                    if just_ext == 'mp4':
-                        extension = 'mp4'
-                    else:
-                        extension = 'mkv'
-                else:
-                    extension = 'ac3'
-
-            elif chosen_codec == 'CAF':
-                converter.run_caf(session['progress_filename'], uploaded_file_path, output_path)
-                extension = 'caf'
-
-            elif chosen_codec == 'DTS':
-                converter.run_dts(session['progress_filename'], uploaded_file_path, is_keep_video, dts_bitrate, output_path)
-                if is_keep_video == "yes":
-                    extension = 'mkv'
-                else:
-                    extension = 'dts'
-
-            elif chosen_codec == 'MP4':
-                converter.run_mp4(session['progress_filename'], uploaded_file_path, mp4_encoding_mode, crf_value, output_path)
-                extension = 'mp4'
-            
-            elif chosen_codec == 'MKV':
-                converter.run_mkv(session['progress_filename'], uploaded_file_path, output_path)
+        elif chosen_codec == 'WAV':
+            converter.run_wav(session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth, output_path)
+            if is_keep_video == "yes":
                 extension = 'mkv'
+            else:
+                extension = 'wav'
 
-            converted_file_name = output_name + "." + extension
+        elif chosen_codec == 'MKV':
+            converter.run_mkv(session['progress_filename'], uploaded_file_path, output_path)
+            extension = 'mkv'
 
-            return f'/conversions/{converted_file_name}'
+        elif chosen_codec == 'MKA':
+            converter.run_mka(session['progress_filename'], uploaded_file_path, output_path)
+            extension = 'mka'
+
+        elif chosen_codec == 'ALAC':
+            converter.run_alac(session['progress_filename'], uploaded_file_path, is_keep_video, output_path)
+            if is_keep_video == "yes":
+                extension = 'mkv'
+            else:
+                extension = 'm4a'
+
+        elif chosen_codec == 'AC3':
+            converter.run_ac3(session['progress_filename'], uploaded_file_path, is_keep_video, ac3_bitrate, output_path)
+            if is_keep_video == "yes":
+                just_ext = uploaded_file_path.split('.')[-1]
+                if just_ext == 'mp4':
+                    extension = 'mp4'
+                else:
+                    extension = 'mkv'
+            else:
+                extension = 'ac3'
+
+        elif chosen_codec == 'CAF':
+            converter.run_caf(session['progress_filename'], uploaded_file_path, output_path)
+            extension = 'caf'
+
+        elif chosen_codec == 'DTS':
+            converter.run_dts(session['progress_filename'], uploaded_file_path, is_keep_video, dts_bitrate, output_path)
+            if is_keep_video == "yes":
+                extension = 'mkv'
+            else:
+                extension = 'dts'
+
+        elif chosen_codec == 'MP4':
+            converter.run_mp4(session['progress_filename'], uploaded_file_path, mp4_encoding_mode, crf_value, output_path)
+            extension = 'mp4'
+        
+        elif chosen_codec == 'MKV':
+            converter.run_mkv(session['progress_filename'], uploaded_file_path, output_path)
+            extension = 'mkv'
+
+        converted_file_name = output_name + "." + extension
+        return f'/conversions/{converted_file_name}'
 
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
@@ -211,7 +200,9 @@ def send_file(filename):
         log.info(f'freeaudioconverter.net/conversions/{filename}')
         return send_from_directory('conversions', filename, as_attachment=True)
 
-# GAME 1
+# END OF CODE FOR AUDIO/VIDEO CONVERTER --------------------------------------------------------------------------------
+
+# Game 1
 @app.route("/game", methods=['POST'])
 def return_world_record():
     current_datetime = datetime.now().strftime('%d-%m-%y at %H:%M:%S')
@@ -238,12 +229,11 @@ def return_world_record():
             lines = f.readlines()
             for line in lines:
                 just_scores.append(line.split('|')[0].strip())
-
         #valid_scores = [x for x in just_scores if int(x) < 100]
         #world_record = max(valid_scores, key=lambda x: int(x))
         return ''
 
-# GAME 2
+# Game 2
 @app.route("/game2", methods=['POST'])
 def save_game2_stats():
     current_datetime = datetime.now().strftime('%d-%m-%y at %H:%M:%S')
@@ -263,7 +253,6 @@ def save_game2_stats():
             lines = f.readlines()
             for line in lines:
                 reaction_times.append(line.split('|')[0][:-3].strip())
-
         # reaction_record = min(reaction_times, key=lambda x: int(x))
         return ''
 

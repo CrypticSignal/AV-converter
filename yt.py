@@ -1,6 +1,5 @@
 from flask import Blueprint, request, send_from_directory
 from urllib.parse import urlparse, parse_qs
-import converter
 from werkzeug.utils import secure_filename
 import time
 import urllib 
@@ -11,10 +10,9 @@ yt = Blueprint('yt', __name__)
 
 os.makedirs('static/yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)    
-download_dir = './downloads'
+download_dir = 'downloads'
 
 relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
-strings_not_allowed = ['command', ';', '$', '&&', '\\' '"', '*', '<', '>', '|', '`']
 
 youtube_dl_path = '/home/pi/.local/bin/youtube-dl' # If testing locally, change this to the correct path.
 
@@ -68,17 +66,12 @@ def yt_downloader():
         log_this('Clicked a button.')
         link = request.form['link']
 
-        if converter.does_variable_contain_bad_string(link, strings_not_allowed):
-            log.info('Bad string detected.')
-            return 'You tried being clever, but there is a server-side check for disallowed strings.', 400
+        # Create the progress file.
+        with open(path_to_progress_file, "w"): pass
+        log.info(f'Progress will be saved to: {path_to_progress_file}')
+        return progress_filename
 
-        else:
-            # Create the progress file.
-            with open(path_to_progress_file, "w"): pass
-            log.info(f'Progress will be saved to: {path_to_progress_file}')
-            return progress_filename
-
-    # The rest runs after the 2nd POST request:
+    # The following runs after the 2nd POST request:
 
     size_of_media_files = 0
     # Get the total size of the media files in the download folder.
@@ -107,7 +100,7 @@ def yt_downloader():
 
         with open(path_to_progress_file, 'w') as f:
             subprocess.run([youtube_dl_path, '-o', download_template, '--embed-thumbnail', '--newline', video_id],
-            stdout=f, shell=False)
+            stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -121,7 +114,7 @@ def yt_downloader():
 
         with open(path_to_progress_file, 'w') as f:
             subprocess.run([youtube_dl_path, '-o', download_template, '--embed-thumbnail', '--newline', '-f',
-            'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', video_id], stdout=f, shell=False)
+            'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -134,7 +127,7 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-o', download_template, '--newline', '-x', video_id], stdout=f, shell=False)
+            subprocess.run([youtube_dl_path, '-o', download_template, '--newline', '-x', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -148,14 +141,13 @@ def yt_downloader():
 
         with open(path_to_progress_file, 'w') as f:
             subprocess.run([youtube_dl_path, '-o', download_template, '--newline', '-x',
-            '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0', video_id], stdout=f, shell=False)
+            '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(video_id)
         return download_link
 
-# Send the converted/trimmed file to the following URL, where <filename> is the "value" for downloadFilePath
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
     just_extension = filename.split('.')[-1]

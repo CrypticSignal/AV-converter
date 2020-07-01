@@ -1,4 +1,4 @@
-document.getElementById('not_keep_vid').checked = true;
+//document.getElementById('not_keep_vid').checked = true;
 
 // Hitting the enter key is the same thing as clicking on the convert button.
 document.addEventListener("keydown", function(event) {

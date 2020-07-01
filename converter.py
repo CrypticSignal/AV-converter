@@ -1,22 +1,6 @@
 import os, subprocess
 from loggers import log
 
-# A function that checks if a variable contains a disallowed substring.
-def does_variable_contain_bad_string(variable, disallowed_strings):
-    for string in disallowed_strings:
-        if string in variable:
-            return True
-    # If we've gotten to this point, the loop has finished without the if-statement ever being True, 
-    # so the variable didn't contain a disallowed string.
-    return False
-
-# If a variable in the list contains a disallowed string, return True. Otherwise, return False.
-def is_bad_string_in_variables(variables_list, disallowed_strings):
-    for variable in variables_list:
-        if does_variable_contain_bad_string(variable, disallowed_strings):
-            return True
-    return False
-    
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     os.makedirs('static/ffmpeg-progress', exist_ok=True)
     progress_file_path = f'static/ffmpeg-progress/{progress_filename}.txt'
@@ -27,7 +11,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
 
     subprocess.run(['ffmpeg', '-hide_banner', '-progress', progress_file_path, '-y', '-i', uploaded_file_path,
     '-metadata', 'comment="freeaudioconverter.net"', '-metadata', 'encoded_by="freeaudioconverter.net"',
-    '-id3v2_version', '3', '-write_id3v1', 'true'] + params, shell=False)
+    '-id3v2_version', '3', '-write_id3v1', 'true'] + params)
 
 # MP3
 def run_mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path):
@@ -113,8 +97,8 @@ def run_mp4(progress_filename, uploaded_file_path, mp4_encoding_mode, crf_value,
     if mp4_encoding_mode == "keep_codecs":
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c copy -f mp4 -movflags faststart', f'{output_path}.mp4')
     elif mp4_encoding_mode == "keep_video_codec":
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac -vbr 5 -f mp4 -movflags faststart',
-        f'{output_path}.mp4')
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac -vbr 5 -f mp4 '
+        f'-movflags faststart', f'{output_path}.mp4')
     elif mp4_encoding_mode == 'convert_video_keep_audio':
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v libx264 -crf {crf_value} -c:a copy -f mp4 '
         f'-movflags faststart', f'{output_path}.mp4')
