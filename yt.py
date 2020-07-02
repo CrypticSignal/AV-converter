@@ -99,7 +99,7 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-o', download_template, '--embed-thumbnail', '--newline', video_id],
+            subprocess.run([youtube_dl_path, '-o', download_template, '--newline', video_id],
             stdout=f)
 
         download_complete_time = time.time()
@@ -141,7 +141,7 @@ def yt_downloader():
 
         with open(path_to_progress_file, 'w') as f:
             subprocess.run([youtube_dl_path, '-o', download_template, '--newline', '-x',
-            '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0', video_id], stdout=f)
+            '--audio-format', 'mp3', '--audio-quality', '0', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
