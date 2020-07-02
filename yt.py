@@ -14,7 +14,7 @@ download_dir = 'downloads'
 
 relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
 
-youtube_dl_path = '/home/pi/.local/bin/youtube-dl' # If testing locally, change this to the correct path.
+youtube_dl_path = '/usr/local/bin/youtube-dl' # If running locally, change this to the correct path.
 
 def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/13231825
     # Examples:
