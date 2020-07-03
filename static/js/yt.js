@@ -61,6 +61,8 @@ async function showDownloadProgress() {
   
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(whichButton) { // whichButton is this.value in yt.html
+    reset();
+
     if (linkBox.value == '') {
         show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
         return;
@@ -103,21 +105,24 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             
             try {
                 // 2nd POST request to get the download link.
-                const responseWithDownloadLink = await fetch("/yt", {
+                const response = await fetch("/yt", {
                     method: 'POST',
                     body: data
                 });
                 // As we're using await fetch, if we reach this line, it means that we've received a response,
                 // so the download has completed.
                 shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
-                downloadLink = await responseWithDownloadLink.text();
-                console.log(`Download Link: ${downloadLink}`)
+                const jsonResponse = await response.json();
+                const downloadLink = jsonResponse.download_path
+                const logFile = jsonResponse.log_file
                 show_alert(`Your browser should have started downloading the file. If it hasn't, click \
                 <a href="${downloadLink}">here</a>.`, "success");
-                const createLink = document.createElement("a"); // Create a virtual link.
+                const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
                 // when the link is visited. As we have set an empty value, it means use the original filename.
-                createLink.href = downloadLink; // Setting the URL of createLink to downloadLink
-                createLink.click();
+                virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
+                virtualDownloadLink.click();
+                document.getElementById('logfile').innerHTML = `Would you like to download the log file? If so, click \
+                <a href="${logFile}">here</a>.`
             } 
             catch(error) { // 2nd POST request.
                 show_alert(error, 'danger');
@@ -128,4 +133,9 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
     else { // If the contents of the link box don't match the regex.
         show_alert(`Invalid URL provided.`, 'danger');
     }
+}
+
+function reset() {
+    document.getElementById('logfile').innerHTML = ''
+    document.getElementById('bitrate_info').style.display = 'none';
 }
