@@ -40,8 +40,8 @@ def trim_file():
 def download_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        log.info(f'freeaudioconverter.net/trims/{filename}')
+        log.info(f'https://freeaudioconverter.net/trims/{filename}')
         return send_from_directory('trims', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'freeaudioconverter.net/trims/{filename}')
+        log.info(f'https://freeaudioconverter.net/trims/{filename}')
         return send_from_directory('trims', filename, as_attachment=True)

@@ -194,10 +194,10 @@ def homepage():
 def send_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        log.info(f'freeaudioconverter.net/conversions/{filename}')
+        log.info(f'https://freeaudioconverter.net/conversions/{filename}')
         return send_from_directory('conversions', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'freeaudioconverter.net/conversions/{filename}')
+        log.info(f'https://freeaudioconverter.net/conversions/{filename}')
         return send_from_directory('conversions', filename, as_attachment=True)
 
 # END OF CODE FOR AUDIO/VIDEO CONVERTER --------------------------------------------------------------------------------
