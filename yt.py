@@ -1,4 +1,4 @@
-from flask import Blueprint, request, send_from_directory, jsonify
+from flask import Blueprint, request, send_from_directory
 from urllib.parse import urlparse, parse_qs
 from werkzeug.utils import secure_filename
 import time
@@ -35,10 +35,8 @@ def return_download_link(progress_file, video_id, download_type):
     log.info(f'download type: {download_type}')
     for file in os.listdir(download_dir):
         if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file:
-            #log.info(%(ext)s)
-            log.info('%(ext)s')
-            log.info(f'DOWNLOADED "{file}"')
 
+            log.info(f'DOWNLOADED "{file}"')
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
             log.info(f'{filesize} MB')
 
@@ -48,7 +46,7 @@ def return_download_link(progress_file, video_id, download_type):
             new_filename = file.replace(f'-{video_id}', '') # Remove the video ID from the filename.
             log.info(f'NEW FILENAME: {new_filename}')
 
-            # Without the if-statement, when running locally on Windows, the os.rename line causes an error saying
+            # Without this if-statement, when running locally on Windows, the os.rename line causes an error saying
             # that the file already exists (if you try downloading the same video again). Interestingly, I don't get
             # this error on my Raspberry Pi 4 (running Raspberry Pi OS) when downloading the same video again.
             if not os.path.isfile(f'{download_dir}/{new_filename}'):
@@ -57,10 +55,10 @@ def return_download_link(progress_file, video_id, download_type):
             if '#' in file: # Links containing a # result in a 404 error.
                 os.rename(new_filename, new_filename.replace('#', ''))
 
-            return jsonify(
-                download_path=f'/downloads/{new_filename}',
-                log_file=progress_file
-            )
+            return {
+                'download_path': f'/downloads/{new_filename}',
+                'log_file': progress_file
+            }
 
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
@@ -170,5 +168,5 @@ def send_file(filename):
 
 @yt.route("/static/yt-progress/<filename>", methods=["GET"])
 def download_log_file(filename):
-    log.info(f'https://freeaudioconverter.net/{filename}')
-    return send_from_directory('static/yt-progress', filename, as_attachment=True)
+    log.info(f'https://freeaudioconverter.net/yt-progress/{filename}')
+    return send_from_directory('static/yt-progress', filename)
