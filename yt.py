@@ -1,4 +1,4 @@
-from flask import Blueprint, request, send_from_directory
+from flask import Blueprint, request, send_from_directory, jsonify
 from urllib.parse import urlparse, parse_qs
 from werkzeug.utils import secure_filename
 import time
@@ -31,9 +31,12 @@ def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/1323
     # Fail?
     return None
 
-def return_download_link(video_id):
+def return_download_link(progress_file, video_id, download_type):
+    log.info(f'download type: {download_type}')
     for file in os.listdir(download_dir):
-        if file.split('.')[-1] in relevant_extensions and video_id in file:
+        if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file:
+            #log.info(%(ext)s)
+            log.info('%(ext)s')
             log.info(f'DOWNLOADED "{file}"')
 
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
@@ -42,7 +45,7 @@ def return_download_link(video_id):
             with open("downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}') 
 
-            new_filename = file.replace(f'-{video_id}', '') # Removes the video ID from the filename.
+            new_filename = file.replace(f'-{video_id}', '') # Remove the video ID from the filename.
             log.info(f'NEW FILENAME: {new_filename}')
 
             # Without the if-statement, when running locally on Windows, the os.rename line causes an error saying
@@ -54,7 +57,10 @@ def return_download_link(video_id):
             if '#' in file: # Links containing a # result in a 404 error.
                 os.rename(new_filename, new_filename.replace('#', ''))
 
-            return f'/downloads/{new_filename}'
+            return jsonify(
+                download_path=f'/downloads/{new_filename}',
+                log_file=progress_file
+            )
 
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
@@ -90,70 +96,79 @@ def yt_downloader():
                 log.info(f'DELETED {file}')
 
     link = request.form['link']
-    download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
+    #download_template = f'{download_dir}/%(title)s.%(ext)s'
     video_id = get_video_id(link)
 
     if request.form['button_clicked'] == 'Video [best]':
 
         log.info(f'Video [best] was chosen. {link}')
+        download_template = f'{download_dir}/%(title)s-%(id)s [Video].%(ext)s'
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-o', download_template, '--newline', video_id],
-            stdout=f)
+            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', video_id], stdout=f)
 
         download_complete_time = time.time()
+
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(video_id)
+        download_link = return_download_link(path_to_progress_file, video_id, '[Video]')
         return download_link
 
     elif request.form['button_clicked'] == 'Video [MP4]':
 
         log.info(f'MP4 was chosen. {link}')
+        download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-o', download_template, '--embed-thumbnail', '--newline', '-f',
+            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-f',
             'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(video_id)
+        download_link = return_download_link(path_to_progress_file, video_id, '[MP4]')
         return download_link
 
     elif request.form['button_clicked'] == 'Audio [best]':
 
         log.info(f'Audio [best] was chosen. {link}')
+        download_template = f'{download_dir}/%(title)s-%(id)s [Audio].%(ext)s'
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-o', download_template, '--newline', '-x', video_id], stdout=f)
+            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-x', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(video_id)
+        download_link = return_download_link(path_to_progress_file, video_id, '[Audio]')
         return download_link
 
     elif request.form['button_clicked'] == 'MP3':
 
         log.info(f'MP3 was chosen. {link}')
+        download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-o', download_template, '--newline', '-x',
+            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-x',
             '--audio-format', 'mp3', '--audio-quality', '0', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(video_id)
+        download_link = return_download_link(path_to_progress_file, video_id, '[MP3]')
         return download_link
 
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        log.info(f'freeaudioconverter.net/downloads/{filename}')
+        log.info(f'https://freeaudioconverter.net/downloads/{filename}')
         return send_from_directory(f'{os.getcwd()}/downloads', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'freeaudioconverter.net/downloads/{filename}')
+        log.info(f'https://freeaudioconverter.net/downloads/{filename}')
         return send_from_directory(f'{os.getcwd()}/downloads', filename, as_attachment=True)
+
+@yt.route("/static/yt-progress/<filename>", methods=["GET"])
+def download_log_file(filename):
+    log.info(f'https://freeaudioconverter.net/{filename}')
+    return send_from_directory('static/yt-progress', filename, as_attachment=True)
