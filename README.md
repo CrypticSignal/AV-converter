@@ -1,5 +1,4 @@
 [![HitCount](http://hits.dwyl.com/BassThatHertz/AudioAndVideoConverter.svg)](http://hits.dwyl.com/BassThatHertz/AudioAndVideoConverter)
-[![Github All Releases](https://img.shields.io/github/downloads/BassThatHertz/AudioAndVideoConverter/total.svg)]()
 [![contributors welcome](https://img.shields.io/badge/contributors-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
 On https://free-av-tools.com (alternative URL: https://freeaudioconverter.net), you can:
