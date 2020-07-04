@@ -1,3 +1,6 @@
+[![contributors welcome](https://img.shields.io/badge/contributors-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+[![HitCount](http://hits.dwyl.com/BassThatHertz/AudioAndVideoConverter.svg)](http://hits.dwyl.com/BassThatHertz/AudioAndVideoConverter)
+
 On https://free-av-tools.com (alternative URL: https://freeaudioconverter.net), you can:
 - Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (in the .mka container), FLAC, ALAC, AC3, DTS or CAF.
 - Convert a video to an audio-only file (to any of the above formats).
@@ -80,4 +83,4 @@ docker run -p 5000:5000 audio-and-video-converter
 ## Notes for contributors
 Contributors are welcome, simply submit a pull request.
 
-use f-strings rather than `.format()` if you know how to do so.
+Use f-strings rather than `.format()` if you know how to do so.
