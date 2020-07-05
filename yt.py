@@ -32,7 +32,6 @@ def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/1323
     return None
 
 def return_download_link(progress_file, video_id, download_type):
-    log.info(f'download type: {download_type}')
     for file in os.listdir(download_dir):
         if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file:
 
@@ -47,8 +46,7 @@ def return_download_link(progress_file, video_id, download_type):
             log.info(f'NEW FILENAME: {new_filename}')
 
             # Without this if-statement, when running locally on Windows, the os.rename line causes an error saying
-            # that the file already exists (if you try downloading the same video again). Interestingly, I don't get
-            # this error on my Raspberry Pi 4 (running Raspberry Pi OS) when downloading the same video again.
+            # that the file already exists (if you try downloading the same video again).
             if not os.path.isfile(f'{download_dir}/{new_filename}'):
                 os.rename(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
                 
@@ -96,6 +94,7 @@ def yt_downloader():
     link = request.form['link']
     #download_template = f'{download_dir}/%(title)s.%(ext)s'
     video_id = get_video_id(link)
+    log.info(f'Video Id: {video_id}')
 
     if request.form['button_clicked'] == 'Video [best]':
 
@@ -104,7 +103,7 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', video_id], stdout=f)
+            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
 
@@ -120,11 +119,11 @@ def yt_downloader():
 
         with open(path_to_progress_file, 'w') as f:
             subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-f',
-            'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', video_id], stdout=f)
+            'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(path_to_progress_file, video_id, '[MP4]')
+        download_link = return_download_link(path_to_progress_file, link, '[MP4]')
         return download_link
 
     elif request.form['button_clicked'] == 'Audio [best]':
@@ -134,7 +133,8 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-x', video_id], stdout=f)
+            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-x', '--', video_id],
+                stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -149,7 +149,7 @@ def yt_downloader():
 
         with open(path_to_progress_file, 'w') as f:
             subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-x',
-            '--audio-format', 'mp3', '--audio-quality', '0', video_id], stdout=f)
+            '--audio-format', 'mp3', '--audio-quality', '0', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -165,8 +165,3 @@ def send_file(filename):
     else:
         log.info(f'https://freeaudioconverter.net/downloads/{filename}')
         return send_from_directory(f'{os.getcwd()}/downloads', filename, as_attachment=True)
-
-@yt.route("/static/yt-progress/<filename>", methods=["GET"])
-def download_log_file(filename):
-    log.info(f'https://freeaudioconverter.net/yt-progress/{filename}')
-    return send_from_directory('static/yt-progress', filename)
