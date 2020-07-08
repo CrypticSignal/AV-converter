@@ -2,7 +2,7 @@
 *.3gp
 *.aac
 *.ac3
-*.ADPCM
+*.adpcm
 *.caf
 *.dts
 *.flac
@@ -15,9 +15,11 @@
 *.wav
 # Video Files
 *.avi
+*.flv
 *.mov
 *.mp4
 *.webm
+*.wmv
 *.mkv
 # Image Files
 *.jpg
@@ -25,6 +27,7 @@
 *.png
 *.webp
 # Misc
+*.db
 *.json
 *.log
 *.part

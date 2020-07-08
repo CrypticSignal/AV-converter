@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, send_from_directory, session
+from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from yt import yt # Importing the blueprint in yt.py
 from trimmer import trimmer # Importing the blueprint in trimmer.py
@@ -24,7 +25,19 @@ max_upload_size = 5 # in GB.
 app.config['MAX_CONTENT_LENGTH'] = max_upload_size * 1000 * 1000 * 1000 # Max upload size.
 app.jinja_env.auto_reload = True
 
-os.makedirs('uploads', exist_ok=True)  
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+db = SQLAlchemy(app)
+
+class User(db.Model): # This class is a table in the database.
+
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(15), unique=True, nullable=False)
+    times_used_converter = db.Column(db.Integer, default=0)
+    times_used_yt_downloader = db.Column(db.Integer, default=0)
+
+    def __init__(self, ip, times_used_converter):
+        self.ip = ip
+        self.times_used_converter = times_used_converter
 
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
@@ -46,6 +59,7 @@ def homepage():
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
+        os.makedirs('uploads', exist_ok=True) 
         chosen_file.save(os.path.join("uploads", filename_secure))
         
         return session['progress_filename']
@@ -192,7 +206,23 @@ def homepage():
 
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
+    #db.create_all()
+    user_ip = request.environ['HTTP_X_FORWARDED_FOR']
+    user = User.query.filter_by(ip=user_ip).first()
+    log.info(user)
+
+    if user:
+        user.times_used_converter += 1
+        x = 'time' if user.times_used_converter == 1 else 'times'
+        log.info(f'This user has used the converter {user.times_used_converter} {x}.')
+        db.session.commit()
+    else:
+        new_user = User(ip=user_ip, times_used_converter=1)
+        db.session.add(new_user)
+        db.session.commit()
+
     just_extension = filename.split('.')[-1]
+
     if just_extension == "m4a":
         log.info(f'https://freeaudioconverter.net/conversions/{filename}')
         return send_from_directory('conversions', filename, mimetype="audio/mp4", as_attachment=True)
@@ -259,7 +289,7 @@ def save_game2_stats():
 @app.route("/")
 def homepage_visited():
     log_visit("visited homepage")
-    return render_template("home.html", title="FreeAudioConverter.net", upload_size=max_upload_size)
+    return render_template("home.html", title="Home", upload_size=max_upload_size)
 
 @app.route("/about")
 def about_page_visited():
@@ -274,7 +304,7 @@ def filetypes_visited():
 @app.route("/yt")
 def yt_page_visited():
     log_visit("visited YT")
-    return render_template("yt.html")
+    return render_template("yt.html", title="YouTube downloader")
 
 @app.route("/trimmer")
 def trimmer_visited():

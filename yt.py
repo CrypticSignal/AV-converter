@@ -1,12 +1,26 @@
-from flask import Blueprint, request, send_from_directory
+from flask import Flask, Blueprint, request, send_from_directory
+from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import urlparse, parse_qs
 from werkzeug.utils import secure_filename
 import time
 import urllib 
-import shutil, os, subprocess
+import, os, subprocess
 from loggers import log_this, log
 
 yt = Blueprint('yt', __name__)
+
+app = Flask(__name__)
+db = SQLAlchemy(app)
+
+class User(db.Model): # This class is a table in the database,
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(20), unique=True, nullable=False)
+    times_used_converter = db.Column(db.Integer, default=0)
+    times_used_yt_downloader = db.Column(db.Integer, default=0)
+
+    def __init__(self, ip, times_used_yt_downloader):
+        self.ip = ip
+        self.times_used_yt_downloader = times_used_yt_downloader
 
 os.makedirs('static/yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)    
@@ -32,6 +46,7 @@ def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/1323
     return None
 
 def return_download_link(progress_file, video_id, download_type):
+    
     for file in os.listdir(download_dir):
         if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file:
 
@@ -94,7 +109,6 @@ def yt_downloader():
     link = request.form['link']
     #download_template = f'{download_dir}/%(title)s.%(ext)s'
     video_id = get_video_id(link)
-    log.info(f'Video Id: {video_id}')
 
     if request.form['button_clicked'] == 'Video [best]':
 
@@ -123,7 +137,7 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(path_to_progress_file, link, '[MP4]')
+        download_link = return_download_link(path_to_progress_file, video_id, '[MP4]')
         return download_link
 
     elif request.form['button_clicked'] == 'Audio [best]':
@@ -158,7 +172,23 @@ def yt_downloader():
 
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
+    #db.create_all()
+    user_ip = request.environ['HTTP_X_FORWARDED_FOR']
+    user = User.query.filter_by(ip=user_ip).first()
+    log.info(user)
+
+    if user:
+        user.times_used_yt_downloader += 1
+        x = 'time' if user.times_used_yt_downloader == 1 else 'times'
+        log.info(f'This user has used the downloader {user.times_used_yt_downloader} {x}.')
+        db.session.commit()
+    else:
+        new_user = User(ip=user_ip, times_used_yt_downloader=1)
+        db.session.add(new_user)
+        db.session.commit()
+
     just_extension = filename.split('.')[-1]
+
     if just_extension == "m4a":
         log.info(f'https://freeaudioconverter.net/downloads/{filename}')
         return send_from_directory(f'{os.getcwd()}/downloads', filename, mimetype="audio/mp4", as_attachment=True)

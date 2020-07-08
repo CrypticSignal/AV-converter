@@ -20,7 +20,6 @@ def trim_file():
     if request.form["request_type"] == "trim":
 
         filename = request.form["filename"]
-        filename_without_ext = filename.split('.')[0]
         log_this(f'wants to trim: {filename}')
         uploaded_file_path = os.path.join("uploads", secure_filename(filename))
         start_time = request.form["start_time"]

@@ -32,7 +32,7 @@ async function showDownloadProgress() {
                 show_alert('Initialising...', 'dark');
             }
             else if (secondLastLine.includes('Downloading webpage')) {
-                show_alert('Video found', 'success');
+                show_alert('Video found...', 'success');
             }
             else if (secondLastLine.includes('[download] ')) {
                 show_alert(secondLastLine.substring(11), 'dark');
@@ -52,7 +52,8 @@ async function showDownloadProgress() {
                 <a href="${downloadLink}">here</a>.`, 'success');
             }
             await sleep(1000); // Using the sleep function defined above.
-        } catch(error) {
+        } 
+        catch(error) {
             show_alert(error, 'danger');
             console.log(error);
         }
@@ -74,6 +75,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
     if (contentsOfLinkBox.match(regExp)) {
 
         if (whichButton === 'Audio [best]') {
+            document.getElementById('donate').style.display = 'none';
             document.getElementById('bitrate_info').style.display = 'block';
         }
 
@@ -113,16 +115,18 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
                 // so the download has completed.
                 shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
                 const jsonResponse = await response.json();
+                console.log(`jsonResponse: ${jsonResponse}`)
+                console.log(jsonResponse['download_path'])
                 const downloadLink = jsonResponse.download_path
-                const logFile = jsonResponse.log_file
                 show_alert(`Your browser should have started downloading the file. If it hasn't, click \
                 <a href="${downloadLink}">here</a>.`, "success");
+                const logFile = jsonResponse.log_file
                 const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
                 // when the link is visited. As we have set an empty value, it means use the original filename.
                 virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
                 virtualDownloadLink.click();
-                document.getElementById('logfile').innerHTML = `Would you like to download the log file? If so, click \
-                <a href="${logFile}">here</a>.`
+                document.getElementById('logfile').innerHTML = `Would you like to view the log file? If so, click \
+                <a href="${logFile}" target="_blank">here</a>.`
             } 
             catch(error) { // 2nd POST request.
                 show_alert(error, 'danger');

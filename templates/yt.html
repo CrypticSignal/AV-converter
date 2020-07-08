@@ -24,7 +24,7 @@
         <button class="btn btn-primary" onclick="buttonClicked(this.value)" value="Audio [best]">Audio [best]</button>
     </div><br><br>
     <i id='bitrate_info' style='display:none'><strong>Audio [best]</strong> usually gives you a file with a bitrate of ~160 kbps. This does not mean that the audio is lower quality than other YouTube downloaders which may give a higher bitrate file. The best audio stream in a YouTube video is usually ~160 kbps and this downloader extracts the best audio stream <strong>(if Audio [best] was selected )</strong>. YouTube downloaders that give you a higher bitrate are doing lossy-to-lossy conversion, giving you lower audio quality than the <strong>Audio [best]</strong> option on this website.</i>
-    <i>This website is running on a server which costs $40 per month. If you want to support my non-profit website, click on the coffee cup on the bottom-right and you can donate as little as £3 :)</i>
+    <i id='donate'>This website is running on a server which costs $40 per month. If you want to support my non-profit website, click on the coffee cup on the bottom-right and you can donate as little as £3 :)</i>
 </div>
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="{{ url_for('static', filename='js/yt.js') }}"></script>
