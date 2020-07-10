@@ -54,7 +54,7 @@ def return_download_link(progress_file_path, video_id, download_type):
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
             log.info(f'{filesize} MB')
 
-            with open("downloaded-files.txt", "a") as f:
+            with open("logs/downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}') 
 
             new_filename = file.replace(f'-{video_id}', '') # Remove the video ID from the filename.

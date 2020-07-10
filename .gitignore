@@ -1,5 +1,6 @@
 *.db
 *.jpg
+*.json
 *.part
 *.webp
 *.ytdl
@@ -11,4 +12,5 @@ downloads
 ffmpeg-progress
 flask_session
 logs
+uploads
 yt-progress

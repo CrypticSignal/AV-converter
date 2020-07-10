@@ -268,9 +268,7 @@ async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complet
         reset();
 
         const downloadLink = jsonResponse.download_path;
-        console.log(`downloadLink: ${downloadLink}`);
         const logFile = jsonResponse.log_file;
-        console.log(`logFile: ${logFile}`);
 
         show_alert(`File converted. Click <a href="${downloadLink}">here</a> \
         if the download does not begin automatically. Would you like to view the log file? If so, click \
@@ -279,9 +277,6 @@ async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complet
         const createLink = document.createElement("a"); // Create a virtual link.
         createLink.href = jsonResponse.download_path;
         createLink.click();
-
-        // document.getElementById('logfile').innerHTML = `Would you like to view the log file? If so, click \
-        // <a href="${logFile}" target="_blank">here</a>.`
     }
     
 } // Closing bracket for pythonHeresWhatYouNeed function.
@@ -297,11 +292,10 @@ function show_alert(message, type) {
     </div>`
 }
 
-// Function to reset the page.
+// A function to reset the page.
 function reset() {
     document.getElementById("converting_btn").style.display = 'none ';
     conversionProgress.style.display = 'none';
-    //alertWrapper.innerHTML = "";
     input.disabled = false;
     input.value = '';
     inputLabel.innerText = "Select file";
@@ -316,12 +310,7 @@ function reset() {
     progressParagraph.style.display = 'none';
 }
 
-<<<<<<< HEAD
 // FILE DRAG-AND-DROP:
-=======
-
-// === File drag and drop ===
->>>>>>> 572b04188d0ad5018c3a1e49c7b084a023ce98eb
 
 // The whole body is the drop zone
 const body = document.querySelector('body');
@@ -351,8 +340,4 @@ body.addEventListener('drop', (event) => {
     dropOverlay.style.display = 'none';
     document.querySelector('#file_input').files = event.dataTransfer.files;
     updateBoxes();
-<<<<<<< HEAD
-}); 
-=======
 });
->>>>>>> 572b04188d0ad5018c3a1e49c7b084a023ce98eb
