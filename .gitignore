@@ -1,30 +1,5 @@
-# Audio files
-*.3gp
-*.aac
-*.ac3
-*.adpcm
-*.caf
-*.dts
-*.flac
-*.m4a
-*.mka
-*.mp3
-*.MTS
-*.ogg
-*.opus
-*.wav
-# Video Files
-*.avi
-*.flv
-*.mov
-*.mp4
-*.webm
-*.wmv
-*.mkv
 # Image Files
 *.jpg
-*jpeg
-*.png
 *.webp
 # Misc
 chat.py
@@ -33,8 +8,11 @@ chat.py
 *.log
 *.part
 *.sh
-*.txt
 *.ytdl
 # Folders
 __pycache__
+conversions
+downloads
+ffmpeg-progress
 flask_session
+yt-progress
