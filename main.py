@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, send_from_directory, session
+from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from yt import yt # Importing the blueprint in yt.py
@@ -13,12 +14,17 @@ import converter
 app = Flask(__name__)
 secret_key = str(os.urandom(16))
 app.secret_key = secret_key
+
+# For the chat section of the website.
+socketio = SocketIO(app)
+socketio.init_app(app, cors_allowed_origins="*")
+
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
-app.register_blueprint(trimmer)
 app.register_blueprint(yt)
+app.register_blueprint(trimmer)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 max_upload_size = 5 # in GB.
@@ -209,7 +215,6 @@ def send_file(filename):
     #db.create_all()
     user_ip = request.environ['HTTP_X_FORWARDED_FOR']
     user = User.query.filter_by(ip=user_ip).first()
-    log.info(user)
 
     if user:
         user.times_used_converter += 1
@@ -326,5 +331,32 @@ def game2_visited():
     log_visit("visited game 2")  
     return render_template("game2.html", title="Game 2")
 
+# CHAT SECTION:
+
+@app.route("/chat")
+def chat():
+    log_visit("visited chat")  
+    return render_template("chat.html", title="Chat")
+
+count = 0
+
+@socketio.on('connect')
+def connect():
+    global count
+    count += 1
+    log.info(f'A user has connected. Total: {count}')
+    socketio.emit('users online', count)
+  
+@socketio.on('disconnect')
+def disconnect():
+    global count
+    count -= 1
+    log.info(f'A user disconnected. Total: {count}')
+    socketio.emit('users online', count)
+    
+@socketio.on('message')
+def handle_message(msg):
+    socketio.send(msg, broadcast=True)
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    socketio.run(app)
