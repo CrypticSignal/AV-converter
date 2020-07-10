@@ -4,8 +4,8 @@ from loggers import log
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     ffmpeg_path = '/home/h/bin/ffmpeg' # If running locally, change this to the correct path.
 
-    os.makedirs('static/ffmpeg-progress', exist_ok=True)
-    progress_file_path = f'static/ffmpeg-progress/{progress_filename}.txt'
+    os.makedirs('ffmpeg-progress', exist_ok=True)
+    progress_file_path = f'ffmpeg-progress/{progress_filename}.txt'
 
     params = params.split(' ') # I want to use subprocess.run() with an array of arguments.
     params.append(output_name)

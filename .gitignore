@@ -1,13 +1,7 @@
-# Image Files
-*.jpg
-*.webp
-# Misc
-chat.py
 *.db
-*.json
-*.log
+*.jpg
 *.part
-*.sh
+*.webp
 *.ytdl
 # Folders
 __pycache__
@@ -15,4 +9,5 @@ conversions
 downloads
 ffmpeg-progress
 flask_session
+logs
 yt-progress

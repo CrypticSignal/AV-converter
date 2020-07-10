@@ -208,7 +208,15 @@ def homepage():
             extension = 'mkv'
 
         converted_file_name = output_name + "." + extension
-        return f'/conversions/{converted_file_name}'
+
+        return {
+            'download_path': f'/conversions/{converted_file_name}',
+            'log_file': f'ffmpeg-progress/{session["progress_filename"]}.txt'
+            }
+       
+@app.route("/ffmpeg-progress/<filename>")
+def get_file(filename):
+    return send_from_directory('ffmpeg-progress', filename)
 
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):

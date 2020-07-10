@@ -22,7 +22,7 @@ class User(db.Model): # This class is a table in the database,
         self.ip = ip
         self.times_used_yt_downloader = times_used_yt_downloader
 
-os.makedirs('static/yt-progress', exist_ok=True)
+os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)    
 download_dir = 'downloads'
 
@@ -45,7 +45,7 @@ def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/1323
     # Fail?
     return None
 
-def return_download_link(progress_file, video_id, download_type):
+def return_download_link(progress_file_path, video_id, download_type):
 
     for file in os.listdir(download_dir):
         if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file:
@@ -70,7 +70,7 @@ def return_download_link(progress_file, video_id, download_type):
 
             return {
                 'download_path': f'/downloads/{new_filename}',
-                'log_file': progress_file
+                'log_file': progress_file_path
             }
 
 # When POST requests are made to /yt
@@ -93,7 +93,7 @@ def yt_downloader():
     # I want to save the download progress to a file and read from that file to show the download progress to the user.
     # Set the name of the file to the time since the epoch.
     progress_filename = str(time.time())[:-8]
-    path_to_progress_file = f'static/yt-progress/{progress_filename}.txt'
+    path_to_progress_file = f'yt-progress/{progress_filename}.txt'
 
     if request.form['button_clicked'] == 'yes':
 
@@ -149,7 +149,7 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-v', '--embed-thumbnail', '-o', download_template, '--newline', '-f',
+            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-f',
             'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
@@ -179,13 +179,17 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-v', '--embed-thumbnail', '-o', download_template, '--newline', '-x',
+            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-x',
             '--audio-format', 'mp3', '--audio-quality', '0', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
         download_link = return_download_link(path_to_progress_file, video_id, '[MP3]')
         return download_link
+
+@yt.route("/yt-progress/<filename>")
+def get_file(filename):
+    return send_from_directory('yt-progress', filename)
 
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
@@ -195,7 +199,7 @@ def send_file(filename):
 
     if just_extension == "m4a":
         log.info(f'https://freeaudioconverter.net/downloads/{filename}')
-        return send_from_directory(f'{os.getcwd()}/downloads', filename, mimetype="audio/mp4", as_attachment=True)
+        return send_from_directory('downloads', filename, mimetype="audio/mp4", as_attachment=True)
     else:
         log.info(f'https://freeaudioconverter.net/downloads/{filename}')
-        return send_from_directory(f'{os.getcwd()}/downloads', filename, as_attachment=True)
+        return send_from_directory('downloads', filename, as_attachment=True)

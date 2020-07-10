@@ -24,7 +24,7 @@ function sleep(ms) {
 async function showDownloadProgress() {
     while (shouldLog) {
         try {
-            const response = await fetch(`static/yt-progress/${responseFromServer}.txt`);
+            const response = await fetch(`yt-progress/${responseFromServer}.txt`);
             const textInFile = await response.text();
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
@@ -113,18 +113,22 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
                 });
                 // As we're using await fetch, if we reach this line, it means that we've received a response,
                 // so the download has completed.
+
                 shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
+
                 const jsonResponse = await response.json();
                 console.log(`jsonResponse: ${jsonResponse}`)
-                console.log(jsonResponse['download_path'])
+
                 const downloadLink = jsonResponse.download_path
+                const logFile = jsonResponse.log_file
+
                 show_alert(`Your browser should have started downloading the file. If it hasn't, click \
                 <a href="${downloadLink}">here</a>.`, "success");
-                const logFile = jsonResponse.log_file
+
                 const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
-                // when the link is visited. As we have set an empty value, it means use the original filename.
                 virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
                 virtualDownloadLink.click();
+
                 document.getElementById('logfile').innerHTML = `Would you like to view the log file? If so, click \
                 <a href="${logFile}" target="_blank">here</a>.`
             } 

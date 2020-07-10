@@ -180,7 +180,7 @@ async function showConversionProgress() {
     // If you start reading the file straight away, .split('=') won't work as FFmpeg hasn't started writing to the file.
     await sleep(1000)
     while (shouldLog) {
-        const response = await fetch(`static/ffmpeg-progress/${progressFilename}.txt`);
+        const response = await fetch(`ffmpeg-progress/${progressFilename}.txt`);
         const textInFile = await response.text();
         const lines = textInFile.split('\n');
         const fifthLastLine = lines[lines.length - 6].split('=');
@@ -246,37 +246,44 @@ async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complet
 
     shouldLog = true;
     showConversionProgress();
+    console.log('blah')
 
-    try {
-        const conversionRequest = await fetch("/", {
-            method: 'POST',
-            body: data,
-        })
-        const response = await conversionRequest.text();
+    const conversionRequest = await fetch("/", {
+        method: 'POST',
+        body: data,
+    })
+    //console.log(await conversionRequest.text())
+    const jsonResponse = await conversionRequest.json();
+    console.log(`jsonResponse: ${jsonResponse}`)
 
-        if (!conversionRequest.ok) {
-            shouldLog = false;
-            reset();
-            show_alert(response, 'danger')
-        } 
-        else {
-            shouldLog = false;
-            reset();
+    if (!conversionRequest.ok) {
+        console.log('Conersion response not ok')
+        shouldLog = false;
+        reset();
+        show_alert(response, 'danger')
+    } 
+    else {
+        console.log('in else')
+        shouldLog = false;
+        reset();
 
-            show_alert(`File converted. <a href="${response}">Click here</a> \
-            if the download does not begin automatically.`, "success");
+        const downloadLink = jsonResponse.download_path;
+        console.log(`downloadLink: ${downloadLink}`);
+        const logFile = jsonResponse.log_file;
+        console.log(`logFile: ${logFile}`);
 
-            const createLink = document.createElement("a"); // Create a virtual link.
-            createLink.href = response;
-            // createLink.download = ''; // The download attribute specifies that the file will be downloaded
-            // // when the link is visited. As we have set an empty value, it means use the original filename.
-            createLink.click();
-        }
+        show_alert(`File converted. Click <a href="${downloadLink}">here</a> \
+        if the download does not begin automatically. Would you like to view the log file? If so, click \
+        <a href="${logFile}" target="_blank">here</a>.`, "success");
+
+        const createLink = document.createElement("a"); // Create a virtual link.
+        createLink.href = jsonResponse.download_path;
+        createLink.click();
+
+        // document.getElementById('logfile').innerHTML = `Would you like to view the log file? If so, click \
+        // <a href="${logFile}" target="_blank">here</a>.`
     }
-    catch (error) {
-        show_alert(error, 'danger');
-        console.log(error);
-    }
+    
 } // Closing bracket for pythonHeresWhatYouNeed function.
 
 function show_alert(message, type) {
@@ -308,3 +315,35 @@ function reset() {
     outputNameBox.value = ''
     progressParagraph.style.display = 'none';
 }
+
+// FILE DRAG-AND-DROP:
+
+// The whole body is the drop zone
+const body = document.querySelector('body');
+const dropOverlay = document.querySelector('#drop-overlay');
+
+let eventTarget = null;
+
+body.addEventListener('dragover', (event) => event.preventDefault());
+
+body.addEventListener('dragenter', (event) => {
+    event.preventDefault();
+
+    eventTarget = event.target;
+    dropOverlay.style.display = 'block';
+});
+
+body.addEventListener('dragleave', (event) => {
+    event.preventDefault();
+
+    if (event.target === eventTarget) {
+        dropOverlay.style.display = 'none';
+    }
+});
+
+body.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dropOverlay.style.display = 'none';
+    document.querySelector('#file_input').files = event.dataTransfer.files;
+    updateBoxes();
+}); 
