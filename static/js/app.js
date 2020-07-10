@@ -308,3 +308,36 @@ function reset() {
     outputNameBox.value = ''
     progressParagraph.style.display = 'none';
 }
+
+
+// === File drag and drop ===
+
+// The whole body is the drop zone
+const body = document.querySelector('body');
+const dropOverlay = document.querySelector('#drop-overlay');
+
+let eventTarget = null;
+
+body.addEventListener('dragover', (event) => event.preventDefault());
+
+body.addEventListener('dragenter', (event) => {
+    event.preventDefault();
+
+    eventTarget = event.target;
+    dropOverlay.style.display = 'block';
+});
+
+body.addEventListener('dragleave', (event) => {
+    event.preventDefault();
+
+    if (event.target === eventTarget) {
+        dropOverlay.style.display = 'none';
+    }
+});
+
+body.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dropOverlay.style.display = 'none';
+    document.querySelector('#file_input').files = event.dataTransfer.files;
+    updateBoxes();
+});

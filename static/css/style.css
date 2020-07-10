@@ -66,10 +66,15 @@ h1 {
   background: darkblue;
   color:white;
 }
+/* Extend height of <htmL> element for file drag-and-drop functionality */
+html {
+  height: 100%;
+}
 body {
   color: black;
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
   /* font-family: "Lucida Console", Courier, monospace; */
   /* font-family: "Times New Roman", Times, serif; */
   /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif */
@@ -125,4 +130,24 @@ body {
 .videofiletypes, .outputformats, .audiofiletypes {
   float: left;
   width: 33%;
+}
+#drop-overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.80); /* Black background with 80% opacity */
+  z-index: 999; /* Sits above everything else */
+}
+#drop-overlay img {
+  margin-bottom: 1em;
+}
+#drop-overlay-text {
+  color: #fff;
+  position: relative;
+  top: 25%;
 }
