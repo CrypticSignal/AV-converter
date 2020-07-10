@@ -4,12 +4,14 @@
 <h1>Chat Room</h1>
 <p>You can talk to others in this chat room. If you want to test this chat room, you can get someone to visit this webpage and send each other messages.</p>
 <p id="users"></p>
+
 <input type="text" name="username" id="username" placeholder="Enter a username"/>
 <input type="text" id="message" id="message" placeholder="Enter your message"/>
-<button id="sendbutton">Send</button>
+<button id="sendbutton">Send</button><hr>
+
 <div id="messages"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
-<script src="{{ url_for('static', filename='js/chat.js') }}"></script
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 
 {% endblock content %}

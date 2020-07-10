@@ -344,19 +344,17 @@ count = 0
 def connect():
     global count
     count += 1
-    log.info(f'A user has connected. Total: {count}')
-    socketio.emit('users online', count)
+    socketio.emit('user connected', count)
   
 @socketio.on('disconnect')
 def disconnect():
     global count
     count -= 1
-    log.info(f'A user disconnected. Total: {count}')
-    socketio.emit('users online', count)
+    socketio.emit('user disconnected', count)
     
-@socketio.on('message')
-def handle_message(msg):
-    socketio.send(msg, broadcast=True)
+@socketio.on('message sent')
+def handle_message(message):
+    socketio.emit('show message', message)
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')

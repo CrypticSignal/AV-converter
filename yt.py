@@ -4,7 +4,7 @@ from urllib.parse import urlparse, parse_qs
 from werkzeug.utils import secure_filename
 import time
 import urllib 
-import, os, subprocess
+import os, subprocess
 from loggers import log_this, log
 
 yt = Blueprint('yt', __name__)
@@ -46,7 +46,7 @@ def get_video_id(url): # Function from https://stackoverflow.com/a/54383711/1323
     return None
 
 def return_download_link(progress_file, video_id, download_type):
-    
+
     for file in os.listdir(download_dir):
         if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file:
 
@@ -73,8 +73,25 @@ def return_download_link(progress_file, video_id, download_type):
                 'log_file': progress_file
             }
 
+# When POST requests are made to /yt
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
+
+    user_ip = request.environ['HTTP_X_FORWARDED_FOR']
+    user = User.query.filter_by(ip=user_ip).first()
+
+    if user:
+        user.times_used_yt_downloader += 1
+        x = 'time' if user.times_used_yt_downloader == 1 else 'times'
+        log.info(f'This user has used the downloader {user.times_used_yt_downloader} {x}.')
+        db.session.commit()
+    else:
+        new_user = User(ip=user_ip, times_used_yt_downloader=1)
+        db.session.add(new_user)
+        db.session.commit()
+
+    # I want to save the download progress to a file and read from that file to show the download progress to the user.
+    # Set the name of the file to the time since the epoch.
     progress_filename = str(time.time())[:-8]
     path_to_progress_file = f'static/yt-progress/{progress_filename}.txt'
 
@@ -132,7 +149,7 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-f',
+            subprocess.run([youtube_dl_path, '-v', '--embed-thumbnail', '-o', download_template, '--newline', '-f',
             'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
@@ -162,7 +179,7 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(path_to_progress_file, 'w') as f:
-            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-x',
+            subprocess.run([youtube_dl_path, '-v', '--embed-thumbnail', '-o', download_template, '--newline', '-x',
             '--audio-format', 'mp3', '--audio-quality', '0', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
@@ -173,19 +190,6 @@ def yt_downloader():
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
     #db.create_all()
-    user_ip = request.environ['HTTP_X_FORWARDED_FOR']
-    user = User.query.filter_by(ip=user_ip).first()
-    log.info(user)
-
-    if user:
-        user.times_used_yt_downloader += 1
-        x = 'time' if user.times_used_yt_downloader == 1 else 'times'
-        log.info(f'This user has used the downloader {user.times_used_yt_downloader} {x}.')
-        db.session.commit()
-    else:
-        new_user = User(ip=user_ip, times_used_yt_downloader=1)
-        db.session.add(new_user)
-        db.session.commit()
 
     just_extension = filename.split('.')[-1]
 

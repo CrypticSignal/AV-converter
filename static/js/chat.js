@@ -14,22 +14,34 @@ document.addEventListener("keydown", function(event) {
     
 const socket = io.connect('https://' + document.domain + ':' + location.port);
 
-socket.on('users online', function(count) {
+socket.on('user connected', function(count) {
+    if (count > 1) {
+        usersOnline.innerHTML = `Users Online: ${count}`;
+        messages.innerHTML += '<p>A user has connected!</p>';
+    }
+    else {
+        usersOnline.innerHTML = `Users Online: ${count}`;
+    }
+});
+
+socket.on('user disconnected', function(count) {
     usersOnline.innerHTML = `Users Online: ${count}`;
+    messages.innerHTML += '<p>A user disconnected.</p>';
 });
 
 function sendData() { // Runs when the send button is clicked.
     const username = usernameBox.value;
     const userInput = messageBox.value;
-    socket.send({
+    socket.emit('message sent', {
         user_name: username,
         message: userInput
     })
 };
 
-socket.on('message', function(msg) {
-    if (typeof msg.user_name !== 'undefined') {
-        messages.innerHTML += `<p><b>${msg.user_name}</b> said: <i>${msg.message}</i></p>`;
+socket.on('show message', function(message) {
+    if (typeof message.user_name !== 'undefined') {
+        messages.innerHTML += `<p><b>${message.user_name}</b>: <i>${message.message}</i></p>`;
         messageBox.value = ''
+        messageBox.focus();
     }   
 });

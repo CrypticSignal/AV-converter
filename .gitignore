@@ -27,6 +27,7 @@
 *.png
 *.webp
 # Misc
+chat.py
 *.db
 *.json
 *.log

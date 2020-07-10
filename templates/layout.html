@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+  
 <head>
     <!--Global site tag (gtag.js) - Google Analytics-->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-167636115-1"></script>
@@ -23,9 +24,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>{{ title }}</title>
 </head>
+
 <body>
 
 <div class="top" id=top_bar>
+
   <!-- Navbar -->
   <a href="javascript:void(0);" class="icon" onclick="myFunction()">
     <i class="fa fa-bars"></i>
@@ -38,12 +41,15 @@
   <a href="contact">Contact</a>
   <a href="game">Game 1</a>
   <a href="game2">Game 2</a>
+  <a href="chat">Chat</a>
+
   <div id='github'>
     <!-- GH follow -->
     <a class="github-button" href="https://github.com/BassThatHertz/AudioAndVideoConverter" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-size="large" aria-label="Follow @BassThatHertz on GitHub">GitHub</a>
     <!-- Star -->
     <a class="github-button" href="https://github.com/BassThatHertz/AudioAndVideoConverter" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star BassThatHertz/AudioAndVideoConverter on GitHub">Star</a>
   </div>
+  
 </div>
 
 {% block content %} {% endblock content%}
@@ -62,4 +68,5 @@
     }
   }
 </script>
+
 </html>
