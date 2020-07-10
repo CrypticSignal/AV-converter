@@ -1,6 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-<script data-name="BMC-Widget" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="fezCGRFkb" data-description="You can send a donation as little as £3" data-color="#5F7FFF" data-position="right" data-x_margin="18" data-y_margin="18"></script>
   
 <h1>Audio / Video Converter</h1>
 
@@ -8,11 +7,7 @@
   <P>Easy to use. Open source. Ad-free.</P>
 </div>
 
-<<<<<<< HEAD
 <h5>Select a file, or drag and drop a file onto this webpage.</h5>
-=======
-<h5>Select the file you wish to convert, or drag and drop a file here</h5>
->>>>>>> 572b04188d0ad5018c3a1e49c7b084a023ce98eb
 
 <div id="drop-overlay">
   <div id="drop-overlay-text">
@@ -344,7 +339,7 @@
   <!--"Cancel upload" button (Bootstrap class)-->
   <button type="button" id="cancel_btn" class="btn btn-secondary d-none">Cancel upload</button>
 
-  <!--"CONVERTING..." BUTTON (Bootstrap class)-->
+  <!--"Converting..." button (Bootstrap class)-->
   <div class="text-center" id="converting_btn" style="display:none">
     <button class="btn btn-info" disabled> 
       <span class="spinner-border spinner-border-sm"></span>
@@ -361,7 +356,7 @@
     <label id="progress_status"></label>
   </div>
 
-  <!-- ENCODER PROGRESS -->
+  <!--ENCODER PROGRESS-->
   <p id="progress" style="display:none"></p>
 
   <!-- ALERTS -->
@@ -372,10 +367,12 @@
 <!--My JavaScript files-->
 <script src="{{ url_for('static', filename='js/elements.js') }}"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-
+<!--jQuery-->
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!--Bootstrap JS-->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!--Buy Me a Coffee widget-->
+<script data-name="BMC-Widget" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="fezCGRFkb" data-description="You can send a donation as little as £3" data-color="#5F7FFF" data-position="right" data-x_margin="18" data-y_margin="18"></script>
 
 {% endblock content %}
