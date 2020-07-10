@@ -5,6 +5,7 @@
 *.ytdl
 # Folders
 __pycache__
+.vscode
 conversions
 downloads
 ffmpeg-progress
