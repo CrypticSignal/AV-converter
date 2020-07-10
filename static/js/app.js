@@ -316,7 +316,12 @@ function reset() {
     progressParagraph.style.display = 'none';
 }
 
+<<<<<<< HEAD
 // FILE DRAG-AND-DROP:
+=======
+
+// === File drag and drop ===
+>>>>>>> 572b04188d0ad5018c3a1e49c7b084a023ce98eb
 
 // The whole body is the drop zone
 const body = document.querySelector('body');
@@ -346,4 +351,8 @@ body.addEventListener('drop', (event) => {
     dropOverlay.style.display = 'none';
     document.querySelector('#file_input').files = event.dataTransfer.files;
     updateBoxes();
+<<<<<<< HEAD
 }); 
+=======
+});
+>>>>>>> 572b04188d0ad5018c3a1e49c7b084a023ce98eb
