@@ -52,24 +52,19 @@ opusenc opus-tools 0.2 (using libopus 1.3.1) | https://github.com/xiph/opus
 libvorbis
 ## Other tool(s) used:
 youtube-dl | https://github.com/ytdl-org/youtube-dl
-## youtube-dl configuration for each download button:
-**Video [MP4]** `-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"`
 
-**Video [best quality]** `youtube-dl <video_id>`
-
-**Audio [MP3]** `-x --embed-thumbnail --audio-format mp3 --audio-quality 0`
-
-**Audio [best]** `-x <video_id>`
 ## Requirements for developers/running locally:
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
 - Python **3.6+**
 - FFmpeg
 
 *When running locally, you will not be able to convert to AAC unless you [compile FFmpeg](https://trac.ffmpeg.org/wiki/CompilationGuide) with `--enable-libfdk-aac` in the configuration. Or, if you know what you're doing, you can edit the code in converter.py to use FFmpeg's native AAC encoder instead.*
-- `pip install Flask-Session`
 - `pip install -r requirements.txt`
+
+*If youtube-dl fails to install when using `pip install -r requirements.txt`, install it manually. Installation details can be found [here](https://github.com/ytdl-org/youtube-dl#installation).*
 - Clone this repository.
-- Change the value of `youtube_dl_path` in yt.py to the correct path. On Raspberry Pi OS, even though youtube-dl is in the PATH, you have to specify the full path to youtube-dl when using it with `subprocess.run()`. On Windows, if youtube-dl is in your PATH, you can set the value of `youtube_dl_path` to 'youtube-dl'.
+- Uncomment `db.create_all()` in main.py and yt.py
+- Change the value of `youtube_dl_path` in yt.py to the correct path.
 - cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
 - Enter localhost:5000 in the address bar of your web browser and hit enter.
 
