@@ -77,28 +77,29 @@ def return_download_link(progress_file_path, video_id, download_type):
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
 
-    user_ip = request.environ['HTTP_X_FORWARDED_FOR']
-    user = User.query.filter_by(ip=user_ip).first()
-
-    if user:
-        user.times_used_yt_downloader += 1
-        x = 'time' if user.times_used_yt_downloader == 1 else 'times'
-        log.info(f'This user has used the downloader {user.times_used_yt_downloader} {x}.')
-        db.session.commit()
-    else:
-        new_user = User(ip=user_ip, times_used_yt_downloader=1)
-        db.session.add(new_user)
-        db.session.commit()
-
-    # I want to save the download progress to a file and read from that file to show the download progress to the user.
-    # Set the name of the file to the time since the epoch.
-    progress_filename = str(time.time())[:-8]
-    path_to_progress_file = f'yt-progress/{progress_filename}.txt'
-
     if request.form['button_clicked'] == 'yes':
 
         log_this('Clicked a button.')
+
+        user_ip = request.environ['HTTP_X_FORWARDED_FOR']
+        user = User.query.filter_by(ip=user_ip).first()
+
+        if user:
+            x = 'time' if user.times_used_yt_downloader == 1 else 'times'
+            log.info(f'This user has used the downloader {user.times_used_yt_downloader} {x} before.')
+            user.times_used_yt_downloader += 1
+            db.session.commit()
+        else:
+            new_user = User(ip=user_ip, times_used_yt_downloader=1)
+            db.session.add(new_user)
+            db.session.commit()
+        
         link = request.form['link']
+
+        # I want to save the download progress to a file and read from that file to show the download progress
+        # to the user. Set the name of the file to the time since the epoch.
+        progress_filename = str(time.time())[:-8]
+        path_to_progress_file = f'yt-progress/{progress_filename}.txt'
 
         # Create the progress file.
         with open(path_to_progress_file, "w"): pass
