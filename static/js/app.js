@@ -13,12 +13,11 @@ convertButton.addEventListener("click", convertButtonClicked);
 
 // This function runs when a file is selected.
 function updateBoxes() {
-    inputLabel.innerText = input.files[0].name; // Show name of selected file.
-    const inputFilename = input.files[0].name; // Filename of the selected file.
+    inputLabel.innerText = input.files[0].name; // Show the name of the selected file.
+    const inputFilename = input.files[0].name; 
     const nameWithoutExt = inputFilename.split('.').slice(0, -1).join('.')
-    const withoutPercentageSigns = nameWithoutExt.replace(/%/g, ''); // Remove percentage sign(s) as this causes
-    // an issue with secure_filename
-    defaultOutputName = withoutPercentageSigns.replace(/\./g, ' '); // Replace the dots with spaces.
+    const defaultOutputName = nameWithoutExt.replace(/%/g, ''); // Remove percentage sign(s) as this causes
+    // an issue when secure_filename is used in main.py
     outputNameBox.value = defaultOutputName; 
 }
 
@@ -26,7 +25,7 @@ async function convertButtonClicked() {
     try {
         const isConvertClicked = new FormData();
         isConvertClicked.append('request_type', 'log_convert_clicked')
-        await fetch('/', {
+        await fetch('/', { // First POST request.
             method: 'POST',
             body: isConvertClicked
         });
@@ -42,7 +41,7 @@ function upload_and_send_conversion_request() {
     "avi", "ac3", "3gp", "MTS", "mts", "webm", "ADPCM", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd"]
 
     if (!input.value && document.getElementById("output_name").value == '') {
-        show_alert("It helps if you select the file that you want to convert.", "danger")
+        show_alert("It helps if you select the file that you want to convert.", "warning")
         return;
     }
     else if (input.value) { // (If a file has been selected)
@@ -52,7 +51,7 @@ function upload_and_send_conversion_request() {
         const fileExt = filenameParts[filenameParts.length - 1];
         const filesize = chosenFile.size;
         if (!allowedFiletypes.includes(fileExt)) {
-            show_alert('Incompatible filetype selected. Click <a href="https://freeaudioconverter.net/filetypes" \
+            show_alert('Incompatible filetype selected. Click <a href="/filetypes" \
             target="_blank">here</a> to see the list of compatible filetypes.', "danger");
                 reset();
                 return;
@@ -118,7 +117,7 @@ function upload_and_send_conversion_request() {
             progressFilename = uploadRequest.responseText;
             progressParagraph.style.display = 'block';
             document.getElementById("converting_btn").style.display = 'block';
-            pythonHeresWhatYouNeed(chosenFile.name);
+            sendConversionRequest(chosenFile.name);
         }
         else {
             show_alert(`${uploadRequest.responseText}`, "danger");
@@ -158,10 +157,10 @@ function showProgress(event) {
     const speed = ((loaded - previousLoaded) / ((Date.now() / 1000) - previousTime));
 
     const completionTimeSeconds = (total - loaded) / speed;
-    const hours = Math.floor(completionTimeSeconds / 3600) % 60;
-    const minutes = Math.floor(completionTimeSeconds / 60) % 60;
-    const seconds = Math.ceil(completionTimeSeconds % 60)
-    const completionTime = `${hours}:${minutes}:${seconds} [H:M:S]`
+    const hours = (Math.floor(completionTimeSeconds / 3600) % 60).toString().padStart(2, '0');
+    const minutes = (Math.floor(completionTimeSeconds / 60) % 60).toString().padStart(2, '0');
+    const seconds = (Math.ceil(completionTimeSeconds % 60)).toString().padStart(2, '0');
+    const completionTime = `${hours}:${minutes}:${seconds} [HH:MM:SS]`
     
     progressStatus.innerText = `${loaded.toFixed(1)} MB of ${total.toFixed(1)} MB uploaded
     Upload Speed: ${(speed * 8).toFixed(1)} Mbps (${(speed).toFixed(1)} MB/s)
@@ -177,7 +176,8 @@ function sleep(ms) {
 }
 
 async function showConversionProgress() {
-    // If you start reading the file straight away, .split('=') won't work as FFmpeg hasn't started writing to the file.
+    // If you start reading the file straight away, there will be an error as there is a little delay
+    // before the conversion progress is written to the file. Hence the initial await sleep(1000).
     await sleep(1000)
     while (shouldLog) {
         const response = await fetch(`ffmpeg-progress/${progressFilename}.txt`);
@@ -189,11 +189,11 @@ async function showConversionProgress() {
         const milliseconds = justProgressTime.substring(9, 12);
         show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
         (and ${milliseconds} milliseconds)`, 'dark');
-        await sleep(1000); // Using the sleep function defined above.
+        await sleep(1000);
     }
 }
 
-async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complete.
+async function sendConversionRequest(filename) { // Runs when upload is complete.
     const chosenCodec = document.getElementById('codecs').value;
     const mp4EncodingMode = document.getElementById('mp4_encoding_mode').value;
     const opusVorbisSlider = document.getElementById("opus_vorbis_slider").value;
@@ -246,40 +246,36 @@ async function pythonHeresWhatYouNeed(filename) { // Runs when upload is complet
 
     shouldLog = true;
     showConversionProgress();
-    console.log('blah')
 
-    const conversionRequest = await fetch("/", {
+    const conversionResponse = await fetch("/", {
         method: 'POST',
         body: data,
     })
-    //console.log(await conversionRequest.text())
-    const jsonResponse = await conversionRequest.json();
-    console.log(`jsonResponse: ${jsonResponse}`)
+  
+    const jsonResponse = await conversionResponse.json();
 
-    if (!conversionRequest.ok) {
-        console.log('Conersion response not ok')
+    if (!conversionResponse.ok) {
         shouldLog = false;
         reset();
         show_alert(response, 'danger')
+        console.log(conversionResponse)
     } 
     else {
-        console.log('in else')
         shouldLog = false;
         reset();
 
         const downloadLink = jsonResponse.download_path;
         const logFile = jsonResponse.log_file;
 
-        show_alert(`File converted. Click <a href="${downloadLink}">here</a> \
-        if the download does not begin automatically. Would you like to view the log file? If so, click \
-        <a href="${logFile}" target="_blank">here</a>.`, "success");
-
         const createLink = document.createElement("a"); // Create a virtual link.
         createLink.href = jsonResponse.download_path;
         createLink.click();
+
+        show_alert(`File converted. Click <a href="${downloadLink}">here</a> \
+        if the download does not begin automatically. If you'd like to view the log file, click \
+        <a href="${logFile}" target="_blank">here</a>.`, "success");
     }
-    
-} // Closing bracket for pythonHeresWhatYouNeed function.
+} // Closing bracket for sendConversionRequest function.
 
 function show_alert(message, type) {
     alertWrapper.style.display = 'block';
@@ -292,7 +288,7 @@ function show_alert(message, type) {
     </div>`
 }
 
-// A function to reset the page.
+// A function that resets the page.
 function reset() {
     document.getElementById("converting_btn").style.display = 'none ';
     conversionProgress.style.display = 'none';
@@ -306,7 +302,7 @@ function reset() {
     outputNameBox.disabled = false;
     uploadingButton.classList.add('d-none');
     progressWrapper.style.display = 'none';
-    outputNameBox.value = ''
+    outputNameBox.value = '';
     progressParagraph.style.display = 'none';
 }
 

@@ -225,9 +225,9 @@ def send_file(filename):
     user = User.query.filter_by(ip=user_ip).first()
 
     if user:
-        user.times_used_converter += 1
         x = 'time' if user.times_used_converter == 1 else 'times'
-        log.info(f'This user has used the converter {user.times_used_converter} {x}.')
+        log.info(f'This user has used the converter {user.times_used_converter} {x} before.')
+        user.times_used_converter += 1
         db.session.commit()
     else:
         new_user = User(ip=user_ip, times_used_converter=1)
