@@ -57,25 +57,30 @@ youtube-dl | https://github.com/ytdl-org/youtube-dl
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
 - Python **3.6+**
 - FFmpeg
-
-*When running locally, you will not be able to convert to AAC unless you [compile FFmpeg](https://trac.ffmpeg.org/wiki/CompilationGuide) with `--enable-libfdk-aac` in the configuration. Or, if you know what you're doing, you can edit the code in converter.py to use FFmpeg's native AAC encoder instead.*
 - `pip install -r requirements.txt`
 
 *If youtube-dl fails to install when using `pip install -r requirements.txt`, install it manually. Installation details can be found [here](https://github.com/ytdl-org/youtube-dl#installation).*
 - Clone this repository.
 - Uncomment `db.create_all()` in main.py and yt.py
+- Change the value of `ffmpeg_path` in converter.py to the correct path.
 - Change the value of `youtube_dl_path` in yt.py to the correct path.
 - cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
 - Enter localhost:5000 in the address bar of your web browser and hit enter.
 
+**If you want to convert to AAC when running this web application locally:**
+
+*When running locally, you will not be able to convert to AAC unless your build of FFmpeg has `--enable-libfdk-aac` in the configuration. This is because this web application uses the high quality [fdk-aac](https://github.com/mstorsjo/fdk-aac) AAC encoder, and "the license of libfdk_aac is not compatible with GPL" ([source](https://trac.ffmpeg.org/wiki/Encode/AAC)). Therefore, you cannot download a pre-built FFmpeg binary that supports that encoder. [Here's](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu) how to complile FFmpeg on Ubuntu/Debian/Mint with libfdk_aac support, if your build of FFmpeg does not have `--enable-libfdk-aac`. Or, if you know what you're doing, you can edit the code in converter.py to use FFmpeg's native AAC encoder instead.*
+
 # Building with Docker
-Run these commands to build and run the Dockerfile. Note sudo is usually required on Linux.
+Run these commands to build and run the Dockerfile.
+
+*Note: sudo is usually required on Linux.*
 ```
 docker build -t audio-and-video-converter .
 docker run -p 5000:5000 audio-and-video-converter
 ```
 
 ## Notes for contributors
-Contributors are welcome, simply submit a pull request.
-
-Use f-strings rather than `.format()` if you know how to do so.
+Contributors are welcome, simply submit a pull request and I ([BassThatHertz](https://github.com/BassThatHertz)) will have a look at it within 24 hours.
+- Try to stay within 120 characters per line.
+- Add comments to explain sections of code where the purpose isn't obvious, or to explain a particular design decision.
