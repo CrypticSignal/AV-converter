@@ -115,7 +115,6 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
                 shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
 
                 const jsonResponse = await response.json();
-                console.log(`jsonResponse: ${jsonResponse}`)
 
                 const downloadLink = jsonResponse.download_path
                 const logFile = jsonResponse.log_file
@@ -142,6 +141,6 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
 }
 
 function reset() {
-    document.getElementById('logfile').style.display = 'none';
+    document.getElementById('logfile').innerHTML = '';
     document.getElementById('bitrate_info').style.display = 'none';
 }
