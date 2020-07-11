@@ -76,6 +76,14 @@ def return_download_link(progress_file_path, video_id, download_type):
 # When POST requests are made to /yt
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
+    # I want to save the download progress to a file and read from that file to show the download progress
+    # to the user. Set the name of the file to the time since the epoch.
+    progress_filename = str(time.time())[:-8]
+    path_to_progress_file = f'yt-progress/{progress_filename}.txt'
+
+    # Create the progress file.
+    with open(path_to_progress_file, "w"): pass
+    log.info(f'Progress will be saved to: {path_to_progress_file}')
 
     if request.form['button_clicked'] == 'yes':
 
@@ -96,14 +104,7 @@ def yt_downloader():
         
         link = request.form['link']
 
-        # I want to save the download progress to a file and read from that file to show the download progress
-        # to the user. Set the name of the file to the time since the epoch.
-        progress_filename = str(time.time())[:-8]
-        path_to_progress_file = f'yt-progress/{progress_filename}.txt'
-
-        # Create the progress file.
-        with open(path_to_progress_file, "w"): pass
-        log.info(f'Progress will be saved to: {path_to_progress_file}')
+        
         return progress_filename
 
     # The following runs after the 2nd POST request:
