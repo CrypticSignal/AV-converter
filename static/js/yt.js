@@ -107,7 +107,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             // 2nd POST request to get the download link.
             const response = await fetch("/yt", {
                 method: 'POST',
-                body: data
+                body: secondFormData
             });
 
             if (response.ok) {
