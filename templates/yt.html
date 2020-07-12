@@ -18,23 +18,24 @@
     <div id="alert_wrapper" style="display:none"></div>
     <p id='logfile'></p>
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="buttonClicked(this.value)" value="Video [MP4]">Video [MP4]</button>
+        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="Video [MP4]">Video [MP4]</button>
     </div>
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="buttonClicked(this.value)" value="Video [best]">Video [best quality]</button>   
+        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="Video [best]">Video [best quality]</button>   
     </div><br><br>
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="buttonClicked(this.value)" value="MP3">Audio [MP3]</button>
+        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="MP3">Audio [MP3]</button>
     </div>
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="buttonClicked(this.value)" value="Audio [best]">Audio [best]</button>
-    </div><br><br>
-    <i id='bitrate_info' style='display:none'><strong>Audio [best]</strong> usually gives you a file with a bitrate of ~160 kbps. This does not mean that the audio is lower quality than other YouTube downloaders which may give a higher bitrate file. The best audio stream in a YouTube video is usually ~160 kbps and this downloader extracts the best audio stream <strong>(if Audio [best] was selected )</strong>. YouTube downloaders that give you a higher bitrate are doing lossy-to-lossy conversion, giving you lower audio quality than the <strong>Audio [best]</strong> option on this website.</i>
-    <i id='donate'>If you want to support my non-profit website, click on the coffee cup on the bottom-right and you can donate as little as £3 :)</i>
+        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="Audio [best]">Audio [best]</button>
+    </div><hr>
+    <i id='bitrate_info' style='display:none'><strong>Audio [best]</strong> usually gives you a file with a bitrate of ~160 kbps. This does not mean that the audio is lower quality than other YouTube downloaders which may give a higher bitrate file. The best audio stream in a YouTube video is usually ~160 kbps and this downloader extracts the best audio stream <strong>(if Audio [best] was selected)</strong>. YouTube downloaders that give you a higher bitrate are doing lossy-to-lossy conversion, giving you lower audio quality than the <strong>Audio [best]</strong> option on this website.</i>
+    <i id='donate'>If you want to support my non-profit website, click on the coffee cup on the bottom-right and you can donate as little as £1 :)</i>
+    
 </div>
-
+<br><br><br>
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="{{ url_for('static', filename='js/yt.js') }}"></script>
-<script data-name="BMC-Widget" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="fezCGRFkb" data-description="You can send a donation as little as £3" data-color="#5F7FFF" data-position="bottom" data-x_margin="18" data-y_margin="18"></script>
+<script data-name="BMC-Widget" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="fezCGRFkb" data-description="To support my non-profit website, you can send a donation as little as £1 :)" data-color="#5F7FFF" data-position="bottom" data-x_margin="18" data-y_margin="18"></script>
 
 {% endblock content %}

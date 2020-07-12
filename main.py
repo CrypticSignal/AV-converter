@@ -263,12 +263,13 @@ def return_world_record():
     except ValueError:
         log.error("GAME 1: The user changed something to a non-int.")
     else:
-        with open("Game Scores/HighScores.txt", "a") as f:
+        os.makedirs('GameScores', exist_ok=True) 
+        with open("GameScores/HighScores.txt", "a") as f:
             f.write(f'{score} | {times_missed} | {user} | {user_agent} | {canvas_width}'
             f'x{canvas_height} | {current_datetime}\n')
     finally:
         just_scores = []
-        with open('Game Scores/HighScores.txt', 'r') as f:
+        with open('GameScores/HighScores.txt', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 just_scores.append(line.split('|')[0].strip())
@@ -288,11 +289,12 @@ def save_game2_stats():
     except ValueError:
         log.error("GAME 2: The user changed reaction_time to a non-int.")
     else:
-        with open("Game Scores/ReactionTimes.txt", "a") as f:
+        os.makedirs('GameScores', exist_ok=True) 
+        with open("GameScores/ReactionTimes.txt", "a") as f:
             f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')
     finally:
         reaction_times = []
-        with open('Game Scores/ReactionTimes.txt', 'r') as f:
+        with open('GameScores/ReactionTimes.txt', 'r') as f:
             lines = f.readlines()
             for line in lines:
                 reaction_times.append(line.split('|')[0][:-3].strip())

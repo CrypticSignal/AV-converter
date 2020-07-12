@@ -80,7 +80,6 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         }
 
         const firstFormData = new FormData();
-        firstFormData.append('link', contentsOfLinkBox);
         firstFormData.append('button_clicked', 'yes');
         
         // 1st POST request to get the name of the progress file.
