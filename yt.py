@@ -147,7 +147,7 @@ def yt_downloader():
 
     elif request.form['button_clicked'] == 'Video [MP4]':
 
-        log.info(f'MP4 was chosen. {link}')
+        log.info(f'MP4 was chosen.')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
         download_start_time = time.time()
 
@@ -163,7 +163,7 @@ def yt_downloader():
 
     elif request.form['button_clicked'] == 'Audio [best]':
 
-        log.info(f'Audio [best] was chosen. {link}')
+        log.info(f'Audio [best] was chosen.')
         download_template = f'{download_dir}/%(title)s-%(id)s [Audio].%(ext)s'
         download_start_time = time.time()
 
@@ -179,7 +179,7 @@ def yt_downloader():
 
     elif request.form['button_clicked'] == 'MP3':
 
-        log.info(f'MP3 was chosen. {link}')
+        log.info(f'MP3 was chosen.')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
         download_start_time = time.time()
 
@@ -204,8 +204,8 @@ def send_file(filename):
     just_extension = filename.split('.')[-1]
 
     if just_extension == "m4a":
-        log.info(f'https://freeaudioconverter.net/downloads/{filename}')
+        log.info(f'https://free-av-tools.com/downloads/{filename}')
         return send_from_directory('downloads', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'https://freeaudioconverter.net/downloads/{filename}')
+        log.info(f'https://free-av-tools.com/downloads/{filename}')
         return send_from_directory('downloads', filename, as_attachment=True)
