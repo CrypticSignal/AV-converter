@@ -26,10 +26,13 @@ function sleep(milliseconds) {
 async function showDownloadProgress(progressFilename) {
     while (shouldLog) {
         try {
-            const response = await fetch(`yt-progress/${progressFilename}.txt`);
+            const response = await fetch(`yt-progress/${progressFilename}`);
+            console.log('Response when fetching the .txt file:');
+            console.log(response);
             const textInFile = await response.text();
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
+            console.log(secondLastLine);
             if (typeof secondLastLine === 'undefined') {
                 show_alert('Initialising...', 'dark');
             }
@@ -89,6 +92,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         });
         
         const progressFilename = await progressFileResponse.text();
+        console.log(`progressFilename: ${progressFilename}`)
 
         if (!progressFileResponse.ok) {
             show_alert(progressFileResponse, 'danger');
@@ -117,7 +121,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
 
                 const downloadLink = jsonResponse.download_path
                 const logFile = jsonResponse.log_file
-
+                
                 const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
                 virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
                 virtualDownloadLink.click();

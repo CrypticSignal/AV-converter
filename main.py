@@ -54,7 +54,7 @@ def homepage():
 
     elif request.form["request_type"] == "uploaded":
 
-        session['progress_filename'] = str(time())[:-8]
+        session['progress_filename'] = str(time())[:-8] + '.txt'
     
         log_this('uploaded a file:')
         chosen_file = request.files["chosen_file"]
@@ -108,7 +108,7 @@ def homepage():
  
         log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
         os.makedirs('conversions', exist_ok=True)
-        output_path = f'conversions/{output_name}'
+        output_path = os.path.join('conversions', output_name)
 
         # Run the appropriate section of converter.py:
 
@@ -210,8 +210,8 @@ def homepage():
         converted_file_name = output_name + "." + extension
 
         return {
-            'download_path': f'/conversions/{converted_file_name}',
-            'log_file': f'ffmpeg-progress/{session["progress_filename"]}.txt'
+            'download_path': os.path.join('conversions', converted_file_name),
+            'log_file': os.path.join('ffmpeg-progress', f'{session["progress_filename"]}.txt')
             }
        
 @app.route("/ffmpeg-progress/<filename>")

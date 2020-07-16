@@ -29,18 +29,19 @@ def trim_file():
         ext = "." + filename.split(".")[-1]
         just_name = filename.split(".")[0]
         output_name = just_name + " [trimmed]" + ext
+        output_file_path = os.path.join('trims', output_name)
 
         subprocess.run(['ffmpeg', '-y', '-i', uploaded_file_path, '-ss', start_time, '-to', end_time,
-        '-map', '0', '-c', 'copy', f'trims/{output_name}'], shell=False)
+        '-map', '0', '-c', 'copy', output_file_path], shell=False)
 
-        return f'/trims/{output_name}'
+        return output_file_path
         
 @trimmer.route("/trims/<filename>", methods=["GET"])
 def download_file(filename):
     just_extension = filename.split('.')[-1]
     if just_extension == "m4a":
-        log.info(f'https://freeaudioconverter.net/trims/{filename}')
+        log.info(f'https://free-av-tools.com/trims/{filename}')
         return send_from_directory('trims', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'https://freeaudioconverter.net/trims/{filename}')
+        log.info(f'https://free-av-tools.com/trims/{filename}')
         return send_from_directory('trims', filename, as_attachment=True)

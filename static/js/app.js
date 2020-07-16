@@ -180,7 +180,7 @@ async function showConversionProgress() {
     // before the conversion progress is written to the file. Hence the initial await sleep(1000).
     await sleep(1000)
     while (shouldLog) {
-        const response = await fetch(`ffmpeg-progress/${progressFilename}.txt`);
+        const response = await fetch(`ffmpeg-progress/${progressFilename}`);
         const textInFile = await response.text();
         const lines = textInFile.split('\n');
         const fifthLastLine = lines[lines.length - 6].split('=');

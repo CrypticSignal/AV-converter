@@ -5,14 +5,16 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     ffmpeg_path = '/home/h/bin/ffmpeg' # If running locally, change this to the correct path.
 
     os.makedirs('ffmpeg-progress', exist_ok=True)
-    progress_file_path = f'ffmpeg-progress/{progress_filename}.txt'
+    progress_file_path = os.path.join('ffmpeg-progress', progress_filename)
+    log.info(progress_file_path)
+
 
     params = params.split(' ') # Split params into a list as I want to use subprocess.run() with an array of arguments.
     params.append(output_name)
     log.info(params)
 
     subprocess.run([ffmpeg_path, '-hide_banner', '-progress', progress_file_path, '-y', '-i', uploaded_file_path,
-    '-metadata', 'comment="freeaudioconverter.net"', '-metadata', 'encoded_by="freeaudioconverter.net"',
+    '-metadata', 'comment="free-av-tools.com"', '-metadata', 'encoded_by="free-av-tools.com"',
     '-id3v2_version', '3', '-write_id3v1', 'true'] + params)
 
 # MP3
