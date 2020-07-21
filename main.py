@@ -153,7 +153,7 @@ def homepage():
         elif chosen_codec == 'Vorbis':
             converter.run_vorbis(session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality,
             opus_vorbis_slider, output_path) 
-            extension = 'mka'
+            extension = 'ogg'
 
         elif chosen_codec == 'WAV':
             converter.run_wav(session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth, output_path)

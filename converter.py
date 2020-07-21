@@ -122,9 +122,9 @@ def run_opus(progress_filename, uploaded_file_path, opus_encoding_type, opus_vor
 # Vorbis
 def run_vorbis(progress_filename, uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path):
     if vorbis_encoding == "abr": # ABR
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libvorbis -b:a {opus_vorbis_slider}k', f'{output_path}.mka')
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libvorbis -b:a {opus_vorbis_slider}k', f'{output_path}.ogg')
     elif vorbis_encoding == "vbr": # True VBR
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libvorbis -q:a {vorbis_quality}', f'{output_path}.mka')
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libvorbis -q:a {vorbis_quality}', f'{output_path}.ogg')
 
 # FLAC
 def run_flac(progress_filename, uploaded_file_path, is_keep_video, flac_compression, output_path):
