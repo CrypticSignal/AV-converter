@@ -1,10 +1,6 @@
-.*/
-*.db
-*.jpg
-*.json
-*.part
-*.webp
-*.ytdl
+# Files
+cookies.txt
+site.db
 # Folders
 __pycache__
 .vscode
