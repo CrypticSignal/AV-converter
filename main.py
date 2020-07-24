@@ -39,7 +39,6 @@ class User(db.Model): # This class is a table in the database.
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(15), unique=True, nullable=False)
     times_used_converter = db.Column(db.Integer, default=0)
-    times_used_yt_downloader = db.Column(db.Integer, default=0)
 
     def __init__(self, ip, times_used_converter):
         self.ip = ip

@@ -14,12 +14,13 @@ db = SQLAlchemy(app)
 class User(db.Model): # This class is a table in the database,
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(20), unique=True, nullable=False)
-    times_used_converter = db.Column(db.Integer, default=0)
     times_used_yt_downloader = db.Column(db.Integer, default=0)
+    mb_downloaded = db.Column(db.Float, default=0)
 
-    def __init__(self, ip, times_used_yt_downloader):
+    def __init__(self, ip, times_used_yt_downloader, mb_downloaded):
         self.ip = ip
         self.times_used_yt_downloader = times_used_yt_downloader
+        self.mb_downloaded = mb_downloaded
 
 os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)    
@@ -61,11 +62,18 @@ def get_video_id(url): # Function from https://gist.github.com/kmonsoor/2a1afba4
 def return_download_link(progress_file_path, video_id, download_type):
 
     for file in os.listdir(download_dir):
-        if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file:
+        if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file: 
 
             log.info(f'DOWNLOADED "{file}"')
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
             log.info(f'{filesize} MB')
+
+            user_ip = request.environ['HTTP_X_FORWARDED_FOR']
+            user = User.query.filter_by(ip=user_ip).first()
+
+            if user:
+                user.mb_downloaded += filesize
+                db.session.commit()
 
             with open("logs/downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}') 
@@ -81,6 +89,8 @@ def return_download_link(progress_file_path, video_id, download_type):
 # When POST requests are made to /yt   
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
+
+    #db.create_all()
 
     size_of_media_files = 0
     # Get the total size of the media files in the download folder.
@@ -118,7 +128,7 @@ def yt_downloader():
             user.times_used_yt_downloader += 1
             db.session.commit()
         else:
-            new_user = User(ip=user_ip, times_used_yt_downloader=1)
+            new_user = User(ip=user_ip, times_used_yt_downloader=1, mb_downloaded=0)
             db.session.add(new_user)
             db.session.commit()
 
@@ -137,7 +147,8 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(progress_file_path, 'w') as f:
-            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '--', video_id], stdout=f)
+            subprocess.run([youtube_dl_path, '--cookies', 'cookies.txt', '-o', download_template, '--newline',
+                '--', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -152,8 +163,8 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(progress_file_path, 'w') as f:
-            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-f',
-            'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--', video_id], stdout=f)
+            subprocess.run([youtube_dl_path, '--cookies', 'cookies.txt', '-o', download_template, '--newline', '-f',
+                'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -168,8 +179,8 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(progress_file_path, 'w') as f:
-            subprocess.run([youtube_dl_path, '-v', '-o', download_template, '--newline', '-x', '--', video_id],
-                stdout=f)
+            subprocess.run([youtube_dl_path, '--cookies', 'cookies.txt', '-o', download_template, '--newline',
+                '-x', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -184,8 +195,8 @@ def yt_downloader():
         download_start_time = time.time()
 
         with open(progress_file_path, 'w') as f:
-            subprocess.run([youtube_dl_path, '--embed-thumbnail', '-v', '-o', download_template, '--newline', '-x',
-            '--audio-format', 'mp3', '--audio-quality', '0', '--', video_id], stdout=f)
+            subprocess.run([youtube_dl_path, '--cookies', 'cookies.txt', '--embed-thumbnail', '-o', download_template,
+            '--newline', '-x', '--audio-format', 'mp3', '--audio-quality', '0', '--', video_id], stdout=f)
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
@@ -199,7 +210,6 @@ def get_file(filename):
 
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    #db.create_all()
 
     just_extension = filename.split('.')[-1]
 
