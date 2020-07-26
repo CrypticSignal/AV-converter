@@ -9,7 +9,7 @@ trimmer = Blueprint('trimmer', __name__)
 def trim_file():
 
     if request.form["request_type"] == "upload_complete":
-   
+
         chosen_file = request.files["chosen_file"]
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
@@ -35,7 +35,7 @@ def trim_file():
         '-map', '0', '-c', 'copy', output_file_path], shell=False)
 
         return output_file_path
-        
+
 @trimmer.route("/trims/<filename>", methods=["GET"])
 def download_file(filename):
     just_extension = filename.split('.')[-1]
