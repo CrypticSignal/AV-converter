@@ -151,7 +151,8 @@ def homepage():
             extension = 'ogg'
 
         elif chosen_codec == 'WAV':
-            converter.run_wav(session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth, output_path)
+            converter.run_wav(session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth,
+                              output_path)
             if is_keep_video == "yes":
                 extension = 'mkv'
             else:
@@ -195,7 +196,8 @@ def homepage():
                 extension = 'dts'
 
         elif chosen_codec == 'MP4':
-            converter.run_mp4(session['progress_filename'], uploaded_file_path, mp4_encoding_mode, crf_value, output_path)
+            converter.run_mp4(session['progress_filename'], uploaded_file_path, mp4_encoding_mode, crf_value,
+                              output_path)
             extension = 'mp4'
 
         elif chosen_codec == 'MKV':
@@ -238,8 +240,6 @@ def send_file(filename):
     else:
         log.info(f'https://freeaudioconverter.net/conversions/{filename}')
         return send_from_directory('conversions', filename, as_attachment=True)
-
-# END OF CODE FOR AUDIO/VIDEO CONVERTER --------------------------------------------------------------------------------
 
 
 # Game 1
