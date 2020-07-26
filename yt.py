@@ -63,7 +63,6 @@ def get_video_id(url): # Function from https://gist.github.com/kmonsoor/2a1afba4
 
 
 def return_download_link(progress_file_path, video_id, download_type):
-
     for file in os.listdir(download_dir):
         if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file:
 
@@ -82,11 +81,7 @@ def return_download_link(progress_file_path, video_id, download_type):
                 f.write(f'\n{file}')
 
             new_filename = file.replace('#', '').replace(f'-{video_id}', '')
-
-            # Without this if-statement, when running locally on Windows, the os.rename line causes an error saying
-            # that the file already exists (if you try downloading the same video again).
-            if not os.path.isfile(f'{download_dir}/{new_filename}'):
-                os.rename(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
+            os.replace(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
 
             return {
                 'download_path': os.path.join('downloads', new_filename),
