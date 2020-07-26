@@ -21,7 +21,7 @@ app.jinja_env.auto_reload = True
 
 # The database object (db) needs to be defined in main.py even though we're not using the database in main.py
 # Otherwise you get the following error:
-# "AssertionError: The sqlalchemy extension was not registered to the current application. 
+# "AssertionError: The sqlalchemy extension was not registered to the current application.
 # Please make sure to call init_app() first."
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -39,6 +39,7 @@ socketio.init_app(app, cors_allowed_origins="*")
 app.register_blueprint(yt)
 app.register_blueprint(trimmer)
 
+
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
 def homepage():
@@ -50,21 +51,21 @@ def homepage():
     elif request.form["request_type"] == "uploaded":
 
         session['progress_filename'] = str(time())[:-8] + '.txt'
-    
+
         log_this('uploaded a file:')
         chosen_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
         log.info(chosen_file)
         log.info(f'Size: {filesize} MB')
-        
+
         # Make the filename safe
         filename_secure = secure_filename(chosen_file.filename)
         # Save the uploaded file to the uploads folder.
-        os.makedirs('uploads', exist_ok=True) 
+        os.makedirs('uploads', exist_ok=True)
         chosen_file.save(os.path.join("uploads", filename_secure))
-        
+
         return session['progress_filename']
-    
+
     elif request.form["request_type"] == "convert":
 
         wav_bit_depth = request.form["wav_bit_depth"]
@@ -89,7 +90,7 @@ def homepage():
         vorbis_quality = request.form["vorbis_quality"]
         # Vorbis/Opus
         opus_vorbis_slider = request.form["opus_vorbis_slider"]
-        # AC3 
+        # AC3
         ac3_bitrate = request.form["ac3_bitrate"]
         # FLAC
         flac_compression = request.form["flac_compression"]
@@ -100,7 +101,7 @@ def homepage():
         opus_encoding_type = request.form["opus_encoding_type"]
         # Desired filename
         output_name = request.form["output_name"]
- 
+
         log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
         os.makedirs('conversions', exist_ok=True)
         output_path = os.path.join('conversions', output_name)
@@ -109,7 +110,7 @@ def homepage():
 
         if chosen_codec == 'MP3':
             converter.run_mp3(session['progress_filename'], uploaded_file_path, is_keep_video, mp3_encoding_type,
-            mp3_bitrate, mp3_vbr_setting, output_path)
+                              mp3_bitrate, mp3_vbr_setting, output_path)
             if is_keep_video == "yes":
                 just_ext = uploaded_file_path.split('.')[-1]
                 if just_ext == 'mp4':
@@ -121,8 +122,7 @@ def homepage():
 
         elif chosen_codec == 'AAC':
             converter.run_aac(session['progress_filename'], uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
-            fdk_vbr, is_fdk_lowpass,
-            fdk_lowpass, output_path)
+                              fdk_vbr, is_fdk_lowpass, fdk_lowpass, output_path)
             if is_keep_video == "yes":
                 just_ext = uploaded_file_path.split('.')[-1]
                 if just_ext == 'mp4':
@@ -134,12 +134,12 @@ def homepage():
 
         elif chosen_codec == 'Opus':
             converter.run_opus(session['progress_filename'], uploaded_file_path, opus_encoding_type, opus_vorbis_slider,
-            opus_cbr_bitrate, output_path)
-            extension = 'opus'   
+                               opus_cbr_bitrate, output_path)
+            extension = 'opus'
 
         elif chosen_codec == 'FLAC':
             converter.run_flac(session['progress_filename'], uploaded_file_path, is_keep_video, flac_compression,
-            output_path)
+                               output_path)
             if is_keep_video == "yes":
                 extension = 'mkv'
             else:
@@ -147,7 +147,7 @@ def homepage():
 
         elif chosen_codec == 'Vorbis':
             converter.run_vorbis(session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality,
-            opus_vorbis_slider, output_path) 
+                                 opus_vorbis_slider, output_path)
             extension = 'ogg'
 
         elif chosen_codec == 'WAV':
@@ -197,7 +197,7 @@ def homepage():
         elif chosen_codec == 'MP4':
             converter.run_mp4(session['progress_filename'], uploaded_file_path, mp4_encoding_mode, crf_value, output_path)
             extension = 'mp4'
-        
+
         elif chosen_codec == 'MKV':
             converter.run_mkv(session['progress_filename'], uploaded_file_path, output_path)
             extension = 'mkv'
@@ -208,14 +208,15 @@ def homepage():
             'download_path': os.path.join('conversions', converted_file_name),
             'log_file': os.path.join('ffmpeg-progress', f'{session["progress_filename"]}.txt')
             }
-       
+
+
 @app.route("/ffmpeg-progress/<filename>")
 def get_file(filename):
     return send_from_directory('ffmpeg-progress', filename)
 
+
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
-    #db.create_all()
     user_ip = request.environ['HTTP_X_FORWARDED_FOR']
     user = User.query.filter_by(ip=user_ip).first()
 
@@ -240,6 +241,7 @@ def send_file(filename):
 
 # END OF CODE FOR AUDIO/VIDEO CONVERTER --------------------------------------------------------------------------------
 
+
 # Game 1
 @app.route("/game", methods=['POST'])
 def return_world_record():
@@ -258,10 +260,10 @@ def return_world_record():
     except ValueError:
         log.error("GAME 1: The user changed something to a non-int.")
     else:
-        os.makedirs('GameScores', exist_ok=True) 
+        os.makedirs('GameScores', exist_ok=True)
         with open("GameScores/HighScores.txt", "a") as f:
-            f.write(f'{score} | {times_missed} | {user} | {user_agent} | {canvas_width}'
-            f'x{canvas_height} | {current_datetime}\n')
+                f.write(f'{score} | {times_missed} | {user} | {user_agent} | {canvas_width}'
+                        f'x{canvas_height} | {current_datetime}\n')
     finally:
         just_scores = []
         with open('GameScores/HighScores.txt', 'r') as f:
@@ -271,6 +273,7 @@ def return_world_record():
         #valid_scores = [x for x in just_scores if int(x) < 100]
         #world_record = max(valid_scores, key=lambda x: int(x))
         return ''
+
 
 # Game 2
 @app.route("/game2", methods=['POST'])
@@ -284,7 +287,7 @@ def save_game2_stats():
     except ValueError:
         log.error("GAME 2: The user changed reaction_time to a non-int.")
     else:
-        os.makedirs('GameScores', exist_ok=True) 
+        os.makedirs('GameScores', exist_ok=True)
         with open("GameScores/ReactionTimes.txt", "a") as f:
             f.write(f'{reaction_time} ms | {user} | {user_agent} | {current_datetime}\n')
     finally:
@@ -296,67 +299,76 @@ def save_game2_stats():
         # reaction_record = min(reaction_times, key=lambda x: int(x))
         return ''
 
+
 @app.route("/")
 def homepage_visited():
     log_visit("visited homepage")
     return render_template("home.html", title="Home", upload_size=max_upload_size)
+
 
 @app.route("/about")
 def about_page_visited():
     log_visit("visited about page")
     return render_template("about.html", title="About")
 
+
 @app.route("/filetypes")
 def filetypes_visited():
     log_visit("visited filetypes")
     return render_template("filetypes.html", title="Filetypes")
+
 
 @app.route("/yt")
 def yt_page_visited():
     log_visit("visited YT")
     return render_template("yt.html", title="YouTube downloader")
 
+
 @app.route("/trimmer")
 def trimmer_visited():
     log_visit("visited trimmer")
     return render_template("trimmer.html", title="File Trimmer")
+
 
 @app.route("/contact")
 def contact_page_visited():
     log_visit("visited contact page")
     return render_template("contact.html", title="Contact")
 
+
 @app.route("/game")
 def game_visited():
-    log_visit("visited game")  
+    log_visit("visited game")
     return render_template("game.html", title="Game")
+
 
 @app.route("/game2")
 def game2_visited():
-    log_visit("visited game 2")  
+    log_visit("visited game 2")
     return render_template("game2.html", title="Game 2")
 
-# CHAT SECTION:
 
 @app.route("/chat")
 def chat():
-    log_visit("visited chat")  
+    log_visit("visited chat")
     return render_template("chat.html", title="Chat")
 
-count = 0
 
+count = 0
 @socketio.on('connect')
 def connect():
     global count
     count += 1
     socketio.emit('user connected', count)
-  
+
+
 @socketio.on('disconnect')
 def disconnect():
     global count
     count -= 1
     socketio.emit('user disconnected', count)
-    
+
+
 @socketio.on('message sent')
 def handle_message(message):
     socketio.emit('show message', message)
