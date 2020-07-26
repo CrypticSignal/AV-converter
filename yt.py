@@ -2,12 +2,10 @@ from flask import Flask, Blueprint, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import urlparse, parse_qs
 import time
-import urllib 
 import os, subprocess
 from loggers import log_this, log
 
 yt = Blueprint('yt', __name__)
-
 app = Flask(__name__)
 db = SQLAlchemy(app)
 
@@ -90,7 +88,7 @@ def return_download_link(progress_file_path, video_id, download_type):
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
 
-    #db.create_all()
+    db.create_all()
 
     size_of_media_files = 0
     # Get the total size of the media files in the download folder.

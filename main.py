@@ -14,39 +14,35 @@ import converter
 app = Flask(__name__)
 secret_key = str(os.urandom(16))
 app.secret_key = secret_key
-
-# For the chat section of the website.
-socketio = SocketIO(app)
-socketio.init_app(app, cors_allowed_origins="*")
-
-SESSION_TYPE = 'filesystem'
-app.config.from_object(__name__)
-Session(app)
-
-app.register_blueprint(yt)
-app.register_blueprint(trimmer)
-
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 max_upload_size = 5 # in GB.
 app.config['MAX_CONTENT_LENGTH'] = max_upload_size * 1000 * 1000 * 1000 # Max upload size.
 app.jinja_env.auto_reload = True
 
+# The database object (db) needs to be defined in main.py even though we're not using the database in main.py
+# Otherwise you get the following error:
+# "AssertionError: The sqlalchemy extension was not registered to the current application. 
+# Please make sure to call init_app() first."
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-class User(db.Model): # This class is a table in the database.
+# session['progress_filename']
+SESSION_TYPE = 'filesystem'
+app.config.from_object(__name__)
+Session(app)
 
-    id = db.Column(db.Integer, primary_key=True)
-    ip = db.Column(db.String(15), unique=True, nullable=False)
-    times_used_converter = db.Column(db.Integer, default=0)
+# For the chat section of the website.
+socketio = SocketIO(app)
+socketio.init_app(app, cors_allowed_origins="*")
 
-    def __init__(self, ip, times_used_converter):
-        self.ip = ip
-        self.times_used_converter = times_used_converter
+app.register_blueprint(yt)
+app.register_blueprint(trimmer)
 
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
 def homepage():
+
     if request.form['request_type'] == 'log_convert_clicked':
         log_this('clicked on the convert button.')
         return ''

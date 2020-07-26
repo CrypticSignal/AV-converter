@@ -32,7 +32,7 @@ async function showDownloadProgress(progressFilename) {
             const textInFile = await response.text();
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
-            console.log(secondLastLine);
+           
             if (typeof secondLastLine === 'undefined') {
                 show_alert('Initialising...', 'dark');
             }
@@ -51,9 +51,8 @@ async function showDownloadProgress(progressFilename) {
             else if (secondLastLine.includes('Deleting original file ')) {
                 show_alert('Almost done...', 'dark');
             }
-            else if (secondLastLine.includes('[ffmpeg] Adding thumbnail')) {
-                show_alert( `Your browser should have started downloading the file. If it hasn't, click \
-                <a href="${downloadLink}">here</a>.`, 'success');
+            else {
+                show_alert(secondLastLine, 'info');
             }
             await sleep(1000); // Using the sleep function created above.
         } 
@@ -96,7 +95,6 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
 
         if (!progressFileResponse.ok) {
             show_alert(progressFileResponse, 'danger');
-            console.log(progressFileResponse);
         }
         else {
             // The FormData for the 2nd POST request.
@@ -114,11 +112,10 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             });
 
             if (response.ok) {
-    
+
                 shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
 
                 const jsonResponse = await response.json();
-
                 const downloadLink = jsonResponse.download_path
                 const logFile = jsonResponse.log_file
                 
