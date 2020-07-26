@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import urlparse, parse_qs
 import time
 import os, subprocess
-from loggers import log_this, log
+from loggers import log, get_ip, log_this
 
 yt = Blueprint('yt', __name__)
 app = Flask(__name__)
@@ -24,9 +24,10 @@ class User(db.Model): # This class is a table in the database,
 os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
-youtube_dl_path = '/home/h/.local/bin/youtube-dl' # If running locally, change this to the correct path.
-relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
 
+youtube_dl_path = '/home/h/.local/bin/youtube-dl' # If running locally, change this to the correct path.
+
+relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
 
 def get_video_id(url): # Function from https://gist.github.com/kmonsoor/2a1afba4ee127cce50a0
     '''Returns Video_ID extracting from the given url of Youtube
@@ -67,7 +68,7 @@ def return_download_link(progress_file_path, video_id, download_type):
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
             log.info(f'{filesize} MB')
 
-            user_ip = request.environ['HTTP_X_FORWARDED_FOR']
+            user_ip = get_ip()
             user = User.query.filter_by(ip=user_ip).first()
 
             if user:
@@ -78,7 +79,11 @@ def return_download_link(progress_file_path, video_id, download_type):
                 f.write(f'\n{file}')
 
             new_filename = file.replace('#', '').replace(f'-{video_id}', '')
-            os.rename(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
+
+            # Without this if-statement, when running locally on Windows, the os.rename line causes an error saying
+            # that the file already exists (if you try downloading the same video again).
+            if not os.path.isfile(f'{download_dir}/{new_filename}'):
+                os.rename(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
 
             return {
                 'download_path': os.path.join('downloads', new_filename),
@@ -90,7 +95,7 @@ def return_download_link(progress_file_path, video_id, download_type):
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
 
-    db.create_all()
+    #db.create_all()
 
     size_of_media_files = 0
     # Get the total size of the media files in the download folder.
@@ -119,7 +124,7 @@ def yt_downloader():
         log_this('Clicked a button.')
         log.info(f'Progress will be saved to: {progress_file_path}')
 
-        user_ip = request.environ['HTTP_X_FORWARDED_FOR']
+        user_ip = request.environ['REMOTE_ADDR']
         user = User.query.filter_by(ip=user_ip).first()
 
         if user:
@@ -142,11 +147,13 @@ def yt_downloader():
 
     if request.form['button_clicked'] == 'Video [best]':
 
+        download_template = f'{download_dir}/%(title)s-%(id)s [Video].%(ext)s'
+
         args = [youtube_dl_path, '--restrict-filenames', '--cookies', 'cookies.txt',
                 '-o', download_template, '--newline', '--', video_id]
 
         log.info(f'Video [best] was chosen.')
-        download_template = f'{download_dir}/%(title)s-%(id)s [Video].%(ext)s'
+        
         download_start_time = time.time()
 
         with open(progress_file_path, 'w') as f:
@@ -160,11 +167,12 @@ def yt_downloader():
 
     elif request.form['button_clicked'] == 'Video [MP4]':
 
+        log.info(f'MP4 was chosen.')
+        download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
+
         args = [youtube_dl_path, '--restrict-filenames', '--cookies', 'cookies.txt', '-o', download_template,
                 '--newline', '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--', video_id]
 
-        log.info(f'MP4 was chosen.')
-        download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
         download_start_time = time.time()
 
         with open(progress_file_path, 'w') as f:
@@ -178,11 +186,12 @@ def yt_downloader():
 
     elif request.form['button_clicked'] == 'Audio [best]':
 
+        log.info(f'Audio [best] was chosen.')
+        download_template = f'{download_dir}/%(title)s-%(id)s [Audio].%(ext)s'
+
         args = [youtube_dl_path, '-x', '--restrict-filenames', '--cookies', 'cookies.txt',
                 '-o', download_template, '--newline', '--', video_id]
 
-        log.info(f'Audio [best] was chosen.')
-        download_template = f'{download_dir}/%(title)s-%(id)s [Audio].%(ext)s'
         download_start_time = time.time()
 
         with open(progress_file_path, 'w') as f:
@@ -196,12 +205,13 @@ def yt_downloader():
 
     elif request.form['button_clicked'] == 'MP3':
 
+        log.info(f'MP3 was chosen.')
+        download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
+
         args = [youtube_dl_path, '-x', '--restrict-filenames', '--cookies', 'cookies.txt',
                 '--embed-thumbnail', '-o', download_template, '--newline', '--audio-format', 'mp3',
                 '--audio-quality', '0', '--', video_id]
 
-        log.info(f'MP3 was chosen.')
-        download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
         download_start_time = time.time()
 
         with open(progress_file_path, 'w') as f:

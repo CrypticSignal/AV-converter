@@ -16,10 +16,10 @@ def setup_logger(name, log_file):
 
 
 def get_ip(): # The contents of this function is from https://stackoverflow.com/a/49760261/13231825
-    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+    if request.environ.get('HTTP_X_FORWARDED_FOR') is None: # This is the case when running locally.
         return request.environ['REMOTE_ADDR']
     else:
-        return request.environ['HTTP_X_FORWARDED_FOR'] # if behind a proxy
+        return request.environ['HTTP_X_FORWARDED_FOR'] 
 
 # Create the ./logs directory if it does not already exist.
 os.makedirs('logs', exist_ok=True)

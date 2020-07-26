@@ -5,6 +5,7 @@ from loggers import log_this, log
 
 trimmer = Blueprint('trimmer', __name__)
 
+
 @trimmer.route("/trimmer", methods=["POST"])
 def trim_file():
 
@@ -32,9 +33,10 @@ def trim_file():
         output_file_path = os.path.join('trims', output_name)
 
         subprocess.run(['ffmpeg', '-y', '-i', uploaded_file_path, '-ss', start_time, '-to', end_time,
-        '-map', '0', '-c', 'copy', output_file_path], shell=False)
+                       '-map', '0', '-c', 'copy', output_file_path], shell=False)
 
         return output_file_path
+
 
 @trimmer.route("/trims/<filename>", methods=["GET"])
 def download_file(filename):
