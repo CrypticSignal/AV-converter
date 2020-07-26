@@ -7,6 +7,9 @@ from loggers import log, get_ip, log_this
 
 yt = Blueprint('yt', __name__)
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
