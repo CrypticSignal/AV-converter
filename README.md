@@ -82,5 +82,4 @@ docker run -p 5000:5000 audio-and-video-converter
 
 ## Notes for contributors
 Contributors are welcome, simply submit a pull request and I ([BassThatHertz](https://github.com/BassThatHertz)) will have a look at it within 24 hours.
-- Try to stay within 120 characters per line.
-- Add comments to explain sections of code where the purpose isn't obvious, or to explain a particular design decision.
+- No more than 120 characters per line.
