@@ -9,7 +9,6 @@ from loggers import log, get_ip, log_this
 yt = Blueprint('yt', __name__)
 app = Flask(__name__)
 
-# session['progress_filename']
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
@@ -192,7 +191,7 @@ def yt_downloader():
         log.info(f'MP3 was chosen.')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
 
-        args = [youtube_dl_path, '-x', '--restrict-filenames', '--cookies', 'cookies.txt',
+        args = [youtube_dl_path, '-x', '--restrict-filenames', '--cookies', 'cookies.txt', '-id3v2_version', '3',
                 '--embed-thumbnail', '-o', download_template, '--newline', '--audio-format', 'mp3',
                 '--audio-quality', '0', '--', video_id]
 
