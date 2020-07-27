@@ -39,19 +39,19 @@ async function showDownloadProgress(progressFilePath) {
                 show_alert('Video found...', 'success');
             }
             else if (secondLastLine.includes('[download] ')) {
-                show_alert(secondLastLine.substring(11), 'dark');
+                show_alert(secondLastLine.substring(11), 'info');
             }
             else if (secondLastLine.includes('[ffmpeg] Destination:')) {
-                show_alert('Finishing up...', 'dark');
+                show_alert('Finishing up...', 'info');
             }
             else if (secondLastLine.includes('[ffmpeg] Merging ')) {
-                show_alert('Merging audio and video...', 'dark');
+                show_alert('Merging audio and video...', 'info');
             }
             else if (secondLastLine.includes('Deleting original file ')) {
-                show_alert('Finishing up...', 'dark');
+                show_alert('Finishing up...', 'info');
             }
             else {
-                show_alert(secondLastLine);
+                show_alert(secondLastLine, 'dark');
             }
             await sleep(500); // Using the sleep function created above.
         }
