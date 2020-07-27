@@ -1,7 +1,7 @@
 linkBox = document.getElementById('link');
 linkBox.addEventListener('mousedown', paste);
 
-// When on desktop, this function paste the contents of the clipboard when clicking on the link box, 
+// When on desktop, this function paste the contents of the clipboard when clicking on the link box,
 // as this is quicker than right-click > Paste.
 async function paste() {
     const clipboardText = await navigator.clipboard.readText();
@@ -23,16 +23,15 @@ function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
-async function showDownloadProgress(progressFilename) {
+async function showDownloadProgress(progressFilePath) {
     while (shouldLog) {
         try {
-            const response = await fetch(`yt-progress/${progressFilename}`);
-            console.log('Response when fetching the .txt file:');
-            console.log(response);
+            const response = await fetch(progressFilePath);
             const textInFile = await response.text();
             lines = textInFile.split('\n');
             secondLastLine = lines[lines.length - 2];
-           
+            console.log('Reading from progress file:')
+            console.log(secondLastLine);
             if (typeof secondLastLine === 'undefined') {
                 show_alert('Initialising...', 'dark');
             }
@@ -49,20 +48,20 @@ async function showDownloadProgress(progressFilename) {
                 show_alert('Merging audio and video...', 'dark');
             }
             else if (secondLastLine.includes('Deleting original file ')) {
-                show_alert('Almost done...', 'dark');
+                show_alert('Finishing up...', 'dark');
             }
             else {
-                show_alert(secondLastLine, 'info');
+                show_alert(secondLastLine);
             }
-            await sleep(1000); // Using the sleep function created above.
-        } 
+            await sleep(500); // Using the sleep function created above.
+        }
         catch(error) {
             show_alert(error, 'danger');
             console.log(error);
         }
     }
 }
-  
+
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(whichButton) { // whichButton is this.value in yt.html
     reset();
@@ -83,18 +82,18 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
 
         const firstFormData = new FormData();
         firstFormData.append('button_clicked', 'yes');
-        
-        // 1st POST request to get the name of the progress file.
-        const progressFileResponse = await fetch('/yt', {
+
+        // 1st POST request to get the path of the progress file.
+        const requestProgressPath = await fetch('/yt', {
             method: 'POST',
             body: firstFormData
         });
-        
-        const progressFilename = await progressFileResponse.text();
-        console.log(`progressFilename: ${progressFilename}`)
 
-        if (!progressFileResponse.ok) {
-            show_alert(progressFileResponse, 'danger');
+        const progressFilePath = await requestProgressPath.text();
+        console.log(`Progress File Path: ${progressFilePath}`)
+
+        if (!requestProgressPath.ok) {
+            show_alert(requestProgressPath, 'danger');
         }
         else {
             // The FormData for the 2nd POST request.
@@ -103,22 +102,22 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             secondFormData.append("button_clicked", whichButton);
 
             shouldLog = true;
-            showDownloadProgress(progressFilename);
-            
+            showDownloadProgress(progressFilePath);
+
             // 2nd POST request to get the download link.
-            const response = await fetch("/yt", {
+            const secondRequest = await fetch("/yt", {
                 method: 'POST',
                 body: secondFormData
             });
 
-            if (response.ok) {
+            if (secondRequest.ok) {
 
                 shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
 
-                const jsonResponse = await response.json();
+                const jsonResponse = await secondRequest.json();
                 const downloadLink = jsonResponse.download_path
                 const logFile = jsonResponse.log_file
-                
+
                 const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
                 virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
                 virtualDownloadLink.click();
@@ -128,12 +127,12 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
 
                 document.getElementById('logfile').innerHTML = `Would you like to view the log file? If so, click \
                 <a href="${logFile}" target="_blank">here</a>.`
-            } 
-            else {
-                show_alert(response, 'danger');
-                console.log(response);
             }
-        } 
+            else {
+                show_alert(secondRequest, 'danger');
+                console.log(secondRequest);
+            }
+        }
     }
     else { // If the contents of the link box don't match the regex.
         show_alert(`Invalid URL provided.`, 'danger');

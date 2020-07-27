@@ -3,13 +3,14 @@ from loggers import log
 
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
-    ffmpeg_path = '/home/h/bin/ffmpeg' # If running locally, change this to the correct path.
+    # If running locally, change this to the correct path.
+    ffmpeg_path = '/home/h/bin/ffmpeg'
 
     os.makedirs('ffmpeg-progress', exist_ok=True)
     progress_file_path = os.path.join('ffmpeg-progress', progress_filename)
     log.info(progress_file_path)
-
-    params = params.split(' ') # Split params into a list as I want to use subprocess.run() with an array of arguments.
+    # Split params into a list as I want to use subprocess.run() with an array of arguments.
+    params = params.split(' ')
     params.append(output_name)
     log.info(params)
 
@@ -170,7 +171,6 @@ def vorbis(progress_filename, uploaded_file_path, vorbis_encoding, vorbis_qualit
 def flac(progress_filename, uploaded_file_path, is_keep_video, flac_compression, output_path):
     # Keep video (if applicable)
     if is_keep_video == "yes":
-        ext = os.path.splitext(uploaded_file_path)[-1]
         output_ext = 'mkv'
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a flac -compression_level {flac_compression} '
                    f'-c:s copy', f'{output_path}.mkv')

@@ -19,26 +19,24 @@ max_upload_size = 5 # in GB.
 app.config['MAX_CONTENT_LENGTH'] = max_upload_size * 1000 * 1000 * 1000 # Max upload size.
 app.jinja_env.auto_reload = True
 
+app.register_blueprint(yt)
+app.register_blueprint(trimmer)
+
 # The database object (db) needs to be defined in main.py even though we're not using the database in main.py
 # Otherwise you get the following error:
-# "AssertionError: The sqlalchemy extension was not registered to the current application.
-# Please make sure to call init_app() first."
+# "AssertionError: The sqlalchemy extension was not registered to the current application."
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
-# session['progress_filename']
-SESSION_TYPE = 'filesystem'
-app.config.from_object(__name__)
-Session(app)
 
 # For the chat section of the website.
 socketio = SocketIO(app)
 socketio.init_app(app, cors_allowed_origins="*")
 
-app.register_blueprint(yt)
-app.register_blueprint(trimmer)
-
+# session['progress_filename']
+SESSION_TYPE = 'filesystem'
+app.config.from_object(__name__)
+Session(app)
 
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
@@ -210,15 +208,15 @@ def get_file(filename):
     return send_from_directory('ffmpeg-progress', filename)
 
 
+# app.js directs the user to this page when the conversion is complete.
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
-    just_extension = os.path.splitext(filename)[-1]
+    log.info(f'https://freeaudioconverter.net/conversions/{filename}')
 
-    if just_extension == ".m4a":
-        log.info(f'https://freeaudioconverter.net/conversions/{filename}')
+    extension = os.path.splitext(filename)[-1]
+    if extension == ".m4a":
         return send_from_directory('conversions', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'https://freeaudioconverter.net/conversions/{filename}')
         return send_from_directory('conversions', filename, as_attachment=True)
 
 
