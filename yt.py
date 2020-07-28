@@ -214,10 +214,9 @@ def get_file(filename):
 
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
+    log.info(f'https://free-av-tools.com/downloads/{filename}')
     extension = os.path.splitext(filename)[-1]
     if extension == ".m4a":
-        log.info(f'https://free-av-tools.com/downloads/{filename}')
         return send_from_directory('downloads', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'https://free-av-tools.com/downloads/{filename}')
-        return send_from_directory('downloads', filename, as_attachment=True
+        return send_from_directory('downloads', filename, as_attachment=True)

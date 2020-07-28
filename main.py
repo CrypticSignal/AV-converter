@@ -212,7 +212,6 @@ def get_file(filename):
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
     log.info(f'https://freeaudioconverter.net/conversions/{filename}')
-
     extension = os.path.splitext(filename)[-1]
     if extension == ".m4a":
         return send_from_directory('conversions', filename, mimetype="audio/mp4", as_attachment=True)
@@ -234,7 +233,7 @@ def return_world_record():
         int(score)
         int(times_missed)
         int(canvas_width)
-        int(canvas_width)
+        int(canvas_height)
     except ValueError:
         log.error("GAME 1: The user changed something to a non-int.")
     else:

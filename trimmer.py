@@ -40,10 +40,9 @@ def trim_file():
 
 @trimmer.route("/trims/<filename>", methods=["GET"])
 def download_file(filename):
-    just_extension = filename.split('.')[-1]
-    if just_extension == "m4a":
-        log.info(f'https://free-av-tools.com/trims/{filename}')
+    log.info(f'https://free-av-tools.com/trims/{filename}')
+    extension = os.path.splitext(filename)[-1]
+    if extension == ".m4a":
         return send_from_directory('trims', filename, mimetype="audio/mp4", as_attachment=True)
     else:
-        log.info(f'https://free-av-tools.com/trims/{filename}')
         return send_from_directory('trims', filename, as_attachment=True)
