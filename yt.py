@@ -193,7 +193,7 @@ def yt_downloader():
         download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
-                '--embed-thumbnail', '-id3v2_version', '3', '--audio-format', 'mp3', '--audio-quality', '0',
+                '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0',
                 '-o', download_template, '--', video_id]
 
         download_start_time = time.time()
