@@ -19,7 +19,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 // If the user has visited the page Before, don't show the opening alert.
 const isVisited = localStorage.getItem('isVisited');
 if (isVisited !== "yes") {
-    alert("This game tests your reaction speed. Whenever you hit the circle, it spawns in a new location. How many times can you hit the circle in 15 seconds? Dismiss this alert to begin playing.");
+    alert("This game tests your reaction speed. Whenever you hit the circle, it spawns in a new location. How many times can you hit the circle in 10 seconds? Dismiss this alert to begin playing.");
     localStorage.setItem('isVisited', 'yes')
 }
 
@@ -79,7 +79,7 @@ function removeCircle(currentXLocation, currentYLocation){
 
 let timesHit = 0;
 let timesMissed = 0;
-let timer = 15;
+let timer = 10;
 
 function newCircle() {
     timesHit += 1;

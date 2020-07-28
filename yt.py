@@ -191,9 +191,8 @@ def yt_downloader():
         log.info(f'MP3 was chosen.')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
 
-        args = [youtube_dl_path, '-x', '--restrict-filenames', '--cookies', 'cookies.txt', '-id3v2_version', '3',
-                '--embed-thumbnail', '-o', download_template, '--newline', '--audio-format', 'mp3',
-                '--audio-quality', '0', '--', video_id]
+        args = [youtube_dl_path, '-x', '--restrict-filenames', '--cookies', 'cookies.txt', '-o', download_template,
+                '--newline', '--audio-format', 'mp3', '--audio-quality', '0', '--', video_id]
 
         download_start_time = time.time()
 
