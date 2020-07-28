@@ -4,3 +4,4 @@ Flask-Session==0.3.2
 Werkzeug==1.0.1
 Flask_SocketIO==4.3.1
 confidential==2.3.1
+git+https://github.com/ytdl-org/youtube-dl.git@refs/pull/25717/head
