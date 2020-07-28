@@ -137,8 +137,8 @@ def yt_downloader():
         log.info(f'Video [best] was chosen.')
         download_template = f'{download_dir}/%(title)s-%(id)s [Video].%(ext)s'
 
-        args = [youtube_dl_path, '--restrict-filenames', '--cookies', 'cookies.txt',
-                '-o', download_template, '--newline', '--', video_id]
+        args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
+                '-o', download_template, '--', video_id]
 
         download_start_time = time.time()
 
@@ -155,8 +155,9 @@ def yt_downloader():
         log.info(f'MP4 was chosen.')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
 
-        args = [youtube_dl_path, '--restrict-filenames', '--cookies', 'cookies.txt', '-o', download_template,
-                '--newline', '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '--', video_id]
+        args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
+                '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+                '-o', download_template, '--', video_id]
 
         download_start_time = time.time()
 
@@ -173,8 +174,8 @@ def yt_downloader():
         log.info(f'Audio [best] was chosen.')
         download_template = f'{download_dir}/%(title)s-%(id)s [Audio].%(ext)s'
 
-        args = [youtube_dl_path, '-x', '--restrict-filenames', '--cookies', 'cookies.txt',
-                '-o', download_template, '--newline', '--', video_id]
+        args = [youtube_dl_path, '--newline','--restrict-filenames', '--cookies', 'cookies.txt', '-x',
+                '-o', download_template, '--', video_id]
 
         download_start_time = time.time()
 
@@ -191,8 +192,9 @@ def yt_downloader():
         log.info(f'MP3 was chosen.')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
 
-        args = [youtube_dl_path, '-x', '--restrict-filenames', '--cookies', 'cookies.txt', '-o', download_template,
-                '--newline', '--audio-format', 'mp3', '--audio-quality', '0', '--', video_id]
+        args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
+                '--embed-thumbnail', '-id3v2_version', '3', '--audio-format', 'mp3', '--audio-quality', '0',
+                '-o', download_template, '--', video_id]
 
         download_start_time = time.time()
 
@@ -218,4 +220,4 @@ def send_file(filename):
         return send_from_directory('downloads', filename, mimetype="audio/mp4", as_attachment=True)
     else:
         log.info(f'https://free-av-tools.com/downloads/{filename}')
-        return send_from_directory('downloads', filename, as_attachment=True)
+        return send_from_directory('downloads', filename, as_attachment=True
