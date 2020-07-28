@@ -76,7 +76,6 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
     if (contentsOfLinkBox.match(regExp)) {
 
         if (whichButton === 'Audio [best]') {
-            document.getElementById('donate').style.display = 'none';
             document.getElementById('bitrate_info').style.display = 'block';
         }
 
