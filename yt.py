@@ -111,7 +111,7 @@ def yt_downloader():
         session['progress_file_path'] = os.path.join('yt-progress', progress_file_name)
         log.info(f'Progress will be saved to: {session["progress_file_path"] }')
 
-        user_ip = request.environ['REMOTE_ADDR']
+        user_ip = get_ip()
         user = User.query.filter_by(ip=user_ip).first()
 
         if user:
