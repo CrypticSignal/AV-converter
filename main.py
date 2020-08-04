@@ -33,7 +33,6 @@ db = SQLAlchemy(app)
 socketio = SocketIO(app)
 socketio.init_app(app, cors_allowed_origins="*")
 
-# session['progress_filename']
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
