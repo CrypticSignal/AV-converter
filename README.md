@@ -57,7 +57,6 @@ youtube-dl | https://github.com/ytdl-org/youtube-dl
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
 - Python **3.6+**
 - FFmpeg
-- [youtube-dl](https://github.com/ytdl-org/youtube-dl#installation) (if you want to use the YouTube downloader).
 - `pip install -r requirements.txt`
 - Clone this repository.
 - Uncomment `db.create_all()` in yt.py
