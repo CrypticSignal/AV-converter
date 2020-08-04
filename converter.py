@@ -19,43 +19,9 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
                     '-id3v2_version', '3', '-write_id3v1', 'true'] + params)
 
 
-# MP3
-def mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting,
-            output_path):
-    # Keep the video (if applicable)
-    if is_keep_video == "yes":
-        ext = os.path.splitext(uploaded_file_path)[-1]
-        output_ext = 'mp4' if ext == '.mp4' else 'mkv'
-        # CBR
-        if mp3_encoding_type == "cbr":
-            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libmp3lame -b:a {mp3_bitrate}k',
-                       f'{output_path}.{output_ext}')
-        # ABR
-        elif mp3_encoding_type == "abr":
-            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libmp3lame --abr 1 -b:a {mp3_bitrate}k',
-                       f'{output_path}.{output_ext}')
-        # VBR
-        elif mp3_encoding_type == "vbr":
-            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libmp3lame -q:a {mp3_vbr_setting}',
-                       f'{output_path}.{output_ext}')
-    # Audio-only output file
-    else:
-        output_ext = 'mp3'
-        if mp3_encoding_type == "cbr":
-            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libmp3lame -b:a {mp3_bitrate}k',
-                       f'{output_path}.mp3')
-        elif mp3_encoding_type == "abr":
-            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libmp3lame --abr 1 -b:a {mp3_bitrate}k',
-                       f'{output_path}.mp3')
-        elif mp3_encoding_type == "vbr":
-            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libmp3lame -q:a {mp3_vbr_setting}',
-                       f'{output_path}.mp3')
-
-    return output_ext
-
 # AAC
 def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, is_fdk_lowpass,
-            fdk_lowpass, output_path):
+        fdk_lowpass, output_path):
     # Keep the video (if applicable)
     if is_keep_video == "yes":
         ext = os.path.splitext(uploaded_file_path)[-1]
@@ -100,17 +66,118 @@ def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
     return output_ext
 
 
-# WAV
-def wav(progress_filename, uploaded_file_path, is_keep_video, wav_bit_depth, output_path):
-    # Keep the video (if applicable)
+# AC3
+def ac3(progress_filename, uploaded_file_path, is_keep_video, ac3_bitrate, output_path):
+    # Keep video (if applicable)
     if is_keep_video == "yes":
-        output_ext = 'mkv'
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a pcm_s{wav_bit_depth}le -c:s copy',
-                   f'{output_path}.mkv')
+        output_ext = 'mp4' if ext == '.mp4' else 'mkv'
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a ac3 -b:a {ac3_bitrate}k -c:s copy',
+                   f'{output_path}.{output_ext}')
     # Audio-only output file
     else:
-        output_ext = 'wav'
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a pcm_s{wav_bit_depth}le', f'{output_path}.wav')
+        output_ext = 'ac3'
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a ac3 -b:a {ac3_bitrate}k', f'{output_path}.ac3')
+
+    return output_ext
+
+
+# ALAC
+def alac(progress_filename, uploaded_file_path, is_keep_video, output_path):
+    # Keep video (if applicable)
+    if is_keep_video == "yes":
+        output_ext = 'mkv'
+        run_ffmpeg(progress_filename, uploaded_file_path, '-c:v copy -c:a alac -c:s copy', f'{output_path}.mkv')
+    # Audio-only output file
+    else:
+        output_ext = 'm4a'
+        run_ffmpeg(progress_filename, uploaded_file_path, '-c:a alac', f'{output_path}.m4a')
+
+    return output_ext
+
+
+# CAF
+def caf(progress_filename, uploaded_file_path, output_path):
+    run_ffmpeg(progress_filename, uploaded_file_path, '-c:a alac', f'{output_path}.caf')
+    output_ext = 'caf'
+    return output_ext
+
+
+# DTS
+def dts(progress_filename, uploaded_file_path, is_keep_video, dts_bitrate, output_path):
+    # Keep video (if applicable)
+    if is_keep_video == "yes":
+        output_ext = 'mkv'
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a dca -b:a {dts_bitrate}k '
+                   f'-c:s copy -strict -2', f'{output_path}.mkv')
+    # Audio-only output file
+    else:
+        output_ext = 'dts'
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a dca -b:a {dts_bitrate}k -strict -2',
+                   f'{output_path}.dts')
+
+    return output_ext
+
+
+# FLAC
+def flac(progress_filename, uploaded_file_path, is_keep_video, flac_compression, output_path):
+    # Keep video (if applicable)
+    if is_keep_video == "yes":
+        output_ext = 'mkv'
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a flac -compression_level {flac_compression} '
+                   f'-c:s copy', f'{output_path}.mkv')
+    # Audio-only output file
+    else:
+        output_path = 'flac'
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a flac -compression_level {flac_compression}',
+                   f'{output_path}.flac')
+
+    return output_ext
+
+
+# MKA
+def mka(progress_filename, uploaded_file_path, output_path):
+    run_ffmpeg(progress_filename, uploaded_file_path, '-c:v copy -c:a copy', f'{output_path}.mka')
+    output_ext = 'mka'
+    return output_ext
+
+
+# MKV
+def mkv(progress_filename, uploaded_file_path, output_path):
+    run_ffmpeg(progress_filename, uploaded_file_path, '-c copy -f matroska', f'{output_path}.mkv')
+    output_ext = 'mkv'
+    return output_ext
+
+# MP3
+def mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting,
+        output_path):
+    # Keep the video (if applicable)
+    if is_keep_video == "yes":
+        ext = os.path.splitext(uploaded_file_path)[-1]
+        output_ext = 'mp4' if ext == '.mp4' else 'mkv'
+        # CBR
+        if mp3_encoding_type == "cbr":
+            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libmp3lame -b:a {mp3_bitrate}k',
+                       f'{output_path}.{output_ext}')
+        # ABR
+        elif mp3_encoding_type == "abr":
+            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libmp3lame --abr 1 -b:a {mp3_bitrate}k',
+                       f'{output_path}.{output_ext}')
+        # VBR
+        elif mp3_encoding_type == "vbr":
+            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libmp3lame -q:a {mp3_vbr_setting}',
+                       f'{output_path}.{output_ext}')
+    # Audio-only output file
+    else:
+        output_ext = 'mp3'
+        if mp3_encoding_type == "cbr":
+            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libmp3lame -b:a {mp3_bitrate}k',
+                       f'{output_path}.mp3')
+        elif mp3_encoding_type == "abr":
+            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libmp3lame --abr 1 -b:a {mp3_bitrate}k',
+                       f'{output_path}.mp3')
+        elif mp3_encoding_type == "vbr":
+            run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libmp3lame -q:a {mp3_vbr_setting}',
+                       f'{output_path}.mp3')
 
     return output_ext
 
@@ -139,7 +206,7 @@ def mp4(progress_filename, uploaded_file_path, mp4_encoding_mode, crf_value, out
 
 # Opus
 def opus(progress_filename, uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate,
-             output_path):
+         output_path):
     # VBR
     if opus_encoding_type == "opus_vbr":
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libopus -b:a {opus_vorbis_slider}k',
@@ -167,83 +234,16 @@ def vorbis(progress_filename, uploaded_file_path, vorbis_encoding, vorbis_qualit
     return output_ext
 
 
-# FLAC
-def flac(progress_filename, uploaded_file_path, is_keep_video, flac_compression, output_path):
-    # Keep video (if applicable)
+# WAV
+def wav(progress_filename, uploaded_file_path, is_keep_video, wav_bit_depth, output_path):
+    # Keep the video (if applicable)
     if is_keep_video == "yes":
         output_ext = 'mkv'
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a flac -compression_level {flac_compression} '
-                   f'-c:s copy', f'{output_path}.mkv')
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a pcm_s{wav_bit_depth}le -c:s copy',
+                   f'{output_path}.mkv')
     # Audio-only output file
     else:
-        output_path = 'flac'
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a flac -compression_level {flac_compression}',
-                   f'{output_path}.flac')
+        output_ext = 'wav'
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a pcm_s{wav_bit_depth}le', f'{output_path}.wav')
 
-    return output_ext
-
-
-# ALAC
-def alac(progress_filename, uploaded_file_path, is_keep_video, output_path):
-    # Keep video (if applicable)
-    if is_keep_video == "yes":
-        output_ext = 'mkv'
-        run_ffmpeg(progress_filename, uploaded_file_path, '-c:v copy -c:a alac -c:s copy', f'{output_path}.mkv')
-    # Audio-only output file
-    else:
-        output_ext = 'm4a'
-        run_ffmpeg(progress_filename, uploaded_file_path, '-c:a alac', f'{output_path}.m4a')
-
-    return output_ext
-
-
-# AC3
-def ac3(progress_filename, uploaded_file_path, is_keep_video, ac3_bitrate, output_path):
-    # Keep video (if applicable)
-    if is_keep_video == "yes":
-        output_ext = 'mp4' if ext == '.mp4' else 'mkv'
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a ac3 -b:a {ac3_bitrate}k -c:s copy',
-                   f'{output_path}.{output_ext}')
-    # Audio-only output file
-    else:
-        output_ext = 'ac3'
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a ac3 -b:a {ac3_bitrate}k', f'{output_path}.ac3')
-
-    return output_ext
-
-
-# DTS
-def dts(progress_filename, uploaded_file_path, is_keep_video, dts_bitrate, output_path):
-    # Keep video (if applicable)
-    if is_keep_video == "yes":
-        output_ext = 'mkv'
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a dca -b:a {dts_bitrate}k '
-                   f'-c:s copy -strict -2', f'{output_path}.mkv')
-    # Audio-only output file
-    else:
-        output_ext = 'dts'
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a dca -b:a {dts_bitrate}k -strict -2',
-                   f'{output_path}.dts')
-
-    return output_ext
-
-
-# CAF
-def caf(progress_filename, uploaded_file_path, output_path):
-    run_ffmpeg(progress_filename, uploaded_file_path, '-c:a alac', f'{output_path}.caf')
-    output_ext = 'caf'
-    return output_ext
-
-
-# MKA
-def mka(progress_filename, uploaded_file_path, output_path):
-    run_ffmpeg(progress_filename, uploaded_file_path, '-c:v copy -c:a copy', f'{output_path}.mka')
-    output_ext = 'mka'
-    return output_ext
-
-
-# MKV
-def mkv(progress_filename, uploaded_file_path, output_path):
-    run_ffmpeg(progress_filename, uploaded_file_path, '-c copy -f matroska', f'{output_path}.mkv')
-    output_ext = 'mkv'
     return output_ext
