@@ -1,5 +1,6 @@
 usersOnline = document.getElementById('users');
 usernameBox = document.getElementById('username');
+typingParagraph = document.getElementById('typing');
 messageBox = document.getElementById('message');
 messages = document.getElementById('messages');
 sendButton = document.getElementById('sendbutton');
@@ -11,7 +12,7 @@ document.addEventListener("keydown", (event) => {
         sendButton.click();
     }
 });
-    
+
 const socket = io.connect('https://' + document.domain + ':' + location.port);
 
 socket.on('user connected', (count) => {
@@ -29,7 +30,37 @@ socket.on('user disconnected', (count) => {
     messages.innerHTML += '<p>A user disconnected.</p>';
 });
 
-function sendData() { // Runs when the send button is clicked.
+messageBox.addEventListener('keydown', showTyping);
+messageBox.addEventListener('keyup', stoppedTyping);
+
+// Runs on the 'keydown' event on the message box.
+function showTyping() {
+    socket.emit('typing', usernameBox.value);
+}
+
+socket.on('show typing', (username) => {
+    typingParagraph.innerHTML = `${username} is typing...`;
+})
+
+// A function that creates a synchronous sleep.
+function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+// Runs on the 'keyup' event on the message box.
+async function stoppedTyping() {
+    await sleep(5000);
+    socket.emit('nottyping');
+}
+
+socket.on('show stopped typing', function () {
+    typingParagraph.innerHTML = '';
+
+})
+
+// Runs when the send button is clicked.
+function sendData() { 
+    socket.emit('nottyping');
     const username = usernameBox.value;
     const userInput = messageBox.value;
     socket.emit('message sent', {
@@ -43,5 +74,5 @@ socket.on('show message', (message) => {
         messages.innerHTML += `<p><b>${message.user_name}</b>: <i>${message.message}</i></p>`;
         messageBox.value = ''
         messageBox.focus();
-    }   
+    }
 });
