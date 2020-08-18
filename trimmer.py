@@ -1,6 +1,7 @@
 from flask import Blueprint, request, send_from_directory
 from werkzeug.utils import secure_filename
-import os, subprocess
+import os
+import subprocess
 from loggers import log_this, log
 
 trimmer = Blueprint('trimmer', __name__)

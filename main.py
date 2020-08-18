@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 from time import time
 from datetime import datetime
 import os
-import converter
+import converter # converter.py
 
 app = Flask(__name__)
 secret_key = str(os.urandom(16))
@@ -43,6 +43,20 @@ def homepage():
 
     if request.form['request_type'] == 'log_convert_clicked':
         log_this('clicked on the convert button.')
+
+        size_of_conversions_folder = 0
+        # Iterate over each file in the folder and add its size to the above variable.
+        for file in os.listdir('conversions'):
+            size_of_file = os.path.getsize(f'conversions/{file}') / 1_000_000
+            size_of_conversions_folder += size_of_file
+        # If there's more than 5 GB of files in the conversions folder, empty it.
+        if size_of_media_files > 5_000:
+            log.info(f'More than 5 GB worth of conversions found. Emptying conversions folder...')
+            for file in os.listdir('conversions'):
+                if file.split('.')[-1] in relevant_extensions:
+                    os.remove(f'conversions/{file}')
+            log.info('Conversions folder emptied.')
+
         return ''
 
     elif request.form["request_type"] == "uploaded":
@@ -348,6 +362,15 @@ def disconnect():
 @socketio.on('message sent')
 def handle_message(message):
     socketio.emit('show message', message)
+
+@socketio.on('typing')
+def show_typing(username):
+    socketio.emit('show typing', username)
+
+@socketio.on('nottyping')
+def show_typing():
+    socketio.emit('show stopped typing')
+
 
 if __name__ == "__main__":
     socketio.run(app, host='0.0.0.0')

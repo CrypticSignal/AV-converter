@@ -3,7 +3,8 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import urlparse, parse_qs
 import time
-import os, subprocess
+import os
+import subprocess
 from loggers import log, get_ip, log_this
 
 yt = Blueprint('yt', __name__)
@@ -29,16 +30,9 @@ class User(db.Model): # This class is a table in the database,
         self.times_used_yt_downloader = times_used_yt_downloader
         self.mb_downloaded = mb_downloaded
 
-os.makedirs('yt-progress', exist_ok=True)
-os.makedirs('downloads', exist_ok=True)
-download_dir = 'downloads'
 
-# If running locally, change this to the correct path.
-youtube_dl_path = '/home/h/.local/bin/youtube-dl'
-
-relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
-
-def get_video_id(url): # Function from https://gist.github.com/kmonsoor/2a1afba4ee127cce50a
+ # Function from https://gist.github.com/kmonsoor/2a1afba4ee127cce50a
+def get_video_id(url):
     if url.startswith(('youtu', 'www')):
         url = 'http://' + url
 
@@ -53,6 +47,11 @@ def get_video_id(url): # Function from https://gist.github.com/kmonsoor/2a1afba4
         return query.path[1:]
     else:
         raise ValueError
+
+relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
+os.makedirs('yt-progress', exist_ok=True)
+os.makedirs('downloads', exist_ok=True)
+download_dir = 'downloads'
 
 
 def return_download_link(progress_file_path, video_id, download_type):
@@ -81,25 +80,29 @@ def return_download_link(progress_file_path, video_id, download_type):
                 'log_file': progress_file_path
             }
 
+# If running locally, change this to the correct path.
+youtube_dl_path = '/home/h/.local/bin/youtube-dl'
+
 
 # When POST requests are made to /yt
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
 
+    # First POST request when the user clicks on a download button.
     if request.form['button_clicked'] == 'yes':
 
         log_this('Clicked a download button.')
+
         #db.create_all()
 
-        # Intialise the size_of_media_files variable
         size_of_media_files = 0
         # Iterate over each file in the folder and add its size to the above variable.
         for file in os.listdir(download_dir):
             size_of_file = os.path.getsize(f'{download_dir}/{file}') / 1_000_000
             size_of_media_files += size_of_file
-        # If there's more than 10 GB of files in the downloads folder, empty it.
-        if size_of_media_files > 10_000:
-            log.info(f'More than 10 GB worth of downloads found. Emptying downloads folder...')
+        # If there's more than 5 GB of files in the downloads folder, empty it.
+        if size_of_media_files > 5_000:
+            log.info(f'More than 5 GB worth of downloads found. Emptying downloads folder...')
             for file in os.listdir(download_dir):
                 if file.split('.')[-1] in relevant_extensions:
                     os.remove(f'{download_dir}/{file}')
@@ -126,7 +129,7 @@ def yt_downloader():
 
         return session['progress_file_path']
 
-    # The following runs after the 2nd POST request:
+    # Second POST request:
 
     link = request.form['link']
     video_id = str(get_video_id(link))
