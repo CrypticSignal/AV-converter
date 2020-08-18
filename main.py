@@ -2,21 +2,23 @@ from flask import Flask, request, render_template, send_from_directory, session
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
-from yt import yt # Importing the blueprint in yt.py
-from trimmer import trimmer # Importing the blueprint in trimmer.py
+from yt import yt  # Importing the blueprint in yt.py
+from trimmer import trimmer  # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
 from werkzeug.utils import secure_filename
 from time import time
 from datetime import datetime
 import os
-import converter # converter.py
+import converter  # converter.py
 
 app = Flask(__name__)
 secret_key = str(os.urandom(16))
 app.secret_key = secret_key
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-max_upload_size = 5 # in GB.
-app.config['MAX_CONTENT_LENGTH'] = max_upload_size * 1000 * 1000 * 1000 # Max upload size.
+# Set the maximum upload size to 5 GB.
+max_upload_size = 5  # in GB.
+app.config['MAX_CONTENT_LENGTH'] = max_upload_size * 1000 * 1000 * 1000
+# Changes to the HTML files are reflected on the website without having to restart the Flask app.
 app.jinja_env.auto_reload = True
 
 app.register_blueprint(yt)
@@ -36,6 +38,7 @@ socketio.init_app(app, cors_allowed_origins="*")
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
+
 
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
@@ -119,19 +122,20 @@ def homepage():
 
         def run_converter(codec, params):
             codec_to_converter = {
-            "aac" : converter.aac,
-            "ac3": converter.ac3,
-            "alac": converter.alac,
-            "dts": converter.dts,
-            "flac": converter.flac,
-            "mka": converter.mka,
-            "mkv": converter.mkv,
-            "mp3" : converter.mp3,
-            "mp4": converter.mp4,
-            "opus": converter.opus,
-            "vorbis": converter.vorbis,
-            "wav": converter.wav
+                                    "aac": converter.aac,
+                                    "ac3": converter.ac3,
+                                    "alac": converter.alac,
+                                    "dts": converter.dts,
+                                    "flac": converter.flac,
+                                    "mka": converter.mka,
+                                    "mkv": converter.mkv,
+                                    "mp3": converter.mp3,
+                                    "mp4": converter.mp4,
+                                    "opus": converter.opus,
+                                    "vorbis": converter.vorbis,
+                                    "wav": converter.wav
             }
+            # Pass the list of parameters (params) to the appropriate converter function.
             return codec_to_converter[codec](*params)
 
         # Run the appropriate function in converter.py:
@@ -221,7 +225,7 @@ def get_file(filename):
     return send_from_directory('ffmpeg-progress', filename)
 
 
-# app.js directs the user to this page when the conversion is complete.
+# app.js directs the user to this URL when the conversion is complete.
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
     log.info(f'https://freeaudioconverter.net/conversions/{filename}')
@@ -248,7 +252,7 @@ def return_world_record():
         int(canvas_width)
         int(canvas_height)
     except ValueError:
-        log.error("GAME 1: The user changed something to a non-int.")
+        log.error("[Game 1] The user changed something to a non-int.")
     else:
         os.makedirs('GameScores', exist_ok=True)
         with open("GameScores/HighScores.txt", "a") as f:
@@ -260,8 +264,6 @@ def return_world_record():
             lines = f.readlines()
             for line in lines:
                 just_scores.append(line.split('|')[0].strip())
-        #valid_scores = [x for x in just_scores if int(x) < 100]
-        #world_record = max(valid_scores, key=lambda x: int(x))
         return ''
 
 
@@ -275,7 +277,7 @@ def save_game2_stats():
     try:
         int(reaction_time)
     except ValueError:
-        log.error("GAME 2: The user changed reaction_time to a non-int.")
+        log.error("[Game 2] The user changed reaction_time to a non-int.")
     else:
         os.makedirs('GameScores', exist_ok=True)
         with open("GameScores/ReactionTimes.txt", "a") as f:
@@ -286,7 +288,6 @@ def save_game2_stats():
             lines = f.readlines()
             for line in lines:
                 reaction_times.append(line.split('|')[0][:-3].strip())
-        # reaction_record = min(reaction_times, key=lambda x: int(x))
         return ''
 
 
@@ -342,9 +343,12 @@ def game2_visited():
 def chat():
     log_visit("visited chat")
     return render_template("chat.html", title="Chat")
-
-
+    
+    
+# Users online counter for /chat
 count = 0
+
+
 @socketio.on('connect')
 def connect():
     global count
@@ -359,17 +363,19 @@ def disconnect():
     socketio.emit('user disconnected', count)
 
 
-@socketio.on('message sent')
-def handle_message(message):
-    socketio.emit('show message', message)
-
 @socketio.on('typing')
 def show_typing(username):
     socketio.emit('show typing', username)
 
+
 @socketio.on('nottyping')
 def show_typing():
     socketio.emit('show stopped typing')
+
+
+@socketio.on('message sent')
+def handle_message(message):
+    socketio.emit('show message', message)
 
 
 if __name__ == "__main__":
