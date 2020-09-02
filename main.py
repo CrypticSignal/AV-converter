@@ -64,9 +64,7 @@ def homepage():
 
     elif request.form["request_type"] == "uploaded":
 
-        session['progress_filename'] = str(time())[:-8] + '.txt'
-
-        log_this('uploaded a file:')
+        log.info('Upload complete.')
         chosen_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
         log.info(chosen_file)
@@ -77,6 +75,9 @@ def homepage():
         # Save the uploaded file to the uploads folder.
         os.makedirs('uploads', exist_ok=True)
         chosen_file.save(os.path.join("uploads", filename_secure))
+
+        conversion_progress_filename = f'{str(time())[:-8]}.txt'
+        session['progress_filename'] = conversion_progress_filename
 
         return session['progress_filename']
 
@@ -216,7 +217,7 @@ def homepage():
 
         return {
             'download_path': os.path.join('conversions', converted_file_name),
-            'log_file': os.path.join('ffmpeg-progress', f'{session["progress_filename"]}.txt')
+            'log_file': os.path.join('ffmpeg-progress', session["progress_filename"])
             }
 
 
