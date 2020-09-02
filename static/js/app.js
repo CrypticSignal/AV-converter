@@ -188,7 +188,7 @@ async function showConversionProgress() {
         const withoutMicroseconds = justProgressTime.slice(0, -7);
         const milliseconds = justProgressTime.substring(9, 12);
         show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
-        (and ${milliseconds} milliseconds)`, 'dark');
+        (and ${milliseconds} milliseconds)`, 'primary');
         await sleep(1000);
     }
 }

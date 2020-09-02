@@ -33,7 +33,7 @@ async function showDownloadProgress(progressFilePath) {
             console.log('Reading from progress file:')
             console.log(secondLastLine);
             if (typeof secondLastLine === 'undefined') {
-                show_alert('Initialising...', 'dark');
+                show_alert('Initialising...', 'warning');
             }
             else if (secondLastLine.includes('Downloading webpage')) {
                 show_alert('Video found...', 'success');
@@ -51,7 +51,7 @@ async function showDownloadProgress(progressFilePath) {
                 show_alert('Finishing up...', 'info');
             }
             else {
-                show_alert(secondLastLine, 'dark');
+                show_alert(secondLastLine, 'primary');
             }
             await sleep(500); // Using the sleep function created above.
         }
