@@ -53,7 +53,7 @@ def homepage():
             size_of_file = os.path.getsize(f'conversions/{file}') / 1_000_000
             size_of_conversions_folder += size_of_file
         # If there's more than 5 GB of files in the conversions folder, empty it.
-        if size_of_media_files > 5_000:
+        if size_of_conversions_folder > 5_000:
             log.info(f'More than 5 GB worth of conversions found. Emptying conversions folder...')
             for file in os.listdir('conversions'):
                 if file.split('.')[-1] in relevant_extensions:
