@@ -91,28 +91,27 @@ def yt_downloader():
     # First POST request when the user clicks on a download button.
     if request.form['button_clicked'] == 'yes':
 
-        log_this('Clicked a download button.')
+        log_this('clicked a download button.')
 
         #db.create_all()
 
-        size_of_media_files = 0
+        size_downloads_folder = 0
         # Iterate over each file in the folder and add its size to the above variable.
         for file in os.listdir(download_dir):
             size_of_file = os.path.getsize(f'{download_dir}/{file}') / 1_000_000
-            size_of_media_files += size_of_file
-        # If there's more than 5 GB of files in the downloads folder, empty it.
-        if size_of_media_files > 5_000:
-            log.info(f'More than 5 GB worth of downloads found. Emptying downloads folder...')
+            size_downloads_folder += size_of_file
+        # If there's more than 1 GB of files in the downloads folder, empty it.
+        if size_downloads_folder > 1000:
+            log.info(f'More than 1 GB worth of downloads found. Emptying downloads folder...')
             for file in os.listdir(download_dir):
-                if file.split('.')[-1] in relevant_extensions:
-                    os.remove(f'{download_dir}/{file}')
+                os.remove(file)
             log.info('Downloads folder emptied.')
 
         # I want to save the download progress to a file and read from that file to show the download progress
         # to the user. Set the name of the file to the time since the epoch.
         progress_file_name = str(time.time())[:-8] + '.txt'
         session['progress_file_path'] = os.path.join('yt-progress', progress_file_name)
-        log.info(f'Progress will be saved to: {session["progress_file_path"] }')
+        log.info(f'Progress will be saved to: {session["progress_file_path"]}')
 
         user_ip = get_ip()
         user = User.query.filter_by(ip=user_ip).first()
