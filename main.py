@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, send_from_directory, session
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
+import shutil
 from yt import yt  # Importing the blueprint in yt.py
 from trimmer import trimmer  # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
@@ -47,24 +48,27 @@ def homepage():
     if request.form['request_type'] == 'log_convert_clicked':
         log_this('clicked on the convert button.')
 
-        size_of_conversions_folder = 0
-        # Iterate over each file in the folder and add its size to the above variable.
         for file in os.listdir('conversions'):
+            os.remove(file)
+
+        uploads_folder_size = 0
+        # Iterate over each file in the folder and add its size to the above variable.
+        for file in os.listdir('uploads'):
             size_of_file = os.path.getsize(f'conversions/{file}') / 1_000_000
-            size_of_conversions_folder += size_of_file
-        # If there's more than 5 GB of files in the conversions folder, empty it.
-        if size_of_conversions_folder > 5_000:
-            log.info(f'More than 5 GB worth of conversions found. Emptying conversions folder...')
-            for file in os.listdir('conversions'):
-                if file.split('.')[-1] in relevant_extensions:
-                    os.remove(f'conversions/{file}')
+            uploads_folder_size += size_of_file
+        # If there's more than 1 GB of files in the conversions folder, empty it.
+        if uploads_folder_size > 1000:
+            log.info(f'More than 1 GB worth of uploads found. Emptying uploads folder...')
+            for file in os.listdir('uploads'):
+                os.remove(file)
             log.info('Conversions folder emptied.')
 
         return ''
 
     elif request.form["request_type"] == "uploaded":
 
-        log.info('Upload complete.')
+        upload_time = datetime.now().strftime('%H:%M:%S')
+        log.info(f'Upload complete at {upload_time}')
         chosen_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
         log.info(chosen_file)
@@ -82,6 +86,8 @@ def homepage():
         return session['progress_filename']
 
     elif request.form["request_type"] == "convert":
+
+        conversion_start_time = time()
 
         wav_bit_depth = request.form["wav_bit_depth"]
         filename = request.form["filename"]
@@ -211,6 +217,9 @@ def homepage():
             params = [session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth,
                       output_path]
             extension = run_converter('wav', params)
+
+        conversion_complete_time = time()
+        log.info(f'Conversion took {round((conversion_complete_time - conversion_start_time), 1)} seconds.')
 
         # Filename after conversion.
         converted_file_name = f'{output_name}.{extension}'
@@ -344,6 +353,10 @@ def game2_visited():
 def chat():
     log_visit("visited chat")
     return render_template("chat.html", title="Chat")
+
+@app.route("/samples")
+def samples():
+    return render_template("samples.html")
     
     
 # Users online counter for /chat
