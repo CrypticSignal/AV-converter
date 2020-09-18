@@ -45,32 +45,38 @@ Session(app)
 @app.route("/", methods=["POST"])
 def homepage():
 
+    # First POST request.
     if request.form['request_type'] == 'log_convert_clicked':
         log_this('clicked on the convert button.')
+        return ''
 
+    # Second POST request.
+    elif request.form["request_type"] == "uploaded":
+
+        upload_time = datetime.now().strftime('%H:%M:%S')
+        log.info(f'Upload complete at {upload_time}')
+
+        # Empty the conversions folder to ensure there's room for the file that is going to be converted.
         for file in os.listdir('conversions'):
-            os.remove(file)
+            os.remove(f'conversions/{file}')
+            log.info(f'Deleted conversions/{file}')
 
         uploads_folder_size = 0
         # Iterate over each file in the folder and add its size to the above variable.
         for file in os.listdir('uploads'):
-            size_of_file = os.path.getsize(f'conversions/{file}') / 1_000_000
+            size_of_file = os.path.getsize(f'uploads/{file}') / 1_000_000
             uploads_folder_size += size_of_file
         # If there's more than 1 GB of files in the conversions folder, empty it.
         if uploads_folder_size > 1000:
             log.info(f'More than 1 GB worth of uploads found. Emptying uploads folder...')
             for file in os.listdir('uploads'):
-                os.remove(file)
+                os.remove(f'uploads/{file}')
             log.info('Conversions folder emptied.')
-
-        return ''
-
-    elif request.form["request_type"] == "uploaded":
-
-        upload_time = datetime.now().strftime('%H:%M:%S')
-        log.info(f'Upload complete at {upload_time}')
+        
+        # Grabbing the JavaScript FormData
         chosen_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
+
         log.info(chosen_file)
         log.info(f'Size: {filesize} MB')
 
