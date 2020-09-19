@@ -2,6 +2,7 @@ from flask import Flask, Blueprint, request, send_from_directory, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import urlparse, parse_qs
+import shutil
 import time
 import os
 import subprocess
@@ -104,7 +105,7 @@ def yt_downloader():
         if size_downloads_folder > 1000:
             log.info(f'More than 1 GB worth of downloads found. Emptying downloads folder...')
             for file in os.listdir(download_dir):
-                os.remove(file)
+                os.remove(f'{download_dir}/{file}')
             log.info('Downloads folder emptied.')
 
         # I want to save the download progress to a file and read from that file to show the download progress
@@ -132,7 +133,7 @@ def yt_downloader():
 
     link = request.form['link']
     video_id = str(get_video_id(link))
-    log.info(f'LINK: {link} | ID: {video_id}')
+    log.info(f'Link: {link} | ID: {video_id}')
 
     if request.form['button_clicked'] == 'Video [best]':
 
