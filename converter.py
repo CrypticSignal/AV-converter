@@ -128,7 +128,7 @@ def flac(progress_filename, uploaded_file_path, is_keep_video, flac_compression,
                    f'-c:s copy', f'{output_path}.mkv')
     # Audio-only output file
     else:
-        output_path = 'flac'
+        output_ext = 'flac'
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a flac -compression_level {flac_compression}',
                    f'{output_path}.flac')
 
