@@ -57,11 +57,11 @@ download_dir = 'downloads'
 
 def return_download_link(progress_file_path, video_id, download_type):
     for file in os.listdir(download_dir):
-        if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file:
+        if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file \
+        and '.temp' not in file:
 
-            log.info(f'DOWNLOADED "{file}"')
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
-            log.info(f'{filesize} MB')
+            log.info(f'{file} | {filesize} MB')
 
             user_ip = get_ip()
             user = User.query.filter_by(ip=user_ip).first()
@@ -96,18 +96,6 @@ def yt_downloader():
 
         #db.create_all()
 
-        size_downloads_folder = 0
-        # Iterate over each file in the folder and add its size to the above variable.
-        for file in os.listdir(download_dir):
-            size_of_file = os.path.getsize(f'{download_dir}/{file}') / 1_000_000
-            size_downloads_folder += size_of_file
-        # If there's more than 1 GB of files in the downloads folder, empty it.
-        if size_downloads_folder > 1000:
-            log.info(f'More than 1 GB worth of downloads found. Emptying downloads folder...')
-            for file in os.listdir(download_dir):
-                os.remove(f'{download_dir}/{file}')
-            log.info('Downloads folder emptied.')
-
         # I want to save the download progress to a file and read from that file to show the download progress
         # to the user. Set the name of the file to the time since the epoch.
         progress_file_name = str(time.time())[:-8] + '.txt'
@@ -138,7 +126,7 @@ def yt_downloader():
     if request.form['button_clicked'] == 'Video [best]':
 
         log.info(f'Video [best] was chosen.')
-        download_template = f'{download_dir}/%(title)s-%(id)s [Video].%(ext)s'
+        download_template = f'{download_dir}/%(title)s-%(id)s [Video - best].%(ext)s'
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
                 '-o', download_template, '--', video_id]
@@ -150,7 +138,7 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(session['progress_file_path'], video_id, '[Video]')
+        download_link = return_download_link(session['progress_file_path'], video_id, '[Video - best]')
         return download_link
 
     elif request.form['button_clicked'] == 'Video [MP4]':
@@ -217,9 +205,16 @@ def get_file(filename):
 
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    log.info(f'https://free-av-tools.com/downloads/{filename}')
     extension = os.path.splitext(filename)[-1]
     if extension == ".m4a":
-        return send_from_directory('downloads', filename, mimetype="audio/mp4", as_attachment=True)
+        try:
+            return send_from_directory('downloads', filename, mimetype="audio/mp4", as_attachment=True)
+        finally:
+            os.remove(f'{download_dir}/{filename}')
+            log.info(f'Deleted {filename}')
     else:
-        return send_from_directory('downloads', filename, as_attachment=True)
+        try:
+            return send_from_directory('downloads', filename, as_attachment=True)
+        finally:
+            os.remove(f'{download_dir}/{filename}')
+            log.info(f'Deleted {filename}')
