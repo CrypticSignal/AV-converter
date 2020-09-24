@@ -55,10 +55,9 @@ os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
 
 
-def return_download_link(progress_file_path, video_id, download_type):
+def return_download_link(progress_file_path, video_id):
     for file in os.listdir(download_dir):
-        if file.split('.')[-1] in relevant_extensions and video_id in file and download_type in file \
-        and '.temp' not in file:
+        if file.split('.')[-1] in relevant_extensions and video_id in file and '.temp' not in file:
 
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
             log.info(f'{file} | {filesize} MB')
@@ -73,7 +72,7 @@ def return_download_link(progress_file_path, video_id, download_type):
             with open("logs/downloaded-files.txt", "a") as f:
                 f.write(f'\n{file}')
 
-            new_filename = file.replace('#', '').replace(f'-{video_id}', '')
+            new_filename = file.replace('_', ' ').replace('#', '').replace(f'-{video_id}', '')
             os.replace(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
 
             return {
@@ -125,8 +124,7 @@ def yt_downloader():
 
     if request.form['button_clicked'] == 'Video [best]':
 
-        log.info(f'Video [best] was chosen.')
-        download_template = f'{download_dir}/%(title)s-%(id)s [Video - best].%(ext)s'
+        download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
                 '-o', download_template, '--', video_id]
@@ -137,14 +135,13 @@ def yt_downloader():
             subprocess.run(args, stdout=f)
 
         download_complete_time = time.time()
-        log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(session['progress_file_path'], video_id, '[Video - best]')
+        log.info(f'Video [best] was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
+        download_link = return_download_link(session['progress_file_path'], video_id)
         return download_link
 
     elif request.form['button_clicked'] == 'Video [MP4]':
 
-        log.info(f'MP4 was chosen.')
-        download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
+        download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
                 '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
@@ -156,14 +153,13 @@ def yt_downloader():
             subprocess.run(args, stdout=f)
 
         download_complete_time = time.time()
-        log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(session['progress_file_path'], video_id, '[MP4]')
+        log.info(f'MP4 was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
+        download_link = return_download_link(session['progress_file_path'], video_id)
         return download_link
 
     elif request.form['button_clicked'] == 'Audio [best]':
 
-        log.info(f'Audio [best] was chosen.')
-        download_template = f'{download_dir}/%(title)s-%(id)s [Audio].%(ext)s'
+        download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
 
         args = [youtube_dl_path, '--newline','--restrict-filenames', '--cookies', 'cookies.txt', '-x',
                 '-o', download_template, '--', video_id]
@@ -174,14 +170,13 @@ def yt_downloader():
             subprocess.run(args, stdout=f)
 
         download_complete_time = time.time()
-        log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(session['progress_file_path'], video_id, '[Audio]')
+        log.info(f'Audio [best] was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
+        download_link = return_download_link(session['progress_file_path'], video_id)
         return download_link
 
     elif request.form['button_clicked'] == 'MP3':
 
-        log.info(f'MP3 was chosen.')
-        download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
+        download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
                 '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0',
@@ -193,8 +188,8 @@ def yt_downloader():
             subprocess.run(args, stdout=f)
 
         download_complete_time = time.time()
-        log.info(f'Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(session['progress_file_path'], video_id, '[MP3]')
+        log.info(f'MP3 was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
+        download_link = return_download_link(session['progress_file_path'], video_id)
         return download_link
 
 
@@ -208,13 +203,13 @@ def send_file(filename):
     extension = os.path.splitext(filename)[-1]
     if extension == ".m4a":
         try:
-            return send_from_directory('downloads', filename, mimetype="audio/mp4", as_attachment=True)
+            return send_from_directory(download_dir, filename, mimetype="audio/mp4", as_attachment=True)
         finally:
             os.remove(f'{download_dir}/{filename}')
-            log.info(f'Deleted {filename}')
+            log.info(f'Deleted "{filename}"')
     else:
         try:
-            return send_from_directory('downloads', filename, as_attachment=True)
+            return send_from_directory(download_dir, filename, as_attachment=True)
         finally:
             os.remove(f'{download_dir}/{filename}')
-            log.info(f'Deleted {filename}')
+            log.info(f'Deleted "{filename}"')
