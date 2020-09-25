@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request, send_from_directory, session
+from flask import Flask, Blueprint, request, send_from_directory, session, jsonify
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import urlparse, parse_qs
@@ -15,12 +15,20 @@ SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
+# If running locally, change this to the correct path.
+youtube_dl_path = '/home/h/.local/bin/youtube-dl'
+# Create the necessary folders and define the directory to save the downloads to.
+os.makedirs('yt-progress', exist_ok=True)
+os.makedirs('downloads', exist_ok=True)
+download_dir = 'downloads'
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-class User(db.Model): # This class is a table in the database,
+# This class is a table in the database.
+class User(db.Model): 
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(20), unique=True, nullable=False)
     times_used_yt_downloader = db.Column(db.Integer, default=0)
@@ -31,8 +39,10 @@ class User(db.Model): # This class is a table in the database,
         self.times_used_yt_downloader = times_used_yt_downloader
         self.mb_downloaded = mb_downloaded
 
+db.create_all()
 
- # Function from https://gist.github.com/kmonsoor/2a1afba4ee127cce50a
+
+# Function from https://gist.github.com/kmonsoor/2a1afba4ee127cce50a
 def get_video_id(url):
     if url.startswith(('youtu', 'www')):
         url = 'http://' + url
@@ -49,25 +59,22 @@ def get_video_id(url):
     else:
         raise ValueError
 
-relevant_extensions = [".mp4", ".webm", ".opus", ".mkv", ".m4a", ".ogg", ".mp3"]
-os.makedirs('yt-progress', exist_ok=True)
-os.makedirs('downloads', exist_ok=True)
-download_dir = 'downloads'
 
+def send_json_response(progress_file_path, video_id):
 
-def return_download_link(progress_file_path, video_id, applicable_extensions):
-    
     for file in os.listdir(download_dir):
 
+        # Delete the unnecessary files.
         if '.temp' in file or '.webp' in file:
             os.remove(os.path.join(download_dir, file))
         
-        elif os.path.splitext(file)[-1] in applicable_extensions and video_id in file:
+        elif video_id in file:
 
-            filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
+            filesize = round((os.path.getsize(os.path.join(download_dir, file)) / 1_000_000), 2)
             log.info(f'{filesize} MB')
 
             user_ip = get_ip()
+            # Query the database by IP.
             user = User.query.filter_by(ip=user_ip).first()
 
             if user:
@@ -75,19 +82,13 @@ def return_download_link(progress_file_path, video_id, applicable_extensions):
                 db.session.commit()
 
             new_filename = file.replace('_', ' ').replace('#', '').replace(f'-{video_id}', '')
+            os.replace(os.path.join(download_dir, file), os.path.join(download_dir, new_filename))
 
             with open("logs/downloads.txt", "a") as f:
                 f.write(f'\n{new_filename}')
 
-            os.replace(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
-
-            return {
-                'download_path': os.path.join('downloads', new_filename),
-                'log_file': progress_file_path
-            }
-
-# If running locally, change this to the correct path.
-youtube_dl_path = '/home/h/.local/bin/youtube-dl'
+            return jsonify(download_path=os.path.join('downloads', new_filename), 
+                           log_file=progress_file_path)
 
 
 # When POST requests are made to /yt
@@ -98,8 +99,6 @@ def yt_downloader():
     if request.form['button_clicked'] == 'yes':
 
         log_this('clicked a download button.')
-
-        #db.create_all()
 
         # Use the get_ip function imported from loggers.py
         user_ip = get_ip()
@@ -126,14 +125,15 @@ def yt_downloader():
 
     # Second POST request:
 
-    link = request.form['link']
+    video_link = request.form['link']
     # Use the get_video_id function to get the video ID from the link.
-    video_id = str(get_video_id(link))
-    log.info(f'Link: {link} | ID: {video_id}')
+    video_id = str(get_video_id(video_link))
+    log.info(f'{video_link} | {video_id}')
 
+    download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
+
+    # Video [best]   
     if request.form['button_clicked'] == 'Video [best]':
-
-        download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
                 '-o', download_template, '--', video_id]
@@ -145,13 +145,11 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'Video [best] was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-        applicable_extensions = ['.mkv', '.webm']
-        download_link = return_download_link(session['progress_file_path'], video_id, applicable_extensions)
-        return download_link
-
+     
+        return send_json_response(session['progress_file_path'], video_id)
+       
+    # Video [MP4]
     elif request.form['button_clicked'] == 'Video [MP4]':
-
-        download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
                 '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
@@ -164,13 +162,11 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'MP4 was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-        applicable_extensions = ['.mp4']
-        download_link = return_download_link(session['progress_file_path'], video_id, applicable_extensions)
-        return download_link
+      
+        return send_json_response(session['progress_file_path'], video_id, applicable_extensions)
 
+    # Audio [best]
     elif request.form['button_clicked'] == 'Audio [best]':
-
-        download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
 
         args = [youtube_dl_path, '--newline','--restrict-filenames', '--cookies', 'cookies.txt', '-x',
                 '-o', download_template, '--', video_id]
@@ -182,13 +178,11 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'Audio [best] was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-        applicable_extensions = ['.m4a', '.ogg', '.opus']
-        download_link = return_download_link(session['progress_file_path'], video_id, applicable_extensions)
-        return download_link
-
+    
+        return send_json_response(session['progress_file_path'], video_id)
+     
+    # MP3
     elif request.form['button_clicked'] == 'MP3':
-
-        download_template = f'{download_dir}/%(title)s-%(id)s.%(ext)s'
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
                 '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0',
@@ -201,28 +195,28 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'MP3 was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-        applicable_extensions = ['.mp3']
-        download_link = return_download_link(session['progress_file_path'], video_id, applicable_extensions)
-        return download_link
+   
+        return send_json_response(session['progress_file_path'], video_id)
 
 
+# This is where the youtube-dl progress file is.
 @yt.route("/yt-progress/<filename>")
 def get_file(filename):
     return send_from_directory('yt-progress', filename)
 
 
+# This page is visited (with virtualDownloadLink.click() in app.js) to send the file to the user.
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    extension = os.path.splitext(filename)[-1]
-    if extension == ".m4a":
+    if os.path.splitext(filename)[-1] == ".m4a":
         try:
             return send_from_directory(download_dir, filename, mimetype="audio/mp4", as_attachment=True)
         finally:
-            log.info(f'"{filename}" sent successfully.')
-            os.remove(f'{download_dir}/{filename}')  
+            log.info(f'"{filename}" sent.')
+            os.remove(os.path.join(download_dir, filename))  
     else:
         try:
             return send_from_directory(download_dir, filename, as_attachment=True)
         finally:
-            log.info(f'"{filename}" sent successfully.')
-            os.remove(f'{download_dir}/{filename}')
+            log.info(f'"{filename}" sent.')
+            os.remove(os.path.join(download_dir, filename))
