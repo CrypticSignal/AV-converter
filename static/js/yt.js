@@ -50,9 +50,6 @@ async function showDownloadProgress(progressFilePath) {
             else if (secondLastLine.includes('Deleting original file ')) {
                 show_alert('Finishing up...', 'info');
             }
-            else {
-                show_alert(secondLastLine, 'primary');
-            }
             await sleep(500); // Using the sleep function created above.
         }
         catch(error) {
@@ -120,12 +117,16 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
                 const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
                 virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
                 virtualDownloadLink.click();
+                
+                // Sometimes the alert below didn't show up but rather it would stay on the "Finishing up..." alert, 
+                // adding a delay seems to fix this.
+                await sleep(500)
 
                 show_alert(`Your browser should have started downloading the file. If it hasn't, click \
                 <a href="${downloadLink}">here</a>.`, "success");
 
-                document.getElementById('logfile').innerHTML = `Would you like to view the log file? If so, click \
-                <a href="${logFile}" target="_blank">here</a>.`
+                document.getElementById('logfile').innerHTML = `If you're a nerd, click \
+                <a href="${logFile}" target="_blank">here</a> to view the youtube-dl log file.`
             }
             else {
                 show_alert(secondRequest, 'danger');

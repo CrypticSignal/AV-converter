@@ -49,15 +49,17 @@ def get_video_id(url):
     else:
         raise ValueError
 
-relevant_extensions = ["mp4", "webm", "opus", "mkv", "m4a", "ogg", "mp3"]
+relevant_extensions = [".mp4", ".webm", ".opus", ".mkv", ".m4a", ".ogg", ".mp3"]
 os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
 
 
-def return_download_link(progress_file_path, video_id):
+def return_download_link(progress_file_path, video_id, applicable_extensions):
     for file in os.listdir(download_dir):
-        if file.split('.')[-1] in relevant_extensions and video_id in file and '.temp' not in file:
+       if os.path.splitext(file)[-1] in applicable_extensions and video_id in file:
+            
+            log.info(f'Files: {file}')
 
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
             log.info(f'{file} | {filesize} MB')
@@ -119,6 +121,7 @@ def yt_downloader():
     # Second POST request:
 
     link = request.form['link']
+    # Use the get_video_id function to get the video ID from the link.
     video_id = str(get_video_id(link))
     log.info(f'Link: {link} | ID: {video_id}')
 
@@ -136,7 +139,8 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'Video [best] was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(session['progress_file_path'], video_id)
+        applicable_extensions = ['.mkv', '.webm']
+        download_link = return_download_link(session['progress_file_path'], video_id, applicable_extensions)
         return download_link
 
     elif request.form['button_clicked'] == 'Video [MP4]':
@@ -154,7 +158,8 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'MP4 was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(session['progress_file_path'], video_id)
+        applicable_extensions = ['.mp4']
+        download_link = return_download_link(session['progress_file_path'], video_id, applicable_extensions)
         return download_link
 
     elif request.form['button_clicked'] == 'Audio [best]':
@@ -171,7 +176,8 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'Audio [best] was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(session['progress_file_path'], video_id)
+        applicable_extensions = ['.m4a', '.ogg', '.opus']
+        download_link = return_download_link(session['progress_file_path'], video_id, applicable_extensions)
         return download_link
 
     elif request.form['button_clicked'] == 'MP3':
@@ -189,7 +195,8 @@ def yt_downloader():
 
         download_complete_time = time.time()
         log.info(f'MP3 was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-        download_link = return_download_link(session['progress_file_path'], video_id)
+        applicable_extensions = ['.mp3']
+        download_link = return_download_link(session['progress_file_path'], video_id, applicable_extensions)
         return download_link
 
 
