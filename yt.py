@@ -56,8 +56,13 @@ download_dir = 'downloads'
 
 
 def return_download_link(progress_file_path, video_id, applicable_extensions):
+    
     for file in os.listdir(download_dir):
-       if os.path.splitext(file)[-1] in applicable_extensions and video_id in file:
+
+        if '.temp' in file or '.webp' in file:
+            os.remove(os.path.join(download_dir, file))
+        
+        elif os.path.splitext(file)[-1] in applicable_extensions and video_id in file:
 
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
             log.info(f'{filesize} MB')
@@ -95,7 +100,10 @@ def yt_downloader():
         log_this('clicked a download button.')
 
         #db.create_all()
+
+        # Use the get_ip function imported from loggers.py
         user_ip = get_ip()
+        # Query the database by IP.
         user = User.query.filter_by(ip=user_ip).first()
 
         if user:
