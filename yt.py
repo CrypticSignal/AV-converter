@@ -60,7 +60,7 @@ def return_download_link(progress_file_path, video_id, applicable_extensions):
        if os.path.splitext(file)[-1] in applicable_extensions and video_id in file:
 
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
-            log.info(f'{file} | {filesize} MB')
+            log.info(f'{filesize} MB')
 
             user_ip = get_ip()
             user = User.query.filter_by(ip=user_ip).first()
@@ -69,10 +69,11 @@ def return_download_link(progress_file_path, video_id, applicable_extensions):
                 user.mb_downloaded += filesize
                 db.session.commit()
 
-            with open("logs/downloaded-files.txt", "a") as f:
-                f.write(f'\n{file}')
-
             new_filename = file.replace('_', ' ').replace('#', '').replace(f'-{video_id}', '')
+
+            with open("logs/downloads.txt", "a") as f:
+                f.write(f'\n{new_filename}')
+
             os.replace(f'{download_dir}/{file}', f'{download_dir}/{new_filename}')
 
             return {
@@ -94,13 +95,6 @@ def yt_downloader():
         log_this('clicked a download button.')
 
         #db.create_all()
-
-        # I want to save the download progress to a file and read from that file to show the download progress
-        # to the user. Set the name of the file to the time since the epoch.
-        progress_file_name = str(time.time())[:-8] + '.txt'
-        session['progress_file_path'] = os.path.join('yt-progress', progress_file_name)
-        log.info(f'Progress will be saved to: {session["progress_file_path"]}')
-
         user_ip = get_ip()
         user = User.query.filter_by(ip=user_ip).first()
 
@@ -113,6 +107,12 @@ def yt_downloader():
             new_user = User(ip=user_ip, times_used_yt_downloader=1, mb_downloaded=0)
             db.session.add(new_user)
             db.session.commit()
+
+        # I want to save the download progress to a file and read from that file to show the download progress
+        # to the user. Set the name of the file to the time since the epoch.
+        progress_file_name = f'{str(time.time())[:-8]}.txt'
+        session['progress_file_path'] = os.path.join('yt-progress', progress_file_name)
+        log.info(f'Progress will be saved to: {session["progress_file_path"]}')
 
         return session['progress_file_path']
 
@@ -210,11 +210,11 @@ def send_file(filename):
         try:
             return send_from_directory(download_dir, filename, mimetype="audio/mp4", as_attachment=True)
         finally:
-            os.remove(f'{download_dir}/{filename}')
-            log.info(f'Deleted "{filename}"')
+            log.info(f'"{filename}" sent successfully.')
+            os.remove(f'{download_dir}/{filename}')  
     else:
         try:
             return send_from_directory(download_dir, filename, as_attachment=True)
         finally:
+            log.info(f'"{filename}" sent successfully.')
             os.remove(f'{download_dir}/{filename}')
-            log.info(f'Deleted "{filename}"')
