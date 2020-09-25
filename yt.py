@@ -58,8 +58,6 @@ download_dir = 'downloads'
 def return_download_link(progress_file_path, video_id, applicable_extensions):
     for file in os.listdir(download_dir):
        if os.path.splitext(file)[-1] in applicable_extensions and video_id in file:
-            
-            log.info(f'Files: {file}')
 
             filesize = round((os.path.getsize(f'{download_dir}/{file}') / 1_000_000), 2)
             log.info(f'{file} | {filesize} MB')
