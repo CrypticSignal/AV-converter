@@ -58,7 +58,7 @@ def homepage():
 
         # Empty the conversions folder to ensure there's room for the file that is going to be converted.
         for file in os.listdir('conversions'):
-            os.remove(f'conversions/{file}')
+            os.remove(os.path.join('conversions', file))
             log.info(f'Deleted conversions/{file}')
 
         uploads_folder_size = 0
@@ -70,7 +70,7 @@ def homepage():
         if uploads_folder_size > 1000:
             log.info(f'More than 1 GB worth of uploads found. Emptying uploads folder...')
             for file in os.listdir('uploads'):
-                os.remove(f'uploads/{file}')
+                os.remove(os.path.join('uploads', file))
             log.info('Conversions folder emptied.')
         
         # Grabbing the JavaScript FormData
@@ -245,8 +245,7 @@ def get_file(filename):
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
     log.info(f'https://freeaudioconverter.net/conversions/{filename}')
-    extension = os.path.splitext(filename)[-1]
-    if extension == ".m4a":
+    if os.path.splitext(filename)[-1] == ".m4a":
         return send_from_directory('conversions', filename, mimetype="audio/mp4", as_attachment=True)
     else:
         return send_from_directory('conversions', filename, as_attachment=True)
