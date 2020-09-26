@@ -44,7 +44,8 @@ You can run the Flask app locally for development purposes or if you want audio/
 - Python **3.6+**
 - FFmpeg
 - `pip install -r requirements.txt`
-If youtube-dl doesn't install when doing `pip install -r requirements.txt`, follow the instruction [here](https://github.com/ytdl-org/youtube-dl#installation) to install youtube-dl. This step is not necessary if you do not wish to do any development/testing related to the YouTube downloader.
+
+*If youtube-dl doesn't install when doing `pip install -r requirements.txt`, follow the instruction [here](https://github.com/ytdl-org/youtube-dl#installation) to install youtube-dl, unless you do not wish to do any development/testing related to the YouTube downloader.*
 - Clone this repository.
 - Change the value of `ffmpeg_path` in converter.py to the correct path.
 - Change the value of `youtube_dl_path` in yt.py to the correct path.
