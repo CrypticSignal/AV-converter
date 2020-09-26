@@ -2,22 +2,27 @@ import os
 import subprocess
 from loggers import log
 
+os.makedirs('ffmpeg-progress', exist_ok=True)
+
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     # If running locally, change this to the correct path.
     ffmpeg_path = '/home/h/bin/ffmpeg'
-
-    os.makedirs('ffmpeg-progress', exist_ok=True)
+    
     progress_file_path = os.path.join('ffmpeg-progress', progress_filename)
-    log.info(progress_file_path)
+    log.info(f'Conversion progress will be saved to: {progress_file_path}')
     # Split params into a list as I want to use subprocess.run() with an array of arguments.
     params = params.split(' ')
     params.append(output_name)
     log.info(params)
-
-    subprocess.run([ffmpeg_path, '-hide_banner', '-progress', progress_file_path, '-y', '-i', uploaded_file_path,
-                    '-metadata', 'comment="free-av-tools.com"', '-metadata', 'encoded_by="free-av-tools.com"',
-                    '-id3v2_version', '3', '-write_id3v1', 'true'] + params)
+    log.info(f'Converting {uploaded_file_path}...')
+    try:
+        subprocess.run([ffmpeg_path, '-hide_banner', '-progress', progress_file_path, '-y', '-i', uploaded_file_path,
+                        '-metadata', 'comment="free-av-tools.com"', '-metadata', 'encoded_by="free-av-tools.com"',
+                        '-id3v2_version', '3', '-write_id3v1', 'true'] + params)
+        log.info('File converted.')
+    except Exception as error:
+        log.info(f'Error converting file: \n{error}')
 
 
 # AAC
