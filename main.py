@@ -66,14 +66,13 @@ def homepage():
         for file in os.listdir('uploads'):
             size_of_file = os.path.getsize(f'uploads/{file}') / 1_000_000
             uploads_folder_size += size_of_file
-        # If there's more than 1 GB of files in the conversions folder, empty it.
+        # If there's more than 1 GB of files in the uploads folder, empty it.
         if uploads_folder_size > 1000:
             log.info(f'More than 1 GB worth of uploads found. Emptying uploads folder...')
             for file in os.listdir('uploads'):
                 os.remove(os.path.join('uploads', file))
             log.info('Conversions folder emptied.')
         
-        # Grabbing the JavaScript FormData
         chosen_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
 

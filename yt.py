@@ -23,8 +23,6 @@ os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
 
-unwanted_extensions = ['.webp', '.jpg']
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -73,22 +71,15 @@ def run_youtube_dl(download_type, args):
     download_complete_time = time.time()
     log.info(f'{download_type} was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
 
+# This list is used in the function below.
+unwanted_extensions = ['.webp', '.jpg']
 
+# This function returns a JSON response containing the relative path of the file that needs to be sent to the user, 
+# and the relative path of the youtube-dl log file.
 def send_json_response(progress_file_path, video_id):
     for file in os.listdir(download_dir):
-
-        downloads_folder_size = 0
-        # Downloads folder size in MB.
-        downloads_folder_size += os.path.getsize(os.path.join(download_dir, file)) / 1_000_000
-
-        if downloads_folder_size > 1000:
-            log.info('Downloads folder larger than 1 GB. Deleting and re-creating the folder...')
-            shutil.rmtree(download_dir)
-            log.info('Downloads folder deleted.')
-            os.mkdir('downloads')
-            log.info('Downloads folder re-created.')
         
-        elif video_id in file and not os.path.splitext(file)[0].endswith('.temp') \
+        if video_id in file and not os.path.splitext(file)[0].endswith('.temp') \
             and os.path.splitext(file)[1] not in unwanted_extensions:
 
             filesize = round((os.path.getsize(os.path.join(download_dir, file)) / 1_000_000), 2)
@@ -103,6 +94,7 @@ def send_json_response(progress_file_path, video_id):
                 db.session.commit()
 
             new_filename = file.replace('_', ' ').replace('#', '').replace(f'-{video_id}', '')
+            log.info(new_filename)
             os.replace(os.path.join(download_dir, file), os.path.join(download_dir, new_filename))
 
             with open("logs/downloads.txt", "a") as f:
@@ -121,6 +113,18 @@ def yt_downloader():
 
         log_this('clicked a download button.')
 
+        downloads_folder_size = 0
+
+        for file in os.listdir(download_dir):
+            # Downloads folder size in MB.
+            downloads_folder_size += os.path.getsize(os.path.join(download_dir, file)) / 1_000_000
+
+        if downloads_folder_size > 1000:
+            log.info('Downloads folder larger than 1 GB. Emptying the folder...')
+            for file in os.listdir(download_dir):
+                os.remove(os.path.join(download_dir, file))
+            log.info('Downloads folder emptied.')
+        
         # Use the get_ip function imported from loggers.py
         user_ip = get_ip()
         # Query the database by IP.
