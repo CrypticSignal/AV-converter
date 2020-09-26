@@ -17,6 +17,7 @@ Session(app)
 
 # If running locally, change this to the correct path.
 youtube_dl_path = '/home/h/.local/bin/youtube-dl'
+
 # Create the necessary folders and define the directory to save the downloads to.
 os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
@@ -163,7 +164,7 @@ def yt_downloader():
         download_complete_time = time.time()
         log.info(f'MP4 was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
       
-        return send_json_response(session['progress_file_path'], video_id, applicable_extensions)
+        return send_json_response(session['progress_file_path'], video_id)
 
     # Audio [best]
     elif request.form['button_clicked'] == 'Audio [best]':

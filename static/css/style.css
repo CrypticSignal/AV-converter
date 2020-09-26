@@ -48,7 +48,7 @@ h5 {
   background-color: lightgreen;
   color: black;
 }
-#github {
+#coffee {
   float: right;
 }
 h1 {
@@ -59,7 +59,7 @@ h1 {
   color: white;
   padding-top: 11px;
   padding-bottom: 22px;
-  margin:0; /* No gap between the black background of the title and the tagline */
+  margin: 0; /* No gap between the black background of the title and the tagline */
 }
 .tagline{
   text-align: center;
@@ -109,14 +109,16 @@ body {
   background: #4CAF50;
   cursor: pointer;
 }
-/* Don't show the hamburger icon on screens displays larger than 600 pixels wide. */
-.top .icon {
+/* Don't show the hamburger button on screens displays larger than 880 pixels wide. */
+.top .hamburger {
   display: none;
 }
-/* When the display is 600 pixels wide or less. */
+/* When the display is 880 pixels wide or less. */
 @media screen and (max-width: 880px) {
   .top a {display: none;} /* Don't show the links */
-  .top a.icon { /* Hamburger menu */
+  .top a.hamburger { /* Hamburger button */
+    background-color: black;
+    color: white;
     display: block; /* Show hamburger menu */
     float: left;
   }

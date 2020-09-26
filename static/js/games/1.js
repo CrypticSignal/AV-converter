@@ -97,11 +97,10 @@ async function showTimer() {
     ctx.fillText(timer, canvas.width/2, 20);
 
     if (timer == 0) {
-
+ 
         if (localStorage.getItem('highScore') == null) {
             localStorage.setItem('highScore', timesHit)
         }
-       
         else if (timesHit > localStorage.getItem('highScore')){
             localStorage.setItem('highScore', timesHit)
         }

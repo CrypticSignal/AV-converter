@@ -2,55 +2,55 @@
 <html lang="en">
   
 <head>
-    <!--Global site tag (gtag.js) - Google Analytics-->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-167636115-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
 
-      gtag('config', 'UA-167636115-1');
-    </script>
-    <meta charset="UTF-8">
-    <meta name="description" content="Convert video and audio files to MP3, MP4, AAC, WAV, FLAC and more. Download YouTube videos or just the audio.">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!--Bootstrap CSS-->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/sketchy.css') }}"> -->
-    <!--My CSS-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- GitHub -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <!-- Needed for hamburger icon on mobile -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>{{ title }}</title>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-179076133-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-179076133-1');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="description" content="Convert video and audio files to MP3, MP4, AAC, WAV, FLAC and more. Download YouTube videos or just the audio.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap 4.3.1 CSS
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
+  <!--Modified Bootstrap CSS-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/sketchy.css') }}">
+  <!--My CSS-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <!-- GitHub -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Needed for hamburger icon on mobile -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>{{ title }}</title>
+
 </head>
 
 <body>
 
 <div class="top" id=top_bar>
-
-  <!-- Navbar -->
-  <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+  <!-- Hamburger button for small displays -->
+  <a href="javascript:void(0);" class="hamburger" onclick="myFunction()">
     <i class="fa fa-bars"></i>
   </a>
+   <!-- Links -->
   <a href="/">Home</a>
   <a href="about">About</a>
   <a href="filetypes">Filetypes</a>
-  <a href="yt">YT</a>
+  <a href="yt">YouTube downloader</a>
   <a href="trimmer">File Trimmer</a>
   <a href="contact">Contact</a>
   <a href="game">Game 1</a>
   <a href="game2">Game 2</a>
   <a href="chat">Chat</a>
-
-  <div id='github'>
-    <!-- GitHub repository -->
-    <a class="github-button" href="https://github.com/BassThatHertz/AudioAndVideoConverter" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-size="large" aria-label="Follow @BassThatHertz on GitHub">GitHub</a>
-    <!-- Star -->
-    <a class="github-button" href="https://github.com/BassThatHertz/AudioAndVideoConverter/stargazers" data-color-scheme="no-preference: dark; light: dark; dark: dark;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star BassThatHertz/AudioAndVideoConverter on GitHub">Star</a>
+   <!-- Buy me a Coffee button -->
+  <div id='coffee'>
+    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="fezcgrfkb" data-color="#000000" data-emoji="" data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#fff" data-font-color="#fff" data-coffee-color="#fd0" ></script>
   </div>
-  
 </div>
 
 {% block content %} {% endblock content%}
@@ -62,10 +62,10 @@
     const x = document.getElementById("top_bar");
     if (x.className === "top") {
       x.className += " mobile";
-      document.getElementById('github').style.display = 'none';
+      document.getElementById('coffee').style.display = 'none';
     } else {
       x.className = "top";
-      document.getElementById('github').style.display = 'block';
+      document.getElementById('coffee').style.display = 'block';
     }
   }
 </script>
