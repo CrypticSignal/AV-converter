@@ -23,6 +23,8 @@ os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
 
+unwanted_extensions = ['.webp', '.jpg']
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -75,12 +77,19 @@ def run_youtube_dl(download_type, args):
 def send_json_response(progress_file_path, video_id):
     for file in os.listdir(download_dir):
 
-        filename_parts = os.path.splitext(file)
-        # Delete the unnecessary files.
-        if filename_parts[0].endswith('.temp') or filename_parts[1] == '.webp':
-            os.remove(os.path.join(download_dir, file))
+        downloads_folder_size = 0
+        # Downloads folder size in MB.
+        downloads_folder_size += os.path.getsize(os.path.join(download_dir, file)) / 1_000_000
+
+        if downloads_folder_size > 1000:
+            log.info('Downloads folder larger than 1 GB. Deleting and re-creating the folder...')
+            shutil.rmtree(download_dir)
+            log.info('Downloads folder deleted.')
+            os.mkdir('downloads')
+            log.info('Downloads folder re-created.')
         
-        elif video_id in file:
+        elif video_id in file and not os.path.splitext(file)[0].endswith('.temp') \
+            and os.path.splitext(file)[1] not in unwanted_extensions:
 
             filesize = round((os.path.getsize(os.path.join(download_dir, file)) / 1_000_000), 2)
             log.info(f'{filesize} MB')
@@ -192,15 +201,15 @@ def get_file(filename):
 # This page is visited (with virtualDownloadLink.click() in app.js) to send the file to the user.
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    if os.path.splitext(filename)[-1] == ".m4a":
+    if os.path.splitext(filename)[1] == ".m4a":
         try:
+            log.info('File sent. Well, not yet. But I can\'t log this after the return statement.')
             return send_from_directory(download_dir, filename, mimetype="audio/mp4", as_attachment=True)
-        finally:
-            log.info(f'"{filename}" sent.')
-            os.remove(os.path.join(download_dir, filename))  
+        except Exception as error:
+            log.info(f'Unable to send file. Error: \n{error}')
     else:
         try:
+            log.info('File sent. Well, not yet. But I can\'t log this after the return statement.')
             return send_from_directory(download_dir, filename, as_attachment=True)
-        finally:
-            log.info(f'"{filename}" sent.')
-            os.remove(os.path.join(download_dir, filename))
+        except Exception as error:
+            log.info(f'Unable to send file. Error: \n{error}')
