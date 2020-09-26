@@ -61,12 +61,23 @@ def get_video_id(url):
         raise ValueError
 
 
-def send_json_response(progress_file_path, video_id):
+def run_youtube_dl(download_type, args):
+    download_start_time = time.time()
 
+    # Using subprocess.run() this way allows the stdout to be written to a file.
+    with open(session['progress_file_path'], 'w') as f:
+        subprocess.run(args, stdout=f)
+
+    download_complete_time = time.time()
+    log.info(f'{download_type} was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
+
+
+def send_json_response(progress_file_path, video_id):
     for file in os.listdir(download_dir):
 
+        filename_parts = os.path.splitext(file)
         # Delete the unnecessary files.
-        if '.temp' in file or '.webp' in file:
+        if filename_parts[0].endswith('.temp') or filename_parts[1] == '.webp':
             os.remove(os.path.join(download_dir, file))
         
         elif video_id in file:
@@ -139,14 +150,7 @@ def yt_downloader():
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
                 '-o', download_template, '--', video_id]
 
-        download_start_time = time.time()
-
-        with open(session['progress_file_path'], 'w') as f:
-            subprocess.run(args, stdout=f)
-
-        download_complete_time = time.time()
-        log.info(f'Video [best] was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-     
+        run_youtube_dl(request.form['button_clicked'], args)
         return send_json_response(session['progress_file_path'], video_id)
        
     # Video [MP4]
@@ -156,14 +160,7 @@ def yt_downloader():
                 '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
                 '-o', download_template, '--', video_id]
 
-        download_start_time = time.time()
-
-        with open(session['progress_file_path'], 'w') as f:
-            subprocess.run(args, stdout=f)
-
-        download_complete_time = time.time()
-        log.info(f'MP4 was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-      
+        run_youtube_dl(request.form['button_clicked'], args)
         return send_json_response(session['progress_file_path'], video_id)
 
     # Audio [best]
@@ -172,14 +169,7 @@ def yt_downloader():
         args = [youtube_dl_path, '--newline','--restrict-filenames', '--cookies', 'cookies.txt', '-x',
                 '-o', download_template, '--', video_id]
 
-        download_start_time = time.time()
-
-        with open(session['progress_file_path'], 'w') as f:
-            subprocess.run(args, stdout=f)
-
-        download_complete_time = time.time()
-        log.info(f'Audio [best] was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-    
+        run_youtube_dl(request.form['button_clicked'], args)
         return send_json_response(session['progress_file_path'], video_id)
      
     # MP3
@@ -189,14 +179,7 @@ def yt_downloader():
                 '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0',
                 '-o', download_template, '--', video_id]
 
-        download_start_time = time.time()
-
-        with open(session['progress_file_path'], 'w') as f:
-            subprocess.run(args, stdout=f)
-
-        download_complete_time = time.time()
-        log.info(f'MP3 was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
-   
+        run_youtube_dl(request.form['button_clicked'], args)
         return send_json_response(session['progress_file_path'], video_id)
 
 
