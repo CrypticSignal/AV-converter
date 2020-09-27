@@ -3,7 +3,7 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import urlparse, parse_qs
 import shutil
-import time
+from time import time
 import os
 import subprocess
 from loggers import log, get_ip, log_this
@@ -62,13 +62,15 @@ def get_video_id(url):
 
 
 def run_youtube_dl(download_type, args):
-    download_start_time = time.time()
+    download_start_time = time()
+    try:
+        # Using subprocess.run() this way allows the stdout to be written to a file.
+        with open(session['progress_file_path'], 'w') as f:
+            subprocess.run(args, stdout=f)
+    except Exception as error:
+        log.error(f'Unable to download video: \n{error}')
 
-    # Using subprocess.run() this way allows the stdout to be written to a file.
-    with open(session['progress_file_path'], 'w') as f:
-        subprocess.run(args, stdout=f)
-
-    download_complete_time = time.time()
+    download_complete_time = time()
     log.info(f'{download_type} was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
 
 # This list is used in the function below.
@@ -142,7 +144,7 @@ def yt_downloader():
 
         # I want to save the download progress to a file and read from that file to show the download progress
         # to the user. Set the name of the file to the time since the epoch.
-        progress_file_name = f'{str(time.time())[:-8]}.txt'
+        progress_file_name = f'{str(time())[:-8]}.txt'
         session['progress_file_path'] = os.path.join('yt-progress', progress_file_name)
         log.info(f'Progress will be saved to: {session["progress_file_path"]}')
 
@@ -205,15 +207,14 @@ def get_file(filename):
 # This page is visited (with virtualDownloadLink.click() in app.js) to send the file to the user.
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
+    log.info(f'https://free-av-tools.com/downloads/{filename}')
     if os.path.splitext(filename)[1] == ".m4a":
         try:
-            log.info('File sent. Well, not yet. But I can\'t log this after the return statement.')
             return send_from_directory(download_dir, filename, mimetype="audio/mp4", as_attachment=True)
         except Exception as error:
-            log.info(f'Unable to send file. Error: \n{error}')
+            log.error(f'Unable to send file. Error: \n{error}')
     else:
         try:
-            log.info('File sent. Well, not yet. But I can\'t log this after the return statement.')
             return send_from_directory(download_dir, filename, as_attachment=True)
         except Exception as error:
-            log.info(f'Unable to send file. Error: \n{error}')
+            log.error(f'Unable to send file. Error: \n{error}')

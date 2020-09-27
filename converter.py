@@ -1,6 +1,7 @@
 import os
 import subprocess
 from loggers import log
+from time import time
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
 
@@ -16,13 +17,16 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     params.append(output_name)
     log.info(params)
     log.info(f'Converting {uploaded_file_path}...')
+    start_time = time()
     try:
         subprocess.run([ffmpeg_path, '-hide_banner', '-progress', progress_file_path, '-y', '-i', uploaded_file_path,
-                        '-metadata', 'comment="free-av-tools.com"', '-metadata', 'encoded_by="free-av-tools.com"',
-                        '-id3v2_version', '3', '-write_id3v1', 'true'] + params)
-        log.info('File converted.')
+                        '-metadata', 'comment=Transcoded using free-av-tools.com', '-metadata',
+                        'encoded_by=free-av-tools.com', '-id3v2_version', '3', '-write_id3v1', 'true'] + params)
+        end_time = time()
+        time_taken = round((end_time - start_time), 2)
+        log.info(f'File converted. Conversion took {time_taken} seconds.')
     except Exception as error:
-        log.info(f'Error converting file: \n{error}')
+        log.error(f'Unable to convert file: \n{error}')
 
 
 # AAC

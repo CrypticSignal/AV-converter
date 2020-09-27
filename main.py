@@ -73,17 +73,18 @@ def homepage():
                 os.remove(os.path.join('uploads', file))
             log.info('Conversions folder emptied.')
         
-        chosen_file = request.files["chosen_file"]
+        uploaded_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
 
-        log.info(chosen_file)
+        log.info(uploaded_file)
         log.info(f'Size: {filesize} MB')
 
-        # Make the filename safe
-        filename_secure = secure_filename(chosen_file.filename)
+        # Make the filename safe.
+        filename_secure = secure_filename(uploaded_file.filename)
+        log.info(f'New Filename: {filename_secure}')
         # Save the uploaded file to the uploads folder.
         os.makedirs('uploads', exist_ok=True)
-        chosen_file.save(os.path.join("uploads", filename_secure))
+        uploaded_file.save(os.path.join("uploads", filename_secure))
 
         conversion_progress_filename = f'{str(time())[:-8]}.txt'
         session['progress_filename'] = conversion_progress_filename
@@ -91,8 +92,6 @@ def homepage():
         return session['progress_filename']
 
     elif request.form["request_type"] == "convert":
-
-        conversion_start_time = time()
 
         wav_bit_depth = request.form["wav_bit_depth"]
         filename = request.form["filename"]
@@ -131,6 +130,7 @@ def homepage():
         log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
         os.makedirs('conversions', exist_ok=True)
         output_path = os.path.join('conversions', output_name)
+
 
         def run_converter(codec, params):
             codec_to_converter = {
@@ -223,9 +223,6 @@ def homepage():
                       output_path]
             extension = run_converter('wav', params)
 
-        conversion_complete_time = time()
-        log.info(f'Conversion took {round((conversion_complete_time - conversion_start_time), 1)} seconds.')
-
         # Filename after conversion.
         converted_file_name = f'{output_name}.{extension}'
 
@@ -244,7 +241,7 @@ def get_file(filename):
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
     log.info(f'https://freeaudioconverter.net/conversions/{filename}')
-    if os.path.splitext(filename)[-1] == ".m4a":
+    if os.path.splitext(filename)[1] == ".m4a":
         return send_from_directory('conversions', filename, mimetype="audio/mp4", as_attachment=True)
     else:
         return send_from_directory('conversions', filename, as_attachment=True)

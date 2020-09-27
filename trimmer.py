@@ -33,8 +33,11 @@ def trim_file():
         output_name = just_name + " [trimmed]" + ext
         output_file_path = os.path.join('trims', output_name)
 
-        subprocess.run(['ffmpeg', '-y', '-i', uploaded_file_path, '-ss', start_time, '-to', end_time,
-                       '-map', '0', '-c', 'copy', output_file_path], shell=False)
+        try:
+            subprocess.run(['ffmpeg', '-y', '-i', uploaded_file_path, '-ss', start_time, '-to', end_time,
+                        '-map', '0', '-c', 'copy', output_file_path], shell=False)
+        except Exception as error:
+            log.error(f'Unable to trim file: \n{error}')
 
         return output_file_path
 
@@ -42,8 +45,7 @@ def trim_file():
 @trimmer.route("/trims/<filename>", methods=["GET"])
 def download_file(filename):
     log.info(f'https://free-av-tools.com/trims/{filename}')
-    extension = os.path.splitext(filename)[-1]
-    if extension == ".m4a":
+    if os.path.splitext(filename)[1] == ".m4a":
         return send_from_directory('trims', filename, mimetype="audio/mp4", as_attachment=True)
     else:
         return send_from_directory('trims', filename, as_attachment=True)
