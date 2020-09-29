@@ -2,6 +2,7 @@ from flask import Flask, Blueprint, request, send_from_directory, session, jsoni
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from urllib.parse import urlparse, parse_qs
+from datetime import datetime
 import shutil
 from time import time
 import os
@@ -73,11 +74,47 @@ def run_youtube_dl(download_type, args):
     download_complete_time = time()
     log.info(f'{download_type} was chosen. Download took: {round((download_complete_time - download_start_time), 1)}s')
 
+
+# Initialise the downloads_today variable.
+downloads_today = 0
+
+
+def log_downloads_per_day():
+    # Create the file that will contain the downloads per day, if it doesn't already exist.
+    if not os.path.exists('logs/downloads-per-day.txt'):
+        open('logs/downloads-per-day.txt', 'x').close()
+
+    file_contents = open('logs/downloads-per-day.txt', 'r').readlines()
+    # The keys will be the date and the values will be the number of downloads.
+    dates_to_downloads = {}
+
+    for line in file_contents:
+        date, downloads = line.split(' --> ')[0], line.split(' --> ')[1]
+        if '\n' in downloads:
+            downloads = downloads[:-1]
+        dates_to_downloads[date] = downloads
+
+    date_today = datetime.today().strftime('%d-%m-%Y')
+    global downloads_today
+
+    if date_today in dates_to_downloads:
+        downloads_today += 1
+        dates_to_downloads[date_today] = downloads_today
+
+        # Use the dictionary to create a string in the format: date --> downloads
+        contents_for_file = '\n'.join([f'{key} --> {value}' for key, value in dates_to_downloads.items()])
+        
+        with open('logs/downloads-per-day.txt', 'w') as f:
+            f.write(contents_for_file)
+    else:
+        downloads_today = 1
+        with open('logs/downloads-per-day.txt', 'a') as f:
+            f.write(f'{date_today} --> {downloads_today}')
+
 # This list is used in the function below.
 unwanted_extensions = ['.webp', '.jpg']
 
-# This function returns a JSON response containing the relative path of the file that needs to be sent to the user, 
-# and the relative path of the youtube-dl log file.
+
 def send_json_response(progress_file_path, video_id):
     for file in os.listdir(download_dir):
         
@@ -185,6 +222,7 @@ def yt_downloader():
                 '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
+        #log_downloads_per_day()
         return send_json_response(session['progress_file_path'], video_id)
      
     # MP3
@@ -203,18 +241,15 @@ def yt_downloader():
 def get_file(filename):
     return send_from_directory('yt-progress', filename)
 
+downloads_today = 0
 
 # This page is visited (with virtualDownloadLink.click() in app.js) to send the file to the user.
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
+    log_downloads_per_day()
     log.info(f'https://free-av-tools.com/downloads/{filename}')
-    if os.path.splitext(filename)[1] == ".m4a":
-        try:
-            return send_from_directory(download_dir, filename, mimetype="audio/mp4", as_attachment=True)
-        except Exception as error:
-            log.error(f'Unable to send file. Error: \n{error}')
-    else:
-        try:
-            return send_from_directory(download_dir, filename, as_attachment=True)
-        except Exception as error:
-            log.error(f'Unable to send file. Error: \n{error}')
+    mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
+    try:
+        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
+    except Exception as error:
+        log.error(f'Unable to send file. Error: \n{error}')
