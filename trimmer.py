@@ -45,7 +45,8 @@ def trim_file():
 @trimmer.route("/trims/<filename>", methods=["GET"])
 def download_file(filename):
     log.info(f'https://free-av-tools.com/trims/{filename}')
-    if os.path.splitext(filename)[1] == ".m4a":
-        return send_from_directory('trims', filename, mimetype="audio/mp4", as_attachment=True)
-    else:
-        return send_from_directory('trims', filename, as_attachment=True)
+    mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
+    try:
+        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
+    except Exception as error:
+        log.error(f'Unable to send file. Error: \n{error}')

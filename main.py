@@ -241,10 +241,11 @@ def get_file(filename):
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
     log.info(f'https://freeaudioconverter.net/conversions/{filename}')
-    if os.path.splitext(filename)[1] == ".m4a":
-        return send_from_directory('conversions', filename, mimetype="audio/mp4", as_attachment=True)
-    else:
-        return send_from_directory('conversions', filename, as_attachment=True)
+    mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
+    try:
+        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
+    except Exception as error:
+        log.error(f'Unable to send file. Error: \n{error}')
 
 
 # Game 1
