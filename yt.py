@@ -222,7 +222,6 @@ def yt_downloader():
                 '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
-        #log_downloads_per_day()
         return send_json_response(session['progress_file_path'], video_id)
      
     # MP3
@@ -241,7 +240,6 @@ def yt_downloader():
 def get_file(filename):
     return send_from_directory('yt-progress', filename)
 
-downloads_today = 0
 
 # This page is visited (with virtualDownloadLink.click() in app.js) to send the file to the user.
 @yt.route("/downloads/<filename>", methods=["GET"])
