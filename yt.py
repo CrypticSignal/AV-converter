@@ -85,13 +85,15 @@ def log_downloads_per_day():
         open('logs/downloads-per-day.txt', 'x').close()
 
     file_contents = open('logs/downloads-per-day.txt', 'r').readlines()
+
+    if file_contents and file_contents[0] == '\n':
+        file_contents.pop(0)
+
     # The keys will be the date and the values will be the number of downloads.
     dates_to_downloads = {}
 
     for line in file_contents:
         date, downloads = line.split(' --> ')[0], line.split(' --> ')[1]
-        if '\n' in downloads:
-            downloads = downloads[:-1]
         dates_to_downloads[date] = downloads
 
     date_today = datetime.today().strftime('%d-%m-%Y')
@@ -100,47 +102,48 @@ def log_downloads_per_day():
     if date_today in dates_to_downloads:
         downloads_today += 1
         dates_to_downloads[date_today] = downloads_today
-
         # Use the dictionary to create a string in the format: date --> downloads
         contents_for_file = '\n'.join([f'{key} --> {value}' for key, value in dates_to_downloads.items()])
-        
+        # Write the string to downloads-per-day.txt
         with open('logs/downloads-per-day.txt', 'w') as f:
             f.write(contents_for_file)
     else:
         downloads_today = 1
         with open('logs/downloads-per-day.txt', 'a') as f:
-            f.write(f'{date_today} --> {downloads_today}')
+            f.write(f'\n{date_today} --> {downloads_today}')
 
-# This list is used in the function below.
-unwanted_extensions = ['.webp', '.jpg']
+
+def clean_downloads_foider():
+    unwanted_extensions = ['.webp', '.jpg']
+    for file in os.listdir(download_dir):
+        if os.path.splitext(file)[1] in unwanted_extensions:
+            os.remove(os.path.join(download_dir, file))
 
 
 def send_json_response(progress_file_path, video_id):
-    for file in os.listdir(download_dir):
-        
-        if video_id in file and not os.path.splitext(file)[0].endswith('.temp') \
-            and os.path.splitext(file)[1] not in unwanted_extensions:
+    clean_downloads_foider()
+    correct_file = [filename for filename in os.listdir(download_dir) if video_id in filename][0]
 
-            filesize = round((os.path.getsize(os.path.join(download_dir, file)) / 1_000_000), 2)
-            log.info(f'{filesize} MB')
+    filesize = round((os.path.getsize(os.path.join(download_dir, correct_file)) / 1_000_000), 2)
+    log.info(f'{filesize} MB')
 
-            user_ip = get_ip()
-            # Query the database by IP.
-            user = User.query.filter_by(ip=user_ip).first()
+    user_ip = get_ip()
+    # Query the database by IP.
+    user = User.query.filter_by(ip=user_ip).first()
 
-            if user:
-                user.mb_downloaded += filesize
-                db.session.commit()
+    if user:
+        user.mb_downloaded += filesize
+        db.session.commit()
 
-            new_filename = file.replace('_', ' ').replace('#', '').replace(f'-{video_id}', '')
-            log.info(new_filename)
-            os.replace(os.path.join(download_dir, file), os.path.join(download_dir, new_filename))
+    new_filename = correct_file.replace('_', ' ').replace('#', '').replace(f'-{video_id}', '')
+    log.info(new_filename)
+    os.replace(os.path.join(download_dir, correct_file), os.path.join(download_dir, new_filename))
 
-            with open("logs/downloads.txt", "a") as f:
-                f.write(f'\n{new_filename}')
+    with open("logs/downloads.txt", "a") as f:
+        f.write(f'\n{new_filename}')
 
-            return jsonify(download_path=os.path.join('downloads', new_filename), 
-                           log_file=progress_file_path)
+    return jsonify(download_path=os.path.join('downloads', new_filename), 
+                    log_file=progress_file_path)
 
 
 # When POST requests are made to /yt
@@ -203,6 +206,7 @@ def yt_downloader():
                 '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
+        log_downloads_per_day()
         return send_json_response(session['progress_file_path'], video_id)
        
     # Video [MP4]
@@ -213,6 +217,7 @@ def yt_downloader():
                 '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
+        log_downloads_per_day()
         return send_json_response(session['progress_file_path'], video_id)
 
     # Audio [best]
@@ -222,16 +227,17 @@ def yt_downloader():
                 '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
+        log_downloads_per_day()
         return send_json_response(session['progress_file_path'], video_id)
      
     # MP3
     elif request.form['button_clicked'] == 'MP3':
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
-                '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0',
-                '-o', download_template, '--', video_id]
+                '--audio-format', 'mp3', '--audio-quality', '0', '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
+        log_downloads_per_day()
         return send_json_response(session['progress_file_path'], video_id)
 
 
@@ -244,7 +250,6 @@ def get_file(filename):
 # This page is visited (with virtualDownloadLink.click() in app.js) to send the file to the user.
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    log_downloads_per_day()
     log.info(f'https://free-av-tools.com/downloads/{filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
     try:
