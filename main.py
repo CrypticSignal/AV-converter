@@ -16,8 +16,8 @@ app = Flask(__name__)
 secret_key = str(os.urandom(16))
 app.secret_key = secret_key
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-# Set the maximum upload size to 5 GB.
-max_upload_size = 5  # in GB.
+# Set the maximum upload size to 3 GB.
+max_upload_size = 3  # in GB.
 app.config['MAX_CONTENT_LENGTH'] = max_upload_size * 1000 * 1000 * 1000
 # Changes to the HTML files are reflected on the website without having to restart the Flask app.
 app.jinja_env.auto_reload = True
@@ -66,9 +66,9 @@ def homepage():
         for file in os.listdir('uploads'):
             size_of_file = os.path.getsize(f'uploads/{file}') / 1_000_000
             uploads_folder_size += size_of_file
-        # If there's more than 1 GB of files in the uploads folder, empty it.
-        if uploads_folder_size > 1000:
-            log.info(f'More than 1 GB worth of uploads found. Emptying uploads folder...')
+        # If there's more than 3 GB of files in the uploads folder, empty it.
+        if uploads_folder_size > 3000:
+            log.info(f'More than 3 GB worth of uploads found. Emptying uploads folder...')
             for file in os.listdir('uploads'):
                 os.remove(os.path.join('uploads', file))
             log.info('Conversions folder emptied.')

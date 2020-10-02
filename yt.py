@@ -110,7 +110,7 @@ def log_downloads_per_day():
     else:
         downloads_today = 1
         with open('logs/downloads-per-day.txt', 'a') as f:
-            f.write(f'\n{date_today} --> {downloads_today}')
+            f.write(f'{date_today} --> {downloads_today}')
 
 
 def clean_downloads_foider():
@@ -161,8 +161,8 @@ def yt_downloader():
             # Downloads folder size in MB.
             downloads_folder_size += os.path.getsize(os.path.join(download_dir, file)) / 1_000_000
 
-        if downloads_folder_size > 1000:
-            log.info('Downloads folder larger than 1 GB. Emptying the folder...')
+        if downloads_folder_size > 3000:
+            log.info('Downloads folder larger than 3 GB. Emptying the folder...')
             for file in os.listdir(download_dir):
                 os.remove(os.path.join(download_dir, file))
             log.info('Downloads folder emptied.')
