@@ -23,7 +23,7 @@ function upload_and_send_trim_request() {
     const filenameParts = inputFilename.split('.');
     const fileExt = filenameParts[filenameParts.length - 1];
 
-    allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv","avi", "ac3", "3gp", "MTS", "webm", "ADPCM", "dts", "spx", "caf"]
+    allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "ac3", "3gp", "MTS", "ADPCM", "dts", "spx", "caf"]
 
     if (!allowedFiletypes.includes(fileExt)) {
         show_alert("Incompatible filetype selected.", "danger")
@@ -92,6 +92,7 @@ function upload_and_send_trim_request() {
 
     // Upload complete
     request.addEventListener("load", () => {
+        console.log(request.status)
 
         if (request.status == 200) {
             send_trim_request();

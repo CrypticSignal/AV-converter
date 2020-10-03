@@ -5,6 +5,7 @@ import subprocess
 from loggers import log_this, log
 
 trimmer = Blueprint('trimmer', __name__)
+os.makedirs('trims', exist_ok=True)
 
 
 @trimmer.route("/trimmer", methods=["POST"])
@@ -12,11 +13,17 @@ def trim_file():
 
     if request.form["request_type"] == "upload_complete":
 
-        chosen_file = request.files["chosen_file"]
+        uploaded_file = request.files["chosen_file"]
         # Make the filename safe
-        filename_secure = secure_filename(chosen_file.filename)
-        # Save the uploaded file to the uploads folder.
-        chosen_file.save(os.path.join("uploads", filename_secure))
+        filename_secure = secure_filename(uploaded_file.filename)
+        # Save the uploaded file to the trims folder.
+        uploaded_file.save(os.path.join('uploads', filename_secure))
+
+        # Empty the trims folder to ensure that there will be enough storage space for the trimmed file.
+        if os.path.exists('trims'):
+            for file in os.listdir('trims'):
+                os.remove(os.path.join('trims', file))
+                log.info(f'Deleted trims/{file}')
         return ''
 
     if request.form["request_type"] == "trim":
@@ -25,17 +32,17 @@ def trim_file():
         log_this(f'wants to trim: {filename}')
         uploaded_file_path = os.path.join("uploads", secure_filename(filename))
         start_time = request.form["start_time"]
-        log.info(f'START TIME: {start_time}')
+        log.info(f'Start: {start_time}')
         end_time = request.form["end_time"]
-        log.info(f'END TIME: {end_time}')
-        ext = "." + filename.split(".")[-1]
-        just_name = filename.split(".")[0]
-        output_name = just_name + " [trimmed]" + ext
+        log.info(f'End: {end_time}')
+        just_name = os.path.splitext(filename)[0]
+        extension = os.path.splitext(filename)[1]
+        output_name = f'{just_name} [trimmed]{extension}'
         output_file_path = os.path.join('trims', output_name)
 
         try:
             subprocess.run(['ffmpeg', '-y', '-i', uploaded_file_path, '-ss', start_time, '-to', end_time,
-                        '-map', '0', '-c', 'copy', output_file_path], shell=False)
+                           '-map', '0', '-c', 'copy', output_file_path])
         except Exception as error:
             log.error(f'Unable to trim file: \n{error}')
 
@@ -47,6 +54,6 @@ def download_file(filename):
     log.info(f'https://free-av-tools.com/trims/{filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
     try:
-        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
+        return send_from_directory('trims', filename, mimetype=mimetype_value, as_attachment=True)
     except Exception as error:
         log.error(f'Unable to send file. Error: \n{error}')
