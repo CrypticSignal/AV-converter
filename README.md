@@ -6,7 +6,7 @@ On https://free-av-tools.com you can:
 - Convert a video to an audio-only file (to any of the above formats).
 - Convert a video to the MP4 or MKV format.
 - Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
-- Trim a video or audio file (will not work if using the Safari browser).
+- Trim an audio file (will not work if using the Safari browser).
 - Download a YouTube video or the audio only. The [webpage](https://freeaudioconverter.net/yt) is a [youtube-dl](https://github.com/ytdl-org/youtube-dl) wrapper.
 
 ## Quick Links:
