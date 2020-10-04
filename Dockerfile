@@ -1,11 +1,18 @@
-FROM python:3.8.3-slim-buster
+FROM alfg/ffmpeg
 
-ADD ./ /
+WORKDIR /app
 
-RUN apt-get -y update
-RUN apt-get -y upgrade
-RUN apt-get -y install git
-RUN apt-get -y install ffmpeg
-RUN pip install -r requirements.txt
+RUN apk update
+RUN apk add build-base git wget curl \
+    bash npm python3-dev py3-pip python3
 
-CMD [ "python", "./main.py" ]
+COPY . .
+   
+RUN pip3 install -r requirements.txt
+
+RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
+RUN chmod a+rx /usr/local/bin/youtube-dl
+
+EXPOSE 5000
+
+CMD [ "python3", "main.py" ]
