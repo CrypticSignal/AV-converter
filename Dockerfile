@@ -9,15 +9,9 @@ RUN apk add build-base git wget curl \
 COPY . .
    
 RUN pip3 install -r requirements.txt
-RUN mkdir conversions
-RUN mkdir uploads
 
 RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
 RUN chmod a+rx /usr/local/bin/youtube-dl
-
-RUN chmod 777 /app/uploads
-RUN chmod 777 /app/conversions
-
 
 EXPOSE 5000
 
