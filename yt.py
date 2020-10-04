@@ -17,7 +17,7 @@ app.config.from_object(__name__)
 Session(app)
 
 # If running locally, change this to the correct path.
-youtube_dl_path = '/usr/local/bin/youtube-dl'
+youtube_dl_path = ['/usr/bin/python3', '/usr/local/bin/youtube-dl']
 
 # Create the necessary folders and define the directory to save the downloads to.
 os.makedirs('yt-progress', exist_ok=True)
@@ -223,8 +223,8 @@ def yt_downloader():
         log.info(f'{video_link} | {video_id}')
         download_template = f'{download_dir}/%(title)s-%(id)s [video].%(ext)s'
 
-        args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
-                '-o', download_template, '--', video_id]
+        args = youtube_dl_path + ['--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
+                                  '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
         log_downloads_per_day()
@@ -238,9 +238,9 @@ def yt_downloader():
         log.info(f'{video_link} | {video_id}')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
 
-        args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
-                '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',
-                '-o', download_template, '--', video_id]
+        args = youtube_dl_path + ['--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
+                                  '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',
+                                  '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
         log_downloads_per_day()
@@ -254,8 +254,8 @@ def yt_downloader():
         log.info(f'{video_link} | {video_id}')
         download_template = f'{download_dir}/%(title)s-%(id)s [audio].%(ext)s'
 
-        args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
-                '-o', download_template, '--', video_id]
+        args = youtube_dl_path + ['--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
+                                  '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
         log_downloads_per_day()
@@ -269,9 +269,10 @@ def yt_downloader():
         log.info(f'{video_link} | {video_id}')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
 
-        args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
-                '--audio-format', 'mp3', '--audio-quality', '0', '-o', download_template, '--', video_id]
-
+        args = youtube_dl_path + ['--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
+                                  '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0',
+                                  '-o', download_template, '--', video_id]
+    
         run_youtube_dl(request.form['button_clicked'], args)
         log_downloads_per_day()
         return send_json_response(session['progress_file_path'], video_id, ' [MP3].')
