@@ -2,9 +2,6 @@ FROM alfg/ffmpeg
 
 WORKDIR /app
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Asia/Kolkata
-
 RUN apk update
 RUN apk add build-base git wget curl \
     bash npm python3-dev py3-pip python3
