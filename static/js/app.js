@@ -57,8 +57,8 @@ function upload_and_send_conversion_request() {
                 reset();
                 return;
             }
-        else if (filesize > 5000000000) {
-            show_alert("Max file size: 5 GB", "danger")
+        else if (filesize > 3000000000) {
+            show_alert("Max file size: 3 GB", "danger")
             reset();
             return;    
         }

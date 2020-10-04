@@ -44,6 +44,23 @@ class User(db.Model):
 db.create_all()
 
 
+def update_database():
+    # Use the get_ip function imported from loggers.py
+    user_ip = get_ip()
+    # Query the database by IP.
+    user = User.query.filter_by(ip=user_ip).first()
+
+    if user:
+        x = 'time' if user.times_used_yt_downloader == 1 else 'times'
+        log.info(f'This user has used the downloader {user.times_used_yt_downloader} {x} before.')
+        user.times_used_yt_downloader += 1
+        db.session.commit()
+    else:
+        new_user = User(ip=user_ip, times_used_yt_downloader=1, mb_downloaded=0)
+        db.session.add(new_user)
+        db.session.commit()
+
+
 # Function from https://gist.github.com/kmonsoor/2a1afba4ee127cce50a
 def get_video_id(url):
     if url.startswith(('youtu', 'www')):
@@ -97,13 +114,14 @@ def log_downloads_per_day():
         dates_to_downloads[date] = downloads
 
     date_today = datetime.today().strftime('%d-%m-%Y')
-    global downloads_today
+    
 
     if date_today in dates_to_downloads:
+        global downloads_today
         downloads_today += 1
         dates_to_downloads[date_today] = downloads_today
         # Use the dictionary to create a string in the format: date --> downloads
-        contents_for_file = '\n'.join([f'{key} --> {value}' for key, value in dates_to_downloads.items()])
+        contents_for_file = ''.join([f'{key} --> {value}' for key, value in dates_to_downloads.items()])
         # Write the string to downloads-per-day.txt
         with open('logs/downloads-per-day.txt', 'w') as f:
             f.write(contents_for_file)
@@ -201,6 +219,7 @@ def yt_downloader():
     if request.form['button_clicked'] == 'Video [best]':
 
         log_this('Chose Video [best]')
+        update_database()
         log.info(f'{video_link} | {video_id}')
         download_template = f'{download_dir}/%(title)s-%(id)s [video].%(ext)s'
 
@@ -215,11 +234,12 @@ def yt_downloader():
     elif request.form['button_clicked'] == 'Video [MP4]':
 
         log_this('Chose Video [MP4]')
+        update_database()
         log.info(f'{video_link} | {video_id}')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
 
         args = [youtube_dl_path, '--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
-                '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+                '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',
                 '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
@@ -230,6 +250,7 @@ def yt_downloader():
     elif request.form['button_clicked'] == 'Audio [best]':
 
         log_this('Chose Audio [best]')
+        update_database()
         log.info(f'{video_link} | {video_id}')
         download_template = f'{download_dir}/%(title)s-%(id)s [audio].%(ext)s'
 
@@ -244,6 +265,7 @@ def yt_downloader():
     elif request.form['button_clicked'] == 'MP3':
 
         log_this('Chose MP3')
+        update_database()
         log.info(f'{video_link} | {video_id}')
         download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
 
