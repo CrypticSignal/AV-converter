@@ -42,11 +42,10 @@ Many filetypes are supported, click [here](https://freeaudioconverter.net/filety
 ## Requirements for developers/running locally:
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
 - Python **3.6+**
-- FFmpeg
-- `pip install -r requirements.txt`
-
-*If youtube-dl doesn't install when doing `pip install -r requirements.txt`, follow the instruction [here](https://github.com/ytdl-org/youtube-dl#installation) to install youtube-dl, unless you do not wish to do any development/testing related to the YouTube downloader.*
+- [FFmpeg](https://ffmpeg.org/download.html)
+- youtube-dl. You can find instuctions on how to install youtube-dl [here](https://github.com/ytdl-org/youtube-dl#installation).
 - Clone this repository.
+- `pip3 install -r requirements.txt`
 - Change the value of `ffmpeg_path` in converter.py to the correct path.
 - Change the value of `youtube_dl_path` in yt.py to the correct path.
 - cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
