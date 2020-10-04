@@ -7,7 +7,7 @@ ENV TZ=Asia/Kolkata
 
 RUN apk update
 RUN apk add build-base git wget curl \
-    bash npm python-dev py3-pip python3
+    bash npm python3-dev py3-pip python3
 
 COPY . .
    
