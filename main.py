@@ -40,6 +40,10 @@ SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
+# Make the necessary folders if they do not already exist.
+os.makedirs('uploads', exist_ok=True)
+os.makedirs('conversions', exist_ok=True)
+
 
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
@@ -83,7 +87,6 @@ def homepage():
         filename_secure = secure_filename(uploaded_file.filename)
         log.info(f'New Filename: {filename_secure}')
         # Save the uploaded file to the uploads folder.
-        os.makedirs('uploads', exist_ok=True)
         uploaded_file.save(os.path.join("uploads", filename_secure))
 
         conversion_progress_filename = f'{str(time())[:-8]}.txt'

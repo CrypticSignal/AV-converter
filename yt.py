@@ -17,7 +17,7 @@ app.config.from_object(__name__)
 Session(app)
 
 # If running locally, change this to the correct path.
-youtube_dl_path = '/home/h/.local/bin/youtube-dl'
+youtube_dl_path = '/usr/local/bin/youtube-dl'
 
 # Create the necessary folders and define the directory to save the downloads to.
 os.makedirs('yt-progress', exist_ok=True)
