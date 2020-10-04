@@ -39,7 +39,7 @@ async function convertButtonClicked() {
 function upload_and_send_conversion_request() {
     
     allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv",
-    "avi", "ac3", "3gp", "MTS", "webm", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd", "aif", "aiff"]
+    "avi", "ac3", "3gp", "MTS", "webm", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd", "aif", "aiff", "vob"]
 
     if (!input.value && document.getElementById("output_name").value == '') {
         show_alert("It helps if you select the file that you want to convert.", "warning")
