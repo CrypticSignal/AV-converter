@@ -1,10 +1,11 @@
 from flask import Flask, Blueprint, request, send_from_directory, session, jsonify
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
+from threading import Thread
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import shutil
-from time import time
+from time import time, sleep
 import os
 import subprocess
 from loggers import log, get_ip, log_this
@@ -78,17 +79,35 @@ def get_video_id(url):
     else:
         raise ValueError
 
+is_downloading = False
+
+
+# This function runs in a separate thread.
+def delete_downloads():
+    while not is_downloading:
+        sleep(60)
+        for file in os.listdir('downloads'):
+            os.remove(os.path.join('downloads', file))
+            log.info(f'Deleted downlods/{file}')
+
+downloads_deleting_thread = Thread(target=delete_downloads)
+downloads_deleting_thread.start()
+
 
 def run_youtube_dl(download_type, args):
-    download_start_time = time()
+    is_downloading = True
     try:
+        download_start_time = time()
         # Using subprocess.run() this way allows the stdout to be written to a file.
         with open(session['progress_file_path'], 'w') as f:
             subprocess.run(args, stdout=f)
+        download_complete_time = time()
     except Exception as error:
         log.error(f'Unable to download video: \n{error}')
-
-    download_complete_time = time()
+    finally:
+        is_downloading = False
+        log.info(is_downloading)
+    
     log.info(f'Download took {round((download_complete_time - download_start_time), 1)}s')
 
 
@@ -153,7 +172,7 @@ def send_json_response(progress_file_path, video_id, download_type):
         user.mb_downloaded += filesize
         db.session.commit()
 
-    new_filename = correct_file.replace('_', ' ').replace('#', '').replace(f'-{video_id}', '')
+    new_filename = correct_file.replace('_', ' ').replace('#', '').replace(f'-{video_id}', '').replace('%', '')
     os.replace(os.path.join(download_dir, correct_file), os.path.join(download_dir, new_filename))
     log.info(f'New Filename: {new_filename}')
     log.info(f'{filesize} MB')

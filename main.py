@@ -2,12 +2,13 @@ from flask import Flask, request, render_template, send_from_directory, session
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
+from threading import Thread
 import shutil
 from yt import yt  # Importing the blueprint in yt.py
 from trimmer import trimmer  # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
 from werkzeug.utils import secure_filename
-from time import time
+from time import time, sleep
 from datetime import datetime
 import os
 import converter  # converter.py
@@ -44,6 +45,43 @@ Session(app)
 os.makedirs('uploads', exist_ok=True)
 os.makedirs('conversions', exist_ok=True)
 
+is_converting = False
+
+
+# This function runs in a separate thread.
+def empty_folders():
+    while not is_converting:
+        sleep(60)
+        for file in os.listdir('conversions'):
+            os.remove(os.path.join('conversions', file))
+            log.info(f'Deleted conversions/{file}')
+
+folder_emptying_thread = Thread(target=empty_folders)
+folder_emptying_thread.start()
+
+
+def run_converter(codec, params):
+    is_converting = True
+    codec_to_converter = {
+                            "aac": converter.aac,
+                            "ac3": converter.ac3,
+                            "alac": converter.alac,
+                            "dts": converter.dts,
+                            "flac": converter.flac,
+                            "mka": converter.mka,
+                            "mkv": converter.mkv,
+                            "mp3": converter.mp3,
+                            "mp4": converter.mp4,
+                            "opus": converter.opus,
+                            "vorbis": converter.vorbis,
+                            "wav": converter.wav
+    }
+    try:
+        # Run the appropriate function in converter.py
+        return codec_to_converter[codec](*params)
+    finally:
+        is_converting = False
+
 
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
@@ -59,27 +97,9 @@ def homepage():
 
         upload_time = datetime.now().strftime('%H:%M:%S')
         log.info(f'Upload complete at {upload_time}')
-
-        # Empty the conversions folder to ensure there's room for the file that is going to be converted.
-        for file in os.listdir('conversions'):
-            os.remove(os.path.join('conversions', file))
-            log.info(f'Deleted conversions/{file}')
-
-        uploads_folder_size = 0
-        # Iterate over each file in the folder and add its size to the above variable.
-        for file in os.listdir('uploads'):
-            size_of_file = os.path.getsize(f'uploads/{file}') / 1_000_000
-            uploads_folder_size += size_of_file
-        # If there's more than 3 GB of files in the uploads folder, empty it.
-        if uploads_folder_size > 3000:
-            log.info(f'More than 3 GB worth of uploads found. Emptying uploads folder...')
-            for file in os.listdir('uploads'):
-                os.remove(os.path.join('uploads', file))
-            log.info('Conversions folder emptied.')
         
         uploaded_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
-
         log.info(uploaded_file)
         log.info(f'Size: {filesize} MB')
 
@@ -133,27 +153,6 @@ def homepage():
         log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
         os.makedirs('conversions', exist_ok=True)
         output_path = os.path.join('conversions', output_name)
-
-
-        def run_converter(codec, params):
-            codec_to_converter = {
-                                    "aac": converter.aac,
-                                    "ac3": converter.ac3,
-                                    "alac": converter.alac,
-                                    "dts": converter.dts,
-                                    "flac": converter.flac,
-                                    "mka": converter.mka,
-                                    "mkv": converter.mkv,
-                                    "mp3": converter.mp3,
-                                    "mp4": converter.mp4,
-                                    "opus": converter.opus,
-                                    "vorbis": converter.vorbis,
-                                    "wav": converter.wav
-            }
-            # Pass the list of parameters (params) to the appropriate converter function.
-            return codec_to_converter[codec](*params)
-
-        # Run the appropriate function in converter.py:
 
         # AAC
         if chosen_codec == 'AAC':
@@ -226,6 +225,9 @@ def homepage():
                       output_path]
             extension = run_converter('wav', params)
 
+        log.info('Conversion complete.')
+        os.remove(uploaded_file_path)
+        log.info(f'Deleted uploads/{uploaded_file_path}')
         # Filename after conversion.
         converted_file_name = f'{output_name}.{extension}'
 
