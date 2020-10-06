@@ -51,7 +51,7 @@ is_converting = False
 # This function runs in a separate thread.
 def empty_folders():
     while not is_converting:
-        sleep(60)
+        sleep(300)
         for file in os.listdir('conversions'):
             os.remove(os.path.join('conversions', file))
             log.info(f'Deleted conversions/{file}')
@@ -245,7 +245,8 @@ def get_file(filename):
 # app.js directs the user to this URL when the conversion is complete.
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
-    log.info(f'https://freeaudioconverter.net/conversions/{filename}')
+    time_now = datetime.now().strftime('%H:%M:%S')
+    log.info(f'[{time_now}] https://free-av-tools.com/conversions/{filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
     try:
         return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)

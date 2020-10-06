@@ -85,7 +85,7 @@ is_downloading = False
 # This function runs in a separate thread.
 def delete_downloads():
     while not is_downloading:
-        sleep(60)
+        sleep(300)
         for file in os.listdir('downloads'):
             os.remove(os.path.join('downloads', file))
             log.info(f'Deleted downlods/{file}')
@@ -106,7 +106,6 @@ def run_youtube_dl(download_type, args):
         log.error(f'Unable to download video: \n{error}')
     finally:
         is_downloading = False
-        log.info(is_downloading)
     
     log.info(f'Download took {round((download_complete_time - download_start_time), 1)}s')
 
@@ -258,7 +257,7 @@ def yt_downloader():
         download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
 
         args = youtube_dl_path + ['--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
-                                  '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',
+                                  '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
                                   '-o', download_template, '--', video_id]
 
         run_youtube_dl(request.form['button_clicked'], args)
@@ -306,7 +305,8 @@ def get_file(filename):
 # This page is visited (with virtualDownloadLink.click() in app.js) to send the file to the user.
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    log.info(f'https://free-av-tools.com/downloads/{filename}')
+    time_now = datetime.now().strftime('%H:%M:%S')
+    log.info(f'[{time_now}] https://free-av-tools.com/downloads/{filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
     try:
         return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
