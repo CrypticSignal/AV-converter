@@ -199,27 +199,6 @@ def yt_downloader():
             # Downloads folder size in MB.
             downloads_folder_size += os.path.getsize(os.path.join(download_dir, file)) / 1_000_000
 
-        if downloads_folder_size > 3000:
-            log.info('Downloads folder larger than 3 GB. Emptying the folder...')
-            for file in os.listdir(download_dir):
-                os.remove(os.path.join(download_dir, file))
-            log.info('Downloads folder emptied.')
-        
-        # Use the get_ip function imported from loggers.py
-        user_ip = get_ip()
-        # Query the database by IP.
-        user = User.query.filter_by(ip=user_ip).first()
-
-        if user:
-            x = 'time' if user.times_used_yt_downloader == 1 else 'times'
-            log.info(f'This user has used the downloader {user.times_used_yt_downloader} {x} before.')
-            user.times_used_yt_downloader += 1
-            db.session.commit()
-        else:
-            new_user = User(ip=user_ip, times_used_yt_downloader=1, mb_downloaded=0)
-            db.session.add(new_user)
-            db.session.commit()
-
         # I want to save the download progress to a file and read from that file to show the download progress
         # to the user. Set the name of the file to the time since the epoch.
         progress_file_name = f'{str(time())[:-8]}.txt'
