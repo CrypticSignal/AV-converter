@@ -47,7 +47,6 @@ You can run the Flask app locally for development purposes or if you want audio/
 - Clone this repository.
 - `pip3 install -r requirements.txt`
 - Change the value of `ffmpeg_path` in converter.py to the correct path.
-- Change the value of `youtube_dl_path` in yt.py to the correct path.
 - cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
 - Enter localhost:5000 in the address bar of your web browser and hit enter.
 
