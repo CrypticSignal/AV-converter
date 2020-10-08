@@ -2,7 +2,7 @@
 [![contributors welcome](https://img.shields.io/badge/contributors-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
 On https://free-av-tools.com you can:
-- Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (in the .mka container), FLAC, ALAC, AC3, DTS or CAF.
+- Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis, FLAC, ALAC, AC3, DTS or CAF.
 - Convert a video to an audio-only file (to any of the above formats).
 - Convert a video to the MP4 or MKV format.
 - Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
@@ -17,8 +17,6 @@ On https://free-av-tools.com you can:
 **[3]** [Supported Filetypes](https://github.com/BassThatHertz/AudioAndVideoConverter#supported-filetypes)
 
 **[4]** [Tools used](https://github.com/BassThatHertz/AudioAndVideoConverter#tools-used)
-
-**[5]** [Requirements for developers/running locally](https://github.com/BassThatHertz/AudioAndVideoConverter#requirements-for-developersrunning-locally)
 
 ## Features (audio/video converter):
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
@@ -43,11 +41,14 @@ Many filetypes are supported, click [here](https://freeaudioconverter.net/filety
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
 - Python **3.6+**
 - [FFmpeg](https://ffmpeg.org/download.html)
-- youtube-dl. You can find instuctions on how to install youtube-dl [here](https://github.com/ytdl-org/youtube-dl#installation).
+- `pip3 install youtube-dl`
+
+## How to self-host:
 - Clone this repository.
-- `pip3 install -r requirements.txt`
 - Change the value of `ffmpeg_path` in converter.py to the correct path.
-- cd into the directory that main.py is and enter `python3 main.py` (or just `python` if that uses Python 3 for you) in the terminal.
+- cd into the directory of this repository.
+- `pip3 install -r requirements.txt`
+- `python3 main.py`
 - Enter localhost:5000 in the address bar of your web browser and hit enter.
 
 **If you want to convert to AAC when running this web application locally:**
