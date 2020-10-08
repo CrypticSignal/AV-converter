@@ -1,6 +1,7 @@
 from flask import Flask, Blueprint, request, send_from_directory, session, jsonify
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
+from youtube_dl import YoutubeDL
 from threading import Thread
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
@@ -16,9 +17,6 @@ app = Flask(__name__)
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
-
-# If running locally, change this to the correct path.
-youtube_dl_path = ['/usr/bin/python3', '/usr/local/bin/youtube-dl']
 
 # Create the necessary folders and define the directory to save the downloads to.
 os.makedirs('yt-progress', exist_ok=True)
@@ -79,36 +77,38 @@ def get_video_id(url):
     else:
         raise ValueError
 
+
 is_downloading = False
 
 
 # This function runs in a separate thread.
 def delete_downloads():
     while not is_downloading:
+        # Give the user 5 minutes to manually start the download (if necessary) before deleting the file.
         sleep(300)
         for file in os.listdir('downloads'):
             os.remove(os.path.join('downloads', file))
             log.info(f'Deleted downlods/{file}')
 
-downloads_deleting_thread = Thread(target=delete_downloads)
-downloads_deleting_thread.start()
+delete_downloads_thread = Thread(target=delete_downloads)
+delete_downloads_thread.start()
 
 
-def run_youtube_dl(download_type, args):
+def run_youtube_dl(video_link, options):
     is_downloading = True
+    download_start_time = time()
     try:
-        download_start_time = time()
-        # Using subprocess.run() this way allows the stdout to be written to a file.
-        with open(session['progress_file_path'], 'w') as f:
-            subprocess.run(args, stdout=f)
-        download_complete_time = time()
+        with YoutubeDL(options) as ydl:
+            ydl.download(video_link)
     except Exception as error:
-        log.error(f'Unable to download video: \n{error}')
+        log.error(f'Error downloading file:\n{error}')
+    else:
+        download_complete_time = time()
+        log.info(f'Download took {round((download_complete_time - download_start_time), 1)}s')
+        log_downloads_per_day()
     finally:
         is_downloading = False
     
-    log.info(f'Download took {round((download_complete_time - download_start_time), 1)}s')
-
 
 # Initialise the downloads_today variable.
 downloads_today = 0
@@ -133,7 +133,6 @@ def log_downloads_per_day():
 
     date_today = datetime.today().strftime('%d-%m-%Y')
     
-
     if date_today in dates_to_downloads:
         global downloads_today
         downloads_today += 1
@@ -159,7 +158,9 @@ def clean_downloads_foider():
 def send_json_response(progress_file_path, video_id, download_type):
     clean_downloads_foider()
     downloads = os.listdir(download_dir)
+    log.info(downloads)
     correct_file = [filename for filename in downloads if video_id in filename and download_type in filename][0]
+    log.info(correct_file)
     log.info(f'Filename: {correct_file}')
     filesize = round((os.path.getsize(os.path.join(download_dir, correct_file)) / 1_000_000), 2)
 
@@ -186,6 +187,15 @@ def send_json_response(progress_file_path, video_id, download_type):
         log.error(f'Unable to return download and/or log file path. Error:\n{error}')
 
 
+class Logger():
+    def debug(self, msg):
+        with open(session['progress_file_path'], 'ab') as f:
+            msg = msg.replace('                  ', '\n').replace('Deleting original file', '\nDeleting original file').replace('\r', '\n')
+            f.write(msg.encode('utf-8'))
+    def warning(self, msg):
+        pass
+
+
 # When POST requests are made to /yt
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
@@ -194,7 +204,6 @@ def yt_downloader():
     if request.form['button_clicked'] == 'yes':
 
         downloads_folder_size = 0
-
         for file in os.listdir(download_dir):
             # Downloads folder size in MB.
             downloads_folder_size += os.path.getsize(os.path.join(download_dir, file)) / 1_000_000
@@ -208,7 +217,7 @@ def yt_downloader():
 
     # Second POST request:
 
-    video_link = request.form['link']
+    video_link = str(request.form['link'])
     # Use the get_video_id function to get the video ID from the link.
     video_id = get_video_id(video_link)
 
@@ -218,13 +227,15 @@ def yt_downloader():
         log_this('Chose Video [best]')
         update_database()
         log.info(f'{video_link} | {video_id}')
-        download_template = f'{download_dir}/%(title)s-%(id)s [video].%(ext)s'
 
-        args = youtube_dl_path + ['--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
-                                  '-o', download_template, '--', video_id]
-
-        run_youtube_dl(request.form['button_clicked'], args)
-        log_downloads_per_day()
+        options = {
+           'format': 'bestvideo+bestaudio/best',
+           'cookiefile': 'cookies.txt',
+           'outtmpl': f'{download_dir}/%(title)s-%(id)s [video].%(ext)s',
+           'logger': Logger(),
+        }
+      
+        run_youtube_dl([video_link], options)
         return send_json_response(session['progress_file_path'], video_id, ' [video].')
        
     # Video [MP4]
@@ -233,14 +244,14 @@ def yt_downloader():
         log_this('Chose Video [MP4]')
         update_database()
         log.info(f'{video_link} | {video_id}')
-        download_template = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
 
-        args = youtube_dl_path + ['--newline', '--restrict-filenames', '--cookies', 'cookies.txt',
-                                  '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-                                  '-o', download_template, '--', video_id]
-
-        run_youtube_dl(request.form['button_clicked'], args)
-        log_downloads_per_day()
+        options = {
+           'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+           'cookiefile': 'cookies.txt',
+           'outtmpl': f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s',
+           'logger': Logger(),
+        }
+        run_youtube_dl([video_link], options)
         return send_json_response(session['progress_file_path'], video_id, ' [MP4].')
 
     # Audio [best]
@@ -251,11 +262,16 @@ def yt_downloader():
         log.info(f'{video_link} | {video_id}')
         download_template = f'{download_dir}/%(title)s-%(id)s [audio].%(ext)s'
 
-        args = youtube_dl_path + ['--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
-                                  '-o', download_template, '--', video_id]
-
-        run_youtube_dl(request.form['button_clicked'], args)
-        log_downloads_per_day()
+        options = {
+           'format': 'bestaudio',
+           'cookiefile': 'cookies.txt',
+           'outtmpl': f'{download_dir}/%(title)s-%(id)s [audio].%(ext)s',
+           'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+            }],
+           'logger': Logger(),
+        }
+        run_youtube_dl([video_link], options)
         return send_json_response(session['progress_file_path'], video_id, ' [audio].')
      
     # MP3
@@ -264,14 +280,20 @@ def yt_downloader():
         log_this('Chose MP3')
         update_database()
         log.info(f'{video_link} | {video_id}')
-        download_template = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
 
-        args = youtube_dl_path + ['--newline', '--restrict-filenames', '--cookies', 'cookies.txt', '-x',
-                                  '--embed-thumbnail', '--audio-format', 'mp3', '--audio-quality', '0',
-                                  '-o', download_template, '--', video_id]
-    
-        run_youtube_dl(request.form['button_clicked'], args)
-        log_downloads_per_day()
+        options = {
+           'format': 'bestaudio',
+           'cookiefile': 'cookies.txt',
+           'audioformat' : "mp3",
+           'outtmpl': f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s',
+           'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '0' # -q:a 0
+            }],
+           'logger': Logger(),
+        }
+        run_youtube_dl([video_link], options)
         return send_json_response(session['progress_file_path'], video_id, ' [MP3].')
 
 
