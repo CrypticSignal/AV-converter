@@ -27,33 +27,32 @@ async function showDownloadProgress(progressFilePath) {
     while (shouldLog) {
         try {
             const response = await fetch(progressFilePath);
-            const textInFile = await response.text();
-            lines = textInFile.split('\n');
-            secondLastLine = lines[lines.length - 2];
-            console.log('Reading from progress file:')
-            console.log(secondLastLine);
-            if (typeof secondLastLine === 'undefined') {
+            const textInFile = await response.text()
+            lines = textInFile.split('\n')
+            lastLine = lines[lines.length - 1];
+            if (lastLine === '') {
                 show_alert('Initialising...', 'warning');
             }
-            else if (secondLastLine.includes('Downloading webpage')) {
+            else if (lastLine.includes('Downloading webpage')) {
                 show_alert('Video found...', 'success');
             }
-            else if (secondLastLine.includes('[download] ')) {
-                show_alert(secondLastLine.substring(11), 'info');
+            else if (lastLine.includes('[download] ')) {
+                show_alert(lastLine.substring(11), 'info');
             }
-            else if (secondLastLine.includes('[ffmpeg] Destination:')) {
-                show_alert('Finishing up...', 'info');
+            else if (lastLine.includes('[MP3].mp3')) {
+                show_alert('Converting to MP3...', 'info')
             }
-            else if (secondLastLine.includes('[ffmpeg] Merging ')) {
+            else if (lastLine.includes('[ffmpeg] Merging ')) {
                 show_alert('Merging audio and video...', 'info');
             }
-            else if (secondLastLine.includes('Deleting original file ')) {
+            else if (lastLine.includes('Deleting original file ')) {
                 show_alert('Finishing up...', 'info');
             }
             await sleep(500); // Using the sleep function created above.
         }
         catch(error) {
-            show_alert(error, 'danger');
+            shouldLog = false;
+            show_alert(error);
             console.log(error);
         }
     }
@@ -86,7 +85,6 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         });
 
         const progressFilePath = await requestProgressPath.text();
-        console.log(`Progress File Path: ${progressFilePath}`)
 
         if (!requestProgressPath.ok) {
             show_alert(requestProgressPath, 'danger');
@@ -130,7 +128,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             }
             else {
                 show_alert(secondRequest, 'danger');
-                console.log(secondRequest);
+
             }
         }
     }

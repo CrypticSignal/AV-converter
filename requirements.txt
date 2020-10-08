@@ -1,6 +1,5 @@
-Flask==1.1.2
-Flask_SQLAlchemy==2.4.3
-Flask-Session==0.3.2
+youtube_dl==2020.9.20
 Werkzeug==1.0.1
+Flask==1.1.2
 Flask_SocketIO==4.3.1
-confidential==2.3.1
+Flask_SQLAlchemy==2.4.4
