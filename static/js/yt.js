@@ -28,25 +28,23 @@ async function showDownloadProgress(progressFilePath) {
         try {
             const response = await fetch(progressFilePath);
             const textInFile = await response.text()
-            lines = textInFile.split('\n')
+            lines = textInFile.split('\r')
             lastLine = lines[lines.length - 1];
-            if (lastLine === '') {
+            console.log(lastLine);
+            if (lastLine.includes('Downloading webpage')) {
                 show_alert('Initialising...', 'warning');
-            }
-            else if (lastLine.includes('Downloading webpage')) {
-                show_alert('Video found...', 'success');
-            }
-            else if (lastLine.includes('[download] ')) {
-                show_alert(lastLine.substring(11), 'info');
             }
             else if (lastLine.includes('[MP3].mp3')) {
                 show_alert('Converting to MP3...', 'info')
             }
-            else if (lastLine.includes('[ffmpeg] Merging ')) {
+            else if (lastLine.includes('[ffmpeg] Merging')) {
                 show_alert('Merging audio and video...', 'info');
             }
-            else if (lastLine.includes('Deleting original file ')) {
+            else if (lastLine.includes('Deleting original file ') || lastLine.includes('[ffmpeg] D')) {
                 show_alert('Finishing up...', 'info');
+            }
+            else if (lastLine.includes('[download] ')) {
+                show_alert(lastLine.substring(11), 'info');
             }
             await sleep(500); // Using the sleep function created above.
         }
@@ -66,74 +64,65 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         return;
     }
 
-    const contentsOfLinkBox = linkBox.value;
-    const regExp = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+    if (whichButton === 'Audio [best]') {
+        document.getElementById('bitrate_info').style.display = 'block';
+    }
 
-    if (contentsOfLinkBox.match(regExp)) {
+    const firstFormData = new FormData();
+    firstFormData.append('button_clicked', 'yes');
 
-        if (whichButton === 'Audio [best]') {
-            document.getElementById('bitrate_info').style.display = 'block';
-        }
+    // 1st POST request to get the path of the progress file.
+    const requestProgressPath = await fetch('/yt', {
+        method: 'POST',
+        body: firstFormData
+    });
 
-        const firstFormData = new FormData();
-        firstFormData.append('button_clicked', 'yes');
+    const progressFilePath = await requestProgressPath.text();
 
-        // 1st POST request to get the path of the progress file.
-        const requestProgressPath = await fetch('/yt', {
+    if (!requestProgressPath.ok) {
+        show_alert(requestProgressPath, 'danger');
+    }
+    else {
+        // The FormData for the 2nd POST request.
+        const secondFormData = new FormData();
+        secondFormData.append("link", linkBox.value);
+        secondFormData.append("button_clicked", whichButton);
+
+        shouldLog = true;
+        showDownloadProgress(progressFilePath);
+
+        // 2nd POST request to get the download link.
+        const secondRequest = await fetch("/yt", {
             method: 'POST',
-            body: firstFormData
+            body: secondFormData
         });
 
-        const progressFilePath = await requestProgressPath.text();
+        if (secondRequest.ok) {
 
-        if (!requestProgressPath.ok) {
-            show_alert(requestProgressPath, 'danger');
+            shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
+
+            const jsonResponse = await secondRequest.json();
+            const downloadLink = jsonResponse.download_path
+            const logFile = jsonResponse.log_file
+
+            const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
+            virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
+            virtualDownloadLink.click();
+            
+            // Sometimes the alert below didn't show up but rather it would stay on the "Finishing up..." alert, 
+            // adding a delay seems to fix this.
+            await sleep(500)
+
+            show_alert(`Your browser should have started downloading the file. If it hasn't, click \
+            <a href="${downloadLink}">here</a>.`, "success");
+
+            document.getElementById('logfile').innerHTML = `If you're a nerd, click \
+            <a href="${logFile}" target="_blank">here</a> to view the youtube-dl log file.`
         }
         else {
-            // The FormData for the 2nd POST request.
-            const secondFormData = new FormData();
-            secondFormData.append("link", linkBox.value);
-            secondFormData.append("button_clicked", whichButton);
+            show_alert(secondRequest, 'danger');
 
-            shouldLog = true;
-            showDownloadProgress(progressFilePath);
-
-            // 2nd POST request to get the download link.
-            const secondRequest = await fetch("/yt", {
-                method: 'POST',
-                body: secondFormData
-            });
-
-            if (secondRequest.ok) {
-
-                shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
-
-                const jsonResponse = await secondRequest.json();
-                const downloadLink = jsonResponse.download_path
-                const logFile = jsonResponse.log_file
-
-                const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
-                virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
-                virtualDownloadLink.click();
-                
-                // Sometimes the alert below didn't show up but rather it would stay on the "Finishing up..." alert, 
-                // adding a delay seems to fix this.
-                await sleep(500)
-
-                show_alert(`Your browser should have started downloading the file. If it hasn't, click \
-                <a href="${downloadLink}">here</a>.`, "success");
-
-                document.getElementById('logfile').innerHTML = `If you're a nerd, click \
-                <a href="${logFile}" target="_blank">here</a> to view the youtube-dl log file.`
-            }
-            else {
-                show_alert(secondRequest, 'danger');
-
-            }
         }
-    }
-    else { // If the contents of the link box don't match the regex.
-        show_alert(`Invalid URL provided.`, 'danger');
     }
 }
 

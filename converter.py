@@ -4,12 +4,11 @@ from loggers import log
 from time import time
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
+# If running locally, change this to the correct path.
+ffmpeg_path = '/home/h/bin/ffmpeg'
 
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
-    # If running locally, change this to the correct path.
-    ffmpeg_path = '/home/h/bin/ffmpeg'
-    
     progress_file_path = os.path.join('ffmpeg-progress', progress_filename)
     log.info(f'Conversion progress will be saved to: {progress_file_path}')
     # Split params into a list as I want to use subprocess.run() with an array of arguments.
