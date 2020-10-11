@@ -226,7 +226,7 @@ def yt_downloader():
     elif request.form['button_clicked'] == 'Video [MP4]':
 
         options['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
-        options['outtmp'] = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
+        options['outtmpl'] = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
         run_youtube_dl([video_link], options)
         return send_json_response(session['progress_file_path'], video_id, ' [MP4].')
 
