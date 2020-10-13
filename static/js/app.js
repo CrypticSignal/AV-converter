@@ -1,4 +1,5 @@
 const input = document.getElementById("file_input");
+const urlInput = document.getElementById("url");
 const inputLabel = document.getElementById("file_input_label");
 const outputNameBox = document.getElementById("output_name");
 const conversionProgress = document.getElementById("progress");
@@ -10,6 +11,7 @@ const cancelButton = document.getElementById("cancel_btn");
 const alertWrapper = document.getElementById("alert_wrapper");
 const progressParagraph = document.getElementById('progress');
 convertButton.addEventListener("click", convertButtonClicked);
+cancelButton.addEventListener("click", abortUpload);
 
 // This function runs when a file is selected.
 function updateBoxes() {
@@ -22,6 +24,9 @@ function updateBoxes() {
 }
 
 async function convertButtonClicked() {
+
+    alertWrapper.innerHTML = "";
+
     try {
         const isConvertClicked = new FormData();
         isConvertClicked.append('request_type', 'log_convert_clicked')
@@ -38,30 +43,70 @@ async function convertButtonClicked() {
 // Run this function when the user clicks on the "Convert" button.
 function upload_and_send_conversion_request() {
     
-    allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv",
-    "avi", "ac3", "3gp", "MTS", "webm", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd", "aif", "aiff", "vob"]
-
-    if (!input.value && document.getElementById("output_name").value == '') {
+    // Show an alert if a file hasn't been selected or the URL input box is empty.
+    if (!input.value && document.getElementById("output_name").value == '' && !urlInput.value) {
         show_alert("It helps if you select the file that you want to convert.", "warning")
         return;
     }
-    else if (input.value) { // (If a file has been selected)
+    // If the URL input box is not empty.
+    else if (urlInput.value) {
+        convertButton.classList.add("d-none");
+
+        const urlConvertRequest = new XMLHttpRequest();
+
+        urlConvertRequest.addEventListener("load", responseReceived);
+        urlConvertRequest.addEventListener("error", showError);
+
+        urlConvertRequest.open("POST", "/");
+
+        const data = new FormData();
+        data.append("request_type", "convert_url");
+        data.append("url", urlInput.value);
+
+        urlConvertRequest.send(data);
+
+        function responseReceived() {
+            if (urlConvertRequest.status == 200) {
+                progressFilename = urlConvertRequest.responseText;
+                progressParagraph.style.display = 'block';
+                document.getElementById("converting_btn").style.display = 'block';
+                sendConversionRequest(urlInput.value);
+            }
+            else {
+                console.log(urlConvertRequest.status)
+                show_alert(`${urlConvertRequest.responseText}`, "danger");
+                console.log(urlConvertRequest.responseText);
+            }
+        }
+    }
+
+    // If a file has been selected.
+    else if (input.value) { 
+
         const chosenFile = input.files[0];
         const filename = chosenFile.name;
         const filenameParts = filename.split('.');
         const fileExt = filenameParts[filenameParts.length - 1];
+        const filesizeMB = ((chosenFile.size / 1000000).toFixed(2)).toString();
         const filesize = chosenFile.size;
+
+        allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv",
+        "avi", "ac3", "3gp", "MTS", "webm", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd", "aif", "aiff", "vob"]
+
+        // Show an alert if an incompatible filetype has been selected.
         if (!allowedFiletypes.includes(fileExt)) {
             show_alert('Incompatible filetype selected. Click <a href="/filetypes" \
             target="_blank">here</a> to see the list of compatible filetypes.', "danger");
                 reset();
                 return;
-            }
+        }
+        // Show an alert if the filesize exceeds the maximum size allowed.
         else if (filesize > 3000000000) {
             show_alert("Max file size: 3 GB", "danger")
             reset();
             return;    
         }
+        // Show an alert if a disallowed character has been entered in the output name box.
         else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') ||
         outputNameBox.value.includes('\\')|| outputNameBox.value.includes('?') || outputNameBox.value.includes('*') ||
         outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') ||
@@ -71,80 +116,76 @@ function upload_and_send_conversion_request() {
             show_alert('Characters not allowed: ., ", /, ?, *, >, <, |, :, $ or the word "command"', "danger");
             return;
         }
+        // Show an alert if output name box is empty.
         else if (document.getElementById("output_name").value == '') {
             show_alert("You must enter your desired filename.", "danger")
             return;
+        }
+
+        alertWrapper.innerHTML = "";
+        input.disabled = true;
+        outputNameBox.disabled = true;
+
+        let uploadRequest = new XMLHttpRequest();
+    
+        uploadRequest.upload.addEventListener("progress", showProgress);
+        uploadRequest.addEventListener("load", responseReceived);
+        uploadRequest.addEventListener("error", showError);
+
+        uploadRequest.open("POST", "/")
+
+        const data = new FormData();
+        data.append("request_type", "uploaded");
+        data.append("chosen_file", chosenFile);
+        data.append("filesize", filesizeMB);
+
+        uploadRequest.send(data);
+
+        // When the upload is commplete:
+        function responseReceived() {
+            uploadingButton.classList.add('d-none');
+            cancelButton.classList.add('d-none');
+            progressWrapper.classList.add("d-none");
+            progress_bar.setAttribute("style", "width: 0%");
+
+            if (uploadRequest.status == 200) {
+                progressFilename = uploadRequest.responseText;
+                progressParagraph.style.display = 'block';
+                document.getElementById("converting_btn").style.display = 'block';
+                sendConversionRequest(chosenFile.name);
+            }
+            else {
+                show_alert(`${uploadRequest.responseText}`, "danger");
+                console.log(uploadRequest.responseText)
+            }
         }
     }
     else {
         show_alert("No file selected.", "danger")
         return;
     }
-
-    alertWrapper.innerHTML = "";
-    input.disabled = true;
-    outputNameBox.disabled = true;
-    convertButton.classList.add("d-none");
-    uploadingButton.classList.remove("d-none");
-    cancelButton.classList.remove("d-none");
-    progressWrapper.classList.remove("d-none");
-
-    const chosenFile = input.files[0];
-    const filesizeMB = ((chosenFile.size / 1000000).toFixed(2)).toString();
-   
-    let uploadRequest = new XMLHttpRequest();
-    
-    uploadRequest.upload.addEventListener("progress", showProgress);
-    uploadRequest.addEventListener("load", uploadComplete);
-    uploadRequest.addEventListener("error", showError);
-    cancelButton.addEventListener("click", abortUpload);
-
-    uploadRequest.open("POST", "/")
-
-    const data = new FormData();
-    data.append("request_type", "uploaded");
-    data.append("chosen_file", chosenFile);
-    data.append("filesize", filesizeMB);
-    uploadRequest.send(data);
-
-    // When the upload is commplete:
-    function uploadComplete() {
-        uploadingButton.classList.add('d-none');
-        cancelButton.classList.add('d-none');
-        progressWrapper.classList.add("d-none");
-        progress_bar.setAttribute("style", "width: 0%");
-
-        if (uploadRequest.status == 200) {
-            progressFilename = uploadRequest.responseText;
-            progressParagraph.style.display = 'block';
-            document.getElementById("converting_btn").style.display = 'block';
-            sendConversionRequest(chosenFile.name);
-        }
-        else {
-            show_alert(`${uploadRequest.responseText}`, "danger");
-            console.log(uploadRequest.responseText)
-        }
-    }
-    // Abort the upload request if the cancel button is clicked.
-    function abortUpload() {
-        uploadRequest.abort();
-        show_alert(`Upload cancelled`, "info");
-        reset();
-    }
-    function showError() {
-        show_alert(`${uploadRequest.responseText}`, "danger");
-        console.log(`uploadRequest error: ${uploadRequest.responseText}`)
-        reset();
-    }
 } // Closing bracket for upload_and_convert function.
+
+// Abort the upload request if the cancel button is clicked.
+function abortUpload() {
+    uploadRequest.abort();
+    show_alert(`Upload cancelled`, "info");
+    reset();
+}
+function showError() {
+    show_alert(`${uploadRequest.responseText}`, "danger");
+    console.log(`uploadRequest error: ${uploadRequest.responseText}`)
+    reset();
+}
 
 let previousTime = Date.now() / 1000;
 let previousLoaded = 0;
 
 function showProgress(event) {
-    convertButton.classList.add('d-none');
-    uploadingButton.classList.remove('d-none');
-    cancelButton.classList.remove('d-none');
+    convertButton.classList.add("d-none");
+    uploadingButton.classList.remove("d-none");
+    cancelButton.classList.remove("d-none");
+    progressWrapper.classList.remove("d-none");
     progressWrapper.style.display = 'block';
     const loaded = event.loaded / 10**6;
     const total = event.total / 10**6;

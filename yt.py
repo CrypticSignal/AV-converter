@@ -31,9 +31,10 @@ download_dir = 'downloads'
 def delete_downloads():
     while not is_downloading:
         # Give users a minute to manually start the download (if necessary) before emptying the downloads folder.
-        sleep(60)
+        sleep(600)
         for file in os.listdir('downloads'):
             os.remove(os.path.join('downloads', file))
+            log.info(f'Deleted downloads/{file}')
 
 
 # This class is a table in the database.
