@@ -91,6 +91,12 @@ def homepage():
     if request.form['request_type'] == 'log_convert_clicked':
         log_this('clicked on the convert button.')
         return ''
+    
+    elif request.form["request_type"] == "convert_url":
+        url = request.form["url"]
+        conversion_progress_filename = f'{str(time())[:-8]}.txt'
+        session['progress_filename'] = conversion_progress_filename
+        return session['progress_filename']
 
     # Second POST request.
     elif request.form["request_type"] == "uploaded":
@@ -118,11 +124,15 @@ def homepage():
 
         wav_bit_depth = request.form["wav_bit_depth"]
         filename = request.form["filename"]
+        log.info(f'Filename: {filename}')
+        if 'http' in filename and '://' in filename:
+            uploaded_file_path = filename
+        else:
+            uploaded_file_path = os.path.join("uploads", secure_filename(filename))
         chosen_codec = request.form["chosen_codec"]
         crf_value = request.form["crf_value"]
         mp4_encoding_mode = request.form["mp4_encoding_mode"]
         is_keep_video = request.form["is_keep_video"]
-        uploaded_file_path = os.path.join("uploads", secure_filename(filename))
         # MP3
         mp3_encoding_type = request.form["mp3_encoding_type"]
         mp3_bitrate = request.form["mp3_bitrate"]
@@ -224,10 +234,7 @@ def homepage():
             params = [session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth,
                       output_path]
             extension = run_converter('wav', params)
-
-        log.info('Conversion complete.')
-        os.remove(uploaded_file_path)
-        log.info(f'Deleted uploads/{uploaded_file_path}')
+    
         # Filename after conversion.
         converted_file_name = f'{output_name}.{extension}'
 
