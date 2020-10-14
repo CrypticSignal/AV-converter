@@ -4,8 +4,8 @@ from loggers import log
 from time import time
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
-# If FFmpeg is not in your PATH, change 'ffmpeg' to the full path.
-ffmpeg_path = 'ffmpeg'
+# If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
+ffmpeg_path = '/home/h/bin/ffmpeg'
 
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
