@@ -68,6 +68,7 @@ function upload_and_send_conversion_request() {
         function responseReceived() {
             if (urlConvertRequest.status == 200) {
                 progressFilename = urlConvertRequest.responseText;
+                console.log(progressFilename)
                 progressParagraph.style.display = 'block';
                 document.getElementById("converting_btn").style.display = 'block';
                 sendConversionRequest(urlInput.value);
@@ -218,20 +219,25 @@ function sleep(ms) {
 }
 
 async function showConversionProgress() {
-    // If you start reading the file straight away, there will be an error as there is a little delay
-    // before the conversion progress is written to the file. Hence the initial await sleep(1000).
-    await sleep(1000)
     while (shouldLog) {
         const response = await fetch(`ffmpeg-progress/${progressFilename}`);
-        const textInFile = await response.text();
-        const lines = textInFile.split('\n');
-        const fifthLastLine = lines[lines.length - 6].split('=');
-        const justProgressTime = fifthLastLine.slice(-1)[0];
-        const withoutMicroseconds = justProgressTime.slice(0, -7);
-        const milliseconds = justProgressTime.substring(9, 12);
-        show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
-        (and ${milliseconds} milliseconds)`, 'primary');
-        await sleep(1000);
+        console.log(response.status)
+        if (response.status == 200) {
+            const textInFile = await response.text();
+            if (textInFile == '') {
+                console.log('Progress file is currently empty.')
+            }
+            else {
+                const lines = textInFile.split('\n');
+                const fifthLastLine = lines[lines.length - 6].split('=');
+                const justProgressTime = fifthLastLine.slice(-1)[0];
+                const withoutMicroseconds = justProgressTime.slice(0, -7);
+                const milliseconds = justProgressTime.substring(9, 12);
+                show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
+                (and ${milliseconds} milliseconds)`, 'primary');
+                await sleep(1000);
+            }
+        }
     }
 }
 
