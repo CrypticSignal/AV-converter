@@ -30,8 +30,9 @@ download_dir = 'downloads'
 # This function runs in a separate thread.
 def delete_downloads():
     while not is_downloading:
-        # Give users a minute to manually start the download (if necessary) before emptying the downloads folder.
+        # Give users 10 minutes to manually start the download (if necessary) before emptying the downloads folder.
         sleep(600)
+        log.info('\n')
         for file in os.listdir('downloads'):
             os.remove(os.path.join('downloads', file))
             log.info(f'Deleted downloads/{file}')
