@@ -243,7 +243,7 @@ async function showConversionProgress() {
 
 async function sendConversionRequest(filename) { // Runs when upload is complete.
     const chosenCodec = document.getElementById('codecs').value;
-    const mp4EncodingMode = document.getElementById('mp4_encoding_mode').value;
+    const videoMode = document.getElementById('video_mode').value;
     const opusVorbisSlider = document.getElementById("opus_vorbis_slider").value;
     const outputName = document.getElementById("output_name").value;
     const mp3EncodingType = document.getElementById('mp3_encoding_type').value;
@@ -270,7 +270,7 @@ async function sendConversionRequest(filename) { // Runs when upload is complete
     data.append("request_type", "convert");
     data.append("filename", filename);
     data.append("chosen_codec", chosenCodec);
-    data.append("mp4_encoding_mode", mp4EncodingMode);
+    data.append("video_mode", videoMode);
     data.append("opus_vorbis_slider", opusVorbisSlider);
     data.append("output_name", outputName);
     data.append("mp3_encoding_type", mp3EncodingType);

@@ -19,7 +19,7 @@ function showHide(value) {
         document.getElementById('mp3_slider_div').style.display = 'block';
         document.getElementById('mp3_vbr_setting_div').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
@@ -43,7 +43,7 @@ function showHide(value) {
         document.getElementById('fdk_lowpass_div').style.display = 'none';
         document.getElementById('fdk_vbr_div').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
@@ -60,7 +60,7 @@ function showHide(value) {
         document.getElementById('mp3_encoder').style.display = 'none';
         document.getElementById('no_settings_required').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
@@ -79,7 +79,7 @@ function showHide(value) {
         document.getElementById("opus_encoding").style.display = 'block';
         document.getElementById('opus_encoding_type').selectedIndex = 1;
         document.getElementById("opus_vorbis_vbr_div").style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById('opus_cbr_div').style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
@@ -99,7 +99,7 @@ function showHide(value) {
         document.getElementById('vorbis_encoding_div').style.display = 'block';
         document.getElementById("vorbis_encoding").selectedIndex = 1;
         document.getElementById('opus_vorbis_vbr_div').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
@@ -117,7 +117,7 @@ function showHide(value) {
         document.getElementById('mp3_encoder').style.display = 'none';
         document.getElementById('flac').style.display = 'block';
         document.getElementById('keep_video_div').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
         document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
@@ -134,7 +134,7 @@ function showHide(value) {
         document.getElementById('mp3_encoder').style.display = 'none';
         document.getElementById('no_settings_required').style.display = 'block';
         document.getElementById('keep_video_div').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
@@ -151,7 +151,7 @@ function showHide(value) {
         document.getElementById('mp3_encoder').style.display = 'none';
         document.getElementById('AC3').style.display = 'block';
         document.getElementById('keep_video_div').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
@@ -168,7 +168,7 @@ function showHide(value) {
         document.getElementById('mp3_encoder').style.display = 'none';
         document.getElementById("DTS").style.display = 'block';
         document.getElementById('keep_video_div').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById('flac').style.display = 'none';
         document.getElementById('opus_vorbis_vbr_div').style.display = 'none';
@@ -184,7 +184,7 @@ function showHide(value) {
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('mp3_encoder').style.display = 'none';
         document.getElementById('no_settings_required').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
@@ -201,7 +201,7 @@ function showHide(value) {
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('mp3_encoder').style.display = 'none';
         document.getElementById('no_settings_required').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
@@ -217,8 +217,10 @@ function showHide(value) {
         document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('mp3_encoder').style.display = 'none';
-        document.getElementById('no_settings_required').style.display = 'block';
-        document.getElementById('MP4').style.display = 'none';
+        document.getElementById('video').style.display = 'block';
+        document.getElementById("video_mode").selectedIndex = 0;
+        document.getElementById('crf_div').style.display = 'none';
+        document.getElementById('no_settings_required').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
         document.getElementById("DTS").style.display = 'none';
@@ -229,11 +231,14 @@ function showHide(value) {
         document.getElementById('AC3').style.display = 'none';
         document.getElementById('AAC').style.display = 'none';
     }
+
     else if (value=='MP4') {
         document.getElementById('wav_bit_depth_div').style.display = 'none';
         document.getElementById('opus_encoder').style.display = 'none';
         document.getElementById('mp3_encoder').style.display = 'none';
-        document.getElementById('MP4').style.display = 'block';
+        document.getElementById('video').style.display = 'block';
+        document.getElementById("video_mode").selectedIndex = 6;
+        document.getElementById('crf_div').style.display = 'block';
         document.getElementById('no_settings_required').style.display = 'none';
         document.getElementById('keep_video_div').style.display = 'none';
         document.getElementById("Opus").style.display = 'none';
@@ -305,8 +310,8 @@ function opusEncodingType(value) {
     }
 }
 
-function mp4Mode(value) {
-    if (value=='keep_video_codec') {
+function videoMode(value) {
+    if (value=='keep_video_codec' || value=='keep_codecs') {
         document.getElementById('crf_div').style.display = 'none';
 }
     else {

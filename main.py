@@ -134,7 +134,7 @@ def homepage():
             uploaded_file_path = os.path.join("uploads", secure_filename(filename))
         chosen_codec = request.form["chosen_codec"]
         crf_value = request.form["crf_value"]
-        mp4_encoding_mode = request.form["mp4_encoding_mode"]
+        video_mode = request.form["video_mode"]
         is_keep_video = request.form["is_keep_video"]
         # MP3
         mp3_encoding_type = request.form["mp3_encoding_type"]
@@ -206,7 +206,7 @@ def homepage():
 
         # MKV
         elif chosen_codec == 'MKV':
-            params = [session['progress_filename'], uploaded_file_path, output_path]
+            params = [session['progress_filename'], uploaded_file_path, video_mode, crf_value, output_path]
             extension = run_converter('mkv', params)
 
         # MP3
@@ -217,7 +217,7 @@ def homepage():
 
         # MP4
         elif chosen_codec == 'MP4':
-            params = [session['progress_filename'], uploaded_file_path, mp4_encoding_mode, crf_value, output_path]
+            params = [session['progress_filename'], uploaded_file_path, video_mode, crf_value, output_path]
             extension = run_converter('mp4', params)
 
         # Opus

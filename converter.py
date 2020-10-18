@@ -11,7 +11,7 @@ ffmpeg_path = '/home/h/bin/ffmpeg'
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     progress_file_path = os.path.join('ffmpeg-progress', progress_filename)
     log.info(f'Conversion progress will be saved to: {progress_file_path}')
-    # Split params into a list as I want to use subprocess.run() with an array of arguments.
+    # Turn params into a list as I want to use subprocess.run() with an array of arguments.
     params = params.split(' ')
     params.append(output_name)
     log.info(params)
@@ -152,10 +152,27 @@ def mka(progress_filename, uploaded_file_path, output_path):
 
 
 # MKV
-def mkv(progress_filename, uploaded_file_path, output_path):
-    run_ffmpeg(progress_filename, uploaded_file_path, '-c copy -f matroska', f'{output_path}.mkv')
+def mkv(progress_filename, uploaded_file_path, video_mode, crf_value, output_path):
+    # No transcoding, simply change the container to MKV.
+    if video_mode == "keep_codecs":
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-map 0 -c copy', f'{output_path}.mkv')
+    # Keep the video as-is, encode the audio.
+    elif video_mode == "keep_video_codec":
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-map 0 -c:v copy -c:a libfdk_aac -c:s copy -vbr 5',
+                   f'{output_path}.mkv')
+    # Transcode the video, leave the audio as-is.
+    elif video_mode == 'convert_video_keep_audio':
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-map 0 -c:v libx264 -crf {crf_value} -c:a copy -c:s copy',
+                   f'{output_path}.mkv')
+    # Transcode the video and audio.
+    else:
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-map 0 -c:v libx264 -preset {video_mode} '
+                   f'-crf {crf_value} -c:a libfdk_aac', f'{output_path}.mkv')
+
     output_ext = 'mkv'
     return output_ext
+
+
 
 # MP3
 def mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting,
@@ -193,21 +210,21 @@ def mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type,
 
 
 # MP4
-def mp4(progress_filename, uploaded_file_path, mp4_encoding_mode, crf_value, output_path):
-    # Keep original codecs, simply change the container to MP4.
-    if mp4_encoding_mode == "keep_codecs":
+def mp4(progress_filename, uploaded_file_path, video_mode, crf_value, output_path):
+    # No transcoding, simply change the container to MP4.
+    if video_mode == "keep_codecs":
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c copy -f mp4 -movflags faststart', f'{output_path}.mp4')
-    # Keep video codec, encode audio.
-    elif mp4_encoding_mode == "keep_video_codec":
+    # Keep the video as-is, encode the audio.
+    elif video_mode == "keep_video_codec":
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac -vbr 5 -f mp4 '
                    f'-movflags faststart', f'{output_path}.mp4')
-    # Encode video, keep audio codec.
-    elif mp4_encoding_mode == 'convert_video_keep_audio':
+    # Transcode the video, keep the audio as-is.
+    elif video_mode == 'convert_video_keep_audio':
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v libx264 -crf {crf_value} -c:a copy -f mp4 '
                    f'-movflags faststart', f'{output_path}.mp4')
-    # Encode video and audio.
+    # Transcode the video and audio.
     else:
-        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v libx264 -preset {mp4_encoding_mode} -crf {crf_value} '
+        run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v libx264 -preset {video_mode} -crf {crf_value} '
                    f'-c:a libfdk_aac -vbr 5 -f mp4 -movflags faststart', f'{output_path}.mp4')
 
     output_ext = 'mp4'
