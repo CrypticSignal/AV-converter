@@ -19,16 +19,19 @@
 <div class="container"> <!-- Bootstrap class -->
   <div class="mb-3"> <!-- Bootstrap class -->
 
+    <!-- File input element. -->
     <div class="custom-file"> <!-- Bootstrap class-->
       <input accept=".mp3, .aac, .m4a, .wav, .flac, .ogg, .opus, .flv, .mp4, .avi, .wmv, .wma, .mka, .mkv, .MTS,
       .mts, .ac3, .3gp, .dts, .webm, .ADPCM, .adpcm, .spx, .caf, .mov, .dtshd, .thd, .aif, .aiff, .vob"
       type="file" class="custom-file-input" id="file_input" oninput="updateBoxes()">
       <label id="file_input_label" class="custom-file-label">Select file</label>
     </div>
+
     <i>Max file size: {{ upload_size }} GB.</i>
     <p>To see the list of supported input filetypes, click <a href=filetypes target="_blank">here</a>.</p>
     <p>Alternatively, you can use a URL as input:</p>
     <input type="url" name="url" id="url" placeholder="https://example.com/video/video.mp4"><br>
+    <i>YouTube links aren't supported. Use the <a href="/yt">YT downloader</a> instead.</i>
 
     <hr><h5>Desired Format</h5>
 

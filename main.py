@@ -52,6 +52,9 @@ is_converting = False
 def empty_folders():
     while not is_converting:
         sleep(300)
+        for file in os.listdir('uploads'):
+            os.remove(os.path.join('uploads', file))
+            log.info(f'Deleted uploads/{file}')
         for file in os.listdir('conversions'):
             os.remove(os.path.join('conversions', file))
             log.info(f'Deleted conversions/{file}')

@@ -55,10 +55,7 @@ def update_database():
     user_ip = get_ip()
     # Query the database by IP.
     user = User.query.filter_by(ip=user_ip).first()
-
     if user:
-        x = 'time' if user.times_used_yt_downloader == 1 else 'times'
-        log.info(f'This user has used the downloader {user.times_used_yt_downloader} {x} before.')
         user.times_used_yt_downloader += 1
         db.session.commit()
     else:
@@ -141,11 +138,11 @@ def clean_downloads_foider():
 
 
 def send_json_response(progress_file_path, video_id, download_type):
-    clean_downloads_foider()
+    #sleep(2000)
+    #clean_downloads_foider()
     downloads = os.listdir(download_dir)
     correct_file = [filename for filename in downloads if video_id in filename and download_type in filename][0]
     log.info(correct_file)
-    log.info(f'Filename: {correct_file}')
     filesize = round((os.path.getsize(os.path.join(download_dir, correct_file)) / 1_000_000), 2)
 
     user_ip = get_ip()
@@ -156,10 +153,10 @@ def send_json_response(progress_file_path, video_id, download_type):
         user.mb_downloaded += filesize
         db.session.commit()
 
-    new_filename = correct_file.replace('_', ' ').replace('#', '').replace(f'-{video_id}', '').replace('%', '')
+    new_filename = correct_file.replace('_', ' ').replace('#', '').replace(f'-{video_id}{download_type}', '').replace('%', '')
+    log.info(new_filename)
     os.replace(os.path.join(download_dir, correct_file), os.path.join(download_dir, new_filename))
-    log.info(f'New Filename: {new_filename}')
-    log.info(f'{filesize} MB')
+    #log.info(f'{filesize} MB')
 
     with open("logs/downloads.txt", "a") as f:
         f.write(f'\n{new_filename}')
@@ -182,7 +179,9 @@ class Logger():
 
 # youtube-dl options template dictionary.
 options = {
+    # Prevent "'latin-1' codec can't encode characters in position 18-23: ordinal not in range(256)" error.
     'restrictfilenames': True,
+    # Set the value of the logger key to the logger class created above.
     'logger': Logger()
 }
 
@@ -200,7 +199,6 @@ def yt_downloader():
     # First POST request when the user clicks on a download button.
     if request.form['button_clicked'] == 'yes':
 
-        log_this('Clicked on a download button.')
         update_database()
         # I want to save the download progress to a file and read from that file to show the download progress
         # to the user. Set the name of the file to the time since the epoch.
@@ -211,50 +209,62 @@ def yt_downloader():
     # Second POST request:
 
     video_link = request.form['link']
-    log.info(video_link)
-    video_id = '-ph5' if get_video_id(video_link) is None else get_video_id(video_link)
-    # video_id = get_video_id(video_link) if get_video_id(video_link) is not None else '-ph5'
+    video_id = video_link.split('=')[1] if get_video_id(video_link) is None else get_video_id(video_link)
 
     # Video [best]   
     if request.form['button_clicked'] == 'Video [best]':
 
+        log_this('Chose Video [best]')
+        log.info(video_link)
         options['format'] = 'bestvideo+bestaudio/best'
-        options['outtmpl'] = f'{download_dir}/%(title)s-%(id)s [video].%(ext)s'
+        options['outtmpl'] = f'{download_dir}/%(title)s-%(id)s-[video].%(ext)s'
         run_youtube_dl([video_link], options)
-        return send_json_response(session['progress_file_path'], video_id, ' [video].')
+        return send_json_response(session['progress_file_path'], video_id, '-[video]')
        
     # Video [MP4]
     elif request.form['button_clicked'] == 'Video [MP4]':
 
+        log_this('Chose Video [MP4]')
+        log.info(video_link)
         options['format'] = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'
-        options['outtmpl'] = f'{download_dir}/%(title)s-%(id)s [MP4].%(ext)s'
+        options['outtmpl'] = f'{download_dir}/%(title)s-%(id)s-[MP4].%(ext)s'
         run_youtube_dl([video_link], options)
-        return send_json_response(session['progress_file_path'], video_id, ' [MP4].')
+        return send_json_response(session['progress_file_path'], video_id, '-[MP4]')
 
     # Audio [best]
     elif request.form['button_clicked'] == 'Audio [best]':
 
+        log_this('Chose Audio [best]')
+        log.info(video_link)
         options['format'] = 'bestaudio'
-        options['outtmpl'] = f'{download_dir}/%(title)s-%(id)s [audio].%(ext)s'
+        options['outtmpl'] = f'{download_dir}/%(title)s-%(id)s-[audio].%(ext)s'
         options['postprocessors'] = [{
             'key': 'FFmpegExtractAudio'
         }]
         run_youtube_dl([video_link], options)
-        return send_json_response(session['progress_file_path'], video_id, ' [audio].')
+        return send_json_response(session['progress_file_path'], video_id, '-[audio]')
      
     # MP3
     elif request.form['button_clicked'] == 'MP3':
 
+        log_this('Chose MP3')
+        log.info(video_link)
         options['format'] = 'bestaudio'
         options['audioformat'] = 'mp3'
-        options['outtmpl'] = f'{download_dir}/%(title)s-%(id)s [MP3].%(ext)s'
-        options['postprocessors'] = [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '0' # -q:a 0
-        }]
+        options['outtmpl'] = f'{download_dir}/%(title)s-%(id)s-[MP3].%(ext)s'
+        options['writethumbnail'] = True
+        options['postprocessors'] = [
+            {
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '0' # -q:a 0
+            },
+            {
+                'key': 'EmbedThumbnail'
+            }
+        ]
         run_youtube_dl([video_link], options)
-        return send_json_response(session['progress_file_path'], video_id, ' [MP3].')
+        return send_json_response(session['progress_file_path'], video_id, '-[MP3]')
 
 
 # This is where the youtube-dl progress file is.
