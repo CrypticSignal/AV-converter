@@ -33,7 +33,7 @@ Many filetypes are supported, click [here](https://freeaudioconverter.net/filety
 ## Tools used:
 [FFmpeg](https://github.com/FFmpeg/FFmpeg) is used for the audio and video converter. Configuration:
 ```
---enable-gpl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-nonfree
+--enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-nonfree
 ```
 [youtube-dl](https://github.com/ytdl-org/youtube-dl) is used for the YouTube downloader.
 
