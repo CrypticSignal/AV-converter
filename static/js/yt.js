@@ -63,7 +63,6 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
         return;
     }
-
     if (whichButton === 'Audio [best]') {
         document.getElementById('bitrate_info').style.display = 'block';
     }
@@ -81,6 +80,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
 
     if (!requestProgressPath.ok) {
         show_alert(requestProgressPath, 'danger');
+        return;
     }
     else {
         // The FormData for the 2nd POST request.
@@ -92,16 +92,18 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         showDownloadProgress(progressFilePath);
 
         // 2nd POST request to get the download link.
+        
         const secondRequest = await fetch("/yt", {
             method: 'POST',
             body: secondFormData
         });
-
-        if (secondRequest.ok) {
-
+        console.log(`secondRequest status: ${secondRequest.status}`)
+        if (secondRequest.status == 200){
+    
             shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
 
             const jsonResponse = await secondRequest.json();
+            console.log(`jsonResponse: ${jsonResponse}`)
             const downloadLink = jsonResponse.download_path
             const logFile = jsonResponse.log_file
 
@@ -119,9 +121,18 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             document.getElementById('logfile').innerHTML = `If you're a nerd, click \
             <a href="${logFile}" target="_blank">here</a> to view the youtube-dl log file.`
         }
+        
+        else if (secondRequest.status == 500) {
+            shouldLog = false;
+            error = await secondRequest.text()
+            show_alert(error, 'danger')
+            console.log(error)
+            return;
+        }
         else {
-            show_alert(secondRequest, 'danger');
-
+            shouldLog = false;
+            show_alert(`HTTP Status Code: ${secondRequest.status}`)
+            return;
         }
     }
 }
