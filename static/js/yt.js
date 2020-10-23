@@ -59,14 +59,12 @@ async function showDownloadProgress(progressFilePath) {
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(whichButton) { // whichButton is this.value in yt.html
     reset();
+
     if (linkBox.value == '') {
         show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
         return;
     }
-    if (whichButton === 'Audio [best]') {
-        document.getElementById('bitrate_info').style.display = 'block';
-    }
-
+    
     const firstFormData = new FormData();
     firstFormData.append('button_clicked', 'yes');
 
@@ -139,5 +137,4 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
 
 function reset() {
     document.getElementById('logfile').innerHTML = '';
-    document.getElementById('bitrate_info').style.display = 'none';
 }

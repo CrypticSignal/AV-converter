@@ -3,7 +3,6 @@ from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from threading import Thread
-import shutil
 from yt import yt  # Importing the blueprint in yt.py
 from trimmer import trimmer  # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
@@ -41,13 +40,7 @@ SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
-# Make the necessary folders if they do not already exist.
-os.makedirs('uploads', exist_ok=True)
-os.makedirs('conversions', exist_ok=True)
-
 is_converting = False
-
-
 # This function runs in a separate thread.
 def empty_folders():
     while not is_converting:
@@ -56,10 +49,8 @@ def empty_folders():
             os.remove(os.path.join('uploads', file))
         for file in os.listdir('conversions'):
             os.remove(os.path.join('conversions', file))
-
-folder_emptying_thread = Thread(target=empty_folders)
-folder_emptying_thread.daemon = True
-folder_emptying_thread.start()
+        for file in os.listdir('ffmpeg-progress'):
+            os.remove(os.path.join('ffmpeg-progress', file))
 
 
 def run_converter(codec, params):
@@ -79,10 +70,18 @@ def run_converter(codec, params):
                             "wav": converter.wav
     }
     try:
-        # Run the appropriate function in converter.py
         return codec_to_converter[codec](*params)
     finally:
         is_converting = False
+
+
+@app.before_first_request
+def initialization():
+    os.makedirs('uploads', exist_ok=True)
+    os.makedirs('conversions', exist_ok=True)
+    folder_emptying_thread = Thread(target=empty_folders)
+    folder_emptying_thread.daemon = True
+    folder_emptying_thread.start()
 
 
 # When a file has been uploaded, a POST request is sent to the homepage.
@@ -113,7 +112,6 @@ def homepage():
 
         # Make the filename safe.
         filename_secure = secure_filename(uploaded_file.filename)
-        log.info(f'New Filename: {filename_secure}')
         # Save the uploaded file to the uploads folder.
         uploaded_file.save(os.path.join("uploads", filename_secure))
 
@@ -124,13 +122,12 @@ def homepage():
 
     elif request.form["request_type"] == "convert":
 
-        wav_bit_depth = request.form["wav_bit_depth"]
         filename = request.form["filename"]
-        log.info(f'Filename: {filename}')
         if 'http' in filename and '://' in filename:
             uploaded_file_path = filename
         else:
             uploaded_file_path = os.path.join("uploads", secure_filename(filename))
+
         chosen_codec = request.form["chosen_codec"]
         crf_value = request.form["crf_value"]
         video_mode = request.form["video_mode"]
@@ -159,6 +156,8 @@ def homepage():
         # Opus
         opus_cbr_bitrate = request.form["opus_cbr_bitrate"]
         opus_encoding_type = request.form["opus_encoding_type"]
+        # WAV
+        wav_bit_depth = request.form["wav_bit_depth"]
         # Desired filename
         output_name = request.form["output_name"]
 
