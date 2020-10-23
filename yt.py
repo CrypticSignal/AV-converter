@@ -204,6 +204,7 @@ def yt_downloader():
         options = {
             'format': 'bestaudio/best',
             'outtmpl': f'{download_dir}/%(title)s-[MP3].%(ext)s',
+            'writethumbnail': True,
             'postprocessors': [
                 {
                     'key': 'FFmpegExtractAudio',

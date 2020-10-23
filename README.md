@@ -9,33 +9,17 @@ On https://free-av-tools.com you can:
 - Trim an audio file (will not work if using the Safari browser).
 - Download a YouTube video or the audio only. The [webpage](https://freeaudioconverter.net/yt) is a [youtube-dl](https://github.com/ytdl-org/youtube-dl) wrapper.
 
-## Quick Links:
-**[1]** [Features (audio/video converter)](https://github.com/BassThatHertz/AudioAndVideoConverter#features-audiovideo-converter)
-
-**[2]** [Features (YouTube downloader)](https://github.com/BassThatHertz/AudioAndVideoConverter#features-youtube-downloader)
-
-**[3]** [Supported Filetypes](https://github.com/BassThatHertz/AudioAndVideoConverter#supported-filetypes)
-
-**[4]** [Tools used](https://github.com/BassThatHertz/AudioAndVideoConverter#tools-used)
-
 ## Features (audio/video converter):
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
 - Whilst the file is being converted, you can see how far into the file the encoder currently is. This information is updated every second.
 
 ## Features (YouTube downloader):
-- Download as an MP3 or MP4 file, or simply the best quality video/audio stream that is available.
-- Download the best quality audio stream without encoding it, so no lossy-to-lossy encoding is done (only applicable if you use the "Audio [best]" button.
+- Download the video. MP4 format is available.
+- Download the audio only. MP3 format is available.
 
 ## Supported Filetypes:
 Many filetypes are supported, click [here](https://freeaudioconverter.net/filetypes) for details.
-
-## Tools used:
-[FFmpeg](https://github.com/FFmpeg/FFmpeg) is used for the audio and video converter. Configuration:
-```
---enable-gpl --enable-openssl --enable-libaom --enable-libass --enable-libfdk-aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libsvtav1 --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-nonfree
-```
-[youtube-dl](https://github.com/ytdl-org/youtube-dl) is used for the YouTube downloader.
 
 ## Requirements for developers/running locally:
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
