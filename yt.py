@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request, send_from_directory, jsonify, session, make_response
+from flask import Flask, Blueprint, request, send_from_directory, jsonify, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from youtube_dl import YoutubeDL
@@ -7,7 +7,6 @@ from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 from time import time, sleep
 import os
-import subprocess
 from loggers import log, get_ip, log_this, log_downloads_per_day
 
 yt = Blueprint('yt', __name__)
