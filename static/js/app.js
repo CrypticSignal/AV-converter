@@ -11,189 +11,52 @@ const cancelButton = document.getElementById("cancel_btn");
 const alertWrapper = document.getElementById("alert_wrapper");
 const progressParagraph = document.getElementById('progress');
 convertButton.addEventListener("click", convertButtonClicked);
-cancelButton.addEventListener("click", abortUpload);
+
+function show_alert(message, type) {
+    alertWrapper.style.display = 'block';
+    alertWrapper.innerHTML =
+    `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      <span>${message}</span>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`
+}
 
 // This function runs when a file is selected.
 function updateBoxes() {
     inputLabel.innerText = input.files[0].name; // Show the name of the selected file.
-    const inputFilename = input.files[0].name; 
+    const inputFilename = input.files[0].name;
     const nameWithoutExt = inputFilename.split('.').slice(0, -1).join('.')
     const defaultOutputName = nameWithoutExt.replace(/%/g, ''); // Remove percentage sign(s) as this causes
     // an issue when secure_filename is used in main.py
-    outputNameBox.value = defaultOutputName; 
+    outputNameBox.value = defaultOutputName;
 }
 
 async function convertButtonClicked() {
-
-    alertWrapper.innerHTML = "";
-
-    try {
-        const isConvertClicked = new FormData();
-        isConvertClicked.append('request_type', 'log_convert_clicked')
-        await fetch('/', { // First POST request.
-            method: 'POST',
-            body: isConvertClicked
-        });
-    } catch(error) {
-        show_alert(error, 'danger')
-        console.log(error)
-    }
-}
-
-// Run this function when the user clicks on the "Convert" button.
-function upload_and_send_conversion_request() {
-    
-    // Show an alert if a file hasn't been selected or the URL input box is empty.
-    if (!input.value && document.getElementById("output_name").value == '' && !urlInput.value) {
-        show_alert("It helps if you select the file that you want to convert.", "warning")
-        return;
-    }
-    // If the URL input box is not empty.
-    else if (urlInput.value) {
-        convertButton.classList.add("d-none");
-
-        const urlConvertRequest = new XMLHttpRequest();
-
-        urlConvertRequest.addEventListener("load", responseReceived);
-        urlConvertRequest.addEventListener("error", showError);
-
-        urlConvertRequest.open("POST", "/");
-
-        const data = new FormData();
-        data.append("request_type", "convert_url");
-        data.append("url", urlInput.value);
-
-        urlConvertRequest.send(data);
-
-        function responseReceived() {
-            if (urlConvertRequest.status == 200) {
-                progressFilename = urlConvertRequest.responseText;
-                console.log(progressFilename)
-                progressParagraph.style.display = 'block';
-                document.getElementById("converting_btn").style.display = 'block';
-                sendConversionRequest(urlInput.value);
-            }
-            else {
-                console.log(urlConvertRequest.status)
-                show_alert(`${urlConvertRequest.responseText}`, "danger");
-                console.log(urlConvertRequest.responseText);
-            }
-        }
-    }
-
-    // If a file has been selected.
-    else if (input.value) { 
-
-        const chosenFile = input.files[0];
-        const filename = chosenFile.name;
-        const filenameParts = filename.split('.');
-        const fileExt = filenameParts[filenameParts.length - 1];
-        const filesizeMB = ((chosenFile.size / 1000000).toFixed(2)).toString();
-        const filesize = chosenFile.size;
-
-        allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv",
-        "avi", "ac3", "3gp", "MTS", "webm", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd", "aif", "aiff", "vob"]
-
-        // Show an alert if an incompatible filetype has been selected.
-        if (!allowedFiletypes.includes(fileExt)) {
-            show_alert('Incompatible filetype selected. Click <a href="/filetypes" \
-            target="_blank">here</a> to see the list of compatible filetypes.', "danger");
-                reset();
-                return;
-        }
-        // Show an alert if the filesize exceeds the maximum size allowed.
-        else if (filesize > 3000000000) {
-            show_alert("Max file size: 3 GB", "danger")
-            reset();
-            return;    
-        }
-        // Show an alert if a disallowed character has been entered in the output name box.
-        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') ||
-        outputNameBox.value.includes('\\')|| outputNameBox.value.includes('?') || outputNameBox.value.includes('*') ||
-        outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') ||
-        outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') ||
-        outputNameBox.value.includes('command') || outputNameBox.value.includes('$') ||
-        outputNameBox.value.includes('.')) {
-            show_alert('Characters not allowed: ., ", /, ?, *, >, <, |, :, $ or the word "command"', "danger");
-            return;
-        }
-        // Show an alert if output name box is empty.
-        else if (document.getElementById("output_name").value == '') {
-            show_alert("You must enter your desired filename.", "danger")
-            return;
-        }
-
-        alertWrapper.innerHTML = "";
-        input.disabled = true;
-        outputNameBox.disabled = true;
-
-        let uploadRequest = new XMLHttpRequest();
-    
-        uploadRequest.upload.addEventListener("progress", showProgress);
-        uploadRequest.addEventListener("load", responseReceived);
-        uploadRequest.addEventListener("error", showError);
-
-        uploadRequest.open("POST", "/")
-
-        const data = new FormData();
-        data.append("request_type", "uploaded");
-        data.append("chosen_file", chosenFile);
-        data.append("filesize", filesizeMB);
-
-        uploadRequest.send(data);
-
-        // When the upload is commplete:
-        function responseReceived() {
-            uploadingButton.classList.add('d-none');
-            cancelButton.classList.add('d-none');
-            progressWrapper.classList.add("d-none");
-            progress_bar.setAttribute("style", "width: 0%");
-
-            if (uploadRequest.status == 200) {
-                progressFilename = uploadRequest.responseText;
-                progressParagraph.style.display = 'block';
-                document.getElementById("converting_btn").style.display = 'block';
-                sendConversionRequest(chosenFile.name);
-            }
-            else {
-                show_alert(`${uploadRequest.responseText}`, "danger");
-                console.log(uploadRequest.responseText)
-            }
-        }
-    }
-    else {
-        show_alert("No file selected.", "danger")
-        return;
-    }
-} // Closing bracket for upload_and_convert function.
-
-// Abort the upload request if the cancel button is clicked.
-function abortUpload() {
-    uploadRequest.abort();
-    show_alert(`Upload cancelled`, "info");
-    reset();
-}
-function showError() {
-    show_alert(`${uploadRequest.responseText}`, "danger");
-    console.log(`uploadRequest error: ${uploadRequest.responseText}`)
-    reset();
+    alertWrapper.style.display = 'none';
+    const isConvertClicked = new FormData();
+    isConvertClicked.append('is_convert_clicked', 'yes')
+    await fetch('/', { // First POST request.
+        method: 'POST',
+        body: isConvertClicked
+    });
 }
 
 let previousTime = Date.now() / 1000;
 let previousLoaded = 0;
+let previousPercentageComplete = 0;
+const uploadProgressRequest = new XMLHttpRequest();
 
+// A function that shows the upload progress.
 function showProgress(event) {
-    convertButton.classList.add("d-none");
-    uploadingButton.classList.remove("d-none");
-    cancelButton.classList.remove("d-none");
-    progressWrapper.classList.remove("d-none");
-    progressWrapper.style.display = 'block';
-    const loaded = event.loaded / 10**6;
-    const total = event.total / 10**6;
-    const percentageComplete = (loaded / total) * 100;
+    const loaded = event.loaded / 10 ** 6;
+    const total = event.total / 10 ** 6;
+    const percentageComplete = Math.floor((loaded / total) * 100);
+
     $('#progress_bar').html(`${Math.floor(percentageComplete)}%`);
     // Add a style attribute to the progress div, i.e. style="width: x%"
-    progress_bar.setAttribute("style", `width: ${Math.floor(percentageComplete)}%`);
+    progress_bar.setAttribute("style", `width: ${percentageComplete}%`);
 
     // MB loaded in this interval is (loaded - previousLoaded) and
     // ((Date.now() / 1000) - previousTime) will give us the time since the last time interval.
@@ -203,41 +66,39 @@ function showProgress(event) {
     const hours = (Math.floor(completionTimeSeconds / 3600) % 60).toString().padStart(2, '0');
     const minutes = (Math.floor(completionTimeSeconds / 60) % 60).toString().padStart(2, '0');
     const seconds = (Math.ceil(completionTimeSeconds % 60)).toString().padStart(2, '0');
-    const completionTime = `${hours}:${minutes}:${seconds} [HH:MM:SS]`
-    
+    const completionTime = `${hours}:${minutes}:${seconds}`
+
     progressStatus.innerText = `${loaded.toFixed(1)} MB of ${total.toFixed(1)} MB uploaded
     Upload Speed: ${(speed * 8).toFixed(1)} Mbps (${(speed).toFixed(1)} MB/s)
-    Upload will complete in ${completionTime}`;
+    Upload will complete in ${completionTime} [HH:MM:SS]`;
+
+    if (percentageComplete > previousPercentageComplete) {
+        const uploadProgress = new FormData();
+        uploadProgress.append('upload_progress', percentageComplete);
+        uploadProgressRequest.open("POST", "/");
+        uploadProgressRequest.send(uploadProgress);
+    }
 
     previousLoaded = loaded;
     previousTime = Date.now() / 1000;
+    previousPercentageComplete = percentageComplete;
 }
 
-// A function that creates a synchronous sleep.
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function showConversionProgress() {
-    while (shouldLog) {
-        const response = await fetch(`ffmpeg-progress/${progressFilename}`);
-        console.log(response.status)
-        if (response.status == 200) {
-            const textInFile = await response.text();
-            if (textInFile == '') {
-                console.log('Progress file is currently empty.')
-            }
-            else {
-                const lines = textInFile.split('\n');
-                const fifthLastLine = lines[lines.length - 6].split('=');
-                const justProgressTime = fifthLastLine.slice(-1)[0];
-                const withoutMicroseconds = justProgressTime.slice(0, -7);
-                const milliseconds = justProgressTime.substring(9, 12);
-                show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
-                (and ${milliseconds} milliseconds)`, 'primary');
-                await sleep(1000);
-            }
-        }
+// When the upload is commplete:
+function getProgressFilename(request, data) {
+    uploadingButton.classList.add('d-none');
+    cancelButton.classList.add('d-none');
+    progressWrapper.classList.add("d-none");
+    progress_bar.setAttribute("style", "width: 0%");
+    if (request.status == 200) {
+        progressFilename = request.responseText;
+        document.getElementById("converting_btn").style.display = 'block';
+        progressParagraph.style.display = 'block';
+        sendConversionRequest(data);
+    }
+    else {
+        console.log(`Request Status: ${request.status}`)
+        show_alert(`${request.responseText}`, "danger");
     }
 }
 
@@ -247,7 +108,7 @@ async function sendConversionRequest(filename) { // Runs when upload is complete
     const opusVorbisSlider = document.getElementById("opus_vorbis_slider").value;
     const outputName = document.getElementById("output_name").value;
     const mp3EncodingType = document.getElementById('mp3_encoding_type').value;
-    const mp3Bitrate = document.getElementById('mp3_bitrate').value; 
+    const mp3Bitrate = document.getElementById('mp3_bitrate').value;
     const vbrSettingMP3 = document.getElementById('mp3_vbr_setting').value;
     const ac3Bitrate = document.getElementById('ac3_bitrate').value;
     const vorbisQuality = document.getElementById('vorbis_quality').value
@@ -298,42 +159,161 @@ async function sendConversionRequest(filename) { // Runs when upload is complete
     const conversionResponse = await fetch("/", {
         method: 'POST',
         body: data,
-    })
-  
-    const jsonResponse = await conversionResponse.json();
+    });
+
+    shouldLog = false;
+    reset();
 
     if (!conversionResponse.ok) {
-        shouldLog = false;
-        reset();
         show_alert(response, 'danger')
         console.log(conversionResponse)
-    } 
+    }
     else {
-        shouldLog = false;
-        reset();
-
-        const downloadLink = jsonResponse.download_path;
-        const logFile = jsonResponse.log_file;
+        const jsonResponse = await conversionResponse.json();
+        downloadLink = jsonResponse.download_path;
+        logFile = jsonResponse.log_file;
 
         const createLink = document.createElement("a"); // Create a virtual link.
         createLink.href = jsonResponse.download_path;
         createLink.click();
 
         show_alert(`File converted. Click <a href="${downloadLink}">here</a> \
-        if the download does not begin automatically. If you'd like to view the log file, click \
+        if the download does not begin automatically. If you'd like to view the FFmpeg output, click \
         <a href="${logFile}" target="_blank">here</a>.`, "success");
     }
-} // Closing bracket for sendConversionRequest function.
+}
 
-function show_alert(message, type) {
-    alertWrapper.style.display = 'block';
-    alertWrapper.innerHTML =
-    `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-      <span>${message}</span>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>`
+// A function that creates a synchronous sleep.
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// This function runs while the file is being converted.
+async function showConversionProgress() {
+    while (shouldLog) {
+        const conversionProgressResponse = await fetch(`ffmpeg-progress/${progressFilename}`);
+        const textInFile = await conversionProgressResponse.text();
+        if (conversionProgressResponse.ok && textInFile) {
+            const lines = textInFile.split('\n');
+            const fifthLastLine = lines[lines.length - 6].split('=');
+            const justProgressTime = fifthLastLine.slice(-1)[0];
+            const withoutMicroseconds = justProgressTime.slice(0, -7);
+            const milliseconds = justProgressTime.substring(9, 12);
+            show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
+            (and ${milliseconds} milliseconds)`, 'primary');
+            console.log(`${withoutMicroseconds} [HH:MM:SS]`)
+            await sleep(1000);
+        }
+    }
+    show_alert(`File converted. Click <a href="${downloadLink}">here</a> \
+        if the download does not begin automatically. If you'd like to view the FFmpeg output, click \
+        <a href="${logFile}" target="_blank">here</a>.`, "success");
+}
+
+// This function runs when the user clicks on the convert button.
+function upload_and_send_conversion_request() {
+    // Show an alert if a file hasn't been selected or the URL input box is empty.
+    if (!input.value && !document.getElementById("output_name").value && !urlInput.value) {
+        show_alert("It helps if you select the file that you want to convert.", "warning")
+        return;
+    }
+    // If the URL input box is not empty.
+    else if (urlInput.value) {
+        convertButton.classList.add("d-none");
+
+        const urlConvertRequest = new XMLHttpRequest();
+        urlConvertRequest.addEventListener("load", () => getProgressFilename(urlConvertRequest, urlInput.value));
+        urlConvertRequest.addEventListener("error", showError);
+
+        const data = new FormData();
+        data.append("request_type", "convert_url");
+        data.append("url", urlInput.value);
+
+        urlConvertRequest.open("POST", "/");
+        urlConvertRequest.send(data);
+    }
+
+    // If a file has been selected.
+    else if (input.value) {
+        const chosenFile = input.files[0];
+        const filename = chosenFile.name;
+        const filenameParts = filename.split('.');
+        const fileExt = filenameParts[filenameParts.length - 1];
+        const filesizeMB = ((chosenFile.size / 1000000).toFixed(2)).toString();
+        const filesize = chosenFile.size;
+
+        const progressFilenameRequest = new XMLHttpRequest();
+        progressFilenameRequest.upload.addEventListener("progress", showProgress);
+        progressFilenameRequest.addEventListener("load", () => getProgressFilename(progressFilenameRequest, filename));
+        progressFilenameRequest.addEventListener("error", () => showError(progressFilenameRequest));
+        cancelButton.addEventListener("click", () => abortUpload(progressFilenameRequest));
+
+        allowedFiletypes = ["mp3", "aac", "wav", "ogg", "opus", "m4a", "flac", "mka", "wma", "mkv", "mp4", "flv", "wmv",
+            "avi", "ac3", "3gp", "MTS", "webm", "adpcm", "dts", "spx", "caf", "mov", "thd", "dtshd", "aif", "aiff", "vob"]
+
+        // Show an alert if an incompatible filetype has been selected.
+        if (!allowedFiletypes.includes(fileExt)) {
+            show_alert('Incompatible filetype selected. Click <a href="/filetypes" \
+            target="_blank">here</a> to see the list of compatible filetypes.', "danger");
+            reset();
+            return;
+        }
+        // Show an alert if the filesize exceeds the maximum size allowed.
+        else if (filesize > 3 * 10**9) {
+            show_alert("Max file size: 3 GB", "danger")
+            reset();
+            return;
+        }
+        // Show an alert if a disallowed character has been entered in the output name box.
+        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') ||
+            outputNameBox.value.includes('\\') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') ||
+            outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') ||
+            outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') ||
+            outputNameBox.value.includes('command') || outputNameBox.value.includes('$') ||
+            outputNameBox.value.includes('.')) {
+            show_alert('Characters not allowed: ., ", /, ?, *, >, <, |, :, $ or the word "command"', "danger");
+            return;
+        }
+        // Show an alert if output name box is empty.
+        else if (document.getElementById("output_name").value == '') {
+            show_alert("You must enter your desired filename.", "danger")
+            return;
+        }
+
+        alertWrapper.style.display = 'none';
+        input.disabled = true;
+        outputNameBox.disabled = true;
+        convertButton.classList.add("d-none");
+        uploadingButton.classList.remove("d-none");
+        cancelButton.classList.remove("d-none");
+        progressWrapper.classList.remove("d-none");
+        progressWrapper.style.display = 'block';
+
+        const data = new FormData();
+        data.append("request_type", "uploaded");
+        data.append("chosen_file", chosenFile);
+        data.append("filesize", filesizeMB);
+    
+        progressFilenameRequest.open("POST", "/")
+        progressFilenameRequest.send(data);
+    }
+    else {
+        show_alert("No file selected.", "danger")
+        return;
+    }
+}
+
+// Abort the upload request if the cancel button is clicked.
+function abortUpload(progressFilenameRequest) {
+    progressFilenameRequest.abort();
+    show_alert(`Upload cancelled`, "info");
+    reset();
+}
+
+function showError(progressFilenameRequest) {
+    show_alert(`${progressFilenameRequest.responseText}`, "danger");
+    console.log(`progressFilenameRequest error: ${progressFilenameRequest.responseText}`)
+    reset();
 }
 
 // A function that resets the page.

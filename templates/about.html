@@ -1,28 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h1>About</h1>
+<h1>FAQ</h1>
 
-<p>This is a non-profit website that I work on in my free time. The code is public so anyone can view it. <a href="https://github.com/BassThatHertz/AudioAndVideoConverter" target="_blank">Here's</a> the link to the GitHub repository. Contributors are welcome.</p>
-<p>You can:</p>
-<p>Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (in the .mka container), FLAC, ALAC, DTS, AC3 (Dolby Digital) or CAF.</p>
-<p>Convert a video to an audio-only file (to any of the above formats).</p>
-<p>Convert a video to the MP4 or MKV format.</p>
-<p>Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
-<p>Trim a video or audio file (will not work if using the Safari browser).</p><hr>
+<strong>What can I do on this website?:</strong>
 
-<h2>Codecs / Encoder Information</h2><hr>
+<ul>
+    <li>Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis (in the .mka container), FLAC, ALAC, DTS, AC3 (Dolby Digital) or CAF.</li>
+    <li>Convert a video to an audio-only file (to any of the above formats).</li>
+    <li>Convert a video to the MP4 or MKV format.</li>
+    <li>Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
+    <li>Trim an audio file (will not work if using the Safari browser).</li>
+<ul>
 
-<h3>MP3</h3>
-<p>This website uses the latest version of the <a target="_blank" href="http://lame.sourceforge.net/">LAME encoder</a> (v3.100) to convert a video/audio file to MP3. The LAME encoder is considered to be the highest quality encoder for MP3.<hr>
-
-<h3>AAC</h3>
-<P>AAC is the codec of iTunes music and is the most common audio codec in MP4 videos. The extension of a raw AAC file is ".aac", and an AAC file wrapped in the MPEG-4 container has the extension ".m4a" (e.g. music downloaded from iTunes).</p><hr>
-
-<h3>Vorbis</h3>
-<p><a target="_blank" href="https://github.com/xiph/vorbis">Vorbis</a> is a lossy codec that performs well, and compares favourably to MP3 at low bitrates (<a target="_blank" href="https://en.wikipedia.org/wiki/File:Opus_quality_comparison_colorblind_compatible.svg">source)</a>. This website saves files converted to Vorbis in the Matroska container [file extension: .mka].</p><hr>
-
-<h3>Opus</h3>
-<p><a target="_blank" href="http://opus-codec.org/">Opus</a> is the talk of the town in world of lossy audio codecs. It compares favourably to all of the major lossy codecs at low bitrates (<a target="_blank" href="http://opus-codec.org/comparison/">source)</a>. This website uses the latest version of Opus; libopus 1.3.1</a></p>
-    
 {% endblock content %}

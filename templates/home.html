@@ -4,7 +4,7 @@
 <h1>Audio / Video Converter</h1>
 
 <div class="tagline">
-  <P>Easy to use. Open source. Ad-free.</P>
+  <P>An easy to use, ad-free website to meet some of your audio/video needs :)</P>
 </div>
 
 <h5>Select a file, or drag and drop a file onto this webpage.</h5>
@@ -31,7 +31,7 @@
     <p>To see the list of supported input filetypes, click <a href=filetypes target="_blank">here</a>.</p>
     <p>Alternatively, you can use a URL as input:</p>
     <input type="url" name="url" id="url" placeholder="https://example.com/video/video.mp4"><br>
-    <i>YouTube links aren't supported. Use the <a href="/yt">YT downloader</a> instead.</i>
+    <i>The link must be supported by <a href="https://ffmpeg.org/" target="_blank">FFmpeg</a>. YouTube links aren't supported.</i>
 
     <hr><h5>Desired Format</h5>
 
@@ -328,14 +328,14 @@
       <i>You chose a format that does not require you to specify any encoder settings.</i>
     </div>
 
-    <!--OUTPUT FILENAME (Bootstrap class)-->
+    <!--Output Filename (Bootstrap class)-->
     <hr><h5>Output Filename</h5>
     <input type="text" class="form-control" maxlength="200" id="output_name" required/><br>
 
-    <!-- ALERTS -->
+    <!-- Bootstrap Alert -->
     <div id="alert_wrapper" style="display:none"></div>
 
-    <!--CONVERT BUTTON (Bootstrap class)-->
+    <!--Convert Button (Bootstrap class)-->
     <button onclick="upload_and_send_conversion_request()" id="convert_btn" class="btn btn-primary">Convert</button>
 
     <button class="btn btn-primary d-none" id="uploading_btn" type="button" disabled>
@@ -353,7 +353,7 @@
         Converting...</button>
     </div>
 
-    <!--Upload-progress bar-->
+    <!--Upload progress bar-->
     <div id="progress_wrapper" style="display:none">
       <br>
       <div class="progress mb-3"> <!--Bootstrap class-->
@@ -373,7 +373,6 @@
 <script src="{{ url_for('static', filename='js/elements.js') }}"></script>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 <!--jQuery-->
-<script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!--Bootstrap JS-->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>

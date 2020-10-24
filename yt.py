@@ -71,12 +71,6 @@ def run_youtube_dl(video_link, options):
 
         
 def send_json_response(download_type):
-    # Remove umwanted filetypes to eliminate the chance of the wrong file being retrieved.
-    unwanted_extensions = ['.webp', '.jpg', '.ytdl', '.part']
-    for file in os.listdir(download_dir):
-        if os.path.splitext(file)[1] in unwanted_extensions:
-            os.remove(os.path.join(download_dir, file))
- 
     global filename
     filename = [file for file in os.listdir(download_dir) if os.path.splitext(file)[0] == filename][0]
     filesize = round((os.path.getsize(os.path.join(download_dir, filename)) / 1_000_000), 2)

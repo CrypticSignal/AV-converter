@@ -1,21 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h1>YouTube downloader</h1>
-
+<h1>YT downloader</h1>
+<!-- 
 <div class="tagline">
-    <P>Easy to use. Open source. Ad-free.</P>
-</div>
+    <P>An easy to use</P>
+</div> -->
 
 <div class="container">
-    <i>This downloader can download a video from many websites, not just YT. Click <a href="https://ytdl-org.github.io/youtube-dl/supportedsites.html" target="_blank">here</a> to see the list of supported websites.</i>
-    <br><br>
-    <p>[YT] <strong>Video (best quality)</strong> - usually gives you an MKV (.mkv) or WebM (.webm) file with Opus audio.</p>
-    <p>[YT] <strong>Audio (best quality)</strong> - usually gives you an Opus file (.opus).</p>
+    <p><strong>Video (best quality)</strong> - usually gives you an MKV (.mkv) or WebM (.webm) file with Opus audio.</p>
+    <p><strong>Audio (best quality)</strong> - usually gives you an Opus file (.opus).</p>
     <p>If using an <strong>iOS device</strong>, select <strong>Video (MP4)</strong> or <strong>Audio (MP3)</strong> as iOS does not support all media formats natively.</p>
     <hr>
 
-    <h5><b>YouTube video link:</b></h5>
+    <h5><b>Link:</b></h5>
     <input type="text" onclick="paste()" class="form-control" maxlength="200" name="link" id="link" required/>
     
     <div id="alert_wrapper" style="display:none"></div>

@@ -88,28 +88,25 @@ def initialization():
 @app.route("/", methods=["POST"])
 def homepage():
 
-    # First POST request.
-    if request.form['request_type'] == 'log_convert_clicked':
-        log_this('clicked on the convert button.')
-        return ''
-    
+    if 'is_convert_clicked' in request.form:
+        log_this('Clicked on the convert button.')
+        return 'is_convert_clicked received.'
+
+    elif 'upload_progress' in request.form:
+        log.info(f"{request.form['upload_progress']}% uploaded...")
+        return request.form['upload_progress']
+
     elif request.form["request_type"] == "convert_url":
-        url = request.form["url"]
-        conversion_progress_filename = f'{str(time())[:-8]}.txt'
-        session['progress_filename'] = conversion_progress_filename
+        session['progress_filename'] = f'{str(time())[:-8]}.txt'
         return session['progress_filename']
 
-    # Second POST request.
     elif request.form["request_type"] == "uploaded":
-
         upload_time = datetime.now().strftime('%H:%M:%S')
         log.info(f'Upload complete at {upload_time}')
-        
         uploaded_file = request.files["chosen_file"]
         filesize = request.form["filesize"]
         log.info(uploaded_file)
         log.info(f'Size: {filesize} MB')
-
         # Make the filename safe.
         filename_secure = secure_filename(uploaded_file.filename)
         # Save the uploaded file to the uploads folder.
@@ -118,6 +115,7 @@ def homepage():
         conversion_progress_filename = f'{str(time())[:-8]}.txt'
         session['progress_filename'] = conversion_progress_filename
 
+        time_now = datetime.now().strftime('%H:%M:%S')
         return session['progress_filename']
 
     elif request.form["request_type"] == "convert":
