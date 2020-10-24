@@ -25,7 +25,7 @@ Many filetypes are supported, click [here](https://freeaudioconverter.net/filety
 You can run the Flask app locally for development purposes or if you want audio/video conversion to be quicker as the file(s) will not need to be uploaded to my server.
 - Python **3.6+**
 - [FFmpeg](https://ffmpeg.org/download.html)
-- `pip3 install youtube-dl`
+- `pip3 install -r requirements.txt`
 
 ## How to self-host:
 - Clone this repository.
