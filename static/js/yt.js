@@ -25,16 +25,12 @@ function sleep(milliseconds) {
 
 async function showDownloadProgress(progressFilePath) {
     while (shouldLog) {
-        try {
-            const response = await fetch(progressFilePath);
+        const response = await fetch(progressFilePath);
+        if (response.ok) {
             const textInFile = await response.text()
             lines = textInFile.split('\r')
             lastLine = lines[lines.length - 1];
-            console.log(lastLine);
-            if (lastLine.includes('Downloading webpage')) {
-                show_alert('Initialising...', 'warning');
-            }
-            else if (lastLine.includes('[MP3].mp3')) {
+            if (lastLine.includes('[MP3].mp3')) {
                 show_alert('Converting to MP3...', 'info')
             }
             else if (lastLine.includes('[ffmpeg] Merging')) {
@@ -48,10 +44,9 @@ async function showDownloadProgress(progressFilePath) {
             }
             await sleep(500); // Using the sleep function created above.
         }
-        catch(error) {
-            shouldLog = false;
-            show_alert(error);
-            console.log(error);
+        else {
+            show_alert(`HTTP status code: ${response.status}`)
+            console.log(response);
         }
     }
 }
@@ -64,24 +59,21 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
         return;
     }
-    
+    show_alert('Initialising...', 'warning');
     const firstFormData = new FormData();
     firstFormData.append('button_clicked', 'yes');
-
     // 1st POST request to get the path of the progress file.
     const requestProgressPath = await fetch('/yt', {
         method: 'POST',
         body: firstFormData
     });
-
-    const progressFilePath = await requestProgressPath.text();
-
     if (!requestProgressPath.ok) {
         show_alert(requestProgressPath, 'danger');
         return;
     }
     else {
-        // The FormData for the 2nd POST request.
+        const progressFilePath = await requestProgressPath.text();
+        console.log(`https://free-av-tools.com/${progressFilePath}`)
         const secondFormData = new FormData();
         secondFormData.append("link", linkBox.value);
         secondFormData.append("button_clicked", whichButton);
@@ -90,21 +82,16 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         showDownloadProgress(progressFilePath);
 
         // 2nd POST request to get the download link.
-        
         const secondRequest = await fetch("/yt", {
             method: 'POST',
             body: secondFormData
         });
-        console.log(`secondRequest status: ${secondRequest.status}`)
+        shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
         if (secondRequest.status == 200){
-    
-            shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
-
             const jsonResponse = await secondRequest.json();
-            console.log(`jsonResponse: ${jsonResponse}`)
+            console.log(jsonResponse)
             const downloadLink = jsonResponse.download_path
             const logFile = jsonResponse.log_file
-
             const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
             virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
             virtualDownloadLink.click();
@@ -121,7 +108,6 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         }
         
         else if (secondRequest.status == 500) {
-            shouldLog = false;
             error = await secondRequest.text()
             show_alert(error, 'danger')
             console.log(error)
@@ -129,7 +115,8 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         }
         else {
             shouldLog = false;
-            show_alert(`HTTP Status Code: ${secondRequest.status}`)
+            show_alert(`${secondRequest.status} status code`)
+            console.log(secondRequest)
             return;
         }
     }

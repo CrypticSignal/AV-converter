@@ -10,7 +10,10 @@ const uploadingButton = document.getElementById("uploading_btn");
 const cancelButton = document.getElementById("cancel_btn");
 const alertWrapper = document.getElementById("alert_wrapper");
 const progressParagraph = document.getElementById('progress');
-convertButton.addEventListener("click", convertButtonClicked);
+convertButton.addEventListener('click', () => {    
+    convertButtonClicked();
+    upload_and_send_conversion_request();    
+});
 
 function show_alert(message, type) {
     alertWrapper.style.display = 'block';
@@ -34,19 +37,15 @@ function updateBoxes() {
 }
 
 async function convertButtonClicked() {
-    alertWrapper.style.display = 'none';
-    const isConvertClicked = new FormData();
-    isConvertClicked.append('is_convert_clicked', 'yes')
-    await fetch('/', { // First POST request.
+    fetch('/', {
         method: 'POST',
-        body: isConvertClicked
+        body: 'The user clicked on the convert button.'
     });
 }
 
 let previousTime = Date.now() / 1000;
 let previousLoaded = 0;
 let previousPercentageComplete = 0;
-const uploadProgressRequest = new XMLHttpRequest();
 
 // A function that shows the upload progress.
 function showProgress(event) {
@@ -73,6 +72,7 @@ function showProgress(event) {
     Upload will complete in ${completionTime} [HH:MM:SS]`;
 
     if (percentageComplete > previousPercentageComplete) {
+        const uploadProgressRequest = new XMLHttpRequest();
         const uploadProgress = new FormData();
         uploadProgress.append('upload_progress', percentageComplete);
         uploadProgressRequest.open("POST", "/");
@@ -84,12 +84,10 @@ function showProgress(event) {
     previousPercentageComplete = percentageComplete;
 }
 
-// When the upload is commplete:
 function getProgressFilename(request, data) {
     uploadingButton.classList.add('d-none');
     cancelButton.classList.add('d-none');
     progressWrapper.classList.add("d-none");
-    progress_bar.setAttribute("style", "width: 0%");
     if (request.status == 200) {
         progressFilename = request.responseText;
         document.getElementById("converting_btn").style.display = 'block';
@@ -97,12 +95,11 @@ function getProgressFilename(request, data) {
         sendConversionRequest(data);
     }
     else {
-        console.log(`Request Status: ${request.status}`)
-        show_alert(`${request.responseText}`, "danger");
+        show_alert(request.responseText, "danger");
     }
 }
 
-async function sendConversionRequest(filename) { // Runs when upload is complete.
+async function sendConversionRequest(filename) { 
     const chosenCodec = document.getElementById('codecs').value;
     const videoMode = document.getElementById('video_mode').value;
     const opusVorbisSlider = document.getElementById("opus_vorbis_slider").value;
@@ -227,7 +224,6 @@ function upload_and_send_conversion_request() {
 
         const data = new FormData();
         data.append("request_type", "convert_url");
-        data.append("url", urlInput.value);
 
         urlConvertRequest.open("POST", "/");
         urlConvertRequest.send(data);

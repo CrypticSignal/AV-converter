@@ -26,7 +26,8 @@ def delete_downloads():
         # Give users 10 minutes to manually start the download (if necessary) before emptying the downloads folder.
         sleep(600)
         for file in os.listdir('downloads'):
-            os.remove(os.path.join('downloads', file))
+            if os.path.splitext(file) != '.part':
+                os.remove(os.path.join('downloads', file))
         for file in os.listdir('yt-progress'):
             os.remove(os.path.join('yt-progress', file))
 
@@ -54,6 +55,7 @@ def run_youtube_dl(video_link, options):
         with YoutubeDL(options) as ydl:
             info = ydl.extract_info(video_link, download=False)
             global filename
+            log.info(filename)
             # Remove the file extension and the 'downloads/' at the start.
             filename = os.path.splitext(ydl.prepare_filename(info))[0][10:]
             ydl.download([video_link])
@@ -73,6 +75,7 @@ def run_youtube_dl(video_link, options):
 def send_json_response(download_type):
     global filename
     filename = [file for file in os.listdir(download_dir) if os.path.splitext(file)[0] == filename][0]
+    log.info(filename)
     filesize = round((os.path.getsize(os.path.join(download_dir, filename)) / 1_000_000), 2)
     # Query the database by IP.
     user = User.query.filter_by(ip=get_ip()).first()
@@ -84,7 +87,6 @@ def send_json_response(download_type):
     new_filename = filename.replace('#', '').replace(download_type, '.').replace('%', '').replace('_', ' ')
     os.replace(os.path.join(download_dir, filename), os.path.join(download_dir, new_filename))
 
-    log.info(filename)      
     log.info(new_filename)
     log.info(f'{filesize} MB')
 
@@ -235,9 +237,9 @@ def send_file(filename):
 
 @yt.app_errorhandler(500)
 def error_handler(error):
-    return f"[youtube-dl error] {session['youtube_dl_error']}", 500
+    return session['youtube_dl_error'], 500
 
 @yt.app_errorhandler(404)
 def error_handler_2(error):
-    return f"[youtube-dl error] {session['youtube_dl_error']}"
+    return session['youtube_dl_error']
     

@@ -87,13 +87,13 @@ def initialization():
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route("/", methods=["POST"])
 def homepage():
-
-    if 'is_convert_clicked' in request.form:
+    if request.data:
         log_this('Clicked on the convert button.')
         return 'is_convert_clicked received.'
 
     elif 'upload_progress' in request.form:
-        log.info(f"{request.form['upload_progress']}% uploaded...")
+        time_now = datetime.now().strftime('[%H:%M:%S]')
+        log.info(f"{time_now} {request.form['upload_progress']}% uploaded...")
         return request.form['upload_progress']
 
     elif request.form["request_type"] == "convert_url":
@@ -372,9 +372,6 @@ def chat():
 def samples():
     return render_template("samples.html")
 
-
-    
-    
 # Users online counter for /chat
 count = 0
 
