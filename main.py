@@ -40,15 +40,20 @@ SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
+is_uploading = False
 is_converting = False
+
+
 # This function runs in a separate thread.
 def empty_folders():
-    while not is_converting:
+    while not is_converting and not is_uploading:
         sleep(600)
         for file in os.listdir('uploads'):
             os.remove(os.path.join('uploads', file))
+            log.info(f'Deleted uploads/{file}')
         for file in os.listdir('conversions'):
             os.remove(os.path.join('conversions', file))
+            log.info(f'Deleted conversions/{file}')
         for file in os.listdir('ffmpeg-progress'):
             os.remove(os.path.join('ffmpeg-progress', file))
 
@@ -92,6 +97,7 @@ def homepage():
         return 'is_convert_clicked received.'
 
     elif 'upload_progress' in request.form:
+        is_uploading = True
         time_now = datetime.now().strftime('[%H:%M:%S]')
         log.info(f"{time_now} {request.form['upload_progress']}% uploaded...")
         return request.form['upload_progress']
@@ -101,6 +107,7 @@ def homepage():
         return session['progress_filename']
 
     elif request.form["request_type"] == "uploaded":
+        is_uploading = False
         upload_time = datetime.now().strftime('%H:%M:%S')
         log.info(f'Upload complete at {upload_time}')
         uploaded_file = request.files["chosen_file"]
