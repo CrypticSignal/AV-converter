@@ -6,7 +6,7 @@ from threading import Thread
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 from time import time, sleep
-import os
+import os, json
 from loggers import log, get_ip, log_this, log_downloads_per_day
 
 yt = Blueprint('yt', __name__)
@@ -54,11 +54,30 @@ def run_youtube_dl(video_link, options):
     try:
         with YoutubeDL(options) as ydl:
             info = ydl.extract_info(video_link, download=False)
-            global filename
-            log.info(filename)
-            # Remove the file extension and the 'downloads/' at the start.
-            filename = os.path.splitext(ydl.prepare_filename(info))[0][10:]
-            ydl.download([video_link])
+
+        video_audio_streams = []
+        for m in info['formats']:
+            file_size = m['filesize']
+            if file_size is not None:
+                file_size = f'{round(int(file_size) / 1000000,2)} mb'
+
+            resolution = 'Audio'
+            if m['height'] is not None:
+                resolution = f"{m['height']}x{m['width']}"
+            video_audio_streams.append({
+                'resolution': resolution,
+                'extension': m['ext'],
+                'file_size': file_size,
+                'video_url': m['url']
+            })
+
+        video_audio_streams = json.dumps(video_audio_streams[::-1])
+        log.info(video_audio_streams)
+        global filename
+        # Remove the file extension and the 'downloads/' at the start.
+        filename = os.path.splitext(ydl.prepare_filename(info))[0][10:]
+        log.info(filename)
+        ydl.download([video_link])
     except KeyError:
         pass
     except Exception as error:
@@ -68,6 +87,7 @@ def run_youtube_dl(video_link, options):
         download_complete_time = time()
         log.info(f'Download took {round((download_complete_time - download_start_time), 1)}s')
         log_downloads_per_day()
+        return video_audio_streams
     finally:
         is_downloading = False
 
@@ -135,7 +155,6 @@ delete_downloads_thread.start()
 
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
-
     # First POST request when the user clicks on a download button.
     if request.form['button_clicked'] == 'yes':
     
@@ -151,8 +170,48 @@ def yt_downloader():
 
     video_link = request.form['link']
 
+    # If the user clicked on the "Other" button.
+    if request.form['button_clicked'] == 'other':
+
+        log.info(f'{video_link} | Other')
+  
+        options = {}
+        with YoutubeDL(options) as ydl:
+            info = ydl.extract_info(video_link, download=False)
+
+        video_audio_streams = []
+
+        for data in info['formats']:
+
+            file_size = data['filesize']
+
+            if file_size is not None:
+                file_size = f'{round(int(file_size) / 1000000, 1)} MB'
+
+            if data['height'] is None:
+                stream_type = 'Audio'
+                resolution = 'N/A'
+                codec = 'AAC' if 'mp4a' in data['acodec'] else data['acodec']
+                extension = '.weba' if data['ext'] == 'webm' else f".{data['ext']}"
+            else:
+                stream_type = 'Video'
+                resolution = f"{data['height']}x{data['width']}"
+                codec = 'AVC' if 'avc' in data['vcodec'] else data['vcodec']
+                extension = f".{data['ext']}"
+
+            video_audio_streams.append({
+                'type': stream_type,
+                'resolution': resolution,
+                'codec': codec,
+                'extension': extension,
+                'file_size': file_size,
+                'video_url': data['url']
+            })
+        video_audio_streams = json.dumps(video_audio_streams[::-1])
+        return jsonify(streams=video_audio_streams)
+
     # Video (best quality)   
-    if request.form['button_clicked'] == 'Video [best]':
+    elif request.form['button_clicked'] == 'Video [best]':
 
         log.info(f'{video_link} | Video')
         options = {
@@ -235,9 +294,11 @@ def send_file(filename):
     except Exception as error:
         log.error(f'Unable to send file. Error: \n{error}')
 
+
 @yt.app_errorhandler(500)
 def error_handler(error):
     return session['youtube_dl_error'], 500
+
 
 @yt.app_errorhandler(404)
 def error_handler_2(error):

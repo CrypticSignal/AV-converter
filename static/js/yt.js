@@ -44,16 +44,45 @@ async function showDownloadProgress(progressFilePath) {
             }
             await sleep(500); // Using the sleep function created above.
         }
-        else {
-            show_alert(`HTTP status code: ${response.status}`)
-            console.log(response);
-        }
     }
 }
 
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(whichButton) { // whichButton is this.value in yt.html
     reset();
+    // If the "Choose" button was clicked.
+    if (whichButton == 'choose') {
+        const data = new FormData();
+        data.append("link", linkBox.value);
+        data.append('button_clicked', 'other');
+        // 1st POST request to get the path of the progress file.
+        const response = await fetch('/yt', {
+            method: 'POST',
+            body: data
+        });
+        const jsonResponse = await response.json();
+        const jsonParsed = JSON.parse(jsonResponse.streams)
+        table = document.getElementById('table')
+        table.innerHTML = '';
+        const tbl = $("<table/>").attr("id", "mytable");
+        const columnNames = `<th>Type</th><th>Resolution</th><th>Codec</th><th>Filetype</th><th>Size</th><th>Right click, save link</th></tr>`
+        table.innerHTML = columnNames;
+        for (let i = 0; i < jsonParsed.length; i++) {
+            const openingTr = `<tr>`;
+            const td1 = `<td>${jsonParsed[i]['type']}</td>`;
+            const td2 = `<td>${jsonParsed[i]['resolution']}</td>`;
+            const td3 = `<td>${jsonParsed[i]['codec']}</td>`;
+            const td4 = `<td>${jsonParsed[i]['extension']}</td>`;
+            let td5 = `<td>${jsonParsed[i]['file_size']}</td>`;
+            if (jsonParsed[i]['file_size'] === null) {
+                td5 = `<td>unknown</td>`
+            }
+            const td6 = `<td><a href="${jsonParsed[i]['video_url']}">Download</a></td>`;
+            const closingTr = `</tr>`
+            table.innerHTML += openingTr + td1 + td2 + td3 + td4 + td5 + td6 + closingTr;
+        }  
+        return;
+    }
 
     if (linkBox.value == '') {
         show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
@@ -86,12 +115,15 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             method: 'POST',
             body: secondFormData
         });
+
         shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
-        if (secondRequest.status == 200){
+        
+        if (secondRequest.status == 200) {
             const jsonResponse = await secondRequest.json();
             console.log(jsonResponse)
-            const downloadLink = jsonResponse.download_path
-            const logFile = jsonResponse.log_file
+            const downloadLink = jsonResponse.download_path;
+            const logFile = jsonResponse.log_file;
+           
             const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
             virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
             virtualDownloadLink.click();
@@ -104,7 +136,8 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             <a href="${downloadLink}">here</a>.`, "success");
 
             document.getElementById('logfile').innerHTML = `If you're a nerd, click \
-            <a href="${logFile}" target="_blank">here</a> to view the youtube-dl log file.`
+            <a href="${logFile}" target="_blank">here</a> to view the youtube-dl log file.` 
+
         }
         
         else if (secondRequest.status == 500) {

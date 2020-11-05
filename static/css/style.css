@@ -1,3 +1,7 @@
+#table, th, td {
+  border:1px solid black;
+  margin: 0 auto;
+}
 /* "fa" are the social media buttons. */
 .fa {
   padding: 20px;
