@@ -51,7 +51,7 @@ async function showDownloadProgress(progressFilePath) {
 async function buttonClicked(whichButton) { // whichButton is this.value in yt.html
     reset();
     // If the "Choose" button was clicked.
-    if (whichButton == 'choose') {
+    if (whichButton == 'other') {
         const data = new FormData();
         data.append("link", linkBox.value);
         data.append('button_clicked', 'other');
