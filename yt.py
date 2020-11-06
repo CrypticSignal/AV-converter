@@ -50,36 +50,15 @@ def update_database():
 
 def run_youtube_dl(video_link, options):
     is_downloading = True
-    download_start_time = time()
     try:
         with YoutubeDL(options) as ydl:
             info = ydl.extract_info(video_link, download=False)
-
-        video_audio_streams = []
-        for m in info['formats']:
-            file_size = m['filesize']
-            if file_size is not None:
-                file_size = f'{round(int(file_size) / 1000000,2)} mb'
-
-            resolution = 'Audio'
-            if m['height'] is not None:
-                resolution = f"{m['height']}x{m['width']}"
-            video_audio_streams.append({
-                'resolution': resolution,
-                'extension': m['ext'],
-                'file_size': file_size,
-                'video_url': m['url']
-            })
-
-        video_audio_streams = json.dumps(video_audio_streams[::-1])
-        log.info(video_audio_streams)
         global filename
         # Remove the file extension and the 'downloads/' at the start.
         filename = os.path.splitext(ydl.prepare_filename(info))[0][10:]
         log.info(filename)
+        download_start_time = time()
         ydl.download([video_link])
-    except KeyError:
-        pass
     except Exception as error:
         log.error(f'Error downloading file:\n{error}')
         session['youtube_dl_error'] = str(error)
@@ -87,7 +66,6 @@ def run_youtube_dl(video_link, options):
         download_complete_time = time()
         log.info(f'Download took {round((download_complete_time - download_start_time), 1)}s')
         log_downloads_per_day()
-        return video_audio_streams
     finally:
         is_downloading = False
 
