@@ -56,7 +56,6 @@ def run_youtube_dl(video_link, options):
         global filename
         # Remove the file extension and the 'downloads/' at the start.
         filename = os.path.splitext(ydl.prepare_filename(info))[0][10:]
-        log.info(filename)
         download_start_time = time()
         ydl.download([video_link])
     except Exception as error:
@@ -72,9 +71,10 @@ def run_youtube_dl(video_link, options):
         
 def send_json_response(download_type):
     global filename
-    filename = [file for file in os.listdir(download_dir) if os.path.splitext(file)[0] == filename][0]
-    log.info(filename)
+    filename = [file for file in os.listdir(download_dir) if '.part' not in file and
+                os.path.splitext(file)[0] == filename][0]
     filesize = round((os.path.getsize(os.path.join(download_dir, filename)) / 1_000_000), 2)
+    log.info(f'{filename} | {filesize} MB')
     # Query the database by IP.
     user = User.query.filter_by(ip=get_ip()).first()
     # If the user has used the downloader before, update the database.
@@ -83,11 +83,8 @@ def send_json_response(download_type):
         db.session.commit()
     # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
     new_filename = filename.replace('#', '').replace(download_type, '.').replace('%', '').replace('_', ' ')
-    os.replace(os.path.join(download_dir, filename), os.path.join(download_dir, new_filename))
-
     log.info(new_filename)
-    log.info(f'{filesize} MB')
-
+    os.replace(os.path.join(download_dir, filename), os.path.join(download_dir, new_filename))
     # Update the list of videos downloaded.
     with open("logs/downloads.txt", "a") as f:
         f.write(f'\n{new_filename}')
@@ -135,7 +132,6 @@ delete_downloads_thread.start()
 def yt_downloader():
     # First POST request when the user clicks on a download button.
     if request.form['button_clicked'] == 'yes':
-    
         log_this('Clicked on a download button.')
         update_database()
         # I want to save the download progress to a file and read from that file to show the download progress
@@ -150,22 +146,16 @@ def yt_downloader():
 
     # If the user clicked on the "Other" button.
     if request.form['button_clicked'] == 'other':
-
         log.info(f'{video_link} | Other')
-  
+        video_audio_streams = []
+        
         options = {}
         with YoutubeDL(options) as ydl:
             info = ydl.extract_info(video_link, download=False)
-
-        video_audio_streams = []
-
+       
         for data in info['formats']:
-
-            file_size = data['filesize']
-
-            if file_size is not None:
-                file_size = f'{round(int(file_size) / 1000000, 1)} MB'
-
+            if data['filesize'] is not None:
+                filesize = f"{round(int(data['filesize']) / 1000000, 1)} MB"
             if data['height'] is None:
                 stream_type = 'Audio'
                 resolution = 'N/A'
@@ -174,7 +164,14 @@ def yt_downloader():
             else:
                 stream_type = 'Video'
                 resolution = f"{data['height']}x{data['width']}"
-                codec = 'AVC' if 'avc' in data['vcodec'] else data['vcodec']
+                if 'avc' in data['vcodec']:
+                    codec = 'AVC'
+                elif 'av01' in data['vcodec']:
+                    codec = 'AV1'
+                elif data['vcodec'] == 'vp9':
+                    codec = 'VP9'
+                else:
+                    codec = data['vcodec']
                 extension = f".{data['ext']}"
 
             video_audio_streams.append({
@@ -182,15 +179,15 @@ def yt_downloader():
                 'resolution': resolution,
                 'codec': codec,
                 'extension': extension,
-                'file_size': file_size,
+                'filesize': filesize,
                 'video_url': data['url']
             })
+
         video_audio_streams = json.dumps(video_audio_streams[::-1])
         return jsonify(streams=video_audio_streams)
 
     # Video (best quality)   
     elif request.form['button_clicked'] == 'Video [best]':
-
         log.info(f'{video_link} | Video')
         options = {
             'format': 'bestvideo+bestaudio/best',
@@ -203,7 +200,6 @@ def yt_downloader():
        
     # MP4
     elif request.form['button_clicked'] == 'Video [MP4]':
-
         log.info(f'{video_link} | MP4')
         options = {
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
@@ -216,7 +212,6 @@ def yt_downloader():
 
     # Audio (best quality)
     elif request.form['button_clicked'] == 'Audio [best]':
-
         log.info(f'{video_link} | Audio')
         options = {
             'format': 'bestaudio/best',
@@ -232,7 +227,6 @@ def yt_downloader():
      
     # MP3
     elif request.form['button_clicked'] == 'MP3':
-
         log.info(f'{video_link} | MP3')
         options = {
             'format': 'bestaudio/best',
@@ -278,7 +272,7 @@ def error_handler(error):
     return session['youtube_dl_error'], 500
 
 
-@yt.app_errorhandler(404)
-def error_handler_2(error):
-    return session['youtube_dl_error']
+# @yt.app_errorhandler(404)
+# def error_handler_2(error):
+#     return session['youtube_dl_error']
     

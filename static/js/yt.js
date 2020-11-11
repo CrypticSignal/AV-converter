@@ -65,7 +65,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         table = document.getElementById('table')
         table.innerHTML = '';
         const tbl = $("<table/>").attr("id", "mytable");
-        const columnNames = `<th>Type</th><th>Resolution</th><th>Codec</th><th>Filetype</th><th>Size</th><th>Right click, save link</th></tr>`
+        const columnNames = `<th>Type</th><th>Resolution</th><th>Codec</th><th>Filetype</th><th>Size</th><th>Right click, save link</th>`
         table.innerHTML = columnNames;
         for (let i = 0; i < jsonParsed.length; i++) {
             const openingTr = `<tr>`;
@@ -73,8 +73,8 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             const td2 = `<td>${jsonParsed[i]['resolution']}</td>`;
             const td3 = `<td>${jsonParsed[i]['codec']}</td>`;
             const td4 = `<td>${jsonParsed[i]['extension']}</td>`;
-            let td5 = `<td>${jsonParsed[i]['file_size']}</td>`;
-            if (jsonParsed[i]['file_size'] === null) {
+            let td5 = `<td>${jsonParsed[i]['filesize']}</td>`;
+            if (jsonParsed[i]['filesize'] === null) {
                 td5 = `<td>unknown</td>`
             }
             const td6 = `<td><a href="${jsonParsed[i]['video_url']}">Download</a></td>`;
