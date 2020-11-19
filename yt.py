@@ -3,7 +3,6 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from youtube_dl import YoutubeDL
 from threading import Thread
-from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 from time import time, sleep
 import os, json
@@ -22,15 +21,17 @@ db = SQLAlchemy(app)
 
 # This function runs in a separate thread.
 def delete_downloads():
-    while not is_downloading:
-        # Give users 10 minutes to manually start the download (if necessary) before emptying the downloads folder.
-        sleep(600)
-        for file in os.listdir('downloads'):
-            if os.path.splitext(file) != '.part':
-                os.remove(os.path.join('downloads', file))
-        for file in os.listdir('yt-progress'):
-            os.remove(os.path.join('yt-progress', file))
-
+    while True:
+        sleep(60)
+        if not is_downloading:
+            for file in os.listdir('downloads'):
+                if os.path.splitext(file) != '.part':
+                    time_now = datetime.now().strftime('%H:%M:%S')
+                    os.remove(os.path.join('downloads', file))
+                    log.info(f'[{time_now}] Deleted downloads/{file}')
+            for file in os.listdir('yt-progress'):
+                os.remove(os.path.join('yt-progress', file))
+    
 
 def update_database():
     # Use the get_ip function imported from loggers.py
@@ -49,6 +50,7 @@ def update_database():
 
 
 def run_youtube_dl(video_link, options):
+    global is_downloading
     is_downloading = True
     try:
         with YoutubeDL(options) as ydl:
@@ -270,9 +272,4 @@ def send_file(filename):
 @yt.app_errorhandler(500)
 def error_handler(error):
     return session['youtube_dl_error'], 500
-
-
-# @yt.app_errorhandler(404)
-# def error_handler_2(error):
-#     return session['youtube_dl_error']
     

@@ -40,25 +40,26 @@ SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
-is_uploading = False
-is_converting = False
-
 
 # This function runs in a separate thread.
 def empty_folders():
-    while not is_converting and not is_uploading:
-        sleep(600)
-        for file in os.listdir('uploads'):
-            os.remove(os.path.join('uploads', file))
-            log.info(f'Deleted uploads/{file}')
-        for file in os.listdir('conversions'):
-            os.remove(os.path.join('conversions', file))
-            log.info(f'Deleted conversions/{file}')
-        for file in os.listdir('ffmpeg-progress'):
-            os.remove(os.path.join('ffmpeg-progress', file))
-
+    while True:
+        sleep(60)
+        if not is_uploading and not is_converting:
+            for file in os.listdir('uploads'):
+                time_now = datetime.now().strftime('%H:%M:%S')
+                os.remove(os.path.join('uploads', file))
+                log.info(f'[{time_now}] Deleted uploads/{file}')
+            for file in os.listdir('conversions'):
+                time_now = datetime.now().strftime('%H:%M:%S')
+                os.remove(os.path.join('conversions', file))
+                log.info(f'[{time_now}] Deleted conversions/{file}')
+            for file in os.listdir('ffmpeg-progress'):
+                os.remove(os.path.join('ffmpeg-progress', file))
+     
 
 def run_converter(codec, params):
+    global is_converting
     is_converting = True
     codec_to_converter = {
                             "aac": converter.aac,
@@ -74,29 +75,23 @@ def run_converter(codec, params):
                             "vorbis": converter.vorbis,
                             "wav": converter.wav
     }
-    try:
-        return codec_to_converter[codec](*params)
-    finally:
-        is_converting = False
+    return codec_to_converter[codec](*params)
 
 
-@app.before_first_request
-def initialization():
-    os.makedirs('uploads', exist_ok=True)
-    os.makedirs('conversions', exist_ok=True)
-    folder_emptying_thread = Thread(target=empty_folders)
-    folder_emptying_thread.daemon = True
-    folder_emptying_thread.start()
+delete_downloads_thread = Thread(target=empty_folders)
+delete_downloads_thread.daemon = True
+delete_downloads_thread.start()
 
 
 # When a file has been uploaded, a POST request is sent to the homepage.
-@app.route("/", methods=["POST"])
+@app.route('/', methods=['POST'])
 def homepage():
     if request.data:
         log_this('Clicked on the convert button.')
         return 'is_convert_clicked received.'
 
-    elif 'upload_progress' in request.form:
+    elif 'upload_progress' in request.form:     
+        global is_uploading  
         is_uploading = True
         time_now = datetime.now().strftime('[%H:%M:%S]')
         log.info(f"{time_now} {request.form['upload_progress']}% uploaded...")
@@ -126,6 +121,8 @@ def homepage():
         return session['progress_filename']
 
     elif request.form["request_type"] == "convert":
+        global is_converting
+        is_converting = True
 
         filename = request.form["filename"]
         if 'http' in filename and '://' in filename:
@@ -240,7 +237,9 @@ def homepage():
             params = [session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth,
                       output_path]
             extension = run_converter('wav', params)
-    
+            
+        is_converting = False
+
         # Filename after conversion.
         converted_file_name = f'{output_name}.{extension}'
 
