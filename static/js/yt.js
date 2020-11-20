@@ -49,7 +49,6 @@ async function showDownloadProgress(progressFilePath) {
 
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(whichButton) { // whichButton is this.value in yt.html
-    reset();
     // If the "Choose" button was clicked.
     if (whichButton == 'other') {
         const data = new FormData();
@@ -150,8 +149,4 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             return;
         }
     }
-}
-
-function reset() {
-    document.getElementById('logfile').innerHTML = '';
 }
