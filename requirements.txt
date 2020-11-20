@@ -1,6 +1,6 @@
-youtube_dl==2020.9.20
-Werkzeug==1.0.1
 Flask==1.1.2
+Flask-Session==0.3.2
 Flask_SocketIO==4.3.1
 Flask_SQLAlchemy==2.4.4
-Flask-Session==0.3.2
+Werkzeug==1.0.1
+youtube-dl
