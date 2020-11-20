@@ -40,6 +40,8 @@ SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
+is_uploading = False
+is_converting = False
 
 # This function runs in a separate thread.
 def empty_folders():
@@ -238,8 +240,6 @@ def homepage():
                       output_path]
             extension = run_converter('wav', params)
             
-        is_converting = False
-
         # Filename after conversion.
         converted_file_name = f'{output_name}.{extension}'
 
@@ -264,6 +264,9 @@ def send_file(filename):
         return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
     except Exception as error:
         log.error(f'Unable to send file. Error: \n{error}')
+    finally:
+        global is_converting
+        is_converting = False
 
 
 # Game 1
