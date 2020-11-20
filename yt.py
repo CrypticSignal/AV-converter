@@ -2,9 +2,8 @@ from flask import Flask, Blueprint, request, send_from_directory, jsonify, sessi
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from youtube_dl import YoutubeDL
-from threading import Thread
 from datetime import datetime
-from time import time, sleep
+from time import time
 import os, json
 from loggers import log, get_ip, log_this, log_downloads_per_day
 
@@ -241,11 +240,10 @@ def get_file(filename):
 # This page is visited (with virtualDownloadLink.click() in app.js) to send the file to the user.
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    time_now = datetime.now().strftime('%H:%M:%S')
-    log.info(f'[{time_now}] https://free-av-tools.com/downloads/{filename}')
+    log.info(f'[{datetime.now().strftime("[%H:%M:%S]")}] https://free-av-tools.com/downloads/{filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
     try:
-        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=False)
+        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
     except Exception as error:
         log.error(f'Unable to send file. Error: \n{error}')
     finally:

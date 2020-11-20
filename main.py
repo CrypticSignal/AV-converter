@@ -2,12 +2,11 @@ from flask import Flask, request, render_template, send_from_directory, session
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
-from threading import Thread
 from yt import yt  # Importing the blueprint in yt.py
 from trimmer import trimmer  # Importing the blueprint in trimmer.py
 from loggers import log, log_this, log_visit
 from werkzeug.utils import secure_filename
-from time import time, sleep
+from time import time
 from datetime import datetime
 import os
 import converter  # converter.py
@@ -67,8 +66,7 @@ def homepage():
         return 'is_convert_clicked received.'
 
     elif 'upload_progress' in request.form: 
-        time_now = datetime.now().strftime('[%H:%M:%S]')
-        log.info(f"{time_now} {request.form['upload_progress']}% uploaded...")
+        log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {request.form["upload_progress"]}% uploaded...')
         return request.form['upload_progress']
 
     elif request.form["request_type"] == "convert_url":
@@ -94,7 +92,7 @@ def homepage():
 
     elif request.form["request_type"] == "convert":
         filename = request.form["filename"]
-        
+
         if 'http' in filename and '://' in filename:
             uploaded_file_path = filename
         else:
