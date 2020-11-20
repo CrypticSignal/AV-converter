@@ -1,15 +1,17 @@
-from flask import Flask, request, render_template, send_from_directory, session
-from flask_socketio import SocketIO
-from flask_sqlalchemy import SQLAlchemy
-from flask_session import Session
-from yt import yt  # Importing the blueprint in yt.py
-from trimmer import trimmer  # Importing the blueprint in trimmer.py
-from loggers import log, log_this, log_visit
-from werkzeug.utils import secure_filename
-from time import time
 from datetime import datetime
 import os
+from time import time
+
+from flask import Flask, render_template, request, send_from_directory, session
+from flask_session import Session
+from flask_socketio import SocketIO
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
+
 import converter  # converter.py
+from loggers import log, log_this, log_visit
+from trimmer import trimmer  # Importing the blueprint in trimmer.py
+from yt import yt  # Importing the blueprint in yt.py
 
 app = Flask(__name__)
 secret_key = str(os.urandom(16))

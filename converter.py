@@ -1,7 +1,8 @@
 import os
 import subprocess
-from loggers import log
 from time import time
+
+from loggers import log
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
 # If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
@@ -80,6 +81,7 @@ def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
 def ac3(progress_filename, uploaded_file_path, is_keep_video, ac3_bitrate, output_path):
     # Keep video (if applicable)
     if is_keep_video == "yes":
+        ext = os.path.splitext(uploaded_file_path)[-1]
         output_ext = 'mp4' if ext == '.mp4' else 'mkv'
         run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a ac3 -b:a {ac3_bitrate}k -c:s copy',
                    f'{output_path}.{output_ext}')

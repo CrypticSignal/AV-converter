@@ -1,11 +1,14 @@
-from flask import Flask, Blueprint, request, send_from_directory, jsonify, session
+from datetime import datetime
+import json
+import os
+from time import time
+
+from flask import Blueprint, Flask, jsonify, request, send_from_directory, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from youtube_dl import YoutubeDL
-from datetime import datetime
-from time import time
-import os, json
-from loggers import log, get_ip, log_this, log_downloads_per_day
+
+from loggers import get_ip, log, log_downloads_per_day, log_this
 
 yt = Blueprint('yt', __name__)
 app = Flask(__name__)

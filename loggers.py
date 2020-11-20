@@ -1,6 +1,8 @@
-import os, logging
-from flask import request
 from datetime import datetime
+import logging
+import os
+
+from flask import request
 
 
 def setup_logger(name, log_file):

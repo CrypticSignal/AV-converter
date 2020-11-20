@@ -1,8 +1,10 @@
-from flask import Blueprint, request, send_from_directory
-from werkzeug.utils import secure_filename
 import os
 import subprocess
-from loggers import log_this, log
+
+from flask import Blueprint, request, send_from_directory
+from werkzeug.utils import secure_filename
+
+from loggers import log, log_this
 
 trimmer = Blueprint('trimmer', __name__)
 os.makedirs('trims', exist_ok=True)
