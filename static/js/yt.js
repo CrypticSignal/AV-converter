@@ -88,6 +88,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
         return;
     }
+
     show_alert('Initialising...', 'warning');
     const firstFormData = new FormData();
     firstFormData.append('button_clicked', 'yes');
@@ -96,6 +97,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         method: 'POST',
         body: firstFormData
     });
+
     if (!requestProgressPath.ok) {
         show_alert(requestProgressPath, 'danger');
         return;
@@ -124,20 +126,15 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             const downloadLink = jsonResponse.download_path;
             const logFile = jsonResponse.log_file;
            
-            const virtualDownloadLink = document.createElement("a"); // Create a virtual link.
-            virtualDownloadLink.href = downloadLink; // Setting the URL of createLink to downloadLink
-            virtualDownloadLink.click();
+            const anchorTag = document.createElement("a");
+            anchorTag.href = downloadLink; 
+            anchorTag.download = ''
+            anchorTag.click();
             
             // Sometimes the alert below didn't show up but rather it would stay on the "Finishing up..." alert, 
             // adding a delay seems to fix this.
             await sleep(500)
-
-            show_alert(`Your browser should have started downloading the file. If it hasn't, click \
-            <a href="${downloadLink}">here</a>.`, "success");
-
-            document.getElementById('logfile').innerHTML = `If you're a nerd, click \
-            <a href="${logFile}" target="_blank">here</a> to view the youtube-dl log file.` 
-
+            show_alert('Your browser should have started downloading the file.', 'success');
         }
         
         else if (secondRequest.status == 500) {

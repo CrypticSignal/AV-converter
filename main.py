@@ -40,29 +40,8 @@ SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
-is_uploading = False
-is_converting = False
-
-# This function runs in a separate thread.
-def empty_folders():
-    while True:
-        sleep(60)
-        if not is_uploading and not is_converting:
-            for file in os.listdir('uploads'):
-                time_now = datetime.now().strftime('%H:%M:%S')
-                os.remove(os.path.join('uploads', file))
-                log.info(f'[{time_now}] Deleted uploads/{file}')
-            for file in os.listdir('conversions'):
-                time_now = datetime.now().strftime('%H:%M:%S')
-                os.remove(os.path.join('conversions', file))
-                log.info(f'[{time_now}] Deleted conversions/{file}')
-            for file in os.listdir('ffmpeg-progress'):
-                os.remove(os.path.join('ffmpeg-progress', file))
-     
 
 def run_converter(codec, params):
-    global is_converting
-    is_converting = True
     codec_to_converter = {
                             "aac": converter.aac,
                             "ac3": converter.ac3,
@@ -80,11 +59,6 @@ def run_converter(codec, params):
     return codec_to_converter[codec](*params)
 
 
-delete_downloads_thread = Thread(target=empty_folders)
-delete_downloads_thread.daemon = True
-delete_downloads_thread.start()
-
-
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route('/', methods=['POST'])
 def homepage():
@@ -92,9 +66,7 @@ def homepage():
         log_this('Clicked on the convert button.')
         return 'is_convert_clicked received.'
 
-    elif 'upload_progress' in request.form:     
-        global is_uploading  
-        is_uploading = True
+    elif 'upload_progress' in request.form: 
         time_now = datetime.now().strftime('[%H:%M:%S]')
         log.info(f"{time_now} {request.form['upload_progress']}% uploaded...")
         return request.form['upload_progress']
@@ -104,10 +76,10 @@ def homepage():
         return session['progress_filename']
 
     elif request.form["request_type"] == "uploaded":
-        is_uploading = False
         upload_time = datetime.now().strftime('%H:%M:%S')
         log.info(f'Upload complete at {upload_time}')
         uploaded_file = request.files["chosen_file"]
+        session['uploaded_file'] = uploaded_file.filename
         filesize = request.form["filesize"]
         log.info(uploaded_file)
         log.info(f'Size: {filesize} MB')
@@ -118,15 +90,11 @@ def homepage():
 
         conversion_progress_filename = f'{str(time())[:-8]}.txt'
         session['progress_filename'] = conversion_progress_filename
-
-        time_now = datetime.now().strftime('%H:%M:%S')
         return session['progress_filename']
 
     elif request.form["request_type"] == "convert":
-        global is_converting
-        is_converting = True
-
         filename = request.form["filename"]
+        
         if 'http' in filename and '://' in filename:
             uploaded_file_path = filename
         else:
@@ -242,6 +210,7 @@ def homepage():
             
         # Filename after conversion.
         converted_file_name = f'{output_name}.{extension}'
+        session['converted_file'] = converted_file_name
 
         return {
             'download_path': os.path.join('conversions', converted_file_name),
@@ -257,17 +226,16 @@ def get_file(filename):
 # app.js directs the user to this URL when the conversion is complete.
 @app.route("/conversions/<filename>", methods=["GET"])
 def send_file(filename):
-    time_now = datetime.now().strftime('%H:%M:%S')
-    log.info(f'[{time_now}] https://free-av-tools.com/conversions/{filename}')
+    log.info(f'{datetime.now().strftime("[%H:%M:%S]")} https://free-av-tools.com/conversions/{filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
     try:
         return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
     except Exception as error:
         log.error(f'Unable to send file. Error: \n{error}')
     finally:
-        global is_converting
-        is_converting = False
-
+        os.remove(f'uploads/{session["uploaded_file"]}')
+        os.remove(f'conversions/{session["converted_file"]}')
+        
 
 # Game 1
 @app.route("/game", methods=['POST'])

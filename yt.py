@@ -19,19 +19,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# This function runs in a separate thread.
-def delete_downloads():
-    while True:
-        sleep(60)
-        if not is_downloading:
-            for file in os.listdir('downloads'):
-                if os.path.splitext(file) != '.part':
-                    time_now = datetime.now().strftime('%H:%M:%S')
-                    os.remove(os.path.join('downloads', file))
-                    log.info(f'[{time_now}] Deleted downloads/{file}')
-            for file in os.listdir('yt-progress'):
-                os.remove(os.path.join('yt-progress', file))
-    
 
 def update_database():
     # Use the get_ip function imported from loggers.py
@@ -50,8 +37,6 @@ def update_database():
 
 
 def run_youtube_dl(video_link, options):
-    global is_downloading
-    is_downloading = True
     try:
         with YoutubeDL(options) as ydl:
             info = ydl.extract_info(video_link, download=False)
@@ -67,9 +52,7 @@ def run_youtube_dl(video_link, options):
         download_complete_time = time()
         log.info(f'Download took {round((download_complete_time - download_start_time), 1)}s')
         log_downloads_per_day()
-    finally:
-        is_downloading = False
-
+ 
         
 def send_json_response(download_type):
     global filename
@@ -85,6 +68,7 @@ def send_json_response(download_type):
         db.session.commit()
     # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
     new_filename = filename.replace('#', '').replace(download_type, '.').replace('%', '').replace('_', ' ')
+    session['new_filename'] = new_filename
     log.info(new_filename)
     os.replace(os.path.join(download_dir, filename), os.path.join(download_dir, new_filename))
     # Update the list of videos downloaded.
@@ -118,16 +102,13 @@ class User(db.Model):
         self.times_used_yt_downloader = times_used_yt_downloader
         self.mb_downloaded = mb_downloaded
 
+
 # Initialization
 db.create_all()
 os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
 downloads_today = 0
-is_downloading = False
-delete_downloads_thread = Thread(target=delete_downloads)
-delete_downloads_thread.daemon = True
-delete_downloads_thread.start()
 
 
 @yt.route("/yt", methods=["POST"])
@@ -167,7 +148,7 @@ def yt_downloader():
                 stream_type = 'Video'
                 resolution = f"{data['height']}x{data['width']}"
                 if 'avc' in data['vcodec']:
-                    codec = 'AVC'
+                    codec = 'H.264'
                 elif 'av01' in data['vcodec']:
                     codec = 'AV1'
                 elif data['vcodec'] == 'vp9':
@@ -264,9 +245,11 @@ def send_file(filename):
     log.info(f'[{time_now}] https://free-av-tools.com/downloads/{filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
     try:
-        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
+        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=False)
     except Exception as error:
         log.error(f'Unable to send file. Error: \n{error}')
+    finally:
+        os.remove(f'downloads/{session["new_filename"]}')
 
 
 @yt.app_errorhandler(500)

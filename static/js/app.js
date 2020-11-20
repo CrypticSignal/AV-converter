@@ -53,6 +53,14 @@ function showProgress(event) {
     const total = event.total / 10 ** 6;
     const percentageComplete = Math.floor((loaded / total) * 100);
 
+    if (percentageComplete > previousPercentageComplete && percentageComplete !== 100) {
+        const uploadProgressRequest = new XMLHttpRequest();
+        const uploadProgress = new FormData();
+        uploadProgress.append('upload_progress', percentageComplete);
+        uploadProgressRequest.open("POST", "/");
+        uploadProgressRequest.send(uploadProgress);
+    }
+
     $('#progress_bar').html(`${Math.floor(percentageComplete)}%`);
     // Add a style attribute to the progress div, i.e. style="width: x%"
     progress_bar.setAttribute("style", `width: ${percentageComplete}%`);
@@ -70,14 +78,6 @@ function showProgress(event) {
     progressStatus.innerText = `${loaded.toFixed(1)} MB of ${total.toFixed(1)} MB uploaded
     Upload Speed: ${(speed * 8).toFixed(1)} Mbps (${(speed).toFixed(1)} MB/s)
     Upload will complete in ${completionTime} [HH:MM:SS]`;
-
-    if (percentageComplete > previousPercentageComplete) {
-        const uploadProgressRequest = new XMLHttpRequest();
-        const uploadProgress = new FormData();
-        uploadProgress.append('upload_progress', percentageComplete);
-        uploadProgressRequest.open("POST", "/");
-        uploadProgressRequest.send(uploadProgress);
-    }
 
     previousLoaded = loaded;
     previousTime = Date.now() / 1000;
@@ -170,13 +170,12 @@ async function sendConversionRequest(filename) {
         downloadLink = jsonResponse.download_path;
         logFile = jsonResponse.log_file;
 
-        const createLink = document.createElement("a"); // Create a virtual link.
-        createLink.href = jsonResponse.download_path;
-        createLink.click();
+        const anchorTag = document.createElement("a");
+        anchorTag.href = jsonResponse.download_path;
+        anchorTag.download = ''
+        anchorTag.click();
 
-        show_alert(`File converted. Click <a href="${downloadLink}">here</a> \
-        if the download does not begin automatically. If you'd like to view the FFmpeg output, click \
-        <a href="${logFile}" target="_blank">here</a>.`, "success");
+        show_alert('File converted. The converted file should have started downloading', 'success');
     }
 }
 
