@@ -56,7 +56,7 @@ def run_youtube_dl(video_link, options):
         log_downloads_per_day()
  
         
-def send_json_response(download_type):
+def return_download_path(download_type):
     global filename
     filename = [file for file in os.listdir(download_dir) if '.part' not in file and
                 os.path.splitext(file)[0] == filename][0]
@@ -76,9 +76,9 @@ def send_json_response(download_type):
     # Update the list of videos downloaded.
     with open("logs/downloads.txt", "a") as f:
         f.write(f'\n{new_filename}')
-
-    return jsonify(download_path=os.path.join('downloads', new_filename), 
-                    log_file=session['progress_file_path'])
+    log.info(type(os.path.join('downloads', new_filename)))
+    
+    return os.path.join('downloads', new_filename)
 
 
 # This value for the 'logger' key in the youtube-dl options dictionaries will be set to this class.        
@@ -181,7 +181,7 @@ def yt_downloader():
             'logger': Logger()
         }
         run_youtube_dl(video_link, options)
-        return send_json_response('-[video].')
+        return return_download_path('-[video].')
        
     # MP4
     elif request.form['button_clicked'] == 'Video [MP4]':
@@ -193,7 +193,7 @@ def yt_downloader():
             'logger': Logger()
         }
         run_youtube_dl(video_link, options)
-        return send_json_response('-[MP4].')
+        return return_download_path('-[MP4].')
 
     # Audio (best quality)
     elif request.form['button_clicked'] == 'Audio [best]':
@@ -208,7 +208,7 @@ def yt_downloader():
             'logger': Logger()
         }
         run_youtube_dl(video_link, options)
-        return send_json_response('-[audio].')
+        return return_download_path('-[audio].')
      
     # MP3
     elif request.form['button_clicked'] == 'MP3':
@@ -231,7 +231,7 @@ def yt_downloader():
             'logger': Logger()
         }
         run_youtube_dl(video_link, options)
-        return send_json_response('-[MP3].')
+        return return_download_path('-[MP3].')
 
 
 # This is where the youtube-dl progress file is.
@@ -248,7 +248,7 @@ def send_file(filename):
     try:
         return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
     except Exception as error:
-        log.error(f'Unable to send file. Error: \n{error}')
+        log.error(f'Unable to send downloads/{filename}. Error: \n{error}')
     finally:
         os.remove(f'downloads/{session["new_filename"]}')
 

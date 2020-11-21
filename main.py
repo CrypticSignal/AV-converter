@@ -41,6 +41,9 @@ SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
 
+os.makedirs('uploads', exist_ok=True)
+os.makedirs('conversions', exist_ok=True)
+
 
 def run_converter(codec, params):
     codec_to_converter = {
@@ -134,7 +137,6 @@ def homepage():
         output_name = request.form["output_name"]
 
         log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
-        os.makedirs('conversions', exist_ok=True)
         output_path = os.path.join('conversions', output_name)
 
         # AAC
@@ -231,12 +233,12 @@ def send_file(filename):
     try:
         return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
     except Exception as error:
-        log.error(f'Unable to send file. Error: \n{error}')
+        log.error(f'Unable to send conversions/{filename}. Error: \n{error}')
     finally:
         os.remove(f'uploads/{session["uploaded_file"]}')
         os.remove(f'conversions/{session["converted_file"]}')
-        
 
+    
 # Game 1
 @app.route("/game", methods=['POST'])
 def return_world_record():
@@ -345,10 +347,7 @@ def chat():
     log_visit("visited chat")
     return render_template("chat.html", title="Chat")
 
-@app.route("/samples")
-def samples():
-    return render_template("samples.html")
-
+    
 # Users online counter for /chat
 count = 0
 

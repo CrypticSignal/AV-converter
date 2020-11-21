@@ -117,23 +117,22 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             body: secondFormData
         });
 
-        shouldLog = false; // Set shouldLog to false to end the while loop in showDownloadProgress.
+        // Set shouldLog to false to end the while loop in showDownloadProgress.
+        shouldLog = false; 
         
         if (secondRequest.status == 200) {
-            const jsonResponse = await secondRequest.json();
-            console.log(jsonResponse)
-            const downloadLink = jsonResponse.download_path;
-            const logFile = jsonResponse.log_file;
+            const response = await secondRequest.text();
+            console.log(response)
            
             const anchorTag = document.createElement("a");
-            anchorTag.href = downloadLink; 
+            anchorTag.href = response; 
             anchorTag.download = ''
             anchorTag.click();
             
-            // Sometimes the alert below didn't show up but rather it would stay on the "Finishing up..." alert, 
-            // adding a delay seems to fix this.
-            await sleep(500)
-            show_alert('Your browser should have started downloading the file.', 'success');
+            // Sometimes the alert below didn't show up, adding a delay seems to fixes this.
+            //await sleep(500)
+            show_alert(`Your browser should have started downloading the file. \
+                       Click <a href="${progressFilePath}">here</a> if you'd like to view the log file.`, 'success');
         }
         
         else if (secondRequest.status == 500) {

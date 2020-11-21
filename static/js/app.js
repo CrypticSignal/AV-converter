@@ -162,8 +162,8 @@ async function sendConversionRequest(filename) {
     reset();
 
     if (!conversionResponse.ok) {
-        show_alert(response, 'danger')
-        console.log(conversionResponse)
+        show_alert(error, 'danger')
+        console.log(error)
     }
     else {
         const jsonResponse = await conversionResponse.json();
@@ -174,8 +174,6 @@ async function sendConversionRequest(filename) {
         anchorTag.href = jsonResponse.download_path;
         anchorTag.download = ''
         anchorTag.click();
-
-        show_alert('File converted. The converted file should have started downloading', 'success');
     }
 }
 
@@ -201,8 +199,7 @@ async function showConversionProgress() {
             await sleep(1000);
         }
     }
-    show_alert(`File converted. Click <a href="${downloadLink}">here</a> \
-        if the download does not begin automatically. If you'd like to view the FFmpeg output, click \
+    show_alert(`File converted. If you'd like to view the FFmpeg output, click \
         <a href="${logFile}" target="_blank">here</a>.`, "success");
 }
 
