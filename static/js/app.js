@@ -73,7 +73,7 @@ function showProgress(event) {
     const hours = (Math.floor(completionTimeSeconds / 3600) % 60).toString().padStart(2, '0');
     const minutes = (Math.floor(completionTimeSeconds / 60) % 60).toString().padStart(2, '0');
     const seconds = (Math.ceil(completionTimeSeconds % 60)).toString().padStart(2, '0');
-    const completionTime = `${hours}:${minutes}:${seconds}`
+    const completionTime = `${hours}:${minutes}:${seconds}`;
 
     progressStatus.innerText = `${loaded.toFixed(1)} MB of ${total.toFixed(1)} MB uploaded
     Upload Speed: ${(speed * 8).toFixed(1)} Mbps (${(speed).toFixed(1)} MB/s)
@@ -155,15 +155,15 @@ async function sendConversionRequest(filename) {
 
     const conversionResponse = await fetch("/", {
         method: 'POST',
-        body: data,
+        body: data
     });
 
     shouldLog = false;
     reset();
 
     if (!conversionResponse.ok) {
-        show_alert(error, 'danger')
-        console.log(error)
+        show_alert('An error occured when trying to convert the video.', 'danger');
+        console.log(conversionResponse);
     }
     else {
         const jsonResponse = await conversionResponse.json();
@@ -172,7 +172,7 @@ async function sendConversionRequest(filename) {
 
         const anchorTag = document.createElement("a");
         anchorTag.href = jsonResponse.download_path;
-        anchorTag.download = ''
+        anchorTag.download = '';
         anchorTag.click();
     }
 }
@@ -195,7 +195,7 @@ async function showConversionProgress() {
             const milliseconds = justProgressTime.substring(9, 12);
             show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
             (and ${milliseconds} milliseconds)`, 'primary');
-            console.log(`${withoutMicroseconds} [HH:MM:SS]`)
+            console.log(`${withoutMicroseconds} [HH:MM:SS]`);
             await sleep(1000);
         }
     }
@@ -207,7 +207,7 @@ async function showConversionProgress() {
 function upload_and_send_conversion_request() {
     // Show an alert if a file hasn't been selected or the URL input box is empty.
     if (!input.value && !document.getElementById("output_name").value && !urlInput.value) {
-        show_alert("It helps if you select the file that you want to convert.", "warning")
+        show_alert("It helps if you select the file that you want to convert.", "warning");
         return;
     }
     // If the URL input box is not empty.
@@ -268,7 +268,7 @@ function upload_and_send_conversion_request() {
         }
         // Show an alert if output name box is empty.
         else if (document.getElementById("output_name").value == '') {
-            show_alert("You must enter your desired filename.", "danger")
+            show_alert("You must enter your desired filename.", "danger");
             return;
         }
 
@@ -286,11 +286,11 @@ function upload_and_send_conversion_request() {
         data.append("chosen_file", chosenFile);
         data.append("filesize", filesizeMB);
     
-        progressFilenameRequest.open("POST", "/")
+        progressFilenameRequest.open("POST", "/");
         progressFilenameRequest.send(data);
     }
     else {
-        show_alert("No file selected.", "danger")
+        show_alert("No file selected.", "danger");
         return;
     }
 }
@@ -304,7 +304,7 @@ function abortUpload(progressFilenameRequest) {
 
 function showError(progressFilenameRequest) {
     show_alert(`${progressFilenameRequest.responseText}`, "danger");
-    console.log(`progressFilenameRequest error: ${progressFilenameRequest.responseText}`)
+    console.log(`progressFilenameRequest error: ${progressFilenameRequest.responseText}`);
     reset();
 }
 
