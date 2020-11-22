@@ -160,10 +160,13 @@ async function sendConversionRequest(filename) {
 
     shouldLog = false;
     reset();
-
-    if (!conversionResponse.ok) {
-        show_alert('An error occured when trying to convert the video.', 'danger');
-        console.log(conversionResponse);
+    console.log(conversionResponse.status)
+    if (conversionResponse.status == 500) {
+        error = await conversionResponse.text()
+        show_alert(error, 'danger');
+    }
+    else if (!conversionResponse.ok) {
+        show_alert('An error occurred when trying to convert the file.', 'danger');
     }
     else {
         const jsonResponse = await conversionResponse.json();

@@ -21,6 +21,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+os.makedirs('yt-progress', exist_ok=True)
+os.makedirs('downloads', exist_ok=True)
+download_dir = 'downloads'
+
 
 def update_database():
     # Use the get_ip function imported from loggers.py
@@ -45,40 +49,49 @@ def run_youtube_dl(video_link, options):
         global filename
         # Remove the file extension and the 'downloads/' at the start.
         filename = os.path.splitext(ydl.prepare_filename(info))[0][10:]
-        download_start_time = time()
         ydl.download([video_link])
     except Exception as error:
         log.error(f'Error downloading file:\n{error}')
         session['youtube_dl_error'] = str(error)
     else:
-        download_complete_time = time()
-        log.info(f'Download took {round((download_complete_time - download_start_time), 1)}s')
         log_downloads_per_day()
  
         
 def return_download_path(download_type):
     global filename
-    filename = [file for file in os.listdir(download_dir) if '.part' not in file and
-                os.path.splitext(file)[0] == filename][0]
+
+    for file in os.listdir(download_dir):
+        if filename in file and '.part' in file:
+            os.remove(f'{download_dir}/{file}')
+            log.info(f'Deleted {file}')
+   
+    filename = [file for file in os.listdir(download_dir) if os.path.splitext(file)[0] == filename][0]
     filesize = round((os.path.getsize(os.path.join(download_dir, filename)) / 1_000_000), 2)
     log.info(f'{filename} | {filesize} MB')
+
     # Query the database by IP.
     user = User.query.filter_by(ip=get_ip()).first()
     # If the user has used the downloader before, update the database.
     if user:
         user.mb_downloaded += filesize
         db.session.commit()
+
     # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
     new_filename = filename.replace('#', '').replace(download_type, '.').replace('%', '').replace('_', ' ')
     session['new_filename'] = new_filename
-    log.info(new_filename)
     os.replace(os.path.join(download_dir, filename), os.path.join(download_dir, new_filename))
+
     # Update the list of videos downloaded.
     with open("logs/downloads.txt", "a") as f:
         f.write(f'\n{new_filename}')
-    log.info(type(os.path.join('downloads', new_filename)))
     
     return os.path.join('downloads', new_filename)
+
+
+def clean_up():
+    os.remove(session['progress_file_path'])
+    os.remove(f'downloads/{session["new_filename"]}')
+    log.info(f'Deleted downloads/{session["new_filename"]}')
 
 
 # This value for the 'logger' key in the youtube-dl options dictionaries will be set to this class.        
@@ -107,9 +120,6 @@ class User(db.Model):
 
 # Initialization
 db.create_all()
-os.makedirs('yt-progress', exist_ok=True)
-os.makedirs('downloads', exist_ok=True)
-download_dir = 'downloads'
 downloads_today = 0
 
 
@@ -240,17 +250,16 @@ def get_file(filename):
     return send_from_directory('yt-progress', filename)
 
 
-# This page is visited (with virtualDownloadLink.click() in app.js) to send the file to the user.
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    log.info(f'[{datetime.now().strftime("[%H:%M:%S]")}] https://free-av-tools.com/downloads/{filename}')
+    log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
     try:
         return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
     except Exception as error:
         log.error(f'Unable to send downloads/{filename}. Error: \n{error}')
     finally:
-        os.remove(f'downloads/{session["new_filename"]}')
+        clean_up()
 
 
 @yt.app_errorhandler(500)

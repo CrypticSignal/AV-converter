@@ -63,6 +63,13 @@ def run_converter(codec, params):
     return codec_to_converter[codec](*params)
 
 
+def clean_up():
+    os.remove(f'uploads/{session["uploaded_file"]}')
+    log.info(f'Deleted uploads/{session["uploaded_file"]}')
+    os.remove(f'conversions/{session["converted_file_name"]}')
+    log.info(f'Deleted conversions/{session["converted_file_name"]}')
+
+
 # When a file has been uploaded, a POST request is sent to the homepage.
 @app.route('/', methods=['POST'])
 def homepage():
@@ -209,15 +216,17 @@ def homepage():
             params = [session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth,
                       output_path]
             extension = run_converter('wav', params)
-            
-        # Filename after conversion.
-        converted_file_name = f'{output_name}.{extension}'
-        session['converted_file'] = converted_file_name
 
-        return {
-            'download_path': os.path.join('conversions', converted_file_name),
-            'log_file': os.path.join('ffmpeg-progress', session["progress_filename"])
-            }
+        possible_extensions = ['.aac', '.ac3', '.dts', '.flac', '.mka', '.mkv', '.mp3', '.mp4', '.ogg', '.opus', '.wav']
+        if extension not in possible_extensions:
+            return extension, 500
+        else:
+            # Filename after conversion.
+            session['converted_file_name'] = f'{output_name}{extension}'
+            return {
+                'download_path': os.path.join('conversions', session['converted_file_name']),
+                'log_file': os.path.join('ffmpeg-progress', session["progress_filename"])
+                }
 
 
 @app.route("/ffmpeg-progress/<filename>")
@@ -235,8 +244,7 @@ def send_file(filename):
     except Exception as error:
         log.error(f'Unable to send conversions/{filename}. Error: \n{error}')
     finally:
-        os.remove(f'uploads/{session["uploaded_file"]}')
-        os.remove(f'conversions/{session["converted_file"]}')
+        clean_up()
 
     
 # Game 1

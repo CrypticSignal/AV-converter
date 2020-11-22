@@ -130,7 +130,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             anchorTag.click();
             
             // Sometimes the alert below didn't show up, adding a delay seems to fixes this.
-            //await sleep(500)
+            await sleep(500)
             show_alert(`Your browser should have started downloading the file. \
                        Click <a href="${progressFilePath}">here</a> if you'd like to view the log file.`, 'success');
         }
