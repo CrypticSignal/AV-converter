@@ -37,7 +37,6 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             'log_file': ffmpeg_output_file
         }
     else:
-        log.info('in else')
         end_time = time()
         time_taken = round((end_time - start_time), 2)
         log.info(f'Conversion took {time_taken} seconds.')

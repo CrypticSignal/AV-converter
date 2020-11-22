@@ -218,7 +218,6 @@ def homepage():
                       output_path]
             extension = run_converter('wav', params)
 
-        possible_extensions = ['.aac', '.ac3', '.dts', '.flac', '.mka', '.mkv', '.mp3', '.mp4', '.ogg', '.opus', '.wav']
         if extension['error'] is not None:
             return extension, 500
         else:
