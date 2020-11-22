@@ -10,6 +10,15 @@ const uploadingButton = document.getElementById("uploading_btn");
 const cancelButton = document.getElementById("cancel_btn");
 const alertWrapper = document.getElementById("alert_wrapper");
 const progressParagraph = document.getElementById('progress');
+
+urlInput.addEventListener('mousedown', forTheLazy);
+
+async function forTheLazy() {
+    const clipboardText = await navigator.clipboard.readText();
+    urlInput.value = clipboardText;
+    outputNameBox.value = 'Output'
+}
+
 convertButton.addEventListener('click', () => {    
     convertButtonClicked();
     upload_and_send_conversion_request();    
@@ -158,19 +167,19 @@ async function sendConversionRequest(filename) {
     shouldLog = true;
     showConversionProgress();
 
-    const conversionResponse = await fetch("/", {
+    conversionResponse = await fetch("/", {
         method: 'POST',
         body: data
     });
 
     shouldLog = false;
-    reset();
 
     if (conversionResponse.status == 500) {
         jsonResponse = await conversionResponse.json()
         error = jsonResponse.error;
         logFile = jsonResponse.log_file;
         show_alert(`${error}<br>Click <a href="${logFile}" target="_blank">here</a> to view the FFmpeg log file.`, 'danger');
+        
     }
     else if (!conversionResponse.ok) {
         show_alert('An error occurred when trying to convert the file.', 'danger');
@@ -183,29 +192,31 @@ async function sendConversionRequest(filename) {
         anchorTag.href = jsonResponse.download_path;
         anchorTag.download = '';
         anchorTag.click();
+
+        show_alert(`Your browser should have started downloading the converted file. If you'd like to view the FFmpeg output, click \
+        <a href="${logFile}" target="_blank">here</a>.`, "success");
     }
+    reset();
 }
 
 // This function runs while the file is being converted.
 async function showConversionProgress() {
-    while (shouldLog) {
+    while (true) {
         await sleep(1000);
-        const conversionProgressResponse = await fetch(`ffmpeg-progress/${progressFilename}`);
-        const textInFile = await conversionProgressResponse.text();
-        if (conversionProgressResponse.ok && textInFile) {
-            const lines = textInFile.split('\n');
-            const fifthLastLine = lines[lines.length - 6].split('=');
-            const justProgressTime = fifthLastLine.slice(-1)[0];
-            const withoutMicroseconds = justProgressTime.slice(0, -7);
-            const milliseconds = justProgressTime.substring(9, 12);
-            show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
-            (and ${milliseconds} milliseconds)`, 'primary');
-            console.log(`${withoutMicroseconds} [HH:MM:SS]`);
+        if (shouldLog) {
+            const conversionProgressResponse = await fetch(`ffmpeg-progress/${progressFilename}`);
+            const textInFile = await conversionProgressResponse.text();
+            if (conversionProgressResponse.ok && textInFile) {
+                const lines = textInFile.split('\n');
+                const fifthLastLine = lines[lines.length - 6].split('=');
+                const justProgressTime = fifthLastLine.slice(-1)[0];
+                const withoutMicroseconds = justProgressTime.slice(0, -7);
+                const milliseconds = justProgressTime.substring(9, 12);
+                show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
+                (and ${milliseconds} milliseconds)`, 'primary');
+                console.log(`${withoutMicroseconds} [HH:MM:SS]`);
+            }
         }
-    }
-    if (conversionResponse.ok) {
-        show_alert(`Your browser should have started downloading the converted file. If you'd like to view the FFmpeg output, click \
-        <a href="${logFile}" target="_blank">here</a>.`, "success");
     }
 }
 
@@ -316,6 +327,7 @@ function showError(progressFilenameRequest) {
 
 // A function that resets the page.
 function reset() {
+    urlInput.value = ''
     document.getElementById("converting_btn").style.display = 'none ';
     conversionProgress.style.display = 'none';
     input.disabled = false;
