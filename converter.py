@@ -23,18 +23,13 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
                         '-metadata', 'comment=Transcoded using free-av-tools.com', '-metadata',
                         'encoded_by=free-av-tools.com', '-id3v2_version', '3', '-write_id3v1', 'true'] + params,
                         stderr=subprocess.PIPE)
-
+                        
     if process.returncode != 0:
-        error = str(process.stderr)
-        log.info(type(error))
-        log.info(f'Err: {error}')
-        return error
+        return str(process.stderr)
     else:
-        log.info('Status code is 0')
-        log.info(f'Ext in converter: {os.path.splitext(output_name)[1]}')
         end_time = time()
         time_taken = round((end_time - start_time), 2)
-        log.info(f'File converted. Conversion took {time_taken} seconds.')
+        log.info(f'Conversion took {time_taken} seconds.')
         return os.path.splitext(output_name)[1]
 
 
