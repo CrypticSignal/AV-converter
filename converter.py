@@ -5,6 +5,7 @@ from time import time
 from loggers import log
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
+os.makedirs('ffmpeg_output', exist_ok=True)
 # If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
 ffmpeg_path = '/home/h/bin/ffmpeg'
 
@@ -18,19 +19,34 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     log.info(params)
     log.info(f'Converting {uploaded_file_path}...')
     start_time = time()
+    filename_without_ext = os.path.splitext(output_name)[0][12:]
+    ffmpeg_output_file = f'ffmpeg_output/{filename_without_ext}.txt'
+    open(ffmpeg_output_file, 'w').close()
 
     process = subprocess.run([ffmpeg_path, '-hide_banner', '-progress', progress_file_path, '-y', '-i', uploaded_file_path,
                         '-metadata', 'comment=Transcoded using free-av-tools.com', '-metadata',
                         'encoded_by=free-av-tools.com', '-id3v2_version', '3', '-write_id3v1', 'true'] + params,
                         stderr=subprocess.PIPE)
-                        
+
+    with open(ffmpeg_output_file, 'w') as f:
+        f.write(process.stderr.decode('utf-8'))
+        
     if process.returncode != 0:
-        return str(process.stderr)
+        return {
+            'error': process.stderr.decode('utf-8'),
+            'log_file': ffmpeg_output_file
+        }
     else:
+        log.info('in else')
         end_time = time()
         time_taken = round((end_time - start_time), 2)
         log.info(f'Conversion took {time_taken} seconds.')
-        return os.path.splitext(output_name)[1]
+        return {
+            'error': None,
+            'ext': os.path.splitext(output_name)[1],
+            'download_path': output_name,
+            'log_file': ffmpeg_output_file
+        }
 
 
 # AAC

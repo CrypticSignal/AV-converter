@@ -15,6 +15,11 @@ convertButton.addEventListener('click', () => {
     upload_and_send_conversion_request();    
 });
 
+// A function that creates a synchronous sleep.
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function show_alert(message, type) {
     alertWrapper.style.display = 'block';
     alertWrapper.innerHTML =
@@ -160,17 +165,18 @@ async function sendConversionRequest(filename) {
 
     shouldLog = false;
     reset();
-    console.log(conversionResponse.status)
+
     if (conversionResponse.status == 500) {
-        error = await conversionResponse.text()
-        show_alert(error, 'danger');
+        jsonResponse = await conversionResponse.json()
+        error = jsonResponse.error;
+        logFile = jsonResponse.log_file;
+        show_alert(`${error}<br>Click <a href="${logFile}" target="_blank">here</a> to view the FFmpeg log file.`, 'danger');
     }
     else if (!conversionResponse.ok) {
         show_alert('An error occurred when trying to convert the file.', 'danger');
     }
     else {
         const jsonResponse = await conversionResponse.json();
-        downloadLink = jsonResponse.download_path;
         logFile = jsonResponse.log_file;
 
         const anchorTag = document.createElement("a");
@@ -180,14 +186,10 @@ async function sendConversionRequest(filename) {
     }
 }
 
-// A function that creates a synchronous sleep.
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // This function runs while the file is being converted.
 async function showConversionProgress() {
     while (shouldLog) {
+        await sleep(1000);
         const conversionProgressResponse = await fetch(`ffmpeg-progress/${progressFilename}`);
         const textInFile = await conversionProgressResponse.text();
         if (conversionProgressResponse.ok && textInFile) {
@@ -199,11 +201,12 @@ async function showConversionProgress() {
             show_alert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
             (and ${milliseconds} milliseconds)`, 'primary');
             console.log(`${withoutMicroseconds} [HH:MM:SS]`);
-            await sleep(1000);
         }
     }
-    show_alert(`File converted. If you'd like to view the FFmpeg output, click \
+    if (conversionResponse.ok) {
+        show_alert(`Your browser should have started downloading the converted file. If you'd like to view the FFmpeg output, click \
         <a href="${logFile}" target="_blank">here</a>.`, "success");
+    }
 }
 
 // This function runs when the user clicks on the convert button.

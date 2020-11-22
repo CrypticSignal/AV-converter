@@ -145,6 +145,7 @@ def homepage():
 
         log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
         output_path = os.path.join('conversions', output_name)
+        extension = None
 
         # AAC
         if chosen_codec == 'AAC':
@@ -218,20 +219,24 @@ def homepage():
             extension = run_converter('wav', params)
 
         possible_extensions = ['.aac', '.ac3', '.dts', '.flac', '.mka', '.mkv', '.mp3', '.mp4', '.ogg', '.opus', '.wav']
-        if extension not in possible_extensions:
+        if extension['error'] is not None:
             return extension, 500
         else:
+            log.info('in else main')
             # Filename after conversion.
-            session['converted_file_name'] = f'{output_name}{extension}'
-            return {
-                'download_path': os.path.join('conversions', session['converted_file_name']),
-                'log_file': os.path.join('ffmpeg-progress', session["progress_filename"])
-                }
+            session['converted_file_name'] = f'{output_name}{extension["ext"]}'
+            return extension
 
 
 @app.route("/ffmpeg-progress/<filename>")
 def get_file(filename):
     return send_from_directory('ffmpeg-progress', filename)
+
+
+@app.route("/ffmpeg_output/<filename>")
+def get_ffmpeg_output(filename):
+    log.info(filename)
+    return send_from_directory('ffmpeg_output', filename)
 
 
 # app.js directs the user to this URL when the conversion is complete.
