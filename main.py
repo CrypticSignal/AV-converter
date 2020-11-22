@@ -64,8 +64,8 @@ def run_converter(codec, params):
 
 
 def clean_up():
-    os.remove(f'uploads/{session["uploaded_file"]}')
-    log.info(f'Deleted uploads/{session["uploaded_file"]}')
+    os.remove(session["uploaded_file_path"])
+    log.info(f'Deleted {session["uploaded_file_path"]}')
     os.remove(f'conversions/{session["converted_file_name"]}')
     log.info(f'Deleted conversions/{session["converted_file_name"]}')
 
@@ -95,8 +95,9 @@ def homepage():
         log.info(f'Size: {filesize} MB')
         # Make the filename safe.
         filename_secure = secure_filename(uploaded_file.filename)
+        session['uploaded_file_path'] = os.path.join('uploads', filename_secure)
         # Save the uploaded file to the uploads folder.
-        uploaded_file.save(os.path.join("uploads", filename_secure))
+        uploaded_file.save(session['uploaded_file_path'])
 
         conversion_progress_filename = f'{str(time())[:-8]}.txt'
         session['progress_filename'] = conversion_progress_filename
