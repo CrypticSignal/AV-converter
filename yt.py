@@ -46,9 +46,8 @@ def run_youtube_dl(video_link, options):
     try:
         with YoutubeDL(options) as ydl:
             info = ydl.extract_info(video_link, download=False)
-        global filename
         # Remove the file extension and the 'downloads/' at the start.
-        filename = os.path.splitext(ydl.prepare_filename(info))[0][10:]
+        session['filename'] = os.path.splitext(ydl.prepare_filename(info))[0][10:]
         ydl.download([video_link])
     except Exception as error:
         log.error(f'Error downloading file:\n{error}')
@@ -58,16 +57,11 @@ def run_youtube_dl(video_link, options):
  
         
 def return_download_path(download_type):
-    global filename
+    session['filename'] = [file for file in os.listdir(download_dir) if '.part'not in file and 
+                           os.path.splitext(file)[0] == session['filename']][0]
 
-    for file in os.listdir(download_dir):
-        if filename in file and '.part' in file:
-            os.remove(f'{download_dir}/{file}')
-            log.info(f'Deleted {file}')
-   
-    filename = [file for file in os.listdir(download_dir) if os.path.splitext(file)[0] == filename][0]
-    filesize = round((os.path.getsize(os.path.join(download_dir, filename)) / 1_000_000), 2)
-    log.info(f'{filename} | {filesize} MB')
+    filesize = round((os.path.getsize(os.path.join(download_dir, session['filename'])) / 1_000_000), 2)
+    log.info(f'{session["filename"]} | {filesize} MB')
 
     # Query the database by IP.
     user = User.query.filter_by(ip=get_ip()).first()
@@ -77,9 +71,9 @@ def return_download_path(download_type):
         db.session.commit()
 
     # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
-    new_filename = filename.replace('#', '').replace(download_type, '.').replace('%', '').replace('_', ' ')
+    new_filename = session['filename'].replace('#', '').replace(download_type, '.').replace('%', '').replace('_', ' ')
     session['new_filename'] = new_filename
-    os.replace(os.path.join(download_dir, filename), os.path.join(download_dir, new_filename))
+    os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, new_filename))
 
     # Update the list of videos downloaded.
     with open("logs/downloads.txt", "a") as f:
@@ -89,9 +83,12 @@ def return_download_path(download_type):
 
 
 def clean_up():
+    for file in os.listdir(download_dir):
+        if session['filename'] in file and '.part' in file:
+            os.remove(f'{download_dir}/{file}')
+            log.info(f'Deleted {file}')
     os.remove(session['progress_file_path'])
     os.remove(f'downloads/{session["new_filename"]}')
-    log.info(f'Deleted downloads/{session["new_filename"]}')
 
 
 # This value for the 'logger' key in the youtube-dl options dictionaries will be set to this class.        
