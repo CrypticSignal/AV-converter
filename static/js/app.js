@@ -167,7 +167,7 @@ async function sendConversionRequest(filename) {
     shouldLog = true;
     showConversionProgress();
 
-    conversionResponse = await fetch("/", {
+    const conversionResponse = await fetch("/", {
         method: 'POST',
         body: data
     });
