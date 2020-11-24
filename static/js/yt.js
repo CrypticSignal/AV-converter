@@ -91,6 +91,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
     show_alert('Initialising...', 'warning');
     const firstFormData = new FormData();
     firstFormData.append('button_clicked', 'yes');
+    firstFormData.append("which_button", whichButton);
     // 1st POST request to get the path of the progress file.
     const requestProgressPath = await fetch('/yt', {
         method: 'POST',

@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 import os
 from time import time
+from pathlib import Path
 
 from flask import Blueprint, Flask, jsonify, request, send_from_directory, session
 from flask_session import Session
@@ -24,6 +25,7 @@ db = SQLAlchemy(app)
 os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
+unwanted_filetypes = ['.part', '.jpg', '.ytdl']
 
 
 def update_database():
@@ -32,8 +34,6 @@ def update_database():
     # Query the database by IP.
     user = User.query.filter_by(ip=user_ip).first()
     if user:
-        x = 'times' if user.times_used_yt_downloader == 1 else 'times'
-        log.info(f'This user has used the downloader {user.times_used_yt_downloader} {x} before.')
         user.times_used_yt_downloader += 1
         db.session.commit()
     else:
@@ -43,11 +43,11 @@ def update_database():
 
 
 def run_youtube_dl(video_link, options):
+    with YoutubeDL(options) as ydl:
+        info = ydl.extract_info(video_link, download=False)
+    # Remove the file extension and the 'downloads/' at the start.
+    session['filename'] = os.path.splitext(ydl.prepare_filename(info))[0][10:]
     try:
-        with YoutubeDL(options) as ydl:
-            info = ydl.extract_info(video_link, download=False)
-        # Remove the file extension and the 'downloads/' at the start.
-        session['filename'] = os.path.splitext(ydl.prepare_filename(info))[0][10:]
         ydl.download([video_link])
     except Exception as error:
         log.error(f'Error downloading file:\n{error}')
@@ -55,9 +55,8 @@ def run_youtube_dl(video_link, options):
     else:
         log_downloads_per_day()
  
-        
-def return_download_path(download_type):
-    session['filename'] = [file for file in os.listdir(download_dir) if '.part'not in file and 
+def return_download_path():
+    session['filename'] = [file for file in os.listdir(download_dir) if Path(file).suffix not in unwanted_filetypes and 
                            os.path.splitext(file)[0] == session['filename']][0]
 
     filesize = round((os.path.getsize(os.path.join(download_dir, session['filename'])) / 1_000_000), 2)
@@ -71,22 +70,21 @@ def return_download_path(download_type):
         db.session.commit()
 
     # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
-    new_filename = session['filename'].replace('#', '').replace(download_type, '.').replace('%', '').replace('_', ' ')
-    session['new_filename'] = new_filename
-    os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, new_filename))
+    session['new_filename'] = session['filename'].replace('#', '').replace('%', '').replace('_', ' ')
+    # Rename the file.
+    os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, session['new_filename']))
 
     # Update the list of videos downloaded.
     with open("logs/downloads.txt", "a") as f:
-        f.write(f'\n{new_filename}')
+        f.write(f'\n{session["new_filename"]}')
     
-    return os.path.join('downloads', new_filename)
+    return os.path.join('downloads', session['new_filename'])
 
 
 def clean_up():
     for file in os.listdir(download_dir):
-        if session['filename'] in file and '.part' in file:
+        if Path(file).suffix in unwanted_filetypes:
             os.remove(f'{download_dir}/{file}')
-            log.info(f'Deleted {file}')
     os.remove(session['progress_file_path'])
     os.remove(f'downloads/{session["new_filename"]}')
 
@@ -124,21 +122,21 @@ downloads_today = 0
 def yt_downloader():
     # First POST request when the user clicks on a download button.
     if request.form['button_clicked'] == 'yes':
-        log_this('Clicked on a download button.')
+        log_this(f'Chose {request.form["which_button"]}')
         update_database()
         # I want to save the download progress to a file and read from that file to show the download progress
         # to the user. Set the name of the file to the time since the epoch.
         progress_file_name = f'{str(time())[:-8]}.txt'
         session['progress_file_path'] = os.path.join('yt-progress', progress_file_name)
-        return session['progress_file_path']
+        return session['progress_file_path'], 200
 
     # Second POST request:
 
     video_link = request.form['link']
+    log.info(video_link)
 
     # If the user clicked on the "Other" button.
     if request.form['button_clicked'] == 'other':
-        log.info(f'{video_link} | Other')
         video_audio_streams = []
         
         options = {}
@@ -180,34 +178,31 @@ def yt_downloader():
 
     # Video (best quality)   
     elif request.form['button_clicked'] == 'Video [best]':
-        log.info(f'{video_link} | Video')
         options = {
             'format': 'bestvideo+bestaudio/best',
-            'outtmpl': f'{download_dir}/%(title)s-[video].%(ext)s',
+            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
             'restrictfilenames': True,
             'logger': Logger()
         }
         run_youtube_dl(video_link, options)
-        return return_download_path('-[video].')
+        return return_download_path()
        
     # MP4
     elif request.form['button_clicked'] == 'Video [MP4]':
-        log.info(f'{video_link} | MP4')
         options = {
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-            'outtmpl': f'{download_dir}/%(title)s-[MP4].%(ext)s',
+            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
             'restrictfilenames': True,
             'logger': Logger()
         }
         run_youtube_dl(video_link, options)
-        return return_download_path('-[MP4].')
+        return return_download_path()
 
     # Audio (best quality)
     elif request.form['button_clicked'] == 'Audio [best]':
-        log.info(f'{video_link} | Audio')
         options = {
             'format': 'bestaudio/best',
-            'outtmpl': f'{download_dir}/%(title)s-[audio].%(ext)s',
+            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio'
             }],
@@ -215,14 +210,13 @@ def yt_downloader():
             'logger': Logger()
         }
         run_youtube_dl(video_link, options)
-        return return_download_path('-[audio].')
+        return return_download_path()
      
     # MP3
     elif request.form['button_clicked'] == 'MP3':
-        log.info(f'{video_link} | MP3')
         options = {
             'format': 'bestaudio/best',
-            'outtmpl': f'{download_dir}/%(title)s-[MP3].%(ext)s',
+            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
             'writethumbnail': True,
             'postprocessors': [
                 {
@@ -238,7 +232,7 @@ def yt_downloader():
             'logger': Logger()
         }
         run_youtube_dl(video_link, options)
-        return return_download_path('-[MP3].')
+        return return_download_path()
 
 
 # This is where the youtube-dl progress file is.
@@ -250,7 +244,7 @@ def get_file(filename):
 @yt.route("/downloads/<filename>", methods=["GET"])
 def send_file(filename):
     log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
-    mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == ".m4a" else ''
+    mimetype_value = 'audio/mp4' if Path(filename).suffix == ".m4a" else ''
     try:
         return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
     except Exception as error:
