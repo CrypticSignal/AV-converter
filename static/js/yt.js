@@ -49,8 +49,17 @@ async function showDownloadProgress(progressFilePath) {
 
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(whichButton) { // whichButton is this.value in yt.html
+
+    if (linkBox.value == '') {
+        show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
+        return;
+    }
+
     // If the "Choose" button was clicked.
     if (whichButton == 'other') {
+        hideInitialButtons();
+        document.getElementById('table_div').style.display = 'block'
+        document.getElementById('show_initial_buttons').style.display = 'block';
         const data = new FormData();
         data.append("link", linkBox.value);
         data.append('button_clicked', 'other');
@@ -79,12 +88,8 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             const td6 = `<td><a href="${jsonParsed[i]['video_url']}">Download</a></td>`;
             const closingTr = `</tr>`
             table.innerHTML += openingTr + td1 + td2 + td3 + td4 + td5 + td6 + closingTr;
-        }  
-        return;
-    }
-
-    if (linkBox.value == '') {
-        show_alert('Trying to download something without pasting the URL? You silly billy.', 'warning')
+        } 
+        hideInitialButtons();
         return;
     }
 
@@ -92,6 +97,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
     const firstFormData = new FormData();
     firstFormData.append('button_clicked', 'yes');
     firstFormData.append("which_button", whichButton);
+
     // 1st POST request to get the path of the progress file.
     const requestProgressPath = await fetch('/yt', {
         method: 'POST',
@@ -99,6 +105,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
     });
 
     if (!requestProgressPath.ok) {
+        con
         show_alert(requestProgressPath, 'danger');
         return;
     }
@@ -108,6 +115,16 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         const secondFormData = new FormData();
         secondFormData.append("link", linkBox.value);
         secondFormData.append("button_clicked", whichButton);
+        
+        if (whichButton == 'download_mp3') {
+            const mp3EncodingType = document.getElementById('mp3_encoding_type').value;
+            const mp3Bitrate = document.getElementById('mp3_bitrate').value;
+            const vbrSettingMP3 = document.getElementById('mp3_vbr_setting').value;
+
+            secondFormData.append("mp3_encoding_type", mp3EncodingType);
+            secondFormData.append("mp3_bitrate", mp3Bitrate);
+            secondFormData.append("mp3_vbr_setting", vbrSettingMP3);
+        } 
 
         shouldLog = true;
         showDownloadProgress(progressFilePath);
@@ -149,4 +166,51 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
             return;
         }
     }
+}
+
+function hideInitialButtons() {
+    document.getElementById('mp4').style.display = 'none';
+    document.getElementById('video_best').style.display = 'none';
+    document.getElementById('audio').style.display = 'none';
+    document.getElementById('mp3').style.display = 'none';
+    document.getElementById('other').style.display = 'none';
+}
+
+function showInitialButtons () {
+    document.getElementById('table_div').style.display = 'none';
+    document.getElementById('show_initial_buttons').style.display = 'none';
+    document.getElementById('MP3').style.display = 'none';
+    document.getElementById('mp4').style.display = 'block';
+    document.getElementById('video_best').style.display = 'block';
+    document.getElementById('audio').style.display = 'block';
+    document.getElementById('other').style.display = 'block';
+}
+
+function showMP3Div(){
+    hideInitialButtons();
+    document.getElementById('MP3').style.display = 'block';
+    document.getElementById("mp3_encoding_type").selectedIndex = 1;
+    document.getElementById('mp3_slider_div').style.display = 'block';
+    document.getElementById('mp3_vbr_setting_div').style.display = 'none';
+    document.getElementById('reset').style.display = 'block';
+}
+
+
+function showHideMP3(value) {
+    if (value=='cbr') {
+        document.getElementById('mp3_slider_div').style.display = 'block';
+        document.getElementById('mp3_vbr_setting_div').style.display = 'none';
+}
+    else {
+        document.getElementById('mp3_vbr_setting_div').style.display = 'block';
+        document.getElementById('mp3_slider_div').style.display = 'none';
+    }
+}
+// Slider for MP3
+const mp3slider = document.getElementById("mp3_bitrate");
+const mp3output = document.getElementById("mp3value");
+mp3output.innerHTML = mp3slider.value + " kbps";
+// Update the current slider value (each time you drag the slider handle)
+mp3slider.oninput = function () {
+    mp3output.innerHTML = this.value + " kbps";
 }

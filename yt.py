@@ -85,7 +85,6 @@ def clean_up():
     for file in os.listdir(download_dir):
         if Path(file).suffix in unwanted_filetypes:
             os.remove(f'{download_dir}/{file}')
-    os.remove(session['progress_file_path'])
     os.remove(f'downloads/{session["new_filename"]}')
 
 
@@ -213,7 +212,14 @@ def yt_downloader():
         return return_download_path()
      
     # MP3
-    elif request.form['button_clicked'] == 'MP3':
+    elif request.form['button_clicked'] == 'download_mp3':
+        if request.form['mp3_encoding_type'] == 'cbr':
+            preferredquality_value = request.form['mp3_bitrate']
+            log.info(f'{preferredquality_value} kbps')
+        else:
+            preferredquality_value = request.form['mp3_vbr_setting']
+            log.info(f'-V {preferredquality_value}')
+
         options = {
             'format': 'bestaudio/best',
             'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
@@ -222,7 +228,7 @@ def yt_downloader():
                 {
                     'key': 'FFmpegExtractAudio',
                     'preferredcodec': 'mp3',
-                    'preferredquality': '0' # -q:a 0
+                    'preferredquality': preferredquality_value
                 },
                 {
                     'key': 'EmbedThumbnail'

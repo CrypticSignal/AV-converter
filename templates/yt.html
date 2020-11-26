@@ -4,33 +4,88 @@
 <h1>YT downloader</h1>
 
 <div class="container">
+
     <p><strong>Video (best quality)</strong> - usually gives you an MKV (.mkv) or WebM (.webm) file with Opus audio.</p>
     <p><strong>Audio (best quality)</strong> - usually gives you an Opus file (.opus).</p>
     <p>If using an <strong>iOS device</strong>, select <strong>Video (MP4)</strong> or <strong>Audio (MP3)</strong> as iOS does not support all media formats natively.</p>
-    <hr>
 
     <h5><b>Link:</b></h5>
     <input type="text" onclick="paste()" class="form-control" maxlength="200" name="link" id="link" required/>
-    
+    <hr> 
+
+    <div id="table_div" style="display:none">
+        <table id="table"></table>
+    </div>
+
     <div id="alert_wrapper" style="display:none"></div>
 
-    <!-- Download buttons -->
+    <!--MP3 DIV-->
+    <div id="MP3" style="display:none">
+  
+        <!--Bitrate modes for MP3-->
+        <div id="mp3_encoding_div">
+          <label for="mp3_encoding_type">Bitrate Type:</label>
+          <select id="mp3_encoding_type" onchange="showHideMP3(this.value);">
+            <option disabled value>Select encoding type</option>
+            <option selected value="cbr">CBR (Constant Bitrate)</option>
+            <option value="vbr">VBR (Variable Bitrate)</option>
+          </select>
+        </div>
+  
+        <!--Bitrate slider for MP3 CBR-->
+        <div id="mp3_slider_div">
+          <p>Set your desired bitrate via the slider:</p>
+          <input type="range" min="64" max="320" step="64" value="192" id="mp3_bitrate" class="slider"/>
+          <span id="mp3value"></span><br><br>
+        </div>
+  
+        <!-- VBR settings for MP3 -->
+        <div id="mp3_vbr_setting_div" style="display:none">
+          <label for="mp3_vbr_setting">Setting:</label>
+          <select id="mp3_vbr_setting">
+            <option disabled value>Select VBR setting</option>
+            <option selected value="0">-V 0 (~240kbps)</option>
+            <option value="1">-V 1 (~220kbps)</option>
+            <option value="2">-V 2 (~190kbps)</option>
+            <option value="3">-V 3 (~170kbps)</option>
+            <option value="4">-V 4 (~160kbps)</option>
+            <option value="5">-V 5 (~130kbps)</option>
+            <option value="6">-V 6 (~120kbps)</option>
+          </select><br>
+          <i>For more details about the settings, click
+          <a target="_blank" href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_settings_details">here</a>.
+          </i>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-dark" onclick="buttonClicked(this.value)" id="download_mp3">Download</button>
+        </div>
+  
+    </div> <!--Closing tag for MP3 div-->
+
+    <div id="show_initial_buttons" style="display:none">
+        <hr>
+        <div class="btn-group">
+            <button class="btn btn-dark" onclick="showInitialButtons()">Bring back the other buttons!</button>
+        </div>
+    </div> 
+
     <div class="btn-group">
-        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="Video [MP4]">Video (MP4)</button>
+        <button class="btn btn-dark" id="mp4" onclick="buttonClicked(this.value)" value="Video [MP4]">Video (MP4)</button>
     </div>
     <div class="btn-group">
-        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="Video [best]">Video (best quality)</button>
+        <button class="btn btn-dark" id="video_best" onclick="buttonClicked(this.value)" value="Video [best]">Video (best quality)</button>
     </div><br><br>
     <div class="btn-group">
-        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="MP3">Audio (MP3)</button>
+        <button class="btn btn-dark" id="mp3" onclick="showMP3Div()" value="MP3">Audio (MP3)</button>
     </div>
     <div class="btn-group">
-        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="Audio [best]">Audio (best quality)</button>
+        <button class="btn btn-dark" id="audio" onclick="buttonClicked(this.value)" value="Audio [best]">Audio (best quality)</button>
     </div><br><br>
     <div class="btn-group">
-        <button class="btn btn-dark" onclick="buttonClicked(this.value)" value="other">Other</button>
+        <button class="btn btn-dark" id="other" onclick="buttonClicked(this.value)" value="other">Other</button>
     </div>
-    <table id="table"></table>
+    
 </div>
 
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
