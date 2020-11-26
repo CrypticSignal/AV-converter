@@ -222,7 +222,6 @@ def homepage():
         if extension['error'] is not None:
             return extension, 500
         else:
-            log.info('in else main')
             # Filename after conversion.
             session['converted_file_name'] = f'{output_name}{extension["ext"]}'
             return extension
