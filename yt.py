@@ -86,6 +86,7 @@ def clean_up():
         if Path(file).suffix in unwanted_filetypes:
             os.remove(f'{download_dir}/{file}')
     os.remove(f'downloads/{session["new_filename"]}')
+    log.info(f'Deleted {session["new_filename"]}')
 
 
 # This value for the 'logger' key in the youtube-dl options dictionaries will be set to this class.        
@@ -119,9 +120,8 @@ downloads_today = 0
 
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
-    # First POST request when the user clicks on a download button.
-    if request.form['button_clicked'] == 'yes':
-        log_this(f'Chose {request.form["which_button"]}')
+
+    if request.data.decode('utf-8') == 'send_progress_path':
         update_database()
         # I want to save the download progress to a file and read from that file to show the download progress
         # to the user. Set the name of the file to the time since the epoch.
@@ -129,19 +129,85 @@ def yt_downloader():
         session['progress_file_path'] = os.path.join('yt-progress', progress_file_name)
         return session['progress_file_path'], 200
 
-    # Second POST request:
-
+    log_this(f'Clicked on {request.form["button_clicked"]}')
     video_link = request.form['link']
     log.info(video_link)
 
-    # If the user clicked on the "Other" button.
-    if request.form['button_clicked'] == 'other':
+    # Video (best quality)   
+    if request.form['button_clicked'] == 'Video [best]':
+        options = {
+            'format': 'bestvideo+bestaudio/best',
+            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
+            'restrictfilenames': True,
+            'logger': Logger()
+        }
+        run_youtube_dl(video_link, options)
+        return return_download_path()
+    
+    # MP4
+    elif request.form['button_clicked'] == 'Video [MP4]':
+        options = {
+            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
+            'restrictfilenames': True,
+            'logger': Logger()
+        }
+        run_youtube_dl(video_link, options)
+        return return_download_path()
+
+    # Audio (best quality)
+    elif request.form['button_clicked'] == 'Audio [best]':
+        options = {
+            'format': 'bestaudio/best',
+            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio'
+            }],
+            'restrictfilenames': True,
+            'logger': Logger()
+        }
+        run_youtube_dl(video_link, options)
+        return return_download_path()
+    
+    # MP3
+    elif request.form['button_clicked'] == 'download_mp3':
+        if request.form['mp3_encoding_type'] == 'cbr':
+            preferredquality_value = request.form['mp3_bitrate']
+            log.info(f'{preferredquality_value} kbps')
+        else:
+            preferredquality_value = request.form['mp3_vbr_setting']
+            log.info(f'-V {preferredquality_value}')
+
+        options = {
+            'newline': True,
+            'format': 'bestaudio/best',
+            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
+            'writethumbnail': True,
+            'postprocessors': [
+                {
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': preferredquality_value
+                },
+                {
+                    'key': 'EmbedThumbnail'
+                }
+            ],
+            'restrictfilenames': True,
+            'logger': Logger()
+        }
+        run_youtube_dl(video_link, options)
+        return return_download_path()
+
+    elif request.form['button_clicked'] == 'other':
+        log_this(f'Chose Other')
+
         video_audio_streams = []
         
         options = {}
         with YoutubeDL(options) as ydl:
             info = ydl.extract_info(video_link, download=False)
-       
+        
         for data in info['formats']:
             if data['filesize'] is not None:
                 filesize = f"{round(int(data['filesize']) / 1000000, 1)} MB"
@@ -174,71 +240,6 @@ def yt_downloader():
 
         video_audio_streams = json.dumps(video_audio_streams[::-1])
         return jsonify(streams=video_audio_streams)
-
-    # Video (best quality)   
-    elif request.form['button_clicked'] == 'Video [best]':
-        options = {
-            'format': 'bestvideo+bestaudio/best',
-            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
-            'restrictfilenames': True,
-            'logger': Logger()
-        }
-        run_youtube_dl(video_link, options)
-        return return_download_path()
-       
-    # MP4
-    elif request.form['button_clicked'] == 'Video [MP4]':
-        options = {
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
-            'restrictfilenames': True,
-            'logger': Logger()
-        }
-        run_youtube_dl(video_link, options)
-        return return_download_path()
-
-    # Audio (best quality)
-    elif request.form['button_clicked'] == 'Audio [best]':
-        options = {
-            'format': 'bestaudio/best',
-            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio'
-            }],
-            'restrictfilenames': True,
-            'logger': Logger()
-        }
-        run_youtube_dl(video_link, options)
-        return return_download_path()
-     
-    # MP3
-    elif request.form['button_clicked'] == 'download_mp3':
-        if request.form['mp3_encoding_type'] == 'cbr':
-            preferredquality_value = request.form['mp3_bitrate']
-            log.info(f'{preferredquality_value} kbps')
-        else:
-            preferredquality_value = request.form['mp3_vbr_setting']
-            log.info(f'-V {preferredquality_value}')
-
-        options = {
-            'format': 'bestaudio/best',
-            'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
-            'writethumbnail': True,
-            'postprocessors': [
-                {
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'mp3',
-                    'preferredquality': preferredquality_value
-                },
-                {
-                    'key': 'EmbedThumbnail'
-                }
-            ],
-            'restrictfilenames': True,
-            'logger': Logger()
-        }
-        run_youtube_dl(video_link, options)
-        return return_download_path()
 
 
 # This is where the youtube-dl progress file is.

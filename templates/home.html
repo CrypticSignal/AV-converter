@@ -30,7 +30,7 @@
     <i>Max file size: {{ upload_size }} GB.</i>
     <p>To see the list of supported input filetypes, click <a href=filetypes target="_blank">here</a>.</p>
     <p>Alternatively, you can use a URL as input:</p>
-    <input type="url" name="url" id="url" placeholder="https://example.com/video/video.mp4"><br>
+    <input type="url" autocomplete="off" name="url" id="url" placeholder="https://example.com/video/video.mp4"><br>
     <i>The link must be supported by <a href="https://ffmpeg.org/" target="_blank">FFmpeg</a>. YouTube links aren't supported.</i>
 
     <hr><h5>Desired Format</h5>
@@ -330,7 +330,7 @@
 
     <!--Output Filename (Bootstrap class)-->
     <hr><h5>Output Filename</h5>
-    <input type="text" class="form-control" maxlength="200" id="output_name" required/><br>
+    <input type="text" autocomplete="off" class="form-control" maxlength="200" id="output_name" required/><br>
 
     <!-- Bootstrap Alert -->
     <div id="alert_wrapper" style="display:none"></div>
