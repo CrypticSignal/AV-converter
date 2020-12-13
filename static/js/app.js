@@ -50,7 +50,7 @@ function updateBoxes() {
     outputNameBox.value = defaultOutputName;
 }
 
-async function convertButtonClicked() {
+function convertButtonClicked() {
     fetch('/', {
         method: 'POST',
         body: 'The user clicked on the convert button.'
@@ -66,14 +66,6 @@ function showProgress(event) {
     const loaded = event.loaded / 10 ** 6;
     const total = event.total / 10 ** 6;
     const percentageComplete = Math.floor((loaded / total) * 100);
-
-    if (percentageComplete > previousPercentageComplete && percentageComplete !== 100) {
-        const uploadProgressRequest = new XMLHttpRequest();
-        const uploadProgress = new FormData();
-        uploadProgress.append('upload_progress', percentageComplete);
-        uploadProgressRequest.open("POST", "/");
-        uploadProgressRequest.send(uploadProgress);
-    }
 
     $('#progress_bar').html(`${Math.floor(percentageComplete)}%`);
     // Add a style attribute to the progress div, i.e. style="width: x%"
@@ -274,13 +266,9 @@ function upload_and_send_conversion_request() {
             return;
         }
         // Show an alert if a disallowed character has been entered in the output name box.
-        else if (outputNameBox.value.includes('"') || outputNameBox.value.includes('/') ||
-            outputNameBox.value.includes('\\') || outputNameBox.value.includes('?') || outputNameBox.value.includes('*') ||
-            outputNameBox.value.includes('>') || outputNameBox.value.includes('<') || outputNameBox.value.includes('|') ||
-            outputNameBox.value.includes(':') || outputNameBox.value.includes(';') || outputNameBox.value.includes('&&') ||
-            outputNameBox.value.includes('command') || outputNameBox.value.includes('$') ||
-            outputNameBox.value.includes('.')) {
-            show_alert('Characters not allowed: ., ", /, ?, *, >, <, |, :, $ or the word "command"', "danger");
+        else if (outputNameBox.value.includes('#') || outputNameBox.value.includes('%') || 
+                 outputNameBox.value.includes('\\') || outputNameBox.value.includes('/')) {
+            show_alert('Characters not allowed: #, %, \\, /', "danger");
             return;
         }
         // Show an alert if output name box is empty.

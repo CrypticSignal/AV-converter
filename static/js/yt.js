@@ -31,10 +31,7 @@ async function showDownloadProgress(progressFilePath) {
             lines = textInFile.split('\r')
             lastLine = lines[lines.length - 1];
             console.log(lastLine);
-            if (lastLine.includes(': Downloading webpage')) {
-                show_alert('Video found!', 'success');
-            }
-            else if (lastLine.includes('.audio_mp3')) {
+            if (lastLine.includes('.audio_mp3')) {
                 show_alert('Converting to MP3...', 'info')
             }
             else if (lastLine.includes('[ffmpeg] Merging')) {
@@ -42,9 +39,6 @@ async function showDownloadProgress(progressFilePath) {
             }
             else if (lastLine.includes('[ffmpeg] Merging')) {
                 show_alert('Merging audio and video...', 'info');
-            }
-            else if (lastLine.includes('Deleting original file ') || lastLine.includes('[ffmpeg] D')) {
-                show_alert('Finishing up...', 'info');
             }
             else if (lastLine.includes('[download] ')) {
                 show_alert(lastLine.substring(11), 'info');
@@ -85,7 +79,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         table = document.getElementById('table')
         table.innerHTML = '';
         const tbl = $("<table/>").attr("id", "mytable");
-        const columnNames = `<th>Type</th><th>Resolution</th><th>Codec</th><th>Filetype</th><th>Size</th><th>Right click, save link</th>`
+        const columnNames = `<th>Type</th><th>Resolution</th><th>Codec</th><th>Filetype</th><th>Size</th><th>Right click on Download, save link</th>`
         table.innerHTML = columnNames;
 
         for (let i = 0; i < jsonParsed.length; i++) {

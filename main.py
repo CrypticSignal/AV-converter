@@ -77,10 +77,6 @@ def homepage():
         log_this('Clicked on the convert button.')
         return 'is_convert_clicked received.'
 
-    elif 'upload_progress' in request.form: 
-        log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {request.form["upload_progress"]}% uploaded...')
-        return request.form['upload_progress']
-
     elif request.form["request_type"] == "convert_url":
         session['progress_filename'] = f'{str(time())[:-8]}.txt'
         return session['progress_filename']

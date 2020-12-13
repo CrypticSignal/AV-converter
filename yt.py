@@ -25,7 +25,7 @@ db = SQLAlchemy(app)
 os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
-unwanted_filetypes = ['.part', '.jpg', '.ytdl']
+unwanted_filetypes = ['.part', '.jpg', '.ytdl', '.webp']
 
 
 def update_database():
@@ -85,8 +85,12 @@ def clean_up():
     for file in os.listdir(download_dir):
         if Path(file).suffix in unwanted_filetypes:
             os.remove(f'{download_dir}/{file}')
-    os.remove(f'downloads/{session["new_filename"]}')
-    log.info(f'Deleted {session["new_filename"]}')
+    try:
+        os.remove(f'downloads/{session["new_filename"]}')
+    except Exception as error:
+        log.info(f'Unable to delete {session["new_filename"]}\n{error}')
+    else:
+        log.info(f'Deleted downloads/{session["new_filename"]}')
 
 
 # This value for the 'logger' key in the youtube-dl options dictionaries will be set to this class.        
@@ -179,7 +183,6 @@ def yt_downloader():
             log.info(f'-V {preferredquality_value}')
 
         options = {
-            'newline': True,
             'format': 'bestaudio/best',
             'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
             'writethumbnail': True,

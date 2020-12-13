@@ -59,3 +59,6 @@ def download_file(filename):
         return send_from_directory('trims', filename, mimetype=mimetype_value, as_attachment=True)
     except Exception as error:
         log.error(f'Unable to send file. Error: \n{error}')
+    finally:
+        os.remove(f'trims/{filename}')
+
