@@ -179,9 +179,11 @@ async function sendConversionRequest(filename) {
     else {
         const jsonResponse = await conversionResponse.json();
         logFile = jsonResponse.log_file;
+        downloadLink = jsonResponse.download_path
+        console.log(downloadLink)
 
         const anchorTag = document.createElement("a");
-        anchorTag.href = jsonResponse.download_path;
+        anchorTag.href = downloadLink;
         anchorTag.download = '';
         anchorTag.click();
 

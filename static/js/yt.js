@@ -27,26 +27,10 @@ async function showDownloadProgress(progressFilePath) {
     while (shouldLog) {
         const response = await fetch(progressFilePath);
         if (response.ok) {
-            const textInFile = await response.text()
-            lines = textInFile.split('\r')
-            lastLine = lines[lines.length - 1];
-            console.log(lastLine);
-            if (lastLine.includes('.audio_mp3')) {
-                show_alert('Converting to MP3...', 'info')
-            }
-            else if (lastLine.includes('[ffmpeg] Merging')) {
-                show_alert('Merging audio and video...', 'info');
-            }
-            else if (lastLine.includes('[ffmpeg] Merging')) {
-                show_alert('Merging audio and video...', 'info');
-            }
-            else if (lastLine.includes('[download] ')) {
-                show_alert(lastLine.substring(11), 'info');
-            }
-            else {
-                show_alert(lastLine, 'info');
-            }
-            await sleep(500);
+            const fileContents = await response.text()
+            show_alert(fileContents, 'info');
+            console.log(fileContents);
+            //await sleep(x);
         }
     }
 }
@@ -74,7 +58,9 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
         });
 
         const jsonResponse = await response.json();
+        console.log(jsonResponse)
         const jsonParsed = JSON.parse(jsonResponse.streams)
+        console.log(jsonParsed)
 
         table = document.getElementById('table')
         table.innerHTML = '';
@@ -156,9 +142,7 @@ async function buttonClicked(whichButton) { // whichButton is this.value in yt.h
 
                 // Sometimes the alert below didn't show up, adding a delay seems to fixes this.
                 await sleep(500)
-                show_alert(`Your browser should have started downloading the file. \
-                           Click <a href="${progressFilePath}" target="_blank">here</a> \
-                           if you'd like to view the log file.`, 'success');
+                show_alert(`Your browser should have started downloading the file :)`, 'success');
             }
             else if (secondRequest.status == 500) {
                 error = await secondRequest.text()
