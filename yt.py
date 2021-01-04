@@ -60,7 +60,6 @@ def return_download_path():
                            os.path.splitext(file)[0] == session['filename']][0]
 
     filesize = round((os.path.getsize(os.path.join(download_dir, session['filename'])) / 1_000_000), 2)
-    log.info(f'{session["filename"]} | {filesize} MB')
 
     # Query the database by IP.
     user = User.query.filter_by(ip=get_ip()).first()
@@ -71,14 +70,20 @@ def return_download_path():
 
     # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
     session['new_filename'] = session['filename'].replace('#', '').replace('%', '').replace('_', ' ')
-    # Rename the file.
-    os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, session['new_filename']))
 
-    # Update the list of videos downloaded.
-    with open("logs/downloads.txt", "a") as f:
-        f.write(f'\n{session["new_filename"]}')
-    
-    return os.path.join('downloads', session['new_filename'])
+    log.info(f'{session["new_filename"]} | {filesize} MB')
+
+    # Rename the file.
+    try:
+        os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, session['new_filename']))
+    except Exception as e:
+        log.info(f'Unable to rename the file:\n{e}')
+    else:
+        # Update the list of videos downloaded.
+        with open("logs/downloads.txt", "a") as f:
+            f.write(f'\n{session["new_filename"]}')
+        
+        return os.path.join('downloads', session['new_filename'])
 
 
 def clean_up():
@@ -93,15 +98,44 @@ def clean_up():
         log.info(f'Deleted downloads/{session["new_filename"]}')
 
 
-# This value for the 'logger' key in the youtube-dl options dictionaries will be set to this class.        
+def file_creator(filename, mode, contents):
+    with open(filename, mode) as f:
+        f.write(contents)
+
+
+write_ytdl_output = False       
+
+
+# This value for the 'logger' key in the youtube-dl options dictionaries will be set to this class. 
 class Logger():
     def debug(self, msg):
-        with open(session['progress_file_path'], 'a') as f:
-            f.write(msg)
+        if write_ytdl_output:
+            file_creator(session['progress_file_path'], 'w', msg)
+
     def warning(self, msg):
         pass
+
     def error(self, msg):
         pass
+
+
+def my_hook(d):
+    if d['status'] == 'finished':
+        file_creator(session['progress_file_path'], 'w', 'Just a moment...')
+
+    elif 'downloaded_bytes' in d.keys() and 'total_bytes' in d.keys():
+        percentage_downloaded = round(((d['downloaded_bytes'] / d['total_bytes']) * 100), 1)
+        final_size_mb = round((d['total_bytes'] / 1_000_000), 1)
+        file_creator(session['progress_file_path'], 'w', f'{percentage_downloaded}% of {final_size_mb} MB retreived...')
+
+    elif 'downloaded_bytes' in d.keys() and 'total_bytes_estimate' in d.keys():
+        percentage_downloaded = round(((d['downloaded_bytes'] / d['total_bytes_estimate']) * 100), 1)
+        final_size_estimate = round((d['total_bytes_estimate'] / 1_000_000), 1)
+        file_creator(session['progress_file_path'], 'w',
+                    f'{percentage_downloaded}% of {final_size_estimate} MB (estimate) retreived...')
+    else:
+        global write_ytdl_output
+        write_ytdl_output = True
 
 
 # This class is a table in the database.
@@ -124,7 +158,6 @@ downloads_today = 0
 
 @yt.route("/yt", methods=["POST"])
 def yt_downloader():
-
     if request.data.decode('utf-8') == 'send_progress_path':
         update_database()
         # I want to save the download progress to a file and read from that file to show the download progress
@@ -143,7 +176,8 @@ def yt_downloader():
             'format': 'bestvideo+bestaudio/best',
             'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
             'restrictfilenames': True,
-            'logger': Logger()
+            'logger': Logger(),
+            'progress_hooks': [my_hook]
         }
         run_youtube_dl(video_link, options)
         return return_download_path()
@@ -154,7 +188,8 @@ def yt_downloader():
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
             'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
             'restrictfilenames': True,
-            'logger': Logger()
+            'logger': Logger(),
+            'progress_hooks': [my_hook]
         }
         run_youtube_dl(video_link, options)
         return return_download_path()
@@ -168,7 +203,8 @@ def yt_downloader():
                 'key': 'FFmpegExtractAudio'
             }],
             'restrictfilenames': True,
-            'logger': Logger()
+            'logger': Logger(),
+            'progress_hooks': [my_hook]
         }
         run_youtube_dl(video_link, options)
         return return_download_path()
@@ -197,7 +233,8 @@ def yt_downloader():
                 }
             ],
             'restrictfilenames': True,
-            'logger': Logger()
+            'logger': Logger(),
+            'progress_hooks': [my_hook]
         }
         run_youtube_dl(video_link, options)
         return return_download_path()
