@@ -35,18 +35,16 @@ You can run the Flask app locally for development purposes or if you want audio/
 Open 2 terminal windows.
 
 Window 1:
-- `cd frontend`
-
-- `npm install`
-
-- `npm run build`
-
-Window 2:
 - `cd backend`
 - `pip3 install -r requirements.txt`
 - `python3 main.py`
 
-Finally, you can go to http://127.0.0.1:5000 via a web browser.
+Window 2:
+- `cd frontend`
+
+- `npm install`
+
+- Enter `npm start` and after a moment you should be taken to http://127.0.0.1:3000
 
 **If you want to convert to AAC when running this web application locally:**
 
