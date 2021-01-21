@@ -1,16 +1,12 @@
 import { Link } from 'react-router-dom';
 
 const topBar = () => {
-
+  
     function myFunction(e) {
         e.preventDefault();
         let x = document.getElementById("top_bar");
-        console.log(x)
-        console.log(x.className)
         if (x.className === "top") {
           x.className += " mobile";
-          console.log('class changed to')
-          console.log(x.className)
           document.getElementById('coffee').style.display = 'none';
         } else {
           x.className = "top";

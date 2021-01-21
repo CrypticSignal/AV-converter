@@ -43,8 +43,8 @@ def update_database():
 def run_youtube_dl(video_link, options):
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(video_link, download=False)
-    # Remove the file extension and the 'downloads/' at the start.
-    session['filename'] = os.path.splitext(ydl.prepare_filename(info))[0][10:]
+    # This is the filename without the extension.
+    session['filename'] = Path(ydl.prepare_filename(info)).stem
     try:
         ydl.download([video_link])
     except Exception as error:

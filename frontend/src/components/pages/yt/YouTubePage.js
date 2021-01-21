@@ -10,19 +10,16 @@ function YoutubePage(props) {
                 <input type="text" autoComplete="off" className="form-control" maxLength={200} name="link" id="link" required />
                 <hr /> 
                 <div id="alert_wrapper" style={{display: 'none'}} />
-
-                <div className="btn-group">
+                <div className="btn-group mr-2 mb-2" role="group">
                     <button className="btn btn-dark" onClick={props.onYtButtonClicked} value="mp4">Video (MP4)</button>
                 </div>
-                <div className="btn-group">
+                <div className="btn-group mb-2" role="group">
                     <button className="btn btn-dark" onClick={props.onYtButtonClicked} value="video_best">Video (best quality)</button>
-                </div><br /><br />
-                <div className="btn-group">
+                </div><br/>
+                <div className="btn-group mr-2" role="group">
                     <button className="btn btn-dark" onClick={props.onYtButtonClicked} value="audio_mp3">Audio (MP3)</button>
                 </div>
-                <div className="btn-group">
-                    <button className="btn btn-dark" onClick={props.onYtButtonClicked} value="audio_best">Audio (best quality)</button>
-                </div>
+                <button className="btn btn-dark" onClick={props.onYtButtonClicked} value="audio_best">Audio (best quality)</button>
             </div>
         </div>
     )
