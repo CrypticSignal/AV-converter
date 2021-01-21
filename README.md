@@ -37,9 +37,9 @@ Open 2 terminal windows.
 Window 1:
 - `cd frontend`
 
--`npm install`
+- `npm install`
 
--`npm run build`
+- `npm run build`
 
 Window 2:
 - `cd backend`
