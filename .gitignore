@@ -1,17 +1,18 @@
-# Files
-*.txt
-cookies.txt
-site.db
-# Folders
 __pycache__
-.vscode
-conversions
-downloads
-ffmpeg_output
-ffmpeg-progress
-flask_session
-GameScores
-logs
-uploads
-yt-progress
-trims
+/backend/logs
+/backend/site.db
+/backend/conversions
+/backend/downloads
+/backend/uploads
+/backend/ffmpeg-progress
+/backend/ffmpeg_output
+/backend/flask_session
+/backend/trims
+/backend/yt-progress
+
+/frontend/build
+/frontend/public
+/frontend/node_modules
+/src/package-lock.json
+
+.eslintcache
