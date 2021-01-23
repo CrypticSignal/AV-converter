@@ -12,6 +12,7 @@ import converter  # converter.py
 from loggers import log, log_this, log_visit
 from trimmer import trimmer  # Importing the blueprint in trimmer.py
 from yt import yt  # Importing the blueprint in yt.py
+from utils import delete_file
 
 app = Flask(__name__)
 secret_key = str(os.urandom(16))
@@ -39,6 +40,7 @@ Session(app)
 
 os.makedirs('uploads', exist_ok=True)
 os.makedirs('conversions', exist_ok=True)
+previous_conversion = None
 
 
 def run_converter(codec, params):
@@ -59,23 +61,14 @@ def run_converter(codec, params):
     return codec_to_converter[codec](*params)
 
 
-def clean_up():
-    os.remove(session["uploaded_file_path"])
-    log.info(f'Deleted {session["uploaded_file_path"]}')
-    os.remove(f'conversions/{session["converted_file_name"]}')
-    log.info(f'Deleted conversions/{session["converted_file_name"]}')
-
-
 @app.route('/api', methods=['POST'])
 def homepage():
     if request.form['request_type'] =='uploaded':
-        log.info(f'Upload complete at {datetime.now().strftime("%H:%M:%S")}')
+        log.info(f'\nUpload complete at {datetime.now().strftime("%H:%M:%S")}')
         log.info(request.files['chosen_file'])
         filename_secure = secure_filename(request.files['chosen_file'].filename)
-        session['uploaded_file_path'] = os.path.join('uploads', filename_secure)
-        uploaded_file_path = session['uploaded_file_path']
         # Save the uploaded file to the uploads folder.
-        request.files['chosen_file'].save(session['uploaded_file_path'])
+        request.files['chosen_file'].save(os.path.join('uploads', filename_secure))
         session['progress_filename'] = f'{str(time())[:-8]}.txt'
         with open(f'ffmpeg-progress/{session["progress_filename"]}', 'w'): pass
         return f'api/ffmpeg-progress/{session["progress_filename"]}'
@@ -86,7 +79,6 @@ def convert_file():
     data = request.form['states']
     filename = request.form['filename']
     uploaded_file_path = os.path.join("uploads", secure_filename(filename))
-    log.info(f'uploaded file path: {uploaded_file_path}')
 
     chosen_codec = json.loads(data)['codec']
     crf_value = json.loads(data)['crfValue']
@@ -119,11 +111,9 @@ def convert_file():
     wav_bit_depth = json.loads(data)['wavBitDepth']
     # Desired filename
     output_name = request.form['output_name']
-    log.info(f'output name: {output_name}')
 
     log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
     output_path = os.path.join('conversions', output_name)
-    extension = None
 
     # AAC
     if chosen_codec == 'AAC':
@@ -198,29 +188,31 @@ def convert_file():
 
     if extension['error'] is not None:
         return extension, 500
+
     else:
         # Filename after conversion.
         session["converted_file_name"] = f'{output_name}{extension["ext"]}'
+
+        global previous_conversion
+        if previous_conversion is not None:
+            delete_file(previous_conversion)
+        previous_conversion = f'conversions/{session["converted_file_name"]}'
+
         return extension
 
 
 @app.route('/api/ffmpeg-progress/<filename>', methods=['GET'])
 def get_file(filename):
-    current = datetime.now().strftime('[%d-%m-%y at %H:%M:%S]')
-    log.info(f'{current} {filename}')
     return send_from_directory('ffmpeg-progress', filename)
 
 
-# app.js directs the user to this URL when the conversion is complete.
-@app.route('/api/conversions/<filename>', methods=['GET'])
-def send_file(filename):
-    log.info('conversions URL hit')
-    log.info(filename)
-    mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == '.m4a' else ''
-    try:
-        return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
-    except Exception as error:
-        log.error(f'Unable to send conversions/{filename}. Error: \n{error}')
+# @app.route('/api/conversions/<filename>', methods=['GET'])
+# def send_file(filename):
+#     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == '.m4a' else ''
+#     try:
+#         return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
+#     except Exception as error:
+#         log.error(f'Unable to send conversions/{filename}. Error: \n{error}')
 
     
 if __name__ == '__main__':

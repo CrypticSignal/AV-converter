@@ -1,8 +1,10 @@
 import os
 import subprocess
-from time import time
+from time import time, sleep
+from datetime import datetime
 
 from loggers import log
+from utils import delete_file
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
 os.makedirs('ffmpeg_output', exist_ok=True)
@@ -12,7 +14,6 @@ ffmpeg_path = 'ffmpeg'
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     progress_file_path = os.path.join('ffmpeg-progress', progress_filename)
-    log.info(f'Conversion progress will be saved to: {progress_file_path}')
     # Turn params into a list as I want to use subprocess.run() with an array of arguments.
     params = params.split(' ')
     params.append(output_name)
@@ -32,6 +33,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         f.write(process.stderr.decode('utf-8'))
         
     if process.returncode != 0:
+        os.remove(uploaded_file_path)
         return {
             'error': process.stderr.decode('utf-8'),
             'log_file': ffmpeg_output_file
@@ -40,14 +42,15 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         end_time = time()
         time_taken = round((end_time - start_time), 2)
         log.info(f'Conversion took {time_taken} seconds.')
+        os.remove(uploaded_file_path)
         return {
             'error': None,
             'ext': os.path.splitext(output_name)[1],
             'download_path': f'api/{output_name}',
             'log_file': ffmpeg_output_file
         }
-
-
+        
+    
 # AAC
 def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, output_path):
     # Keep the video (if applicable)

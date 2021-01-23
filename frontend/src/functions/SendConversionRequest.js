@@ -6,19 +6,14 @@ function sleep(ms) {
 }
 
 let shouldLog = false
-let showSuccessAlert = false;
 
 async function showConversionProgress(progressFilePath) {
     while (true) {
-        if (showSuccessAlert) {
-            showAlert('Done! Your browser should have started downloading the converted file :)', 'success');
-            break;
-        }
-        while (shouldLog) {
+        if (shouldLog) {
             await sleep(500)
             const conversionProgressResponse = await fetch(progressFilePath);
             const textInFile = await conversionProgressResponse.text();
-            
+
             if (conversionProgressResponse.ok && textInFile) {
                 const lines = textInFile.split('\n');
                 const fifthLastLine = lines[lines.length - 6].split('=');
@@ -28,6 +23,10 @@ async function showConversionProgress(progressFilePath) {
                 showAlert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
                 (and ${milliseconds} milliseconds)`, 'primary');
             }
+        }
+        else {
+            showAlert('Done! Your browser should have started downloading the converted file :)', 'success');
+            return;
         }
     }
     
@@ -44,11 +43,14 @@ async function sendConversionRequest(inputFilename, progressFilePath, state) {
     data.append('output_name', document.getElementById('output_name').value)
     data.append('states', JSON.stringify(state))
 
+    console.log('Making the conversionResponse request...')
+
     const conversionResponse = await fetch('/api/convert', {
         method: 'POST',
         body: data
     });
 
+    console.log(conversionResponse)
     shouldLog = false
     //reset();
 
@@ -66,7 +68,7 @@ async function sendConversionRequest(inputFilename, progressFilePath, state) {
         anchorTag.href = jsonResponse.download_path;
         anchorTag.download = '';
         anchorTag.click();
-        showSuccessAlert = true
+        console.log('Download URL visited.')
         reset();
     }
 }

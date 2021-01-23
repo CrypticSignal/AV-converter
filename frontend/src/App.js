@@ -6,6 +6,7 @@ import Filetypes from './components/pages/Filetypes';
 import YoutubePage from './components/pages/yt/YouTubePage';
 import buttonClicked from './components/pages/yt/yt'
 
+import AlertDiv from './components/AlertDiv';
 import TopBar from './components/TopBar'; 
 import FileInput from './components/FileInput';
 import AacEncodingTypeSelector from './components/AAC/EncodingTypeSelector';
@@ -51,20 +52,17 @@ class App extends React.Component {
             vorbisEncodingType: 'abr',
             qValue: '6',
             // WAV
-            wavBitDepth: '16',
-            ytButtonClicked: null
+            wavBitDepth: '16'
           }
 
   onFileInput = (e) => {
-    const filename = e.target.files[0].name;
-    const filetype = e.target.files[0].type;
-    console.log('Selected File:', filename, filetype)
     this.setState({ file: e.target.files[0] })
 
     const inputLabel = document.getElementById("file_input_label");
     inputLabel.innerText = e.target.files[0].name; // Show the name of the selected file.
     
     const outputNameBox = document.getElementById("output_name");
+    const filename = e.target.files[0].name;
     const nameWithoutExt = filename.split('.').slice(0, -1).join('.')
     // Remove percentage sign(s) as this causes an issue when secure_filename is used in main.py
     const defaultOutputName = nameWithoutExt.replace(/%/g, ''); 
@@ -77,7 +75,6 @@ class App extends React.Component {
 
   onBitrateSliderMoved = (e) => {
     this.setState({ sliderValue: e.target.value })
-    console.log(e.target.value)
   }
 
   // MP3
@@ -90,7 +87,6 @@ class App extends React.Component {
   }
   onMp3VbrSettingChange = (e) => {
     this.setState({ mp3VbrSetting: e.target.value })
-
   }
 
   // AAC
@@ -120,7 +116,6 @@ class App extends React.Component {
   // isKeepVideo
   onIsKeepVideoChange = (e) => {
     this.setState({ isKeepVideo: e.target.value })
-    console.log(e.target.value)
   }
 
   // MKV and MP4
@@ -134,7 +129,6 @@ class App extends React.Component {
   // Opus
   onOpusTypeChange = (e) => {
     this.setState({ opusType: e.target.value })
-    console.log(e.target.value)
   }
 
   // Vorbis
@@ -142,14 +136,12 @@ class App extends React.Component {
     this.setState({ vorbisEncodingType: e.target.value })
   }
   onVorbisSliderMoved = (e) => {
-    
     this.setState({ qValue: e.target.value })
   }
 
   // WAV
   onWavBitDepthChange = (e) => {
     this.setState({ wavBitDepth: e.target.value })
-    console.log(e.target.value)
   }
 
   onSubmitClicked = async() => {
@@ -159,9 +151,7 @@ class App extends React.Component {
   // YT downloader page
   onYtButtonClicked = (e) => {
     this.setState({ ytButtonClicked: e.target.value });
-    console.log(document.getElementById('link').value)
     buttonClicked(document.getElementById('link').value, e.target.value)
-    console.log(e.target.value)
   }
 
   renderComponent = () => {
@@ -306,7 +296,7 @@ class App extends React.Component {
                 {this.renderComponent()}<br/>
                 <hr/><h5>Output Filename</h5>
                 <input type="text" autoComplete="off" className="form-control" maxLength="200" id="output_name" required/><br/>
-                <div id="alert_wrapper" style={{display: 'none'}}/>
+                <AlertDiv/>
                 <SubmitButton 
                   onSubmitClicked={this.onSubmitClicked} />
                 <button className="btn btn-primary d-none" id="uploading_btn" type="button" disabled>

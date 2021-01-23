@@ -1,6 +1,5 @@
 import os
-from datetime import datetime
-from time import time
+from time import time, sleep
 from pathlib import Path
 from flask import Blueprint, Flask, request, send_from_directory, session
 from flask_session import Session
@@ -8,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from youtube_dl import YoutubeDL
 
 from loggers import get_ip, log, log_downloads_per_day, log_this
+from utils import delete_file
 
 yt = Blueprint('yt', __name__)
 app = Flask(__name__)
@@ -23,16 +23,18 @@ db = SQLAlchemy(app)
 os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
+previous_download = None
 unwanted_filetypes = ['.part', '.jpg', '.ytdl', '.webp']
 
 
-def update_database():
+def update_database(mb_downloaded):
     # Use the get_ip function imported from loggers.py
     user_ip = get_ip()
     # Query the database by IP.
     user = User.query.filter_by(ip=user_ip).first()
     if user:
         user.times_used_yt_downloader += 1
+        user.mb_downloaded += mb_downloaded
         db.session.commit()
     else:
         new_user = User(ip=user_ip, times_used_yt_downloader=1, mb_downloaded=0)
@@ -43,15 +45,19 @@ def update_database():
 def run_youtube_dl(video_link, options):
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(video_link, download=False)
+
+    filename = Path(ydl.prepare_filename(info)).name
     # This is the filename without the extension.
     session['filename'] = Path(ydl.prepare_filename(info)).stem
+    
     try:
         ydl.download([video_link])
     except Exception as error:
-        log.error(f'Error downloading file:\n{error}')
+        log.error(f'Error downloading {filename}:\n{str(error)}')
         session['youtube_dl_error'] = str(error)
     else:
         log_downloads_per_day()
+        
  
 def return_download_path():
     session['filename'] = [file for file in os.listdir(download_dir) if Path(file).suffix not in unwanted_filetypes and 
@@ -59,34 +65,28 @@ def return_download_path():
 
     filesize = round((os.path.getsize(os.path.join(download_dir, session['filename'])) / 1_000_000), 2)
     log.info(f'{session["filename"]} | {filesize} MB')
-
-    # Query the database by IP.
-    user = User.query.filter_by(ip=get_ip()).first()
-    # If the user has used the downloader before, update the database.
-    if user:
-        user.mb_downloaded += filesize
-        db.session.commit()
+    update_database(filesize)
 
     # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
     session['new_filename'] = session['filename'].replace('#', '').replace('%', '').replace('_', ' ')
-    # Rename the file.
-    os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, session['new_filename']))
+
+    try:
+        log.info(f'Renaming {session["filename"]} to {session["new_filename"]}...')
+        # Rename the file.
+        os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, session['new_filename']))
+    except Exception as e:
+        log.info(f'Renamed failed:\n{e}')
+    else:
+        global previous_download
+        if previous_download is not None:
+            delete_file(previous_download)
+        previous_download = f'downloads/{session["new_filename"]}'
 
     # Update the list of videos downloaded.
     with open("logs/downloads.txt", "a") as f:
         f.write(f'\n{session["new_filename"]}')
     
     return f'api/downloads/{session["new_filename"]}'
-
-
-def clean_up():
-    for file in os.listdir(download_dir):
-        if Path(file).suffix in unwanted_filetypes:
-            os.remove(f'{download_dir}/{file}')
-    try:
-        os.remove(f'downloads/{session["new_filename"]}')
-    except Exception as error:
-        log.info(f'Unable to delete {session["new_filename"]}\n{error}')
 
 
 # This value for the 'logger' key in the youtube-dl options dictionaries will be set to this class.        
@@ -120,9 +120,7 @@ downloads_today = 0
 
 @yt.route("/api/yt", methods=["POST"])
 def yt_downloader():
-
     if request.form['button_clicked'] == 'yes':
-        update_database()
         # I want to save the download progress to a file and read from that file to show the download progress
         # to the user. Set the name of the file to the time since the epoch.
         progress_file_name = f'{str(time())[:-8]}.txt'
@@ -250,16 +248,14 @@ def get_file(filename):
     return send_from_directory('yt-progress', filename)
 
 
-@yt.route("/api/downloads/<filename>", methods=["GET"])
-def send_file(filename):
-    log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
-    try:
-        mimetype_value = 'audio/mp4' if Path(filename).suffix == ".m4a" else ''
-        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
-    except Exception as error:
-        log.error(f'Unable to send downloads/{filename}. Error: \n{error}')
-    finally:
-        clean_up()
+# @yt.route("/api/downloads/<filename>", methods=["GET"])
+# def send_file(filename):
+#     log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
+#     try:
+#         mimetype_value = 'audio/mp4' if Path(filename).suffix == ".m4a" else ''
+#         return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
+#     except Exception as error:
+#         log.error(f'Unable to send downloads/{filename}. Error: \n{error}')
 
 
 @yt.app_errorhandler(500)
