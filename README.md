@@ -32,7 +32,7 @@ You can run the Flask app locally for development purposes or if you want audio/
 - add `"proxy": "http://127.0.0.1:5000"` to `frontend/package.json`.
 - Change the value of `ffmpeg_path` in converter.py to the correct path.
 
-**backend/main/py:**
+**backend/main.py:**
 - Uncomment `@app.route('/api/conversions/<filename>', methods=['GET'])` and the `send_file` function underneath it.
 
 **backend/yt.py:**
