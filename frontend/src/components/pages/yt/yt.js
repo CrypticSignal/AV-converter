@@ -52,7 +52,6 @@ async function showDownloadProgress(progressFilePath) {
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(url, whichButton) { // whichButton is this.value in yt.html
     const linkBox = document.getElementById('link');
-    console.log(`whichButton: ${whichButton}`)
     linkBox.addEventListener('mousedown', paste);
     if (linkBox.value == '') {
         showAlert('Trying to download something without pasting the URL? You silly billy.', 'warning')
@@ -94,13 +93,10 @@ async function buttonClicked(url, whichButton) { // whichButton is this.value in
         
         if (secondRequest.status == 200) {
             const response = await secondRequest.text();
-            console.log(response)
-           
             const anchorTag = document.createElement("a");
             anchorTag.href = response; 
             anchorTag.download = ''
             anchorTag.click();
-            
             // Sometimes the alert below didn't show up, adding a delay seems to fixes this.
             await sleep(500)
             showAlert(`Your browser should have started downloading the file. \

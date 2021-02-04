@@ -1,0 +1,159 @@
+#table, th, td {
+  border:1px solid black;
+  margin: 0 auto;
+}
+/* "fa" are the social media buttons. */
+.fa {
+  padding: 20px;
+  font-size: 30px;
+  width: 50px;
+  text-align: center;
+  text-decoration: none;
+}
+.fa:hover {
+  opacity: 0.7;
+}
+.fa-snapchat-ghost {
+  background: #fffc00;
+  color: black;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+.fa-twitter {
+  background: #55ACEE;
+  color: white;
+}
+.fa-instagram {
+  background: #e4405f;
+  color: white;
+}
+h5 {
+  /* font-family: Arial; */
+  /* font-family: "Times New Roman", Times, serif; */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* font-weight: bold; */
+}
+/* Add a black background color to the top div. */
+.top {
+  background-color: black;
+  overflow: hidden;
+}
+/* The links in the top div. */
+.top a {
+  float: left;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 9px;
+  text-decoration: none;
+  font-size: 17px;
+}
+/* When hovering over a link on the navigation bar */
+.top a:hover {
+  background-color: lightgreen;
+  color: black;
+}
+#coffee {
+  float: right;
+}
+h1 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 200%;
+  text-align: center;
+  background: black;
+  color: white;
+  padding-top: 11px;
+  padding-bottom: 22px;
+  margin: 0; /* No gap between the black background of the title and the tagline */
+}
+#tagline{
+  text-align: center;
+  background: darkblue;
+  color:white;
+}
+/* Extend height of <htmL> element for file drag-and-drop functionality */
+html {
+  height: 100%;
+}
+#root {
+  color: black;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  /* font-family: "Lucida Console", Courier, monospace; */
+  /* font-family: "Times New Roman", Times, serif; */
+  /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif */
+}
+/* The slider. */
+.slider {
+  -webkit-appearance: none;
+  width: 50%;
+  height: 15px;
+  border-radius: 5px;  
+  background: black;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+/* The slider handle (webkit - applies to Chrome, Opera, Safari, Edge). */ 
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%; 
+  background: white;
+  cursor: pointer;
+}
+/* moz - applies to Firefox.  */
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+/* Don't show the hamburger button on screens displays larger than 880 pixels wide. */
+.top .hamburger {
+  display: none;
+}
+/* When the display is 880 pixels wide or less. */
+@media screen and (max-width: 880px) {
+  .top a {display: none;} /* Don't show the links */
+  .top a.hamburger { /* Hamburger button */
+    background-color: black;
+    color: white;
+    display: block; /* Show hamburger menu */
+    float: left;
+  }
+  .top.mobile a { /* The links */
+    text-align: left;
+    float: none; /* Display the links vertically instead of horizontally) */
+    display: block;
+  }
+}
+/* Filetypes page. */
+.videofiletypes, .outputformats, .audiofiletypes {
+  float: left;
+  width: 33%;
+}
+#drop-overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.80); /* Black background with 80% opacity */
+  z-index: 999; /* Sits above everything else */
+}
+#drop-overlay img {
+  margin-bottom: 1em;
+}
+#drop-overlay-text {
+  color: #fff;
+  position: relative;
+  top: 25%;
+}

@@ -1,5 +1,4 @@
-function AlertDiv(props) {
-    console.log(props.displayProperty)
+function AlertDiv() {
     return (
         <div id="alert_wrapper" style={{display: 'none'}}/>
     )

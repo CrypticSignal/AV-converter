@@ -49,8 +49,8 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             'download_path': f'api/{output_name}',
             'log_file': ffmpeg_output_file
         }
-        
-    
+
+
 # AAC
 def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, output_path):
     # Keep the video (if applicable)
@@ -66,9 +66,7 @@ def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
         else:
             return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac '
                         f'-vbr {fdk_vbr} -c:s copy', f'{output_path}.{output_ext}')
-        
-  
-    # Audio-only output file,outpt
+
     else:
         output_ext = 'm4a'
         # CBR
@@ -79,8 +77,6 @@ def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
         else:
             return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac '
                         f'-vbr {fdk_vbr}', f'{output_path}.m4a')
-          
-         
 
 
 # AC3

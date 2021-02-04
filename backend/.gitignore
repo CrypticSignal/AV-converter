@@ -1,16 +1,16 @@
 # Files
-*.txt
 cookies.txt
 site.db
 # Folders
 __pycache__
 .vscode
+uploads
 conversions
 downloads
 ffmpeg_output
+ffmpeg-progress
+yt-progress
 flask_session
 GameScores
 logs
-uploads
-yt-progress
 trims

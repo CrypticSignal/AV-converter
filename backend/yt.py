@@ -71,11 +71,10 @@ def return_download_path():
     session['new_filename'] = session['filename'].replace('#', '').replace('%', '').replace('_', ' ')
 
     try:
-        log.info(f'Renaming {session["filename"]} to {session["new_filename"]}...')
         # Rename the file.
         os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, session['new_filename']))
     except Exception as e:
-        log.info(f'Renamed failed:\n{e}')
+        log.info(f'Unable to rename the file to {session["new_filename"]}:\n{e}')
     else:
         global previous_download
         if previous_download is not None:
@@ -89,7 +88,6 @@ def return_download_path():
     return f'api/downloads/{session["new_filename"]}'
 
 
-# This value for the 'logger' key in the youtube-dl options dictionaries will be set to this class.        
 class Logger():
     def debug(self, msg):
         with open(session['progress_file_path'], 'a') as f:

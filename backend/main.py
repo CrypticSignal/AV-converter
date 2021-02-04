@@ -76,7 +76,9 @@ def homepage():
 
 @app.route('/api/convert', methods=['POST'])
 def convert_file():
+    
     data = request.form['states']
+    log.info(data)
     filename = request.form['filename']
     uploaded_file_path = os.path.join("uploads", secure_filename(filename))
 
@@ -90,7 +92,7 @@ def convert_file():
     mp3_bitrate = json.loads(data)['sliderValue']
     mp3_vbr_setting = json.loads(data)['mp3VbrSetting']
     # AAC
-    fdk_type = json.loads(data)['aacEncodingMode']
+    fdk_type = json.loads(data)['aacEncodingType']
     fdk_cbr = json.loads(data)['sliderValue']
     fdk_vbr = json.loads(data)['aacVbrMode']
     # Vorbis
@@ -106,7 +108,7 @@ def convert_file():
     dts_bitrate = json.loads(data)['dtsBitrate']
     # Opus
     opus_cbr_bitrate = json.loads(data)['sliderValue']
-    opus_encoding_type = json.loads(data)['opusType']
+    opus_encoding_type = json.loads(data)['opusEncodingType']
     # WAV
     wav_bit_depth = json.loads(data)['wavBitDepth']
     # Desired filename

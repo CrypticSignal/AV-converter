@@ -1,4 +1,4 @@
-function progressBar() {
+function ProgressBar() {
     return (
         <div id="progress_wrapper" style={{display: 'none'}}>
             <br/>
@@ -10,4 +10,4 @@ function progressBar() {
     )
 }
 
-export default progressBar;
+export default ProgressBar;
