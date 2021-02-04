@@ -1,0 +1,6 @@
+Flask==1.1.2
+Flask-Session==0.3.2
+Flask_SocketIO==4.3.1
+Flask_SQLAlchemy==2.4.4
+Werkzeug==1.0.1
+youtube-dl
