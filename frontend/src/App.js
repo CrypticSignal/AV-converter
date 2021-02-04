@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import AboutPage from './components/pages/AboutPage';
@@ -9,186 +9,202 @@ import buttonClicked from './components/pages/yt/yt'
 import AlertDiv from './components/AlertDiv';
 import TopBar from './components/TopBar'; 
 import FileInput from './components/FileInput';
-import AacEncodingTypeSelector from './components/AAC/EncodingTypeSelector';
-import AC3 from './components/AC3';
-import DTS from './components/DTS';
-import FLAC from './components/FLAC';
+import AacEncodingTypeSelector from './components/encoders/AAC/EncodingTypeSelector';
+import AC3 from './components/encoders/AC3';
+import DTS from './components/encoders/DTS';
+import FLAC from './components/encoders/FLAC';
 import IsKeepVideo from './components/IsKeepVideo';
 import MKVMP4 from './components/MKVMP4';
-import Mp3EncodingTypeSelector from './components/MP3/EncodingTypeSelector';
+import Mp3EncodingTypeSelector from './components/encoders/MP3/EncodingTypeSelector';
 import NoOptions from './components/NoOptions';
-import Opus from './components/Opus';
-import VorbisEncodingType from './components/Vorbis/VorbisEncodingType';
-import WavBitDepth from './components/WAV';
+import Opus from './components/encoders/Opus';
+import VorbisEncodingType from './components/encoders/VorbisEncodingType';
+import WavBitDepth from './components/encoders/WAV';
 import SubmitButton from './components/SubmitButton';
 
 import start from './functions/Start';
 
-class App extends React.Component {
-  state = { 
-            file: null,  
-            codec: 'MP3',
-            sliderValue: '192',
-            // MP3
-            mp3EncodingType: 'cbr',
-            mp3VbrSetting: '0',
-            // AAC
-            aacEncodingMode: 'cbr',
-            aacVbrMode: '5',
-            // AC3
-            ac3Bitrate: '640',
-            // DTS
-            dtsBitrate: '768',
-            // FLAC
-            flacCompression: '5',
-            // Keep the video?
-            isKeepVideo: 'no',
-            // MKV and MP4
-            videoSetting: 'veryfast', // x264 preset
-            crfValue: '18',
-            // Opus
-            opusType: 'vbr',
-            // Vorbis
-            vorbisEncodingType: 'abr',
-            qValue: '6',
-            // WAV
-            wavBitDepth: '16'
-          }
+function App() {
+  const [codec, setCodec] = useState('MP3');
+  const [file, setFile] = useState(null);
+  const [sliderValue, setSliderValue] = useState('192');
+  // MP3
+  const [mp3EncodingType, setMp3EncodingType] = useState('cbr');
+  const [mp3VbrSetting, setMp3VbrSetting] = useState('0');
+  // AAC
+  const [aacEncodingType, setAacEncodingType] = useState('cbr');
+  const [aacVbrMode, setAacVbrMode] = useState('5');
+  // AC3
+  const [ac3Bitrate, setAc3Bitrate] = useState('640');
+  // DTS
+  const [dtsBitrate, setDtsBitrate] = useState('768');
+  // FLAC
+  const [flacCompression, setFlacCompression] =useState('5');
+  // Keep the video?
+  const [isKeepVideo, setIsKeepVideo] = useState('no');
+  // MKV and MP4
+  const [videoSetting, setVideoSetting] = useState('veryfast');
+  const [crfValue, setCrfValue] = useState('18');
+  // Opus
+  const [opusEncodingType, setOpusEncodingType] = useState('vbr');
+  // Vorbis
+  const [vorbisEncodingType, setVorbisEncodingType] = useState('abr');
+  const [qValue, setQValue] = useState('6');
+  // WAV
+  const [wavBitDepth, setWavBitDepth] = useState('16');
+  // Which button was clicked on the YT downloader page.
+  const [whichButtonClicked, setWhichButtonClicked] = useState(null);
 
-  onFileInput = (e) => {
-    this.setState({ file: e.target.files[0] })
-
-    const inputLabel = document.getElementById("file_input_label");
-    inputLabel.innerText = e.target.files[0].name; // Show the name of the selected file.
-    
-    const outputNameBox = document.getElementById("output_name");
+  const onFileInput = (e) => {
+    setFile(e.target.files[0])
     const filename = e.target.files[0].name;
+    const inputLabel = document.getElementById("file_input_label");
+    const outputNameBox = document.getElementById("output_name");
+    // Show the name of the selected file.
+    inputLabel.innerText = filename
+    // Filename without the extension.
     const nameWithoutExt = filename.split('.').slice(0, -1).join('.')
     // Remove percentage sign(s) as this causes an issue when secure_filename is used in main.py
-    const defaultOutputName = nameWithoutExt.replace(/%/g, ''); 
+    const defaultOutputName = nameWithoutExt.replace(/%/g, '');
+    // Set the value of the Output Name box to defaultOutputName.
     outputNameBox.value = defaultOutputName;
   }
 
-  onCodecChange = (e) => {
-    this.setState({ codec: e.target.value });
+  const onCodecChange = (e) => {
+    setCodec(e.target.value);
+    //renderComponent();
   };
 
-  onBitrateSliderMoved = (e) => {
-    this.setState({ sliderValue: e.target.value })
+  const onBitrateSliderMoved = (e) => {
+    setSliderValue(e.target.value)
   }
 
   // MP3
-  onMp3EncodingTypeChange = (e) => {
-    this.setState({ mp3EncodingType: e.target.value});
+  const onMp3EncodingTypeChange = (e) => {
+    setMp3EncodingType(e.target.value);
   };
-  onMp3BitrateChange = (e) => {
-    this.setState({ mp3Bitrate: e.target.value });
-    document.getElementById('bitrateText').innerHTML = ` ${e.target.value} kbps`
-  }
-  onMp3VbrSettingChange = (e) => {
-    this.setState({ mp3VbrSetting: e.target.value })
+
+  const onMp3VbrSettingChange = (e) => {
+    setMp3VbrSetting(e.target.value)
   }
 
   // AAC
-  onAacEncodingTypeChange = (e) => {
-    this.setState({ aacEncodingMode: e.target.value});
+  const onAacEncodingTypeChange = (e) => {
+    setAacEncodingType(e.target.value);
   }
-  onAacVbrModeChange = (e) => {
-    this.setState({ aacVbrMode: e.target.value} );
+  const onAacVbrModeChange = (e) => {
+    setAacVbrMode(e.target.value);
   }
 
   // AC3
-  onAc3BitrateChange = (e) => {
-    this.setState({ ac3Bitrate: e.target.value })
+  const onAc3BitrateChange = (e) => {
+    setAc3Bitrate(e.target.value)
   }
 
   // DTS
-  onDtsBitrateChange = (e) => {
-    this.setState({ dtsBitrate: e.target.value })
+  const onDtsBitrateChange = (e) => {
+    setDtsBitrate(e.target.value)
     console.log(e.target.value)
   }
 
   // FLAC
-  onFlacCompressionChange = (e) => {
-    this.setState({ flacCompression: e.target.value })
+  const onFlacCompressionChange = (e) => {
+    setFlacCompression(e.target.value)
   }
 
   // isKeepVideo
-  onIsKeepVideoChange = (e) => {
-    this.setState({ isKeepVideo: e.target.value })
+  const onIsKeepVideoChange = (e) => {
+    setIsKeepVideo(e.target.value)
   }
 
   // MKV and MP4
-  onVideoSettingChange = (e) => {
-    this.setState({ videoSetting: e.target.value })
+  const onVideoSettingChange = (e) => {
+    setVideoSetting(e.target.value)
   }
-  onCrfChange = (e) => {
-    this.setState({ crfValue: e.target.value })
+  const onCrfChange = (e) => {
+    setCrfValue(e.target.value)
   }
 
   // Opus
-  onOpusTypeChange = (e) => {
-    this.setState({ opusType: e.target.value })
+  const onOpusTypeChange = (e) => {
+    setOpusEncodingType(e.target.value)
   }
 
   // Vorbis
-  onVorbisEncodingTypeChange = (e) => {
-    this.setState({ vorbisEncodingType: e.target.value })
+  const onVorbisEncodingTypeChange = (e) => {
+    setVorbisEncodingType(e.target.value)
   }
-  onVorbisSliderMoved = (e) => {
-    this.setState({ qValue: e.target.value })
+  const onVorbisSliderMoved = (e) => {
+    setQValue(e.target.value)
   }
 
   // WAV
-  onWavBitDepthChange = (e) => {
-    this.setState({ wavBitDepth: e.target.value })
+  const onWavBitDepthChange = (e) => {
+    setWavBitDepth(e.target.value)
   }
 
-  onSubmitClicked = async() => {
-    start(this.state)
+  const onSubmitClicked = () => {
+    const states = {
+      file: file,
+      codec: codec,
+      sliderValue: sliderValue,
+      mp3EncodingType: mp3EncodingType,
+      mp3VbrSetting: mp3VbrSetting,
+      aacEncodingType: aacEncodingType,
+      aacVbrMode: aacVbrMode,
+      ac3Bitrate: ac3Bitrate,
+      dtsBitrate: dtsBitrate,
+      flacCompression: flacCompression,
+      isKeepVideo: isKeepVideo,
+      videoSetting: videoSetting,
+      crfValue: crfValue, 
+      opusEncodingType: opusEncodingType,
+      vorbisEncodingType: vorbisEncodingType,
+      qValue: qValue,
+      wavBitDepth: wavBitDepth
+    }
+    start(states)
   }
 
   // YT downloader page
-  onYtButtonClicked = (e) => {
-    this.setState({ ytButtonClicked: e.target.value });
+  const onYtButtonClicked = (e) => {
+    setWhichButtonClicked(e.target.value)
     buttonClicked(document.getElementById('link').value, e.target.value)
   }
 
-  renderComponent = () => {
-    const codec = this.state.codec
+  const renderComponent = () => {
     switch (codec) {
       case 'MP3':
         return (
           <div>
             <Mp3EncodingTypeSelector
-              mp3EncodingType={this.state.mp3EncodingType}
-              sliderValue={this.state.sliderValue}
-              // Passing the functions as props.
-              onMp3EncodingTypeChange={this.onMp3EncodingTypeChange}
-              onBitrateSliderMoved={this.onBitrateSliderMoved}
-              onMp3VbrSettingChange={this.onMp3VbrSettingChange}
-              vbrSetting={this.state.mp3VbrSetting} />
+              mp3EncodingType={mp3EncodingType}
+              sliderValue={sliderValue}
+              onMp3EncodingTypeChange={onMp3EncodingTypeChange}
+              onBitrateSliderMoved={onBitrateSliderMoved}
+              onMp3VbrSettingChange={onMp3VbrSettingChange}
+              vbrSetting={mp3VbrSetting} />
             <IsKeepVideo
-              onIsKeepVideoChange={this.onIsKeepVideoChange}
-              isKeepVideo={this.state.isKeepVideo} />
+              onIsKeepVideoChange={onIsKeepVideoChange}
+              isKeepVideo={isKeepVideo} />
           </div>
             
         );
       case 'AAC':
           return (
             <AacEncodingTypeSelector
-              onAacEncodingTypeChange={this.onAacEncodingTypeChange}
-              encodingType={this.state.aacEncodingMode}
-              onBitrateSliderMoved={this.onBitrateSliderMoved}
-              sliderValue={this.state.sliderValue}
-              onVbrModeChange={this.onAacVbrModeChange} 
-              vbrMode={this.state.aacVbrMode} />
+              onAacEncodingTypeChange={onAacEncodingTypeChange}
+              encodingType={aacEncodingType}
+              onBitrateSliderMoved={onBitrateSliderMoved}
+              sliderValue={sliderValue}
+              onVbrModeChange={onAacVbrModeChange} 
+              vbrMode={aacVbrMode} />
           )
       case 'AC3':
         return (
           <AC3
-            onAc3BitrateChange={this.onAc3BitrateChange}
-            ac3Bitrate={this.state.ac3Bitrate} />
+            onAc3BitrateChange={onAc3BitrateChange}
+            ac3Bitrate={ac3Bitrate} />
         )
       case 'ALAC':
         return (
@@ -201,14 +217,14 @@ class App extends React.Component {
       case 'DTS':
         return (
           <DTS 
-            onDtsBitrateChange={this.onDtsBitrateChange}
-            dtsBitrate={this.state.dtsBitrate} />
+            onDtsBitrateChange={onDtsBitrateChange}
+            dtsBitrate={dtsBitrate} />
         )
       case 'FLAC':
         return (
           <FLAC
-            onFlacCompressionChange={this.onFlacCompressionChange}
-            flacCompression={this.state.flacCompression} />
+            onFlacCompressionChange={onFlacCompressionChange}
+            flacCompression={flacCompression} />
         )
       case 'MKA':
         return (
@@ -217,140 +233,140 @@ class App extends React.Component {
       case 'MKV':
         return (
           <MKVMP4
-            onVideoSettingChange={this.onVideoSettingChange}
-            videoSetting={this.state.videoSetting}
-            onCrfChange={this.onCrfChange}
-            crfValue = {this.state.crfValue} />
+            onVideoSettingChange={onVideoSettingChange}
+            videoSetting={videoSetting}
+            onCrfChange={onCrfChange}
+            crfValue = {crfValue} />
         )
       case 'MP4':
         return (
           <MKVMP4
-            onVideoSettingChange={this.onVideoSettingChange}
-            videoSetting={this.state.videoSetting}
-            onCrfChange={this.onCrfChange}
-            crfValue = {this.state.crfValue} />
+            onVideoSettingChange={onVideoSettingChange}
+            videoSetting={videoSetting}
+            onCrfChange={onCrfChange}
+            crfValue = {crfValue} />
         )
 
       case 'Opus':
         return (
           <Opus
-            onOpusTypeChange={this.onOpusTypeChange}
-            opusType={this.state.opusType}
-            onBitrateSliderMoved={this.onBitrateSliderMoved}
-            sliderValue={this.state.sliderValue} />
+            onOpusTypeChange={onOpusTypeChange}
+            opusType={opusEncodingType}
+            onBitrateSliderMoved={onBitrateSliderMoved}
+            sliderValue={sliderValue} />
         )
 
       case 'Vorbis':
         return (
           <VorbisEncodingType
-            onVorbisEncodingTypeChange={this.onVorbisEncodingTypeChange}
-            vorbisEncodingType={this.state.vorbisEncodingType}
-            onSliderMoved={this.onVorbisSliderMoved}
-            qValue={this.state.qValue}
-            onBitrateSliderMoved={this.onBitrateSliderMoved}
-            sliderValue={this.state.sliderValue} />
+            onVorbisEncodingTypeChange={onVorbisEncodingTypeChange}
+            vorbisEncodingType={vorbisEncodingType}
+            onSliderMoved={onVorbisSliderMoved}
+            qValue={qValue}
+            onBitrateSliderMoved={onBitrateSliderMoved}
+            sliderValue={sliderValue} />
 
         )
       case 'WAV':
         return (
           <WavBitDepth
-            onWavBitDepthChange={this.onWavBitDepthChange}
-            bitDepth={this.state.wavBitDepth}/>
+            onWavBitDepthChange={onWavBitDepthChange}
+            bitDepth={wavBitDepth}/>
         )
       default:
         return null;
     }
   };
 
-  render() {
-    return (
-      <Router>
-        <Switch>
-          <Route exact path='/'>
-            <div>
-              <TopBar/>
-              <h1>Audio / Video Converter</h1>
-              <div className="container">
-                <FileInput
-                updateBoxes={this.onFileInput} />
-                <hr></hr><h5>Desired Format</h5>
-                <select
-                  id="codecs"
-                  onChange={this.onCodecChange}
-                  value={this.state.codec}>
-                  <option value="AAC">AAC (.m4a)</option>
-                  <option value="AC3">AC3 (Dolby Digital)</option>
-                  <option value="ALAC">ALAC</option>
-                  <option value="CAF">CAF (.caf)</option>
-                  <option value="DTS">DTS</option>
-                  <option value="FLAC">FLAC</option>
-                  <option value="MKA">MKA (extract audio without encoding it)</option>
-                  <option value="MKV">MKV (.mkv)</option>
-                  <option value="MP3">MP3</option>
-                  <option value="MP4">MP4 (.mp4)</option>
-                  <option value="Opus">Opus (.opus)</option>
-                  <option value="Vorbis">Vorbis (.ogg)</option>
-                  <option value="WAV">WAV</option>
-                </select><br></br><br></br>
-                <hr/><h5>Encoder Settings</h5>
-                {this.renderComponent()}<br/>
-                <hr/><h5>Output Filename</h5>
-                <input type="text" autoComplete="off" className="form-control" maxLength="200" id="output_name" required/><br/>
-                <AlertDiv/>
-                <SubmitButton 
-                  onSubmitClicked={this.onSubmitClicked} />
-                <button className="btn btn-primary d-none" id="uploading_btn" type="button" disabled>
-                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-                  Uploading file for conversion...
-                </button>
-                <>
-                {/*"Cancel upload" button (Bootstrap class)*/}
-                <button type="button" id="cancel_btn" className="btn btn-secondary d-none">Cancel upload</button>
-                </>
-                <>
-                {/*"Converting..." button (Bootstrap class)*/}
-                <div className="text-center" id="converting_btn" style={{display: 'none'}}>
-                  <button className="btn btn-info" disabled>
-                    <span className="spinner-border spinner-border-sm" />
-                    Converting...</button>
-                </div>
-                {/*Upload progress bar*/}
-                <div id="progress_wrapper" style={{display: 'none'}}>
-                  <br />
-                  <div className="progress mb-3"> {/*Bootstrap class*/}
-                    <div id="progress_bar" className="progress-bar" role="progressbar" aria-valuenow={0} aria-valuemin={0} aria-valuemax={100} />
-                  </div>
-                  <p id="progress_status" />
-                </div>
-                </>
-                <>
-                {/*ENCODER PROGRESS*/}
-                <p id="progress" style={{display: 'none'}} />
-                </>
+  return (
+    <Router>
+      <Switch>
+        <Route exact path='/'>
+          <div>
+            <TopBar/>
+            <h1>Audio / Video Converter</h1>
+            <div className="container">
+              <FileInput
+              updateBoxes={onFileInput} 
+              />
+              <hr></hr><h5>Desired Format</h5>
+              <select
+                id="codecs"
+                onChange={onCodecChange}
+                value={codec}>
+                <option value="AAC">AAC (.m4a)</option>
+                <option value="AC3">AC3 (Dolby Digital)</option>
+                <option value="ALAC">ALAC</option>
+                <option value="CAF">CAF (.caf)</option>
+                <option value="DTS">DTS</option>
+                <option value="FLAC">FLAC</option>
+                <option value="MKA">MKA (extract audio without encoding it)</option>
+                <option value="MKV">MKV (.mkv)</option>
+                <option value="MP3">MP3</option>
+                <option value="MP4">MP4 (.mp4)</option>
+                <option value="Opus">Opus (.opus)</option>
+                <option value="Vorbis">Vorbis (.ogg)</option>
+                <option value="WAV">WAV</option>
+              </select><br></br><br></br>
+              <hr/><h5>Encoder Settings</h5>
+              {renderComponent()}
+              <br/>
+              <hr/><h5>Output Filename</h5>
+              <input type="text" autoComplete="off" className="form-control" maxLength="200" id="output_name" required/><br/>
+              <AlertDiv/>
+              <SubmitButton 
+                onSubmitClicked={onSubmitClicked} />
+              <button className="btn btn-primary d-none" id="uploading_btn" type="button" disabled>
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                Uploading file for conversion...
+              </button>
+              <>
+              {/*"Cancel upload" button (Bootstrap class)*/}
+              <button type="button" id="cancel_btn" className="btn btn-secondary d-none">Cancel upload</button>
+              </>
+              <>
+              {/*"Converting..." button (Bootstrap class)*/}
+              <div className="text-center" id="converting_btn" style={{display: 'none'}}>
+                <button className="btn btn-info" disabled>
+                  <span className="spinner-border spinner-border-sm" />
+                  Converting...</button>
               </div>
+              {/*Upload progress bar*/}
+              <div id="progress_wrapper" style={{display: 'none'}}>
+                <br />
+                <div className="progress mb-3"> {/*Bootstrap class*/}
+                  <div id="progress_bar" className="progress-bar" role="progressbar" aria-valuenow={0} aria-valuemin={0} aria-valuemax={100} />
+                </div>
+                <p id="progress_status" />
+              </div>
+              </>
+              <>
+              {/*ENCODER PROGRESS*/}
+              <p id="progress" style={{display: 'none'}} ></p>
+              </>
             </div>
-          </Route>
+          </div>
+        </Route>
 
-          <Route exact path='/about'>
-            <TopBar/>
-            <AboutPage/>
-          </Route>
+        <Route exact path='/about'>
+          <TopBar/>
+          <AboutPage/>
+        </Route>
 
-          <Route exact path='/filetypes'>
-            <Filetypes/>
-          </Route>
+        <Route exact path='/filetypes'>
+          <Filetypes/>
+        </Route>
 
-          <Route exact path='/yt'>
-            <TopBar/>
-            <YoutubePage
-              onYtButtonClicked={this.onYtButtonClicked}
-              buttonClicked={this.state.ytButtonClicked} />
-          </Route>
+        <Route exact path='/yt'>
+          <TopBar/>
+          <YoutubePage
+            onYtButtonClicked={onYtButtonClicked}
+            buttonClicked={whichButtonClicked} />
+        </Route>
 
-        </Switch>
-      </Router>
-    );
-  }
+      </Switch>
+    </Router>
+  );
 }
 
 export default App;
