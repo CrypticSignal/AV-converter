@@ -1,4 +1,4 @@
-import BitrateSlider from '../BitrateSlider';
+import BitrateSlider from '../../BitrateSlider';
 import VbrDropdown from './VbrDropdown';
 
 function Mp3EncodingTypeSelector(props) {

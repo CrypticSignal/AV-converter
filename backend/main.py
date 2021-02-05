@@ -76,9 +76,8 @@ def homepage():
 
 @app.route('/api/convert', methods=['POST'])
 def convert_file():
-    
     data = request.form['states']
-    log.info(data)
+    
     filename = request.form['filename']
     uploaded_file_path = os.path.join("uploads", secure_filename(filename))
 

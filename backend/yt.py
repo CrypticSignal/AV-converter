@@ -143,7 +143,6 @@ def yt_downloader():
     # MP4
     elif request.form['button_clicked'] == 'mp4':
         options = {
-            'cookiefile': 'cookies.txt',
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
             'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
             'restrictfilenames': True,
