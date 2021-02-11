@@ -9,7 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 
 import converter  # converter.py
-from loggers import log, log_this, log_visit
+from loggers import log
 from trimmer import trimmer  # Importing the blueprint in trimmer.py
 from yt import yt  # Importing the blueprint in yt.py
 from utils import delete_file

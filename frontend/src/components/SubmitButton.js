@@ -4,8 +4,4 @@ function SubmitButton(props) {
     )
 }
 
-        
- 
-
-
 export default SubmitButton;

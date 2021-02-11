@@ -1,14 +1,3 @@
-
-
-// When on desktop, this function paste the contents of the clipboard when clicking on the link box,
-// as this is quicker than right-click > Paste.
-async function paste() {
-    const clipboardText = await navigator.clipboard.readText();
-    document.getElementById("link").value = clipboardText;
-  }
-
-const alertWrapper = document.getElementById("alert_wrapper");
-
 function showAlert(message, type) {
     const alertWrapper = document.getElementById("alert_wrapper");
     alertWrapper.style.display = 'block';
@@ -52,7 +41,6 @@ async function showDownloadProgress(progressFilePath) {
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(url, whichButton) { // whichButton is this.value in yt.html
     const linkBox = document.getElementById('link');
-    linkBox.addEventListener('mousedown', paste);
     if (linkBox.value == '') {
         showAlert('Trying to download something without pasting the URL? You silly billy.', 'warning')
         return;
@@ -68,7 +56,9 @@ async function buttonClicked(url, whichButton) { // whichButton is this.value in
     });
 
     if (!requestProgressPath.ok) {
-        showAlert(requestProgressPath, 'danger');
+        const error = await requestProgressPath.text()
+        showAlert(error, 'danger')
+        console.log(error)
         return;
     }
     else {
@@ -102,17 +92,10 @@ async function buttonClicked(url, whichButton) { // whichButton is this.value in
             showAlert(`Your browser should have started downloading the file. \
                        Click <a href="${progressFilePath}">here</a> if you'd like to view the log file.`, 'success');
         }
-        
-        else if (secondRequest.status == 500) {
-            const error = await secondRequest.text()
-            showAlert(error, 'danger')
-            console.log(error)
-            return;
-        }
         else {
-            shouldLog = false;
-            showAlert(`${secondRequest.status} status code`)
-            console.log(secondRequest)
+            const error = await secondRequest.text();
+            showAlert(error, 'danger');
+            console.log(error);
             return;
         }
     }

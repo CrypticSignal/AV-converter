@@ -1,10 +1,8 @@
 import os
 import subprocess
-from time import time, sleep
-from datetime import datetime
+from time import time
 
 from loggers import log
-from utils import delete_file
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
 os.makedirs('ffmpeg_output', exist_ok=True)

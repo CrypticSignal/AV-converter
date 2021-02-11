@@ -61,31 +61,35 @@ def run_youtube_dl(video_link, options):
  
 def return_download_path():
     session['filename'] = [file for file in os.listdir(download_dir) if Path(file).suffix not in unwanted_filetypes and 
-                           os.path.splitext(file)[0] == session['filename']][0]
+                           Path(file).stem == session['filename']][0]
 
     filesize = round((os.path.getsize(os.path.join(download_dir, session['filename'])) / 1_000_000), 2)
-    log.info(f'{session["filename"]} | {filesize} MB')
     update_database(filesize)
 
     # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
     session['new_filename'] = session['filename'].replace('#', '').replace('%', '').replace('_', ' ')
+    log.info(f'{session["new_filename"]} | {filesize} MB')
 
     try:
         # Rename the file.
         os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, session['new_filename']))
+        global previous_download
     except Exception as e:
         log.info(f'Unable to rename the file to {session["new_filename"]}:\n{e}')
+        previous_download = f'downloads/{session["filename"]}'
     else:
-        global previous_download
-        if previous_download is not None:
-            delete_file(previous_download)
-        previous_download = f'downloads/{session["new_filename"]}'
+        # Update the list of videos downloaded.
+        with open("logs/downloads.txt", "a") as f:
+            f.write(f'\n{session["new_filename"]}')
 
-    # Update the list of videos downloaded.
-    with open("logs/downloads.txt", "a") as f:
-        f.write(f'\n{session["new_filename"]}')
-    
-    return f'api/downloads/{session["new_filename"]}'
+        if previous_download is not None:
+            try:
+                delete_file(previous_download)
+            except Exception as e:
+                log.info(f'Unable to delete {previous_download}:\n{e}')
+                
+        previous_download = f'downloads/{session["new_filename"]}'
+        return f'api/downloads/{session["new_filename"]}'
 
 
 class Logger():
@@ -119,13 +123,19 @@ downloads_today = 0
 @yt.route("/api/yt", methods=["POST"])
 def yt_downloader():
     if request.form['button_clicked'] == 'yes':
-        # I want to save the download progress to a file and read from that file to show the download progress
-        # to the user. Set the name of the file to the time since the epoch.
         progress_file_name = f'{str(time())[:-8]}.txt'
         session['progress_file_path'] = f'yt-progress/{progress_file_name}'
         return session['progress_file_path'], 200
 
     log_this(f'Clicked on {request.form["button_clicked"]}')
+
+    user_ip = get_ip()
+    # Query the database by IP.
+    user = User.query.filter_by(ip=user_ip).first()
+    if user:
+        string = f'{user.times_used_yt_downloader} times' if user.times_used_yt_downloader > 1 else 'once'
+        log.info(f'This user has used the downloader {string} before.')
+
     video_link = request.form['link']
     log.info(video_link)
 
@@ -167,16 +177,7 @@ def yt_downloader():
     
     # MP3
     elif request.form['button_clicked'] == 'audio_mp3':
-        # if request.form['mp3_encoding_type'] == 'cbr':
-        #     preferredquality_value = request.form['mp3_bitrate']
-        #     log.info(f'{preferredquality_value} kbps')
-        # else:
-        #     preferredquality_value = request.form['mp3_vbr_setting']
-        #     log.info(f'-V {preferredquality_value}')
-
         options = {
-            'force_ipv4': True,
-            'newline': True,
             'format': 'bestaudio/best',
             'outtmpl': f'{download_dir}/%(title)s.%(ext)s',
             'writethumbnail': True,
@@ -195,48 +196,6 @@ def yt_downloader():
         }
         run_youtube_dl(video_link, options)
         return return_download_path()
-
-    # elif request.form['button_clicked'] == 'other':
-    #     log_this(f'Chose Other')
-
-    #     video_audio_streams = []
-        
-    #     options = {}
-    #     with YoutubeDL(options) as ydl:
-    #         info = ydl.extract_info(video_link, download=False)
-        
-    #     for data in info['formats']:
-    #         if data['filesize'] is not None:
-    #             filesize = f"{round(int(data['filesize']) / 1000000, 1)} MB"
-    #         if data['height'] is None:
-    #             stream_type = 'Audio'
-    #             resolution = 'N/A'
-    #             codec = 'AAC' if 'mp4a' in data['acodec'] else data['acodec']
-    #             extension = '.weba' if data['ext'] == 'webm' else f".{data['ext']}"
-    #         else:
-    #             stream_type = 'Video'
-    #             resolution = f"{data['height']}x{data['width']}"
-    #             if 'avc' in data['vcodec']:
-    #                 codec = 'H.264'
-    #             elif 'av01' in data['vcodec']:
-    #                 codec = 'AV1'
-    #             elif data['vcodec'] == 'vp9':
-    #                 codec = 'VP9'
-    #             else:
-    #                 codec = data['vcodec']
-    #             extension = f".{data['ext']}"
-
-    #         video_audio_streams.append({
-    #             'type': stream_type,
-    #             'resolution': resolution,
-    #             'codec': codec,
-    #             'extension': extension,
-    #             'filesize': filesize,
-    #             'video_url': data['url']
-    #         })
-
-    #     video_audio_streams = json.dumps(video_audio_streams[::-1])
-    #     return jsonify(streams=video_audio_streams)
 
 
 # This is where the youtube-dl progress file is.

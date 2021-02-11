@@ -1,3 +1,8 @@
+async function pasteClipboard() {
+    const clipboardText = await navigator.clipboard.readText();
+    document.getElementById("link").value = clipboardText;
+}
+
 function YoutubePage(props) {
     return (
         <div>
@@ -7,7 +12,7 @@ function YoutubePage(props) {
                 <p><strong>Audio (best quality)</strong> - usually gives you an Opus file (.opus).</p>
                 <p>If using an <strong>iOS device</strong>, select <strong>Video (MP4)</strong> or <strong>Audio (MP3)</strong> as iOS does not support all media formats natively.</p>
                 <h5><b>Link:</b></h5>
-                <input type="text" autoComplete="off" className="form-control" maxLength={200} name="link" id="link" required />
+                <input type="text" autoComplete="off" className="form-control" onClick={pasteClipboard} id="link" required />
                 <hr /> 
                 <div id="alert_wrapper" style={{display: 'none'}} />
                 <div className="btn-group mr-2 mb-2" role="group">
