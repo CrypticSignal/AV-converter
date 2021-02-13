@@ -1,7 +1,7 @@
 import BitrateSlider from '../BitrateSlider';
-import VorbisQualitySlider from './VorbisQualitySlider';
+import VorbisQualitySlider from './QualitySlider';
 
-function VorbisEncodingType(props) {
+function EncodingType(props) {
     function renderComponent() {
         switch (props.vorbisEncodingType) {
             case 'abr':
@@ -15,7 +15,7 @@ function VorbisEncodingType(props) {
                 )
             case 'vbr':
                 return (
-                    <VorbisQualitySlider
+                    <QualitySlider
                         onSliderMoved={props.onSliderMoved}
                         qValue={props.qValue} />
                 )
@@ -38,4 +38,4 @@ function VorbisEncodingType(props) {
     )
 }
 
-export default VorbisEncodingType;
+export default EncodingType;

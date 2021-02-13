@@ -1,28 +1,28 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import AboutPage from './components/pages/AboutPage';
-import Filetypes from './components/pages/Filetypes';
-import YoutubePage from './components/pages/yt/YouTubePage';
-import buttonClicked from './components/pages/yt/yt'
+import AboutPage from './pages/AboutPage';
+import Filetypes from './pages/Filetypes';
+import YoutubePage from './pages/YouTubePage';
+import buttonClicked from '../functions/yt'
 
-import AlertDiv from './components/AlertDiv';
-import TopBar from './components/TopBar'; 
-import FileInput from './components/FileInput';
-import AacEncodingTypeSelector from './components/encoders/AAC/EncodingTypeSelector';
-import AC3 from './components/encoders/AC3';
-import DTS from './components/encoders/DTS';
-import FLAC from './components/encoders/FLAC';
-import IsKeepVideo from './components/IsKeepVideo';
-import MKVMP4 from './components/MKVMP4';
-import Mp3EncodingTypeSelector from './components/encoders/MP3/EncodingTypeSelector';
-import NoOptions from './components/NoOptions';
-import Opus from './components/encoders/Opus';
-import VorbisEncodingType from './components/encoders/VorbisEncodingType';
-import WavBitDepth from './components/encoders/WAV';
-import SubmitButton from './components/SubmitButton';
+import AlertDiv from './AlertDiv';
+import TopBar from './TopBar'; 
+import FileInput from './FileInput';
+import AacEncodingTypeSelector from './AAC/EncodingTypeSelector';
+import AC3 from './AC3';
+import DTS from './DTS';
+import FLAC from './FLAC';
+import IsKeepVideo from './IsKeepVideo';
+import MKVMP4 from './MKVMP4';
+import Mp3EncodingTypeSelector from './MP3/EncodingTypeSelector';
+import NoOptions from './NoOptions';
+import Opus from './Opus';
+import EncodingType from './Vorbis/EncodingType';
+import WavBitDepth from './WAV';
+import SubmitButton from './SubmitButton';
 
-import start from './functions/Start';
+import start from '../functions/Start';
 
 function App() {
   const [codec, setCodec] = useState('MP3');
@@ -258,7 +258,7 @@ function App() {
 
       case 'Vorbis':
         return (
-          <VorbisEncodingType
+          <EncodingType
             onVorbisEncodingTypeChange={onVorbisEncodingTypeChange}
             vorbisEncodingType={vorbisEncodingType}
             onSliderMoved={onVorbisSliderMoved}

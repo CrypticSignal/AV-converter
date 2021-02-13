@@ -1,4 +1,4 @@
-import BitrateSlider from '../BitrateSlider';
+import BitrateSlider from './BitrateSlider';
 
 function Opus(props) {
     return (

@@ -1,4 +1,4 @@
-function VorbisQualitySlider(props) {
+function QualitySlider(props) {
     return (
         <div id="vorbis_quality_div">
             <p>Set your desired quality setting via the slider:</p>
@@ -12,4 +12,4 @@ function VorbisQualitySlider(props) {
     )
 }
 
-export default VorbisQualitySlider;
+export default QualitySlider;
