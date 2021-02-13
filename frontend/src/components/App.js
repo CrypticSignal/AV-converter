@@ -9,13 +9,13 @@ import buttonClicked from '../functions/yt'
 import AlertDiv from './AlertDiv';
 import TopBar from './TopBar'; 
 import FileInput from './FileInput';
-import AacEncodingTypeSelector from './AAC/EncodingTypeSelector';
+import EncodingTypeSelector from './AAC/EncodingTypeSelector';
 import AC3 from './AC3';
 import DTS from './DTS';
 import FLAC from './FLAC';
 import IsKeepVideo from './IsKeepVideo';
 import MKVMP4 from './MKVMP4';
-import Mp3EncodingTypeSelector from './MP3/EncodingTypeSelector';
+import EncodingTypeSelector from './MP3/EncodingTypeSelector';
 import NoOptions from './NoOptions';
 import Opus from './Opus';
 import EncodingType from './Vorbis/EncodingType';
@@ -177,7 +177,7 @@ function App() {
       case 'MP3':
         return (
           <div>
-            <Mp3EncodingTypeSelector
+            <EncodingTypeSelector
               mp3EncodingType={mp3EncodingType}
               sliderValue={sliderValue}
               onMp3EncodingTypeChange={onMp3EncodingTypeChange}
@@ -192,7 +192,7 @@ function App() {
         );
       case 'AAC':
           return (
-            <AacEncodingTypeSelector
+            <EncodingTypeSelector
               onAacEncodingTypeChange={onAacEncodingTypeChange}
               encodingType={aacEncodingType}
               onBitrateSliderMoved={onBitrateSliderMoved}

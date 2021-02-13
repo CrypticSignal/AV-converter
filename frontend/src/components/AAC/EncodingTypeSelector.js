@@ -1,7 +1,7 @@
-import BitrateSlider from '../../BitrateSlider';
+import BitrateSlider from '../BitrateSlider';
 import VbrDropdown from './VbrDropdown';
 
-function AacEncodingTypeSelector(props) {
+function EncodingTypeSelector(props) {
 
     function renderComponent() {
         switch (props.encodingType) {
@@ -34,4 +34,4 @@ function AacEncodingTypeSelector(props) {
     )
 }
 
-export default AacEncodingTypeSelector;
+export default EncodingTypeSelector;

@@ -1,7 +1,7 @@
-import BitrateSlider from '../../BitrateSlider';
+import BitrateSlider from '../BitrateSlider';
 import VbrDropdown from './VbrDropdown';
 
-function Mp3EncodingTypeSelector(props) {
+function EncodingTypeSelector(props) {
   function renderComponent() {
     // Show the BitrateSlider component if CBR or ABR is selected. Show the VbrDropdown component if VBR is selected.
     switch (props.mp3EncodingType) {
@@ -43,4 +43,4 @@ function Mp3EncodingTypeSelector(props) {
   );
 }
 
-export default Mp3EncodingTypeSelector;
+export default EncodingTypeSelector;
