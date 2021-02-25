@@ -29,7 +29,7 @@ app.register_blueprint(trimmer)
 
 # The database object (db) needs to be defined in main.py even though we're not using the database in main.py
 # Otherwise you get the following error:
-# 'AssertionError: The sqlalchemy converter_result_dictionary was not registered to the current application.'
+# 'AssertionError: The sqlalchemy extension was not registered to the current application.'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
