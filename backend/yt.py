@@ -1,13 +1,15 @@
+from datetime import datetime
 import os
-from time import time, sleep
 from pathlib import Path
+from time import time
+
 from flask import Blueprint, Flask, request, send_from_directory, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from youtube_dl import YoutubeDL
 
 from loggers import get_ip, log, log_downloads_per_day, log_this
-from utils import delete_file
+from utils import clean_up, delete_file
 
 yt = Blueprint('yt', __name__)
 app = Flask(__name__)
@@ -73,23 +75,23 @@ def return_download_path():
     try:
         # Rename the file.
         os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, session['new_filename']))
-        global previous_download
     except Exception as e:
         log.info(f'Unable to rename the file to {session["new_filename"]}:\n{e}')
-        previous_download = f'downloads/{session["filename"]}'
     else:
         # Update the list of videos downloaded.
         with open("logs/downloads.txt", "a") as f:
             f.write(f'\n{session["new_filename"]}')
 
-        if previous_download is not None:
-            try:
-                delete_file(previous_download)
-            except Exception as e:
-                log.info(f'Unable to delete {previous_download}:\n{e}')
-                
-        previous_download = f'downloads/{session["new_filename"]}'
-        return f'api/downloads/{session["new_filename"]}'
+    clean_up()
+    global previous_download
+    if previous_download is not None:
+        try:
+            delete_file(previous_download)
+        except Exception as e:
+            log.info(f'Unable to delete {previous_download}:\n{e}')
+    previous_download = f'downloads/{session["new_filename"]}'
+
+    return f'api/downloads/{session["new_filename"]}'
 
 
 class Logger():
@@ -204,14 +206,11 @@ def get_file(filename):
     return send_from_directory('yt-progress', filename)
 
 
-# @yt.route("/api/downloads/<filename>", methods=["GET"])
-# def send_file(filename):
-#     log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
-#     try:
-#         mimetype_value = 'audio/mp4' if Path(filename).suffix == ".m4a" else ''
-#         return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
-#     except Exception as error:
-#         log.error(f'Unable to send downloads/{filename}. Error: \n{error}')
+@yt.route("/api/downloads/<filename>", methods=["GET"])
+def send_file(filename):
+    log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
+    mimetype_value = 'audio/mp4' if Path(filename).suffix == ".m4a" else ''
+    return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
 
 
 @yt.app_errorhandler(500)

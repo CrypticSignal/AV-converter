@@ -5,7 +5,7 @@ from time import time
 from loggers import log
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
-os.makedirs('ffmpeg_output', exist_ok=True)
+os.makedirs('ffmpeg-output', exist_ok=True)
 # If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
 ffmpeg_path = 'ffmpeg'
 
@@ -19,7 +19,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     log.info(f'Converting {uploaded_file_path}...')
     start_time = time()
     filename_without_ext = os.path.splitext(output_name)[0][12:]
-    ffmpeg_output_file = os.path.join('ffmpeg_output',f'{filename_without_ext}.txt')
+    ffmpeg_output_file = f'ffmpeg-output/{filename_without_ext}.txt'
     with open(ffmpeg_output_file, 'w'): pass
 
     process = subprocess.run([ffmpeg_path, '-hide_banner', '-progress', progress_file_path, '-y', '-i', uploaded_file_path,
@@ -34,7 +34,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         os.remove(uploaded_file_path)
         return {
             'error': process.stderr.decode('utf-8'),
-            'log_file': ffmpeg_output_file
+            'log_file': f'api/{ffmpeg_output_file}'
         }
     else:
         end_time = time()
@@ -45,7 +45,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             'error': None,
             'ext': os.path.splitext(output_name)[1],
             'download_path': f'api/{output_name}',
-            'log_file': ffmpeg_output_file
+            'log_file': f'api/{ffmpeg_output_file}'
         }
 
 

@@ -9,23 +9,21 @@ let shouldLog = false
 
 async function showConversionProgress(progressFilePath) {
     while (true) {
-        if (shouldLog) {
-            await sleep(500)
+        await sleep(500)
+        if (shouldLog) {  
             const conversionProgressResponse = await fetch(progressFilePath);
             const textInFile = await conversionProgressResponse.text();
-
             if (conversionProgressResponse.ok && textInFile) {
                 const lines = textInFile.split('\n');
                 const fifthLastLine = lines[lines.length - 6].split('=');
                 const justProgressTime = fifthLastLine.slice(-1)[0];
                 const withoutMicroseconds = justProgressTime.slice(0, -7);
                 const milliseconds = justProgressTime.substring(9, 12);
-                showAlert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br>\
+                showAlert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br> \
                 (and ${milliseconds} milliseconds)`, 'primary');
             }
         }
         else {
-            showAlert('Done! Your browser should have started downloading the converted file :)', 'success');
             return;
         }
     }
@@ -43,8 +41,6 @@ async function sendConversionRequest(inputFilename, progressFilePath, state) {
     data.append('output_name', document.getElementById('output_name').value)
     data.append('states', JSON.stringify(state))
 
-    console.log('Making the conversionResponse request...')
-
     const conversionResponse = await fetch('/api/convert', {
         method: 'POST',
         body: data
@@ -52,7 +48,7 @@ async function sendConversionRequest(inputFilename, progressFilePath, state) {
 
     console.log(conversionResponse)
     shouldLog = false
-    //reset();
+    reset();
 
     if (conversionResponse.status === 500) {
         const error = await conversionResponse.text()
@@ -64,12 +60,16 @@ async function sendConversionRequest(inputFilename, progressFilePath, state) {
     }
     else {
         const jsonResponse = await conversionResponse.json();
+        const logFile = jsonResponse.log_file
         const anchorTag = document.createElement("a");
         anchorTag.href = jsonResponse.download_path;
         anchorTag.download = '';
         anchorTag.click();
-        console.log('Download URL visited.')
-        reset();
+        showAlert(
+            `File converted. The converted file should have started downloading. \
+            Click <a href="${logFile}">here</a> to view the FFmpeg output.`,
+            'success'
+        )
     }
 }
 

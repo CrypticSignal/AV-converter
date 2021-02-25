@@ -15,7 +15,7 @@ import DTS from './DTS';
 import FLAC from './FLAC';
 import IsKeepVideo from './IsKeepVideo';
 import MKVMP4 from './MKVMP4';
-import EncodingTypeSelector from './MP3/EncodingTypeSelector';
+import MP3EncodingTypeSelector from './MP3/EncodingTypeSelector';
 import NoOptions from './NoOptions';
 import Opus from './Opus';
 import EncodingType from './Vorbis/EncodingType';
@@ -177,7 +177,7 @@ function App() {
       case 'MP3':
         return (
           <div>
-            <EncodingTypeSelector
+            <MP3EncodingTypeSelector
               mp3EncodingType={mp3EncodingType}
               sliderValue={sliderValue}
               onMp3EncodingTypeChange={onMp3EncodingTypeChange}

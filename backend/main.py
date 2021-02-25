@@ -29,7 +29,7 @@ app.register_blueprint(trimmer)
 
 # The database object (db) needs to be defined in main.py even though we're not using the database in main.py
 # Otherwise you get the following error:
-# 'AssertionError: The sqlalchemy extension was not registered to the current application.'
+# 'AssertionError: The sqlalchemy converter_result_dictionary was not registered to the current application.'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -120,86 +120,85 @@ def convert_file():
     if chosen_codec == 'AAC':
         params = [session['progress_filename'], uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
                     fdk_vbr, output_path]
-        extension = run_converter('aac', params)
+        converter_result_dictionary = run_converter('aac', params)
 
     # AC3
     elif chosen_codec == 'AC3':
         params = [session['progress_filename'], uploaded_file_path, is_keep_video, ac3_bitrate, output_path]
-        extension = run_converter('ac3', params)
+        converter_result_dictionary = run_converter('ac3', params)
 
     # ALAC
     elif chosen_codec == 'ALAC':
         params = [session['progress_filename'], uploaded_file_path, is_keep_video, output_path]
-        extension = run_converter('alac', params)
+        converter_result_dictionary = run_converter('alac', params)
 
     # CAF
     elif chosen_codec == 'CAF':
         params = [session['progress_filename'], uploaded_file_path, output_path]
-        extension = run_converter('caf', params)
+        converter_result_dictionary = run_converter('caf', params)
 
     # DTS
     elif chosen_codec == 'DTS':
         params = [session['progress_filename'], uploaded_file_path, is_keep_video, dts_bitrate, output_path]
-        extension = run_converter('dts', params)
+        converter_result_dictionary = run_converter('dts', params)
 
     # FLAC
     elif chosen_codec == 'FLAC':
         params = [session['progress_filename'], uploaded_file_path, is_keep_video, flac_compression,
                     output_path]
-        extension = run_converter('flac', params)
+        converter_result_dictionary = run_converter('flac', params)
 
     # MKA
     elif chosen_codec == 'MKA':
         params = [session['progress_filename'], uploaded_file_path, output_path]
-        extension = run_converter('mka', params)
+        converter_result_dictionary = run_converter('mka', params)
 
     # MKV
     elif chosen_codec == 'MKV':
         params = [session['progress_filename'], uploaded_file_path, video_mode, crf_value, output_path]
-        extension = run_converter('mkv', params)
+        converter_result_dictionary = run_converter('mkv', params)
 
     # MP3
     elif chosen_codec == 'MP3':
         params = [session['progress_filename'], uploaded_file_path, is_keep_video, mp3_encoding_type,
                     mp3_bitrate, mp3_vbr_setting, output_path]
-        extension = run_converter('mp3', params)
+        converter_result_dictionary = run_converter('mp3', params)
 
     # MP4
     elif chosen_codec == 'MP4':
         params = [session['progress_filename'], uploaded_file_path, video_mode, crf_value, output_path]
-        extension = run_converter('mp4', params)
+        converter_result_dictionary = run_converter('mp4', params)
 
     # Opus
     elif chosen_codec == 'Opus':
         params = [session['progress_filename'], uploaded_file_path, opus_encoding_type, opus_vorbis_slider,
                     opus_cbr_bitrate, output_path]
-        extension = run_converter('opus', params)
+        converter_result_dictionary = run_converter('opus', params)
 
     # Vorbis
     elif chosen_codec == 'Vorbis':
         params = [session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality,
                     opus_vorbis_slider, output_path]
-        extension = run_converter('vorbis', params)
+        converter_result_dictionary = run_converter('vorbis', params)
 
     # WAV
     elif chosen_codec == 'WAV':
         params = [session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth,
                     output_path]
-        extension = run_converter('wav', params)
+        converter_result_dictionary = run_converter('wav', params)
 
-    if extension['error'] is not None:
-        return extension, 500
-
+    if converter_result_dictionary['error'] is not None:
+        return converter_result_dictionary, 500
     else:
         # Filename after conversion.
-        session["converted_file_name"] = f'{output_name}{extension["ext"]}'
+        session["converted_file_name"] = f'{output_name}{converter_result_dictionary["ext"]}'
 
         global previous_conversion
         if previous_conversion is not None:
             delete_file(previous_conversion)
         previous_conversion = f'conversions/{session["converted_file_name"]}'
 
-        return extension
+        return converter_result_dictionary
 
 
 @app.route('/api/ffmpeg-progress/<filename>', methods=['GET'])
@@ -207,13 +206,16 @@ def get_file(filename):
     return send_from_directory('ffmpeg-progress', filename)
 
 
-# @app.route('/api/conversions/<filename>', methods=['GET'])
-# def send_file(filename):
-#     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == '.m4a' else ''
-#     try:
-#         return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
-#     except Exception as error:
-#         log.error(f'Unable to send conversions/{filename}. Error: \n{error}')
+@app.route('/api/ffmpeg-output/<filename>', methods=['GET'])
+def view_ffmpeg_output(filename):
+    return send_from_directory('ffmpeg-output', filename)
+
+
+@app.route('/api/conversions/<filename>', methods=['GET'])
+def send_file(filename):
+    log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
+    mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == '.m4a' else ''
+    return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
 
     
 if __name__ == '__main__':

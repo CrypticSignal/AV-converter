@@ -7,10 +7,9 @@ __pycache__
 uploads
 conversions
 downloads
-ffmpeg_output
+ffmpeg-output
 ffmpeg-progress
 yt-progress
 flask_session
-GameScores
 logs
 trims

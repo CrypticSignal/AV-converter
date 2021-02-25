@@ -1,5 +1,5 @@
 import BitrateSlider from '../BitrateSlider';
-import VorbisQualitySlider from './QualitySlider';
+import QualitySlider from './QualitySlider';
 
 function EncodingType(props) {
     function renderComponent() {
