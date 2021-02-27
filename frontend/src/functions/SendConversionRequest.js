@@ -9,25 +9,18 @@ let shouldLog = false
 
 async function showConversionProgress(progressFilePath) {
     while (true) {
-        await sleep(500)
+        await sleep(1000)
         if (shouldLog) {  
             const conversionProgressResponse = await fetch(progressFilePath);
             const textInFile = await conversionProgressResponse.text();
             if (conversionProgressResponse.ok && textInFile) {
-                const lines = textInFile.split('\n');
-                const fifthLastLine = lines[lines.length - 6].split('=');
-                const justProgressTime = fifthLastLine.slice(-1)[0];
-                const withoutMicroseconds = justProgressTime.slice(0, -7);
-                const milliseconds = justProgressTime.substring(9, 12);
-                showAlert(`${withoutMicroseconds} [HH:MM:SS] of the file has been converted so far...<br> \
-                (and ${milliseconds} milliseconds)`, 'primary');
+                showAlert(textInFile, 'primary');
             }
         }
         else {
             return;
         }
     }
-    
 }
 
 async function sendConversionRequest(inputFilename, progressFilePath, state) { 
@@ -51,12 +44,9 @@ async function sendConversionRequest(inputFilename, progressFilePath, state) {
     reset();
 
     if (conversionResponse.status === 500) {
-        const error = await conversionResponse.text()
-        showAlert(error, 'danger');
-        console.log(error);
-    }
-    else if (!conversionResponse.ok) {
-        showAlert('An error occurred when trying to convert the file.', 'danger');
+        const jsonResponse = await conversionResponse.json();
+        const logFile = jsonResponse.log_file
+        showAlert(`Unable to convert. Click <a href=${logFile}>here</a> to view the FFmpeg output.`, 'danger');
     }
     else {
         const jsonResponse = await conversionResponse.json();
