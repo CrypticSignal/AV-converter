@@ -2,6 +2,8 @@ import os
 import subprocess
 from time import time
 
+from ffmpeg import probe
+
 from loggers import log
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
@@ -12,41 +14,68 @@ ffmpeg_path = 'ffmpeg'
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     progress_file_path = os.path.join('ffmpeg-progress', progress_filename)
-    # Turn params into a list as I want to use subprocess.run() with an array of arguments.
+    file_duration = float(probe(uploaded_file_path)['format']['duration'])
+
     params = params.split(' ')
     params.append(output_name)
-    log.info(params)
     log.info(f'Converting {uploaded_file_path}...')
-    start_time = time()
+    
     filename_without_ext = os.path.splitext(output_name)[0][12:]
     ffmpeg_output_file = f'ffmpeg-output/{filename_without_ext}.txt'
     with open(ffmpeg_output_file, 'w'): pass
+    start_time = time()
 
-    process = subprocess.run([ffmpeg_path, '-hide_banner', '-progress', progress_file_path, '-y', '-i', uploaded_file_path,
-                        '-metadata', 'comment=Transcoded using free-av-tools.com', '-metadata',
-                        'encoded_by=free-av-tools.com', '-id3v2_version', '3', '-write_id3v1', 'true'] + params,
-                        stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        [
+            ffmpeg_path, '-loglevel', 'debug', '-progress', '-', '-nostats', 
+            '-y', '-i', uploaded_file_path,
+            '-metadata', 'comment=Transcoded using av-converter.com', '-metadata', 'encoded_by=av-converter.com', 
+            '-id3v2_version', '3', '-write_id3v1', 'true'
+        ] + params, 
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
 
-    with open(ffmpeg_output_file, 'w') as f:
-        f.write(process.stderr.decode('utf-8'))
-        
-    if process.returncode != 0:
-        os.remove(uploaded_file_path)
-        return {
-            'error': process.stderr.decode('utf-8'),
-            'log_file': f'api/{ffmpeg_output_file}'
-        }
-    else:
-        end_time = time()
-        time_taken = round((end_time - start_time), 2)
-        log.info(f'Conversion took {time_taken} seconds.')
-        os.remove(uploaded_file_path)
-        return {
-            'error': None,
-            'ext': os.path.splitext(output_name)[1],
-            'download_path': f'api/{output_name}',
-            'log_file': f'api/{ffmpeg_output_file}'
-        }
+    while True:
+        # If the process has completed
+        if process.poll() is not None:
+            # The return code is not 0 if an error occurred.
+            if process.returncode != 0:
+                log.info('Unable to convert.')
+                return {
+                    'error': 'Unable to convert',
+                    'log_file': f'api/{ffmpeg_output_file}'
+                }
+            else:
+                log.info(f'Conversion took {round((time() - start_time), 1)} seconds.')
+                os.remove(uploaded_file_path)
+                return {
+                    'error': None,
+                    'ext': os.path.splitext(output_name)[1],
+                    'download_path': f'api/{output_name}',
+                    'log_file': f'api/{ffmpeg_output_file}'
+                }
+        else:
+            output = process.stdout.readline().decode('utf-8')
+            with open(ffmpeg_output_file, 'a') as f:
+                f.write(output)
+
+            if 'out_time_ms' in output:
+                microseconds = int(output.strip()[12:])
+                secs = microseconds / 1_000_000
+                percentage = (secs / file_duration) * 100
+
+            elif "speed" in output:
+                speed = output.strip()[6:]
+                speed = 0 if ' ' in speed or 'N/A' in speed else float(speed[:-1])
+                try:
+                    eta = (file_duration - secs) / speed
+                except ZeroDivisionError:
+                    continue
+                else:
+                    minutes = round(eta / 60)
+                    seconds = f'{round(eta % 60):02d}'
+                    with open(progress_file_path, 'w') as f:
+                        f.write(f'Progress: {round(percentage, 1)}% | Speed: {speed}x | ETA: {minutes}:{seconds} [M:S]')
 
 
 # AAC
@@ -59,12 +88,10 @@ def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
         if fdk_type == "fdk_cbr":
             return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac '
                         f'-b:a {fdk_cbr}k -c:s copy', f'{output_path}.{output_ext}')
-        
         # VBR
         else:
             return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a libfdk_aac '
                         f'-vbr {fdk_vbr} -c:s copy', f'{output_path}.{output_ext}')
-
     else:
         output_ext = 'm4a'
         # CBR
