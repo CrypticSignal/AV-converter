@@ -1,18 +1,18 @@
+from datetime import datetime
 import json
 import os
-from datetime import datetime
 from time import time
+
 from flask import Flask, request, send_from_directory, session
 from flask_session import Session
-from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 
 import converter  # converter.py
 from loggers import log
-from trimmer import trimmer  # Importing the blueprint in trimmer.py
-from yt import yt  # Importing the blueprint in yt.py
+from trimmer import trimmer  # Import the 'trimmer' blueprint in trimmer.py
 from utils import delete_file
+from yt import yt  # Import the 'yt' blueprint in yt.py
 
 app = Flask(__name__)
 secret_key = str(os.urandom(16))
@@ -187,9 +187,8 @@ def convert_file():
                     output_path]
         converter_result_dictionary = run_converter('wav', params)
 
-    if converter_result_dictionary['error'] is not None:
-        return converter_result_dictionary, 500
-    else:
+    # The 'error' key is set to None if the file converted successfully.
+    if converter_result_dictionary['error'] is None:
         # Filename after conversion.
         session["converted_file_name"] = f'{output_name}{converter_result_dictionary["ext"]}'
 
@@ -197,8 +196,10 @@ def convert_file():
         if previous_conversion is not None:
             delete_file(previous_conversion)
         previous_conversion = f'conversions/{session["converted_file_name"]}'
-
         return converter_result_dictionary
+    # Return a 500 error if the file conversion was not successful.
+    else:
+        return converter_result_dictionary, 500
 
 
 @app.route('/api/ffmpeg-progress/<filename>', methods=['GET'])
