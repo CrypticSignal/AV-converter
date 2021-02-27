@@ -1,5 +1,5 @@
 function reset() {
-    //document.getElementById('alert_wrapper').style.display = 'none';
+    document.getElementById('alert_wrapper').style.display = 'none';
     const convertButton = document.getElementById("convert_btn");
     const cancelButton = document.getElementById("cancel_btn");
     const outputNameBox = document.getElementById("output_name");
