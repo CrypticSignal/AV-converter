@@ -11,7 +11,7 @@ On https://av-converter.com you can:
 ## Features (audio/video converter):
 - You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
 - Upload completion time is shown in realtime.
-- Whilst the file is being converted, an alert shows how much of the file (HH:MM:SS) has been converted so far. The alert is updated twice every second.
+- Whilst the file is being converted, an alert shows how much of the file (HH:MM:SS) has been converted so far. The alert is updated every second.
 
 ## Features (YouTube downloader):
 - Download the video. MP4 format is available.
