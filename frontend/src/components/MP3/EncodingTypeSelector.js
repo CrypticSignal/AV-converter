@@ -5,14 +5,7 @@ function MP3EncodingTypeSelector(props) {
   function renderComponent() {
     // Show the BitrateSlider component if CBR or ABR is selected. Show the VbrDropdown component if VBR is selected.
     switch (props.mp3EncodingType) {
-      case 'cbr':
-        return <BitrateSlider 
-                  onBitrateSliderMoved={props.onBitrateSliderMoved}
-                  sliderValue={props.sliderValue}
-                  min='64'
-                  max='320'
-                  step='64' />
-      case 'abr':
+      case 'cbr': case 'abr':
         return <BitrateSlider 
                   onBitrateSliderMoved={props.onBitrateSliderMoved}
                   sliderValue={props.sliderValue}

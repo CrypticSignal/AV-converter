@@ -51,6 +51,7 @@ def run_youtube_dl(video_link, options):
     filename = Path(ydl.prepare_filename(info)).name
     # This is the filename without the extension.
     session['filename'] = Path(ydl.prepare_filename(info)).stem
+    log.info(session['filename'])
     
     try:
         ydl.download([video_link])
@@ -82,7 +83,7 @@ def return_download_path():
         with open("logs/downloads.txt", "a") as f:
             f.write(f'\n{session["new_filename"]}')
 
-    clean_up()
+    #clean_up()
     global previous_download
     if previous_download is not None:
         try:

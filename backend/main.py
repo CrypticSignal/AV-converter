@@ -3,7 +3,7 @@ import json
 import os
 from time import time
 
-from flask import Flask, request, send_from_directory, session
+from flask import Flask, render_template, request, send_from_directory, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -217,6 +217,11 @@ def send_file(filename):
     log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == '.m4a' else ''
     return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
+
+
+@app.route('/game')
+def game():
+    return render_template('game.html')
 
     
 if __name__ == '__main__':
