@@ -83,7 +83,7 @@ def return_download_path():
         with open("logs/downloads.txt", "a") as f:
             f.write(f'\n{session["new_filename"]}')
 
-    #clean_up()
+    clean_up()
     global previous_download
     if previous_download is not None:
         try:
