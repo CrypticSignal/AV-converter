@@ -47,13 +47,13 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
                 }
             else:
                 log.info(f'Conversion took {round((time() - start_time), 1)} seconds.')
-                os.remove(uploaded_file_path)
                 return {
                     'error': None,
                     'ext': os.path.splitext(output_name)[1],
                     'download_path': f'api/{output_name}',
                     'log_file': f'api/{ffmpeg_output_file}'
                 }
+        # While FFmpeg is running.
         else:
             output = process.stdout.readline().decode('utf-8')
             with open(ffmpeg_output_file, 'a') as f:
