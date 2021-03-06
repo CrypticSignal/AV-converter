@@ -1,4 +1,3 @@
-from backend.utils import empty_folder
 from datetime import datetime
 import json
 import os
