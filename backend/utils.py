@@ -20,3 +20,10 @@ def delete_file(filepath):
         log.info(f'Unable to delete {filepath}:\n{e}')
     else:
         log.info(f'Deleted {filepath}')
+
+
+def empty_folder(folder_path):
+    for file in os.listdir(folder_path):
+        os.remove(os.path.join(folder_path, file))
+        log.info(f'Deleted {folder_path}/{file}')
+        
