@@ -14,15 +14,14 @@ ffmpeg_path = 'ffmpeg'
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     progress_file_path = os.path.join('ffmpeg-progress', progress_filename)
-    file_duration = float(probe(uploaded_file_path)['format']['duration'])
-
     params = params.split(' ')
     params.append(output_name)
-    log.info(f'Converting {uploaded_file_path}...')
-    
     filename_without_ext = os.path.splitext(output_name)[0][12:]
     ffmpeg_output_file = f'ffmpeg-output/{filename_without_ext}.txt'
+
     with open(ffmpeg_output_file, 'w'): pass
+
+    log.info(f'Converting {uploaded_file_path}...')
     start_time = time()
 
     process = subprocess.Popen(
@@ -35,6 +34,11 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
 
+    try:
+        file_duration = float(probe(uploaded_file_path)['format']['duration'])
+    except Exception:
+        pass
+    
     while True:
         # If the process has completed
         if process.poll() is not None:
@@ -62,7 +66,10 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             if 'out_time_ms' in output:
                 microseconds = int(output.strip()[12:])
                 secs = microseconds / 1_000_000
-                percentage = (secs / file_duration) * 100
+                try:
+                    percentage = (secs / file_duration) * 100
+                except Exception:
+                    percentage = 'unknown'
 
             elif "speed" in output:
                 speed = output.strip()[6:]
