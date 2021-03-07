@@ -25,7 +25,6 @@ db = SQLAlchemy(app)
 os.makedirs('yt-progress', exist_ok=True)
 os.makedirs('downloads', exist_ok=True)
 download_dir = 'downloads'
-previous_download = None
 unwanted_filetypes = ['.part', '.jpg', '.ytdl', '.webp']
 
 
