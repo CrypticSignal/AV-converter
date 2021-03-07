@@ -69,7 +69,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
                 speed = 0 if ' ' in speed or 'N/A' in speed else float(speed[:-1])
                 try:
                     eta = (file_duration - secs) / speed
-                except ZeroDivisionError:
+                except Exception:
                     continue
                 else:
                     minutes = round(eta / 60)
