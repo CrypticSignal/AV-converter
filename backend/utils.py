@@ -8,7 +8,7 @@ def clean_up():
     for file in os.listdir('downloads'):
         if Path(file).suffix in ['.part', '.webp', '.ytdl'] or '.temp.' in file:
             try:
-                os.remove(file)
+                os.remove(os.path.join('downloads', file))
             except Exception:
                 log.info(f'[CLEAN UP] Unable to delete {file}')
      
