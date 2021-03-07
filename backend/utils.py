@@ -18,8 +18,6 @@ def delete_file(filepath):
         os.remove(filepath)
     except Exception as e:
         log.info(f'Unable to delete {filepath}:\n{e}')
-    else:
-        log.info(f'Deleted {filepath}')
 
 
 def empty_folder(folder_path):
