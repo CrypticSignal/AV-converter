@@ -41,7 +41,6 @@ Session(app)
 
 os.makedirs('uploads', exist_ok=True)
 os.makedirs('conversions', exist_ok=True)
-previous_conversion = None
 
 
 def run_converter(codec, params):
@@ -196,11 +195,6 @@ def convert_file():
     if converter_result_dictionary['error'] is None:
         # Filename after conversion.
         session["converted_file_name"] = f'{output_name}{converter_result_dictionary["ext"]}'
-
-        global previous_conversion
-        if previous_conversion is not None:
-            delete_file(previous_conversion)
-        previous_conversion = f'conversions/{session["converted_file_name"]}'
         return converter_result_dictionary
     # Return a 500 error if the file conversion was not successful.
     else:
@@ -221,7 +215,10 @@ def view_ffmpeg_output(filename):
 def send_file(filename):
     log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
     mimetype_value = 'audio/mp4' if os.path.splitext(filename)[1] == '.m4a' else ''
-    return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
+    try:
+        return send_from_directory('conversions', filename, mimetype=mimetype_value, as_attachment=True)
+    finally:
+        delete_file(os.path.join('conversions', filename))
 
 
 @app.route('/game')
