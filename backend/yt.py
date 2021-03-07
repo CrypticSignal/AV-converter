@@ -84,14 +84,6 @@ def return_download_path():
             f.write(f'\n{session["new_filename"]}')
 
     clean_up()
-    global previous_download
-    if previous_download is not None:
-        try:
-            delete_file(previous_download)
-        except Exception as e:
-            log.info(f'Unable to delete {previous_download}:\n{e}')
-    previous_download = f'downloads/{session["new_filename"]}'
-
     return f'api/downloads/{session["new_filename"]}'
 
 
@@ -211,7 +203,10 @@ def get_file(filename):
 def send_file(filename):
     log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
     mimetype_value = 'audio/mp4' if Path(filename).suffix == ".m4a" else ''
-    return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
+    try:
+        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
+    finally:
+        delete_file(os.path.join('downloads', filename))
 
 
 @yt.app_errorhandler(500)
