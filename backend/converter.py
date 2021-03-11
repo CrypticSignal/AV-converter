@@ -43,18 +43,17 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         log.info(f'Unable to get the duration of {uploaded_file_path}')
         
     character_set = 'utf-8'
-    
+
     while True:
         # The process is in progress.
         if process.poll() is None:
             try:
                 output = process.stdout.readline().decode(character_set)
             except UnicodeDecodeError as e:
-                log.info(f'Unable to use utf-8:\n{e}')
                 character_set = 'latin-1'
-                log.info('Character set changed to latin-1.')
-
-            with open(ffmpeg_output_file, 'a', encoding=character_set) as f:
+                log.info(f'{e}\nCharacter set changed to latin-1.')
+            
+            with open(ffmpeg_output_file, 'a', encoding='utf-8') as f:
                 f.write(output)
 
             if 'out_time_ms' in output:
