@@ -41,10 +41,45 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         file_duration = float(probe(uploaded_file_path)['format']['duration'])
     except Exception:
         log.info(f'Unable to get the duration of {uploaded_file_path}')
+        
+    character_set = 'utf-8'
     
     while True:
-        # If the process has completed.
-        if process.poll() is not None:
+        # The process is in progress.
+        if process.poll() is None:
+            try:
+                output = process.stdout.readline().decode(character_set)
+            except UnicodeDecodeError as e:
+                log.info(f'Unable to use utf-8:\n{e}')
+                character_set = 'latin-1'
+                log.info('Character set changed to latin-1.')
+
+            with open(ffmpeg_output_file, 'a', encoding=character_set) as f:
+                f.write(output)
+
+            if 'out_time_ms' in output:
+                microseconds = int(output.strip()[12:])
+                secs = microseconds / 1_000_000
+                try:
+                    percentage = (secs / file_duration) * 100
+                except Exception:
+                    percentage = 'unknown'
+
+            elif "speed" in output:
+                speed = output.strip()[6:]
+                speed = 0 if ' ' in speed or 'N/A' in speed else float(speed[:-1])
+                try:
+                    eta = (file_duration - secs) / speed
+                except Exception:
+                    continue
+                else:
+                    minutes = round(eta / 60)
+                    seconds = f'{round(eta % 60):02d}'
+                    with open(progress_file_path, 'w') as f:
+                        f.write(f'Progress: {round(percentage, 1)}% | Speed: {speed}x | ETA: {minutes}:{seconds} [M:S]')
+
+        # The process has completed.
+        else:
             # Empty the uploads folder if there is less than 2 GB free storage space.
             free_space = shutil.disk_usage('/')[2]
             free_space_gb = free_space / 1_000_000_000
@@ -66,32 +101,6 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
                     'download_path': f'api/{output_name}',
                     'log_file': f'api/{ffmpeg_output_file}'
                 }
-        # While FFmpeg is running.
-        else:
-            output = process.stdout.readline().decode('latin-1')
-            with open(ffmpeg_output_file, 'a', encoding='latin-1') as f:
-                f.write(output)
-    
-            if 'out_time_ms' in output:
-                microseconds = int(output.strip()[12:])
-                secs = microseconds / 1_000_000
-                try:
-                    percentage = (secs / file_duration) * 100
-                except Exception:
-                    percentage = 'unknown'
-
-            elif "speed" in output:
-                speed = output.strip()[6:]
-                speed = 0 if ' ' in speed or 'N/A' in speed else float(speed[:-1])
-                try:
-                    eta = (file_duration - secs) / speed
-                except Exception:
-                    continue
-                else:
-                    minutes = round(eta / 60)
-                    seconds = f'{round(eta % 60):02d}'
-                    with open(progress_file_path, 'w') as f:
-                        f.write(f'Progress: {round(percentage, 1)}% | Speed: {speed}x | ETA: {minutes}:{seconds} [M:S]')
 
 
 # AAC
