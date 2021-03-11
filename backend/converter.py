@@ -103,7 +103,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
 
 
 # AAC
-def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, output_path):
+def aac(progress_filename, uploaded_file_path, output_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr):
     # Keep the video (if applicable)
     if is_keep_video == "yes":
         ext = os.path.splitext(uploaded_file_path)[-1]
@@ -128,7 +128,7 @@ def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
 
 
 # AC3
-def ac3(progress_filename, uploaded_file_path, is_keep_video, ac3_bitrate, output_path):
+def ac3(progress_filename, uploaded_file_path, output_path, is_keep_video, ac3_bitrate):
     # Keep video (if applicable)
     if is_keep_video == "yes":
         ext = os.path.splitext(uploaded_file_path)[-1]
@@ -141,7 +141,7 @@ def ac3(progress_filename, uploaded_file_path, is_keep_video, ac3_bitrate, outpu
 
 
 # ALAC
-def alac(progress_filename, uploaded_file_path, is_keep_video, output_path):
+def alac(progress_filename, uploaded_file_path, output_path):
     # Keep video (if applicable)
     if is_keep_video == "yes":
         return run_ffmpeg(progress_filename, uploaded_file_path, '-c:v copy -c:a alac -c:s copy', f'{output_path}.mkv')
@@ -156,7 +156,7 @@ def caf(progress_filename, uploaded_file_path, output_path):
 
 
 # DTS
-def dts(progress_filename, uploaded_file_path, is_keep_video, dts_bitrate, output_path):
+def dts(progress_filename, uploaded_file_path, output_path, is_keep_video, dts_bitrate):
     # Keep video (if applicable)
     if is_keep_video == "yes":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a dca -b:a {dts_bitrate}k '
@@ -168,7 +168,7 @@ def dts(progress_filename, uploaded_file_path, is_keep_video, dts_bitrate, outpu
 
 
 # FLAC
-def flac(progress_filename, uploaded_file_path, is_keep_video, flac_compression, output_path):
+def flac(progress_filename, uploaded_file_path, output_path, flac_compression):
     # Keep video (if applicable)
     if is_keep_video == "yes":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a flac '
@@ -181,11 +181,11 @@ def flac(progress_filename, uploaded_file_path, is_keep_video, flac_compression,
 
 # MKA
 def mka(progress_filename, uploaded_file_path, output_path):
-    return run_ffmpeg(progress_filename, uploaded_file_path, '-c:a copy', f'{output_path}.mka')
+    return run_ffmpeg(progress_filename, uploaded_file_path, '-map 0:a -c:a copy', f'{output_path}.mka')
 
 
 # MKV
-def mkv(progress_filename, uploaded_file_path, video_mode, crf_value, output_path):
+def mkv(progress_filename, uploaded_file_path, output_path, video_mode, crf_value):
     # No transcoding, simply change the container to MKV.
     if video_mode == "keep_codecs":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-map 0 -c copy', f'{output_path}.mkv')
@@ -204,8 +204,8 @@ def mkv(progress_filename, uploaded_file_path, video_mode, crf_value, output_pat
 
 
 # MP3
-def mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting,
-        output_path):
+def mp3(progress_filename, uploaded_file_path, output_path, is_keep_video, mp3_encoding_type, mp3_bitrate, 
+        mp3_vbr_setting):
     # Keep the video (if applicable)
     if is_keep_video == "yes":
         ext = os.path.splitext(uploaded_file_path)[-1]
@@ -236,7 +236,7 @@ def mp3(progress_filename, uploaded_file_path, is_keep_video, mp3_encoding_type,
 
 
 # MP4
-def mp4(progress_filename, uploaded_file_path, video_mode, crf_value, output_path):
+def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_value):
     # No transcoding, simply change the container to MP4.
     if video_mode == "keep_codecs":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-c copy -f mp4 -movflags faststart', 
@@ -256,8 +256,8 @@ def mp4(progress_filename, uploaded_file_path, video_mode, crf_value, output_pat
 
 
 # Opus
-def opus(progress_filename, uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate,
-         output_path):
+def opus(progress_filename, uploaded_file_path, output_path, is_keep_video, opus_encoding_type, opus_vorbis_slider, 
+         opus_cbr_bitrate):
     # VBR
     if opus_encoding_type == "opus_vbr":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libopus -b:a {opus_vorbis_slider}k',
@@ -269,7 +269,7 @@ def opus(progress_filename, uploaded_file_path, opus_encoding_type, opus_vorbis_
 
 
 # Vorbis
-def vorbis(progress_filename, uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path):
+def vorbis(progress_filename, uploaded_file_path, output_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider):
     # ABR
     if vorbis_encoding == "abr":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libvorbis -b:a {opus_vorbis_slider}k',
@@ -281,7 +281,7 @@ def vorbis(progress_filename, uploaded_file_path, vorbis_encoding, vorbis_qualit
 
 
 # WAV
-def wav(progress_filename, uploaded_file_path, is_keep_video, wav_bit_depth, output_path):
+def wav(progress_filename, uploaded_file_path, output_path, wav_bit_depth):
     # Keep the video (if applicable)
     if is_keep_video == "yes":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a pcm_s{wav_bit_depth}le -c:s copy',
