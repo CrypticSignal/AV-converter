@@ -81,15 +81,16 @@ def return_download_path():
         # Update the list of videos downloaded.
         with open("logs/downloads.txt", "a") as f:
             f.write(f'\n{session["new_filename"]}')
-
-    clean_up()
-    return f'api/downloads/{session["new_filename"]}'
-
+        # The download link.
+        return f'api/downloads/{session["new_filename"]}'
+    finally:
+        clean_up()
+    
 
 class Logger():
     def debug(self, msg):
         with open(session['progress_file_path'], 'a') as f:
-            f.write(msg)
+            f.write(f'{msg}\n')
     def warning(self, msg):
         pass
     def error(self, msg):

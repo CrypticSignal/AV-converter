@@ -1,7 +1,6 @@
 from datetime import datetime
 import json
 import os
-import shutil
 from time import time
 
 from flask import Flask, render_template, request, send_from_directory, session
@@ -12,7 +11,7 @@ from werkzeug.utils import secure_filename
 import converter  # converter.py
 from loggers import log
 from trimmer import trimmer  # Import the 'trimmer' blueprint in trimmer.py
-from utils import delete_file, empty_folder
+from utils import delete_file
 from yt import yt  # Import the 'yt' blueprint in yt.py
 
 app = Flask(__name__)
@@ -76,11 +75,6 @@ def homepage():
 
 @app.route('/api/convert', methods=['POST'])
 def convert_file():
-    free_space = shutil.disk_usage('/')[2]
-    free_space_gb = free_space / 1_000_000_000
-    if free_space_gb < 2:
-        empty_folder('uploads')
-
     data = request.form['states']
     filename = request.form['filename']
     uploaded_file_path = os.path.join("uploads", secure_filename(filename))

@@ -1,11 +1,4 @@
-function showAlert(message, type) {
-    const alertWrapper = document.getElementById("alert_wrapper");
-    alertWrapper.style.display = 'block';
-    alertWrapper.innerHTML =
-    `<div class="alert alert-${type}" role="alert">
-      ${message}
-    </div>`
-}
+import showAlert from './ShowAlert';
 
 // A function that creates a synchronous sleep.
 function sleep(milliseconds) {
@@ -13,33 +6,49 @@ function sleep(milliseconds) {
 }
 
 let shouldLog = false;
+// This needs to be a "var" variable so that it can be set to "true" in the showDownloadProgress function.
+var is_downloading_audio = false;
 
 async function showDownloadProgress(progressFilePath) {
     while (shouldLog) {
+        await sleep(250);
         const response = await fetch(progressFilePath);
         if (response.ok) {
             const textInFile = await response.text()
-            const lines = textInFile.split('\r')
-            const lastLine = lines[lines.length - 1];
-            if (lastLine.includes('[MP3].mp3')) {
-                showAlert('Converting to MP3...', 'info')
+            const lines = textInFile.split('\n')
+            const lastLine = lines[lines.length - 2];
+            if (is_downloading_audio) {
+                if (lastLine.includes('[download]')) {
+                    showAlert(lastLine.replace('[download]', '[audio]'), 'info');
+                }
+                else if (lastLine.includes('[ffmpeg] Merging')) {
+                    showAlert('Merging the audio and video...', 'info');
+                }
             }
-            else if (lastLine.includes('[ffmpeg] Merging')) {
-                showAlert('Merging audio and video...', 'info');
+            else {
+                if (textInFile.includes('.m4a') && ! textInFile.includes('pass -k to keep')) {
+                    is_downloading_audio = true;
+                }
+                else if (lastLine.includes('[download]')) {
+                    showAlert(lastLine.substring(11), 'info');
+                }
+                else if (lastLine.includes('.mp3')) {
+                    showAlert('Converting to MP3...', 'info')
+                }
+
+                else if (lastLine.includes('[ffmpeg] Merging')) {
+                    showAlert('Merging the audio and video...', 'info');
+                }
+                else if (lastLine.includes('Deleting original file ')) {
+                    showAlert('Your file is almost ready...', 'info');
+                }
             }
-            else if (lastLine.includes('Deleting original file ') || lastLine.includes('[ffmpeg] D')) {
-                showAlert('Finishing up...', 'info');
-            }
-            else if (lastLine.includes('[download] ')) {
-                showAlert(lastLine.substring(11), 'info');
-            }
-            await sleep(500); // Using the sleep function created above.
         }
     }
 }
 
 // This function runs when one of the download buttons is clicked.
-async function buttonClicked(url, whichButton) { // whichButton is this.value in yt.html
+async function buttonClicked(url, whichButton) {
     const linkBox = document.getElementById('link');
     if (linkBox.value == '') {
         showAlert('Trying to download something without pasting the URL? You silly billy.', 'warning')
@@ -47,8 +56,10 @@ async function buttonClicked(url, whichButton) { // whichButton is this.value in
     }
 
     showAlert('Initialising...', 'warning');
+
     const firstFormData = new FormData();
     firstFormData.append('button_clicked', 'yes');
+
     // 1st POST request to get the path of the progress file.
     const requestProgressPath = await fetch('/api/yt', {
         method: 'POST',
@@ -78,8 +89,8 @@ async function buttonClicked(url, whichButton) { // whichButton is this.value in
             body: secondFormData
         });
 
-        // Set shouldLog to false to end the while loop in showDownloadProgress.
         shouldLog = false; 
+        is_downloading_audio = false;
         
         if (secondRequest.status == 200) {
             const response = await secondRequest.text();
@@ -87,15 +98,14 @@ async function buttonClicked(url, whichButton) { // whichButton is this.value in
             anchorTag.href = response; 
             anchorTag.download = ''
             anchorTag.click();
-            // Sometimes the alert below didn't show up, adding a delay seems to fixes this.
-            await sleep(500)
+            // Sometimes the alert below didn't show up, adding a delay seems to fix this.
+            await sleep(1000)
             showAlert(`Your browser should have started downloading the file. \
-                       Click <a href="${progressFilePath}">here</a> if you'd like to view the log file.`, 'success');
+                      Click <a href="${progressFilePath}">here</a> if you'd like to view the log file.`, 'success');
         }
         else {
             const error = await secondRequest.text();
             showAlert(error, 'danger');
-            console.log(error);
             return;
         }
     }

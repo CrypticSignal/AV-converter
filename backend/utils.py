@@ -3,14 +3,17 @@ import os
 
 from loggers import log
 
+ytdl_format_codes = ['f137', 'f140', 'f251', 'f401']
+
 
 def clean_up():
     for file in os.listdir('downloads'):
-        if Path(file).suffix in ['.part', '.webp', '.ytdl'] or '.temp.' in file:
+        if (Path(file).suffix in ['.part', '.webp', '.ytdl'] or file.split('.')[-2] in ytdl_format_codes or 
+            '.part' in file):
             try:
                 os.remove(os.path.join('downloads', file))
-            except Exception:
-                log.info(f'[CLEAN UP] Unable to delete {file}')
+            except Exception as e:
+                log.info(f'Unable to delete {file}:\n{e}')
      
 
 def delete_file(filepath):
@@ -22,6 +25,8 @@ def delete_file(filepath):
 
 def empty_folder(folder_path):
     for file in os.listdir(folder_path):
-        os.remove(os.path.join(folder_path, file))
-        log.info(f'Deleted {folder_path}/{file}')
+        try:
+            os.remove(os.path.join(folder_path, file))
+        except Exception as e:
+            log.info(f'Unable to delete {folder_path}/{file}:\n{e}')
         
