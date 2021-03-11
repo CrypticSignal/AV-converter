@@ -180,7 +180,9 @@ def convert_file():
     # Vorbis
     elif chosen_codec == 'Vorbis':
         params = [
-            session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path]
+            session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, 
+            output_path
+        ]
         converter_result_dictionary = run_converter('vorbis', params)
 
     # WAV
