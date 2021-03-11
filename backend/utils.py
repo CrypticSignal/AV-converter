@@ -8,7 +8,7 @@ ytdl_format_codes = ['f137', 'f140', 'f251', 'f401']
 
 def clean_up(filename_stem):
     for file in os.listdir('downloads'):
-        if filename_stem in file and Path(file).suffix !== '':
+        if filename_stem in file and Path(file).suffix != '':
             if (Path(file).suffix in ['.part', '.webp', '.ytdl'] or file.split('.')[-2] in ytdl_format_codes or 
                 '.part' in file):
                 try:
