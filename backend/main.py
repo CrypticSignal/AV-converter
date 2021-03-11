@@ -42,24 +42,6 @@ os.makedirs('uploads', exist_ok=True)
 os.makedirs('conversions', exist_ok=True)
 
 
-def run_converter(codec, params):
-    codec_to_converter = {
-        'aac': converter.aac,
-        'ac3': converter.ac3,
-        'alac': converter.alac,
-        'dts': converter.dts,
-        'flac': converter.flac,
-        'mka': converter.mka,
-        'mkv': converter.mkv,
-        'mp3': converter.mp3,
-        'mp4': converter.mp4,
-        'opus': converter.opus,
-        'vorbis': converter.vorbis,
-        'wav': converter.wav
-    }
-    return codec_to_converter[codec](*params)
-
-
 @app.route('/api', methods=['POST'])
 def homepage():
     if request.form['request_type'] =='uploaded':
@@ -116,79 +98,60 @@ def convert_file():
     log.info(f'They chose {chosen_codec} | Output Filename: {output_name}')
     output_path = os.path.join('conversions', output_name)
 
+    mutual_params = [session['progress_filename'], uploaded_file_path]
+
     # AAC
     if chosen_codec == 'AAC':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, output_path]
-        converter_result_dictionary = run_converter('aac', params)
-
+        params = [*mutual_params, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, output_path]
+        converter_result_dictionary = converter.aac(*params)
     # AC3
     elif chosen_codec == 'AC3':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, ac3_bitrate, output_path]
-        converter_result_dictionary = run_converter('ac3', params)
-
+        params = [*mutual_params, is_keep_video, ac3_bitrate, output_path]
+        converter_result_dictionary = converter.ac3(*params)
     # ALAC
     elif chosen_codec == 'ALAC':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, output_path]
-        converter_result_dictionary = run_converter('alac', params)
-
+        params = [*mutual_params, is_keep_video, output_path]
+        converter_result_dictionary = converter.alac(*params)
     # CAF
     elif chosen_codec == 'CAF':
-        params = [session['progress_filename'], uploaded_file_path, output_path]
-        converter_result_dictionary = run_converter('caf', params)
-
+        params = [*mutual_params, output_path]
+        converter_result_dictionary = converter.caf(*params)
     # DTS
     elif chosen_codec == 'DTS':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, dts_bitrate, output_path]
-        converter_result_dictionary = run_converter('dts', params)
-
+        params = [*mutual_params, is_keep_video, dts_bitrate, output_path]
+        converter_result_dictionary = converter.dts(*params)
     # FLAC
     elif chosen_codec == 'FLAC':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, flac_compression, output_path]
-        converter_result_dictionary = run_converter('flac', params)
-
+        params = [*mutual_params, is_keep_video, flac_compression, output_path]
+        converter_result_dictionary = converter.flac(*params)
     # MKA
     elif chosen_codec == 'MKA':
-        params = [session['progress_filename'], uploaded_file_path, output_path]
-        converter_result_dictionary = run_converter('mka', params)
-
+        params = [*mutual_params, output_path]
+        converter_result_dictionary = converter.mka(*params)
     # MKV
     elif chosen_codec == 'MKV':
-        params = [session['progress_filename'], uploaded_file_path, video_mode, crf_value, output_path]
-        converter_result_dictionary = run_converter('mkv', params)
-
+        params = [*mutual_params, video_mode, crf_value, output_path]
+        converter_result_dictionary = converter.mkv(*params)
     # MP3
     elif chosen_codec == 'MP3':
-        params = [
-            session['progress_filename'], uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, 
-            output_path
-        ]
-        converter_result_dictionary = run_converter('mp3', params)
-
+        params = [*mutual_params, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, output_path]
+        converter_result_dictionary = converter.mp3(*params)
     # MP4
     elif chosen_codec == 'MP4':
-        params = [session['progress_filename'], uploaded_file_path, video_mode, crf_value, output_path]
-        converter_result_dictionary = run_converter('mp4', params)
-
+        params = [*mutual_params, video_mode, crf_value, output_path]
+        converter_result_dictionary = converter.mp4(*params)
     # Opus
     elif chosen_codec == 'Opus':
-        params = [
-            session['progress_filename'], uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, 
-            output_path
-        ]
-        converter_result_dictionary = run_converter('opus', params)
-
+        params = [*mutual_params, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, output_path]
+        converter_result_dictionary = converter.opus(*params)
     # Vorbis
     elif chosen_codec == 'Vorbis':
-        params = [
-            session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, 
-            output_path
-        ]
-        converter_result_dictionary = run_converter('vorbis', params)
-
+        params = [*mutual_params, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path]
+        converter_result_dictionary = converter.vorbis(*params)
     # WAV
     elif chosen_codec == 'WAV':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth, output_path]
-        converter_result_dictionary = run_converter('wav', params)
+        params = [*mutual_params, is_keep_video, wav_bit_depth, output_path]
+        converter_result_dictionary = converter.wav(*params)
 
     # The 'error' key is set to None if the file converted successfully.
     if converter_result_dictionary['error'] is None:
