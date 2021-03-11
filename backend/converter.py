@@ -115,7 +115,7 @@ def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
                               f'{output_path}.m4a')
         # VBR
         else:
-            return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libfdk_aac -vbr {fdk_vbr} '
+            return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libfdk_aac -vbr {fdk_vbr}', 
                               f'{output_path}.m4a')
 
 
