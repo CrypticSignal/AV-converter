@@ -110,12 +110,12 @@ def aac(progress_filename, uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
                               f'-vbr {fdk_vbr} -c:s copy', f'{output_path}.{output_ext}')
     else:
         # CBR
-        if fdk_type == "fdk_cbr":
-            return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libfdk_aac -b:a {fdk_cbr}k',
+        if fdk_type == "cbr":
+            return run_ffmpeg(progress_filename, uploaded_file_path, f'-map 0:a -c:a libfdk_aac -b:a {fdk_cbr}k',
                               f'{output_path}.m4a')
         # VBR
         else:
-            return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libfdk_aac -vbr {fdk_vbr}', 
+            return run_ffmpeg(progress_filename, uploaded_file_path, f'-map 0:a -c:a libfdk_aac -vbr {fdk_vbr}', 
                               f'{output_path}.m4a')
 
 
