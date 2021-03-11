@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 import subprocess
 from time import time
 
@@ -19,8 +20,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     params = params.split(' ')
     params.append(output_name)
     log.info(params)
-    filename_without_ext = os.path.splitext(output_name)[0][12:]
-    ffmpeg_output_file = f'ffmpeg-output/{filename_without_ext}.txt'
+    ffmpeg_output_file = os.path.join('ffmpeg-output', f'{Path(uploaded_file_path).stem}.txt')
 
     with open(ffmpeg_output_file, 'w'): pass
 
@@ -68,8 +68,8 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
                 }
         # While FFmpeg is running.
         else:
-            output = process.stdout.readline().decode('utf-8')
-            with open(ffmpeg_output_file, 'a', encoding='utf-8') as f:
+            output = process.stdout.readline().decode('latin-1')
+            with open(ffmpeg_output_file, 'a', encoding='latin-1') as f:
                 f.write(output)
     
             if 'out_time_ms' in output:

@@ -47,10 +47,7 @@ def run_youtube_dl(video_link, options):
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(video_link, download=False)
 
-    filename = Path(ydl.prepare_filename(info)).name
-    # This is the filename without the extension.
-    session['filename'] = Path(ydl.prepare_filename(info)).stem
-    log.info(session['filename'])
+    session['filename_stem'] = Path(ydl.prepare_filename(info)).stem
     
     try:
         ydl.download([video_link])
@@ -62,30 +59,32 @@ def run_youtube_dl(video_link, options):
         
  
 def return_download_path():
-    session['filename'] = [file for file in os.listdir(download_dir) if Path(file).suffix not in unwanted_filetypes and 
-                           Path(file).stem == session['filename']][0]
+    filename = [file for file in os.listdir(download_dir) if Path(file).suffix not in unwanted_filetypes and 
+                Path(file).stem == session['filename_stem']][0]
 
-    filesize = round((os.path.getsize(os.path.join(download_dir, session['filename'])) / 1_000_000), 2)
+    filesize = round((os.path.getsize(os.path.join(download_dir, filename)) / 1_000_000), 2)
     update_database(filesize)
 
     # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
-    session['new_filename'] = session['filename'].replace('#', '').replace('%', '').replace('_', ' ')
-    log.info(f'{session["new_filename"]} | {filesize} MB')
+    new_filename = filename.replace('#', '').replace('%', '').replace('_', ' ')
 
     try:
         # Rename the file.
-        os.replace(os.path.join(download_dir, session['filename']), os.path.join(download_dir, session['new_filename']))
+        os.replace(os.path.join(download_dir, filename), os.path.join(download_dir, new_filename))
     except Exception as e:
-        log.info(f'Unable to rename the file to {session["new_filename"]}:\n{e}')
+        log.info(f'Unable to rename {filename} to {new_filename}:\n{e}')
+        clean_up(Path(filename).stem)
     else:
+        log.info(f'{new_filename} | {filesize} MB')
+        clean_up(Path(new_filename).stem)
+
         # Update the list of videos downloaded.
         with open("logs/downloads.txt", "a") as f:
-            f.write(f'\n{session["new_filename"]}')
-        # The download link.
-        return f'api/downloads/{session["new_filename"]}'
-    finally:
-        clean_up()
-    
+            f.write(f'\n{new_filename}')
+
+        # Return the download link.
+        return os.path.join('api', 'downloads', new_filename)
+        
 
 class Logger():
     def debug(self, msg):

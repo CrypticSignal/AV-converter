@@ -9,7 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 
 import converter  # converter.py
-from loggers import log
+from loggers import log, log_this
 from trimmer import trimmer  # Import the 'trimmer' blueprint in trimmer.py
 from utils import delete_file
 from yt import yt  # Import the 'yt' blueprint in yt.py
@@ -44,18 +44,18 @@ os.makedirs('conversions', exist_ok=True)
 
 def run_converter(codec, params):
     codec_to_converter = {
-                            'aac': converter.aac,
-                            'ac3': converter.ac3,
-                            'alac': converter.alac,
-                            'dts': converter.dts,
-                            'flac': converter.flac,
-                            'mka': converter.mka,
-                            'mkv': converter.mkv,
-                            'mp3': converter.mp3,
-                            'mp4': converter.mp4,
-                            'opus': converter.opus,
-                            'vorbis': converter.vorbis,
-                            'wav': converter.wav
+        'aac': converter.aac,
+        'ac3': converter.ac3,
+        'alac': converter.alac,
+        'dts': converter.dts,
+        'flac': converter.flac,
+        'mka': converter.mka,
+        'mkv': converter.mkv,
+        'mp3': converter.mp3,
+        'mp4': converter.mp4,
+        'opus': converter.opus,
+        'vorbis': converter.vorbis,
+        'wav': converter.wav
     }
     return codec_to_converter[codec](*params)
 
@@ -63,14 +63,16 @@ def run_converter(codec, params):
 @app.route('/api', methods=['POST'])
 def homepage():
     if request.form['request_type'] =='uploaded':
-        log.info(f'\nUpload complete at {datetime.now().strftime("%H:%M:%S")}')
-        log.info(request.files['chosen_file'])
+        log_this(f'Uploaded {request.files["chosen_file"].filename}')
+
         filename_secure = secure_filename(request.files['chosen_file'].filename)
         # Save the uploaded file to the uploads folder.
         request.files['chosen_file'].save(os.path.join('uploads', filename_secure))
+
         session['progress_filename'] = f'{str(time())[:-8]}.txt'
-        with open(f'ffmpeg-progress/{session["progress_filename"]}', 'w'): pass
-        return f'api/ffmpeg-progress/{session["progress_filename"]}'
+        with open(os.path.join('ffmpeg-progress', session['progress_filename']), 'w'): pass
+
+        return os.path.join('api', 'ffmpeg-progress', session['progress_filename'])
 
 
 @app.route('/api/convert', methods=['POST'])
@@ -116,8 +118,7 @@ def convert_file():
 
     # AAC
     if chosen_codec == 'AAC':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, fdk_type, fdk_cbr,
-                    fdk_vbr, output_path]
+        params = [session['progress_filename'], uploaded_file_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr, output_path]
         converter_result_dictionary = run_converter('aac', params)
 
     # AC3
@@ -142,8 +143,7 @@ def convert_file():
 
     # FLAC
     elif chosen_codec == 'FLAC':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, flac_compression,
-                    output_path]
+        params = [session['progress_filename'], uploaded_file_path, is_keep_video, flac_compression, output_path]
         converter_result_dictionary = run_converter('flac', params)
 
     # MKA
@@ -158,8 +158,10 @@ def convert_file():
 
     # MP3
     elif chosen_codec == 'MP3':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, mp3_encoding_type,
-                    mp3_bitrate, mp3_vbr_setting, output_path]
+        params = [
+            session['progress_filename'], uploaded_file_path, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting, 
+            output_path
+        ]
         converter_result_dictionary = run_converter('mp3', params)
 
     # MP4
@@ -169,26 +171,25 @@ def convert_file():
 
     # Opus
     elif chosen_codec == 'Opus':
-        params = [session['progress_filename'], uploaded_file_path, opus_encoding_type, opus_vorbis_slider,
-                    opus_cbr_bitrate, output_path]
+        params = [
+            session['progress_filename'], uploaded_file_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate, 
+            output_path
+        ]
         converter_result_dictionary = run_converter('opus', params)
 
     # Vorbis
     elif chosen_codec == 'Vorbis':
-        params = [session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality,
-                    opus_vorbis_slider, output_path]
+        params = [
+            session['progress_filename'], uploaded_file_path, vorbis_encoding, vorbis_quality, opus_vorbis_slider, output_path]
         converter_result_dictionary = run_converter('vorbis', params)
 
     # WAV
     elif chosen_codec == 'WAV':
-        params = [session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth,
-                    output_path]
+        params = [session['progress_filename'], uploaded_file_path, is_keep_video, wav_bit_depth, output_path]
         converter_result_dictionary = run_converter('wav', params)
 
     # The 'error' key is set to None if the file converted successfully.
     if converter_result_dictionary['error'] is None:
-        # Filename after conversion.
-        session["converted_file_name"] = f'{output_name}{converter_result_dictionary["ext"]}'
         return converter_result_dictionary
     # Return a 500 error if the file conversion was not successful.
     else:
