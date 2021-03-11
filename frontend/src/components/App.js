@@ -188,23 +188,32 @@ function App() {
               onIsKeepVideoChange={onIsKeepVideoChange}
               isKeepVideo={isKeepVideo} />
           </div>
-            
-        );
+        )
       case 'AAC':
           return (
-            <EncodingTypeSelector
-              onAacEncodingTypeChange={onAacEncodingTypeChange}
-              encodingType={aacEncodingType}
-              onBitrateSliderMoved={onBitrateSliderMoved}
-              sliderValue={sliderValue}
-              onVbrModeChange={onAacVbrModeChange} 
-              vbrMode={aacVbrMode} />
+            <div>
+              <EncodingTypeSelector
+                onAacEncodingTypeChange={onAacEncodingTypeChange}
+                encodingType={aacEncodingType}
+                onBitrateSliderMoved={onBitrateSliderMoved}
+                sliderValue={sliderValue}
+                onVbrModeChange={onAacVbrModeChange} 
+                vbrMode={aacVbrMode} />
+              <IsKeepVideo
+                onIsKeepVideoChange={onIsKeepVideoChange}
+                isKeepVideo={isKeepVideo} />
+            </div>
           )
       case 'AC3':
         return (
-          <AC3
+          <div>
+            <AC3
             onAc3BitrateChange={onAc3BitrateChange}
             ac3Bitrate={ac3Bitrate} />
+            <IsKeepVideo
+              onIsKeepVideoChange={onIsKeepVideoChange}
+              isKeepVideo={isKeepVideo} />
+          </div>
         )
       case 'ALAC':
         return (
@@ -216,9 +225,14 @@ function App() {
         )
       case 'DTS':
         return (
-          <DTS 
-            onDtsBitrateChange={onDtsBitrateChange}
-            dtsBitrate={dtsBitrate} />
+          <div>
+            <DTS 
+              onDtsBitrateChange={onDtsBitrateChange}
+              dtsBitrate={dtsBitrate} />
+            <IsKeepVideo
+              onIsKeepVideoChange={onIsKeepVideoChange}
+              isKeepVideo={isKeepVideo} />
+          </div>
         )
       case 'FLAC':
         return (
@@ -246,7 +260,6 @@ function App() {
             onCrfChange={onCrfChange}
             crfValue = {crfValue} />
         )
-
       case 'Opus':
         return (
           <Opus
@@ -255,7 +268,6 @@ function App() {
             onBitrateSliderMoved={onBitrateSliderMoved}
             sliderValue={sliderValue} />
         )
-
       case 'Vorbis':
         return (
           <EncodingType
