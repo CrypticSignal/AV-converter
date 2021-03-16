@@ -14,7 +14,7 @@ def clean_up(filename_stem):
                 try:
                     os.remove(os.path.join('downloads', file))
                 except Exception as e:
-                    log.info(f'Unable to delete {file}:\n{e}')
+                    log.info(f'[CLEAN UP] Unable to delete {file}:\n{e}')
      
 
 def delete_file(filepath):
@@ -22,6 +22,8 @@ def delete_file(filepath):
         os.remove(filepath)
     except Exception as e:
         log.info(f'Unable to delete {filepath}:\n{e}')
+    else:
+        log.info(f'{Path(filepath).name} deleted.')
 
 
 def empty_folder(folder_path):
@@ -30,4 +32,6 @@ def empty_folder(folder_path):
             os.remove(os.path.join(folder_path, file))
         except Exception as e:
             log.info(f'Unable to delete {folder_path}/{file}:\n{e}')
+
+    log.info(f'{folder_path} folder emptied.')
         
