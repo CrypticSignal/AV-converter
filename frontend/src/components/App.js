@@ -217,7 +217,12 @@ function App() {
         )
       case 'ALAC':
         return (
-          <NoOptions/>
+          <div>
+            <NoOptions/>
+            <IsKeepVideo
+              onIsKeepVideoChange={onIsKeepVideoChange}
+              isKeepVideo={isKeepVideo} />
+          </div>
         )
       case 'CAF':
         return (
@@ -236,9 +241,14 @@ function App() {
         )
       case 'FLAC':
         return (
-          <FLAC
+          <div>
+            <FLAC
             onFlacCompressionChange={onFlacCompressionChange}
             flacCompression={flacCompression} />
+            <IsKeepVideo
+              onIsKeepVideoChange={onIsKeepVideoChange}
+              isKeepVideo={isKeepVideo} />
+          </div>
         )
       case 'MKA':
         return (
@@ -281,9 +291,14 @@ function App() {
         )
       case 'WAV':
         return (
-          <WavBitDepth
-            onWavBitDepthChange={onWavBitDepthChange}
-            bitDepth={wavBitDepth}/>
+          <div>
+            <WavBitDepth
+              onWavBitDepthChange={onWavBitDepthChange}
+              bitDepth={wavBitDepth} />
+            <IsKeepVideo
+              onIsKeepVideoChange={onIsKeepVideoChange}
+              isKeepVideo={isKeepVideo} />
+            </div>
         )
       default:
         return null;
