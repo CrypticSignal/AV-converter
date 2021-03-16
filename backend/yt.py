@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 from pathlib import Path
+import shutil
 from time import time
 
 from flask import Blueprint, Flask, request, send_from_directory, session
@@ -9,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from youtube_dl import YoutubeDL
 
 from loggers import get_ip, log, log_downloads_per_day, log_this
-from utils import clean_up, delete_file
+from utils import clean_up, delete_file, empty_folder
 
 yt = Blueprint('yt', __name__)
 app = Flask(__name__)
@@ -52,7 +53,7 @@ def run_youtube_dl(video_link, options):
     try:
         ydl.download([video_link])
     except Exception as error:
-        log.error(f'Error downloading {filename}:\n{str(error)}')
+        log.error(f'Error downloading {session["filename_stem"]}:\n{str(error)}')
         session['youtube_dl_error'] = str(error)
     else:
         log_downloads_per_day()
@@ -116,10 +117,19 @@ downloads_today = 0
 
 @yt.route("/api/yt", methods=["POST"])
 def yt_downloader():
+    # First POST request:
     if request.form['button_clicked'] == 'yes':
+        # Empty the downloads folder if there is less than 2 GB free storage space.
+        free_space = shutil.disk_usage('/')[2]
+        free_space_gb = free_space / 1_000_000_000
+        if free_space_gb < 2:
+            empty_folder('downloads')
+
         progress_file_name = f'{str(time())[:-8]}.txt'
         session['progress_file_path'] = f'yt-progress/{progress_file_name}'
         return session['progress_file_path'], 200
+
+    # Second POST request:
 
     log_this(f'Clicked on {request.form["button_clicked"]}')
 
@@ -200,12 +210,13 @@ def get_file(filename):
 
 @yt.route("/api/downloads/<filename>", methods=["GET"])
 def send_file(filename):
-    log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
     mimetype_value = 'audio/mp4' if Path(filename).suffix == ".m4a" else ''
     try:
-        return send_from_directory(download_dir, filename, mimetype=mimetype_value, as_attachment=True)
+        return send_from_directory(download_dir, filename, mimetype=mimetype_value)
     finally:
         delete_file(os.path.join('downloads', filename))
+    
+    
 
 
 @yt.app_errorhandler(500)

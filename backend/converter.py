@@ -168,7 +168,7 @@ def dts(progress_filename, uploaded_file_path, output_path, is_keep_video, dts_b
 
 
 # FLAC
-def flac(progress_filename, uploaded_file_path, output_path, flac_compression):
+def flac(progress_filename, uploaded_file_path, output_path, is_keep_video, flac_compression):
     # Keep video (if applicable)
     if is_keep_video == "yes":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a flac '
@@ -256,8 +256,7 @@ def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
 
 
 # Opus
-def opus(progress_filename, uploaded_file_path, output_path, is_keep_video, opus_encoding_type, opus_vorbis_slider, 
-         opus_cbr_bitrate):
+def opus(progress_filename, uploaded_file_path, output_path, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate):
     # VBR
     if opus_encoding_type == "opus_vbr":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:a libopus -b:a {opus_vorbis_slider}k',
@@ -281,7 +280,7 @@ def vorbis(progress_filename, uploaded_file_path, output_path, vorbis_encoding, 
 
 
 # WAV
-def wav(progress_filename, uploaded_file_path, output_path, wav_bit_depth):
+def wav(progress_filename, uploaded_file_path, output_path, is_keep_video, wav_bit_depth):
     # Keep the video (if applicable)
     if is_keep_video == "yes":
         return run_ffmpeg(progress_filename, uploaded_file_path, f'-c:v copy -c:a pcm_s{wav_bit_depth}le -c:s copy',
