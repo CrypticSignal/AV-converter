@@ -71,8 +71,13 @@ function App() {
   }
 
   const onCodecChange = (e) => {
+    if (e.target.value === 'MKV') {
+      setVideoSetting('keep_codecs');
+    }
+    else if (e.target.value === 'MP4') {
+      setVideoSetting('veryfast');
+    }
     setCodec(e.target.value);
-    //renderComponent();
   };
 
   const onBitrateSliderMoved = (e) => {
@@ -83,7 +88,6 @@ function App() {
   const onMp3EncodingTypeChange = (e) => {
     setMp3EncodingType(e.target.value);
   };
-
   const onMp3VbrSettingChange = (e) => {
     setMp3VbrSetting(e.target.value)
   }
