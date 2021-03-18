@@ -17,7 +17,7 @@ function MKVMP4(props) {
                 <option value="veryslow">[12] -preset veryslow</option>
             </select><br/>
             
-            <i style={{ display: props.videoSetting.includes("keep") ? "none" : "block" }}>
+            <i style={{ display: props.videoSetting.includes("codec") ? "none" : "block" }}>
                 When using a preset (options 4 to 12), the video codec is converted to H.264 (AVC) and the
                 audio codec is converted to AAC, using libfdk_aac with VBR mode 5. More details about the presets can be found 
                 <a href="https://trac.ffmpeg.org/wiki/Encode/H.264" target="_blank"> here</a>.
