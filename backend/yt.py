@@ -53,10 +53,12 @@ def run_youtube_dl(video_link, options):
     try:
         ydl.download([video_link])
     except Exception as error:
-        log.error(f'Error downloading {session["filename_stem"]}:\n{str(error)}')
-        session['youtube_dl_error'] = str(error)
+        log.info(f'Error downloading {session["filename_stem"]}:\n{error}')
+        return str(error), 500
     else:
         log_downloads_per_day()
+
+    return True
         
  
 def return_download_path():
@@ -151,9 +153,14 @@ def yt_downloader():
             'restrictfilenames': True,
             'logger': Logger()
         }
-        run_youtube_dl(video_link, options)
-        return return_download_path()
-    
+
+        result = run_youtube_dl(video_link, options)
+
+        if result == True:
+            return return_download_path()
+   
+        return result
+        
     # MP4
     elif request.form['button_clicked'] == 'mp4':
         options = {
@@ -162,8 +169,13 @@ def yt_downloader():
             'restrictfilenames': True,
             'logger': Logger()
         }
-        run_youtube_dl(video_link, options)
-        return return_download_path()
+
+        result = run_youtube_dl(video_link, options)
+
+        if result == True:
+            return return_download_path()
+   
+        return result
 
     # Audio (best quality)
     elif request.form['button_clicked'] == 'audio_best':
@@ -176,8 +188,13 @@ def yt_downloader():
             'restrictfilenames': True,
             'logger': Logger()
         }
-        run_youtube_dl(video_link, options)
-        return return_download_path()
+
+        result = run_youtube_dl(video_link, options)
+
+        if result == True:
+            return return_download_path()
+   
+        return result
     
     # MP3
     elif request.form['button_clicked'] == 'audio_mp3':
@@ -198,8 +215,13 @@ def yt_downloader():
             'restrictfilenames': True,
             'logger': Logger()
         }
-        run_youtube_dl(video_link, options)
-        return return_download_path()
+
+        result = run_youtube_dl(video_link, options)
+
+        if result == True:
+            return return_download_path()
+   
+        return result
 
 
 # This is where the youtube-dl progress file is.
@@ -219,7 +241,7 @@ def send_file(filename):
     
 
 
-@yt.app_errorhandler(500)
-def error_handler(error):
-    return session['youtube_dl_error'], 500
+# @yt.app_errorhandler(500)
+# def error_handler(error):
+#     return session['youtube_dl_error'], 500
     
