@@ -7,7 +7,6 @@ function getProgressFilename(request, inputFilename, state) {
   document.getElementById("progress_wrapper").classList.add("d-none");
   if (request.status == 200) {
     const progressFilename = request.responseText;
-    console.log(progressFilename);
     document.getElementById("converting_btn").style.display = "block";
     sendConversionRequest(inputFilename, progressFilename, state);
   } else {

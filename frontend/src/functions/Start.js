@@ -116,7 +116,8 @@ function start(state) {
     document.getElementById("alert_wrapper").style.display = "none";
     input.disabled = true;
     outputNameBox.disabled = true;
-    document.getElementById("convert_btn").classList.add("d-none");
+    const cancelButton = document.getElementById("convert_btn");
+    cancelButton.classList.add("d-none");
     document.getElementById("uploading_btn").classList.remove("d-none");
     document.getElementById("cancel_btn").classList.remove("d-none");
     const progressWrapper = document.getElementById("progress_wrapper");
