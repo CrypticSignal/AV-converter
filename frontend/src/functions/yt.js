@@ -100,8 +100,7 @@ async function buttonClicked(url, whichButton) {
             anchorTag.click();
             // Sometimes the alert below didn't show up, adding a delay seems to fix this.
             await sleep(1000)
-            showAlert(`Your browser should have started downloading the file. \
-                      Click <a href="${progressFilePath}">here</a> if you'd like to view the log file.`, 'success');
+            showAlert('Your browser should have started downloading the file.', 'success');
         }
         else {
             const error = await secondRequest.text();

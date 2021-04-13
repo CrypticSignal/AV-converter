@@ -1,7 +1,6 @@
 from datetime import datetime
 import os
 from pathlib import Path
-import shutil
 from time import time
 
 from flask import Blueprint, Flask, request, send_from_directory, session
@@ -121,12 +120,6 @@ downloads_today = 0
 def yt_downloader():
     # First POST request:
     if request.form['button_clicked'] == 'yes':
-        # Empty the downloads folder if there is less than 2 GB free storage space.
-        free_space = shutil.disk_usage('/')[2]
-        free_space_gb = free_space / 1_000_000_000
-        if free_space_gb < 2:
-            empty_folder('downloads')
-
         progress_file_name = f'{str(time())[:-8]}.txt'
         session['progress_file_path'] = f'yt-progress/{progress_file_name}'
         return session['progress_file_path'], 200

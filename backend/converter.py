@@ -7,7 +7,7 @@ from time import time
 from ffmpeg import probe
 
 from loggers import log
-from utils import empty_folder
+from utils import delete_file, empty_folder
 
 os.makedirs('ffmpeg-progress', exist_ok=True)
 os.makedirs('ffmpeg-output', exist_ok=True)
@@ -19,14 +19,17 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     progress_file_path = os.path.join('ffmpeg-progress', progress_filename)
     params = params.split(' ')
     params.append(output_name)
-    log.info(params)
+    try:
+        log.info(params)
+    except Exception as e:
+        log.info(e)
+
     ffmpeg_output_file = os.path.join('ffmpeg-output', f'{Path(uploaded_file_path).stem}.txt')
 
     with open(ffmpeg_output_file, 'w'): pass
-
     log.info(f'Converting {uploaded_file_path}...')
-    start_time = time()
 
+    start_time = time()
     process = subprocess.Popen(
         [
             ffmpeg_path, '-loglevel', 'debug', '-progress', '-', '-nostats', 
@@ -84,6 +87,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             free_space_gb = free_space / 1_000_000_000
             if free_space_gb < 2:
                 empty_folder('uploads')
+                
             # The return code is not 0 if an error occurred.
             if process.returncode != 0:
                 log.info('Unable to convert.')
@@ -94,6 +98,8 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             # The conversion was successful
             else:
                 log.info(f'Conversion took {round((time() - start_time), 1)} seconds.')
+                delete_file(progress_file_path)
+                delete_file(ffmpeg_output_file)
                 return {
                     'error': None,
                     'ext': os.path.splitext(output_name)[1],

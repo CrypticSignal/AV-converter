@@ -11,7 +11,7 @@ __pycache__
 /backend/yt-progress
 
 /frontend/build
-/frontend/node_modules
-/src/package-lock.json
+**/node_modules
+**/package-lock.json
 
 .eslintcache
