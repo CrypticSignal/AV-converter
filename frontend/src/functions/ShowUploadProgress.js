@@ -17,20 +17,14 @@ function showUploadProgress(event) {
   const speed = (loaded - previousLoaded) / (Date.now() / 1000 - previousTime);
 
   const completionTimeSeconds = (total - loaded) / speed;
-  const hours = (Math.floor(completionTimeSeconds / 3600) % 60)
-    .toString()
-    .padStart(2, "0");
-  const minutes = (Math.floor(completionTimeSeconds / 60) % 60)
-    .toString()
-    .padStart(2, "0");
+  const hours = (Math.floor(completionTimeSeconds / 3600) % 60).toString().padStart(2, "0");
+  const minutes = (Math.floor(completionTimeSeconds / 60) % 60).toString().padStart(2, "0");
   const seconds = Math.ceil(completionTimeSeconds % 60)
     .toString()
     .padStart(2, "0");
   const completionTime = `${hours}:${minutes}:${seconds}`;
 
-  progressStatus.innerText = `${loaded.toFixed(1)} MB of ${total.toFixed(
-    1
-  )} MB uploaded
+  progressStatus.innerText = `${loaded.toFixed(1)} MB of ${total.toFixed(1)} MB uploaded
     Upload Speed: ${(speed * 8).toFixed(1)} Mbps (${speed.toFixed(1)} MB/s)
     Upload will complete in ${completionTime} [HH:MM:SS]`;
 

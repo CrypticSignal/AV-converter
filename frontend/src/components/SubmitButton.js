@@ -1,10 +1,6 @@
 function SubmitButton(props) {
   return (
-    <button
-      id="convert_btn"
-      className="btn btn-primary"
-      onClick={props.onSubmitClicked}
-    >
+    <button id="convert_btn" className="btn btn-primary" onClick={props.onSubmitClicked}>
       Submit
     </button>
   );

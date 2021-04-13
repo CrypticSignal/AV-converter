@@ -4,11 +4,7 @@ function VbrDropdown(props) {
   return (
     <div id="fdk_vbr_div">
       <label htmlFor="fdk_vbr_value">VBR mode:</label>
-      <select
-        id="fdk_vbr_value"
-        onChange={props.onVbrModeChange}
-        value={props.vbrMode}
-      >
+      <select id="fdk_vbr_value" onChange={props.onVbrModeChange} value={props.vbrMode}>
         <option disabled value>
           Select VBR mode
         </option>

@@ -5,9 +5,7 @@ import getProgressFilename from "./GetProgressFilename";
 
 function showError(progressFilenameRequest) {
   showAlert(`${progressFilenameRequest.responseText}`, "danger");
-  console.log(
-    `progressFilenameRequest error: ${progressFilenameRequest.responseText}`
-  );
+  console.log(`progressFilenameRequest error: ${progressFilenameRequest.responseText}`);
   reset();
 }
 
@@ -22,10 +20,7 @@ function start(state) {
   const outputNameBox = document.getElementById("output_name");
   // Show an alert if a file hasn't been selected or the URL input box is empty.
   if (!input.value && !outputNameBox.value) {
-    showAlert(
-      "It helps if you select the file that you want to convert.",
-      "warning"
-    );
+    showAlert("It helps if you select the file that you want to convert.", "warning");
     return;
   }
   // If a file has been selected.
@@ -127,19 +122,12 @@ function start(state) {
     // The convesion progress will be written to a .txt file. This request will receive the name of the .txt file
     const progressFilenameRequest = new XMLHttpRequest();
 
-    progressFilenameRequest.upload.addEventListener(
-      "progress",
-      showUploadProgress
-    );
+    progressFilenameRequest.upload.addEventListener("progress", showUploadProgress);
     progressFilenameRequest.addEventListener("load", () =>
       getProgressFilename(progressFilenameRequest, inputFilename, state)
     );
-    progressFilenameRequest.addEventListener("error", () =>
-      showError(progressFilenameRequest)
-    );
-    cancelButton.addEventListener("click", () =>
-      abortUpload(progressFilenameRequest)
-    );
+    progressFilenameRequest.addEventListener("error", () => showError(progressFilenameRequest));
+    cancelButton.addEventListener("click", () => abortUpload(progressFilenameRequest));
 
     const data = new FormData();
     data.append("request_type", "uploaded");

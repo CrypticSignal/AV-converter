@@ -14,8 +14,7 @@ function QualitySlider(props) {
       <span>{` -q${props.qValue}`}</span>
       <br />
       <i>
-        Quality range is from "-q 0" (lowest) to "-q 10" (highest). For more
-        details, click{" "}
+        Quality range is from "-q 0" (lowest) to "-q 10" (highest). For more details, click{" "}
         <a
           target="_blank"
           href="https://wiki.hydrogenaud.io/index.php?title=Recommended_Ogg_Vorbis#Recommended_Encoder_Settings"

@@ -188,10 +188,7 @@ function App() {
               onMp3VbrSettingChange={onMp3VbrSettingChange}
               vbrSetting={mp3VbrSetting}
             />
-            <IsKeepVideo
-              onIsKeepVideoChange={onIsKeepVideoChange}
-              isKeepVideo={isKeepVideo}
-            />
+            <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
       case "AAC":
@@ -205,33 +202,21 @@ function App() {
               onVbrModeChange={onAacVbrModeChange}
               vbrMode={aacVbrMode}
             />
-            <IsKeepVideo
-              onIsKeepVideoChange={onIsKeepVideoChange}
-              isKeepVideo={isKeepVideo}
-            />
+            <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
       case "AC3":
         return (
           <div>
-            <AC3
-              onAc3BitrateChange={onAc3BitrateChange}
-              ac3Bitrate={ac3Bitrate}
-            />
-            <IsKeepVideo
-              onIsKeepVideoChange={onIsKeepVideoChange}
-              isKeepVideo={isKeepVideo}
-            />
+            <AC3 onAc3BitrateChange={onAc3BitrateChange} ac3Bitrate={ac3Bitrate} />
+            <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
       case "ALAC":
         return (
           <div>
             <NoOptions />
-            <IsKeepVideo
-              onIsKeepVideoChange={onIsKeepVideoChange}
-              isKeepVideo={isKeepVideo}
-            />
+            <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
       case "CAF":
@@ -239,14 +224,8 @@ function App() {
       case "DTS":
         return (
           <div>
-            <DTS
-              onDtsBitrateChange={onDtsBitrateChange}
-              dtsBitrate={dtsBitrate}
-            />
-            <IsKeepVideo
-              onIsKeepVideoChange={onIsKeepVideoChange}
-              isKeepVideo={isKeepVideo}
-            />
+            <DTS onDtsBitrateChange={onDtsBitrateChange} dtsBitrate={dtsBitrate} />
+            <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
       case "FLAC":
@@ -256,10 +235,7 @@ function App() {
               onFlacCompressionChange={onFlacCompressionChange}
               flacCompression={flacCompression}
             />
-            <IsKeepVideo
-              onIsKeepVideoChange={onIsKeepVideoChange}
-              isKeepVideo={isKeepVideo}
-            />
+            <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
       case "MKA":
@@ -305,14 +281,8 @@ function App() {
       case "WAV":
         return (
           <div>
-            <WavBitDepth
-              onWavBitDepthChange={onWavBitDepthChange}
-              bitDepth={wavBitDepth}
-            />
-            <IsKeepVideo
-              onIsKeepVideoChange={onIsKeepVideoChange}
-              isKeepVideo={isKeepVideo}
-            />
+            <WavBitDepth onWavBitDepthChange={onWavBitDepthChange} bitDepth={wavBitDepth} />
+            <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
       default:
@@ -338,9 +308,7 @@ function App() {
                 <option value="CAF">CAF (.caf)</option>
                 <option value="DTS">DTS</option>
                 <option value="FLAC">FLAC</option>
-                <option value="MKA">
-                  MKA (extract audio without encoding it)
-                </option>
+                <option value="MKA">MKA (extract audio without encoding it)</option>
                 <option value="MKV">MKV (.mkv)</option>
                 <option value="MP3">MP3</option>
                 <option value="MP4">MP4 (.mp4)</option>
@@ -367,12 +335,7 @@ function App() {
               <br />
               <AlertDiv />
               <SubmitButton onSubmitClicked={onSubmitClicked} />
-              <button
-                className="btn btn-primary d-none"
-                id="uploading_btn"
-                type="button"
-                disabled
-              >
+              <button className="btn btn-primary d-none" id="uploading_btn" type="button" disabled>
                 <span
                   className="spinner-border spinner-border-sm"
                   role="status"
@@ -382,21 +345,13 @@ function App() {
               </button>
               <>
                 {/*"Cancel upload" button (Bootstrap class)*/}
-                <button
-                  type="button"
-                  id="cancel_btn"
-                  className="btn btn-secondary d-none"
-                >
+                <button type="button" id="cancel_btn" className="btn btn-secondary d-none">
                   Cancel upload
                 </button>
               </>
               <>
                 {/*"Converting..." button (Bootstrap class)*/}
-                <div
-                  className="text-center"
-                  id="converting_btn"
-                  style={{ display: "none" }}
-                >
+                <div className="text-center" id="converting_btn" style={{ display: "none" }}>
                   <button className="btn btn-info" disabled>
                     <span className="spinner-border spinner-border-sm" />
                     Converting...
@@ -439,10 +394,7 @@ function App() {
 
         <Route exact path="/yt">
           <TopBar />
-          <YoutubePage
-            onYtButtonClicked={onYtButtonClicked}
-            buttonClicked={whichButtonClicked}
-          />
+          <YoutubePage onYtButtonClicked={onYtButtonClicked} buttonClicked={whichButtonClicked} />
         </Route>
       </Switch>
     </Router>

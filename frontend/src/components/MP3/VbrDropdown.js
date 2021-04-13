@@ -2,11 +2,7 @@ function VbrDropdown(props) {
   return (
     <div>
       <label htmlFor="mp3_vbr_setting">Setting:</label>
-      <select
-        id="mp3_vbr_setting"
-        onChange={props.onVbrSettingChange}
-        value={props.vbrSetting}
-      >
+      <select id="mp3_vbr_setting" onChange={props.onVbrSettingChange} value={props.vbrSetting}>
         <option disabled value>
           Select VBR setting
         </option>

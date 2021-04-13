@@ -15,10 +15,7 @@ function FLAC(props) {
       <span id="flac_value" />
       {` ${props.flacCompression}`}
       <br />
-      <i>
-        A higher value means a slighter smaller file size, but a longer
-        conversion time.
-      </i>
+      <i>A higher value means a slighter smaller file size, but a longer conversion time.</i>
     </div>
   );
 }

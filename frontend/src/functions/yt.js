@@ -24,10 +24,7 @@ async function showDownloadProgress(progressFilePath) {
           showAlert("Merging the audio and video...", "info");
         }
       } else {
-        if (
-          textInFile.includes(".m4a") &&
-          !textInFile.includes("pass -k to keep")
-        ) {
+        if (textInFile.includes(".m4a") && !textInFile.includes("pass -k to keep")) {
           is_downloading_audio = true;
         } else if (lastLine.includes("[download]")) {
           showAlert(lastLine.substring(11), "info");
@@ -47,10 +44,7 @@ async function showDownloadProgress(progressFilePath) {
 async function buttonClicked(url, whichButton) {
   const linkBox = document.getElementById("link");
   if (linkBox.value == "") {
-    showAlert(
-      "Trying to download something without pasting the URL? You silly billy.",
-      "warning"
-    );
+    showAlert("Trying to download something without pasting the URL? You silly billy.", "warning");
     return;
   }
 
@@ -98,10 +92,7 @@ async function buttonClicked(url, whichButton) {
       anchorTag.click();
       // Sometimes the alert below didn't show up, adding a delay seems to fix this.
       await sleep(1000);
-      showAlert(
-        "Your browser should have started downloading the file.",
-        "success"
-      );
+      showAlert("Your browser should have started downloading the file.", "success");
     } else {
       const error = await secondRequest.text();
       showAlert(error, "danger");

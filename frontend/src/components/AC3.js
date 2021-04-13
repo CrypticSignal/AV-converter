@@ -2,15 +2,11 @@ function AC3(props) {
   return (
     <div id="AC3">
       <p>
-        The maximum number of output channels is 6. Therefore, audio with more
-        than 6 channels (such as 7.1 surround) will get downmixed to 5.1
+        The maximum number of output channels is 6. Therefore, audio with more than 6 channels (such
+        as 7.1 surround) will get downmixed to 5.1
       </p>
       <label htmlFor="ac3_bitrate">Bitrate:</label>
-      <select
-        id="ac3_bitrate"
-        onChange={props.onAc3BitrateChange}
-        value={props.ac3Bitrate}
-      >
+      <select id="ac3_bitrate" onChange={props.onAc3BitrateChange} value={props.ac3Bitrate}>
         <option disabled value>
           Select a Bitrate
         </option>
@@ -21,8 +17,8 @@ function AC3(props) {
       </select>
       <br />
       <i>
-        A higher bitrate allows for potentially higher audio quality, at the
-        expense of a larger file size.
+        A higher bitrate allows for potentially higher audio quality, at the expense of a larger
+        file size.
       </i>
     </div>
   );

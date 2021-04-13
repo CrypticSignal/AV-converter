@@ -1,16 +1,10 @@
 function MKVMP4(props) {
   return (
     <div id="video">
-      <select
-        id="video_mode"
-        onChange={props.onVideoSettingChange}
-        value={props.videoSetting}
-      >
+      <select id="video_mode" onChange={props.onVideoSettingChange} value={props.videoSetting}>
         <option value="keep_codecs">[1] -c copy</option>
         <option value="keep_video_codec">[2] -c:v copy -c:a libfdk_aac</option>
-        <option value="convert_video_keep_audio">
-          [3] -c:v libx264 -c:a copy
-        </option>
+        <option value="convert_video_keep_audio">[3] -c:v libx264 -c:a copy</option>
         <option disabled>Or choose an x264 preset:</option>
         <option value="ultrafast">[4] -preset ultrafast</option>
         <option value="superfast">[5] -preset superfast</option>
@@ -29,9 +23,9 @@ function MKVMP4(props) {
           display: props.videoSetting.includes("codec") ? "none" : "block",
         }}
       >
-        When using a preset (options 4 to 12), the video codec is converted to
-        H.264 (AVC) and the audio codec is converted to AAC, using libfdk_aac
-        with VBR mode 5. More details about the presets can be found
+        When using a preset (options 4 to 12), the video codec is converted to H.264 (AVC) and the
+        audio codec is converted to AAC, using libfdk_aac with VBR mode 5. More details about the
+        presets can be found
         <a href="https://trac.ffmpeg.org/wiki/Encode/H.264" target="_blank">
           {" "}
           here
@@ -61,13 +55,9 @@ function MKVMP4(props) {
         {` ${props.crfValue}`}
         <br />
         <i>
-          A lower CRF means higher video quality, at the expense of a larger
-          file size. A CRF of 17 or 18 is considered to be visually lossless or
-          nearly so. More details{" "}
-          <a
-            href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf"
-            target="_blank"
-          >
+          A lower CRF means higher video quality, at the expense of a larger file size. A CRF of 17
+          or 18 is considered to be visually lossless or nearly so. More details{" "}
+          <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf" target="_blank">
             here
           </a>
           .

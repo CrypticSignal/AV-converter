@@ -15,12 +15,7 @@ function EncodingType(props) {
           />
         );
       case "vbr":
-        return (
-          <QualitySlider
-            onSliderMoved={props.onSliderMoved}
-            qValue={props.qValue}
-          />
-        );
+        return <QualitySlider onSliderMoved={props.onSliderMoved} qValue={props.qValue} />;
       default:
         return null;
     }
@@ -29,10 +24,7 @@ function EncodingType(props) {
     <div id="Vorbis">
       <div id="vorbis_encoding_div">
         <label>VBR setting:</label>
-        <select
-          onChange={props.onVorbisEncodingTypeChange}
-          value={props.vorbisEncodingType}
-        >
+        <select onChange={props.onVorbisEncodingTypeChange} value={props.vorbisEncodingType}>
           <option disabled>Select encoding type</option>
           <option value="abr">ABR (Average Bitrate)</option>
           <option value="vbr">VBR (target a quality level)</option>
