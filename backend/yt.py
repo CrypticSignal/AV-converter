@@ -91,7 +91,10 @@ def return_download_path():
 class Logger():
     def debug(self, msg):
         with open(session['progress_file_path'], 'a') as f:
-            f.write(f'{msg}\n')
+            try:
+                f.write(f'{msg}\n')
+            except Exception as e:
+                log.info('Unable to write YT progress to file:\n{e}')
     def warning(self, msg):
         pass
     def error(self, msg):
@@ -230,8 +233,6 @@ def send_file(filename):
         return send_from_directory(download_dir, filename, mimetype=mimetype_value)
     finally:
         delete_file(os.path.join('downloads', filename))
-    
-    
 
 
 # @yt.app_errorhandler(500)
