@@ -139,7 +139,7 @@ def convert_file():
         converter_result_dictionary = converter.mp4(*params)
     # Opus
     elif chosen_codec == 'Opus':
-        params = [*mutual_params, is_keep_video, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate]
+        params = [*mutual_params, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate]
         converter_result_dictionary = converter.opus(*params)
     # Vorbis
     elif chosen_codec == 'Vorbis':
