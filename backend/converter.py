@@ -22,7 +22,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     try:
         log.info(params)
     except Exception as e:
-        log.info(e)
+        log.info('Unable to print the FFmpeg parameters:\n{e}')
 
     ffmpeg_output_file = os.path.join('ffmpeg-output', f'{Path(uploaded_file_path).stem}.txt')
 
