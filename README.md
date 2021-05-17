@@ -1,4 +1,5 @@
-[![HitCount](http://hits.dwyl.com/CrypticSignal/av-converter.svg)](http://hits.dwyl.com/CrypticSignal/av-converter)
+https://img.shields.io/github/commit-activity/y/CrypticSignal/av-converter?label=commits
+https://img.shields.io/tokei/lines/github/CrypticSignal/av-converter?label=lines%20of%20code
 
 On https://av-converter.com you can:
 - Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis, FLAC, ALAC, AC3, DTS or CAF.
