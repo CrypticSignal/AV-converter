@@ -1,5 +1,4 @@
-[![HitCount](http://hits.dwyl.com/BassThatHertz/AudioAndVideoConverter.svg)](http://hits.dwyl.com/BassThatHertz/AudioAndVideoConverter)
-[![contributors welcome](https://img.shields.io/badge/contributors-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+![Lines of code](https://img.shields.io/tokei/lines/github/CrypticSignal/av-converter?label=lines%20of%20code)
 
 On https://av-converter.com you can:
 - Convert an audio file to another format - MP3, AAC, WAV, Opus, Vorbis, FLAC, ALAC, AC3, DTS or CAF.
