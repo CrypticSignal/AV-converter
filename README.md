@@ -1,4 +1,3 @@
-![GitHub commit activity](https://img.shields.io/github/commit-activity/y/CrypticSignal/av-converter?label=commits)
 ![Lines of code](https://img.shields.io/tokei/lines/github/CrypticSignal/av-converter?label=lines%20of%20code)
 
 On https://av-converter.com you can:
