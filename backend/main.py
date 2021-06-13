@@ -110,7 +110,7 @@ def convert_file():
         converter_result_dictionary = converter.ac3(*params)
     # ALAC
     elif chosen_codec == 'ALAC':
-        converter_result_dictionary = converter.alac(*mutual_params)
+        converter_result_dictionary = converter.alac(*mutual_params, is_keep_video)
     # CAF
     elif chosen_codec == 'CAF':
         converter_result_dictionary = converter.caf(*mutual_params)
