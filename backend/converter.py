@@ -145,7 +145,7 @@ def ac3(progress_filename, uploaded_file_path, output_path, is_keep_video, ac3_b
 
 
 # ALAC
-def alac(progress_filename, uploaded_file_path, output_path):
+def alac(progress_filename, uploaded_file_path, output_path, is_keep_video):
     # Keep video (if applicable)
     if is_keep_video == "yes":
         return run_ffmpeg(progress_filename, uploaded_file_path, '-c:v copy -c:a alac', f'{output_path}.mkv')
