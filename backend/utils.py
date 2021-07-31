@@ -47,16 +47,16 @@ def empty_folder(folder_path):
             log.info(f"Unable to delete {folder_path}/{file}:\n{e}")
 
 
+# This function returns True if the first audio stream is mono.
 def is_mono_audio(filepath):
     try:
-        audio_streams = [
+        first_audio_stream = [
             stream for stream in probe(filepath)["streams"] if stream["codec_type"] == "audio"
-        ]
+        ][0]
     except Exception:
-        pass
+        log.info(f"ffprobe was unable to detect an audio stream in {filepath}")
     else:
-        for index, stream in enumerate(audio_streams):
-            if audio_streams[index]["channels"] == 1:
-                return True
+        if first_audio_stream["channels"] == 1:
+            return True
 
     return False
