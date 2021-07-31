@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 import shutil
 
+from ffmpeg import probe
+
 from loggers import log
 
 ytdl_format_codes = ["f137", "f140", "f251", "f401"]
@@ -43,3 +45,18 @@ def empty_folder(folder_path):
             os.remove(os.path.join(folder_path, file))
         except Exception as e:
             log.info(f"Unable to delete {folder_path}/{file}:\n{e}")
+
+
+def is_mono_audio(filepath):
+    try:
+        audio_streams = [
+            stream for stream in probe(filepath)["streams"] if stream["codec_type"] == "audio"
+        ]
+    except Exception:
+        pass
+    else:
+        for index, stream in enumerate(audio_streams):
+            if audio_streams[index]["channels"] == 1:
+                return True
+
+    return False
