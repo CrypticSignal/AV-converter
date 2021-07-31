@@ -74,9 +74,9 @@ def convert_file():
     mp3_bitrate = json.loads(data)["sliderValue"]
     mp3_vbr_setting = json.loads(data)["mp3VbrSetting"]
     # AAC
-    fdk_type = json.loads(data)["aacEncodingType"]
-    fdk_cbr = json.loads(data)["sliderValue"]
-    fdk_vbr = json.loads(data)["aacVbrMode"]
+    aac_encoding_type = json.loads(data)["aacEncodingType"]
+    bitrate = json.loads(data)["sliderValue"]
+    vbr_quality = json.loads(data)["aacVbrMode"]
     # Vorbis
     vorbis_encoding = json.loads(data)["vorbisEncodingType"]
     vorbis_quality = json.loads(data)["qValue"]
@@ -103,7 +103,7 @@ def convert_file():
 
     # AAC
     if chosen_codec == "AAC":
-        params = [*mutual_params, is_keep_video, fdk_type, fdk_cbr, fdk_vbr]
+        params = [*mutual_params, is_keep_video, aac_encoding_type, bitrate, vbr_quality]
         converter_result_dictionary = converter.aac(*params)
     # AC3
     elif chosen_codec == "AC3":

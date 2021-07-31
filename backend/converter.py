@@ -14,6 +14,14 @@ os.makedirs("ffmpeg-output", exist_ok=True)
 # If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
 ffmpeg_path = "/home/h/bin/ffmpeg"
 
+if "libfdk-aac" in subprocess.check_output([ffmpeg_path, "-buildconf"]).decode("utf-8"):
+    aac_encoder = "libfdk_aac"
+    aac_vbr_enabler = "-vbr"
+# FFmpeg was not compiled with libfdk-aac support, use the native AAC encoder.
+else:
+    aac_encoder = "aac"
+    aac_vbr_enabler = "-q:a"
+
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     progress_file_path = os.path.join("ffmpeg-progress", progress_filename)
@@ -98,66 +106,74 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
                             f"Progress: {round(percentage, 1)}% | Speed: {speed}x | ETA: {minutes}:{seconds} [M:S]"
                         )
 
-        # The process has completed.
-        else:
-            # Empty the uploads folder if there is less than 2 GB free storage space.
-            free_space_gb = shutil.disk_usage("/")[2] / 1_000_000_000
-            if free_space_gb < 2:
-                empty_folder("uploads")
+        # process.poll() is not None - the FFmpeg process has completed:
 
-            # The return code is not 0 if an error occurred.
-            if process.returncode != 0:
-                log.info("Unable to convert.")
-                return {"error": "Unable to convert", "log_file": f"api/{ffmpeg_output_file}"}
+        # Empty the uploads folder if there is less than 2 GB free storage space.
+        free_space_gb = shutil.disk_usage("/")[2] / 1_000_000_000
+        if free_space_gb < 2:
+            empty_folder("uploads")
 
-            log.info(f"Conversion took {round((time() - start_time), 1)} seconds.")
-            delete_file(progress_file_path)
-            # delete_file(ffmpeg_output_file)
-            return {
-                "error": None,
-                "ext": os.path.splitext(output_name)[1],
-                "download_path": f"api/{output_name}",
-                "log_file": f"api/{ffmpeg_output_file}",
-            }
+        # The return code is not 0 if an error occurred.
+        if process.returncode != 0:
+            log.info("Unable to convert.")
+            return {"error": "Unable to convert", "log_file": f"api/{ffmpeg_output_file}"}
+
+        log.info(f"Conversion took {round((time() - start_time), 1)} seconds.")
+        delete_file(progress_file_path)
+
+        return {
+            "error": None,
+            "ext": os.path.splitext(output_name)[1],
+            "download_path": f"api/{output_name}",
+            "log_file": f"api/{ffmpeg_output_file}",
+        }
 
 
 # AAC
 def aac(
-    progress_filename, uploaded_file_path, output_path, is_keep_video, fdk_type, fdk_cbr, fdk_vbr
+    progress_filename,
+    uploaded_file_path,
+    output_path,
+    is_keep_video,
+    encoding_type,
+    bitrate,
+    vbr_quality,
 ):
+    log.info(encoding_type)
     if is_keep_video == "yes":
         output_ext = Path(uploaded_file_path).suffix
-        # CBR
-        if fdk_type == "fdk_cbr":
+
+        if encoding_type == "cbr":
             return run_ffmpeg(
                 progress_filename,
                 uploaded_file_path,
-                f"-c:v copy -c:a libfdk_aac " f"-b:a {fdk_cbr}k",
+                f"-c:v copy -c:a {aac_encoder} -b:a {bitrate}k",
                 f"{output_path}.{output_ext}",
             )
-        # VBR
-        else:
-            return run_ffmpeg(
-                progress_filename,
-                uploaded_file_path,
-                f"-c:v copy -c:a libfdk_aac " f"-vbr {fdk_vbr}",
-                f"{output_path}.{output_ext}",
-            )
-    # CBR
-    if fdk_type == "cbr":
+        # VBR was selected.
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-map 0:a -c:a libfdk_aac -b:a {fdk_cbr}k",
-            f"{output_path}.m4a",
+            f"-c:v copy -c:a {aac_encoder} {aac_vbr_enabler} {vbr_quality}",
+            f"{output_path}.{output_ext}",
         )
-    else:
+
+    # Keep video was not selected:
+
+    if encoding_type == "cbr":
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-map 0:a -c:a libfdk_aac -vbr {fdk_vbr}",
+            f"-map 0:a -c:a {aac_encoder} -b:a {bitrate}k",
             f"{output_path}.m4a",
         )
+    # VBR was selected.
+    return run_ffmpeg(
+        progress_filename,
+        uploaded_file_path,
+        f"-map 0:a -c:a {aac_encoder} {aac_vbr_enabler} {vbr_quality}",
+        f"{output_path}.m4a",
+    )
 
 
 # AC3
@@ -170,7 +186,7 @@ def ac3(progress_filename, uploaded_file_path, output_path, is_keep_video, ac3_b
             f"-c:v copy -c:a ac3 -b:a {ac3_bitrate}k",
             f"{output_path}.{output_ext}",
         )
-
+    # Audio only output file.
     return run_ffmpeg(
         progress_filename, uploaded_file_path, f"-c:a ac3 -b:a {ac3_bitrate}k", f"{output_path}.ac3"
     )
@@ -182,6 +198,7 @@ def alac(progress_filename, uploaded_file_path, output_path, is_keep_video):
         return run_ffmpeg(
             progress_filename, uploaded_file_path, "-c:v copy -c:a alac", f"{output_path}.mkv"
         )
+    # Audio only output file.
     return run_ffmpeg(progress_filename, uploaded_file_path, "-c:a alac", f"{output_path}.m4a")
 
 
@@ -200,6 +217,7 @@ def dts(progress_filename, uploaded_file_path, output_path, is_keep_video, dts_b
             f"-c:v copy -c:a dca -b:a {dts_bitrate}k " f"-strict -2",
             f"{output_path}.{output_ext}",
         )
+    # Audio only output file.
     return run_ffmpeg(
         progress_filename,
         uploaded_file_path,
@@ -217,6 +235,7 @@ def flac(progress_filename, uploaded_file_path, output_path, is_keep_video, flac
             f"-map 0 -c:v copy -c:s copy -c:a flac " f"-compression_level {flac_compression}",
             f"{output_path}.mkv",
         )
+    # Audio only output file.
     return run_ffmpeg(
         progress_filename,
         uploaded_file_path,
@@ -244,7 +263,7 @@ def mkv(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-map 0 -c:v copy -c:s copy -c:a libfdk_aac -vbr 5",
+            f"-map 0 -c:v copy -c:s copy -c:a {aac_encoder} {aac_vbr_enabler} 5",
             f"{output_path}.mkv",
         )
     # Transcode the video, leave the audio as-is.
@@ -261,7 +280,7 @@ def mkv(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
             progress_filename,
             uploaded_file_path,
             f"-map 0 -c:v libx264 -preset {video_mode} "
-            f"-crf {crf_value} -c:a libfdk_aac -c:s copy",
+            f"-crf {crf_value} -c:a {aac_encoder}  copy",
             f"{output_path}.mkv",
         )
 
@@ -293,14 +312,16 @@ def mp3(
                 "-c:v copy -c:a libmp3lame --abr 1 "
                 f"-b:a {mp3_bitrate}k {output_path}.{output_ext}",
             )
-        elif mp3_encoding_type == "vbr":
+        # VBR was selected.
+        else:
             return run_ffmpeg(
                 progress_filename,
                 uploaded_file_path,
                 "-c:v copy -c:a libmp3lame " f"-q:a {mp3_vbr_setting} {output_path}.{output_ext}",
             )
 
-    # Audio-only output files:
+    # Keep the video was not selected - audio only output file:
+
     if mp3_encoding_type == "cbr":
         return run_ffmpeg(
             progress_filename,
@@ -315,7 +336,8 @@ def mp3(
             f"-c:a libmp3lame --abr 1 -b:a {mp3_bitrate}k",
             f"{output_path}.mp3",
         )
-    elif mp3_encoding_type == "vbr":
+    # VBR was selected.
+    else:
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
@@ -340,7 +362,7 @@ def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"{constant_options} -c:V copy -c:a libfdk_aac -vbr 5",
+            f"{constant_options} -c:V copy -c:a {aac_encoder} {aac_vbr_enabler} 5",
             f"{output_path}.mp4",
         )
     # Transcode the video, keep the audio as-is.
@@ -357,7 +379,7 @@ def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
             progress_filename,
             uploaded_file_path,
             f"{constant_options} -c:V libx264 -preset {video_mode}"
-            f" -crf {crf_value} -c:a libfdk_aac -vbr 5",
+            f" -crf {crf_value} -c:a {aac_encoder} {aac_vbr_enabler} 5",
             f"{output_path}.mp4",
         )
 
@@ -378,6 +400,7 @@ def opus(
             f"-c:a libopus -b:a {opus_vorbis_slider}k",
             f"{output_path}.opus",
         )
+    # CBR
     return run_ffmpeg(
         progress_filename,
         uploaded_file_path,
@@ -402,6 +425,7 @@ def vorbis(
             f"-c:a libvorbis -b:a {opus_vorbis_slider}k",
             f"{output_path}.ogg",
         )
+    # Constant quality mode.
     return run_ffmpeg(
         progress_filename,
         uploaded_file_path,
@@ -419,6 +443,7 @@ def wav(progress_filename, uploaded_file_path, output_path, is_keep_video, wav_b
             f"-c:v copy -c:a pcm_s{wav_bit_depth}le",
             f"{output_path}.mkv",
         )
+    # Audio only output file.
     return run_ffmpeg(
         progress_filename, uploaded_file_path, f"-c:a pcm_s{wav_bit_depth}le", f"{output_path}.wav"
     )
