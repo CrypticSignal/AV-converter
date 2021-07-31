@@ -18,6 +18,10 @@ function Opus(props) {
         max="512"
         step="16"
       />
+      <i>
+        If the audio is mono, selecting a bitrate above 256 kbps will result in an unsuccessful
+        conversion as Opus only supports up to 256 kbps per channel.
+      </i>
     </div>
   );
 }
