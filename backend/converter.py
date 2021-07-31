@@ -7,7 +7,7 @@ from time import time
 from ffmpeg import probe
 
 from loggers import log
-from utils import delete_file, empty_folder
+from utils import delete_file, empty_folder, is_mono_audio
 
 os.makedirs("ffmpeg-progress", exist_ok=True)
 os.makedirs("ffmpeg-output", exist_ok=True)
@@ -107,26 +107,26 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
                         )
 
         # process.poll() is not None - the FFmpeg process has completed:
+        else:
+            # Empty the uploads folder if there is less than 2 GB free storage space.
+            free_space_gb = shutil.disk_usage("/")[2] / 1_000_000_000
+            if free_space_gb < 2:
+                empty_folder("uploads")
 
-        # Empty the uploads folder if there is less than 2 GB free storage space.
-        free_space_gb = shutil.disk_usage("/")[2] / 1_000_000_000
-        if free_space_gb < 2:
-            empty_folder("uploads")
+            # The return code is not 0 if an error occurred.
+            if process.returncode != 0:
+                log.info("Unable to convert.")
+                return {"error": "Unable to convert", "log_file": f"api/{ffmpeg_output_file}"}
 
-        # The return code is not 0 if an error occurred.
-        if process.returncode != 0:
-            log.info("Unable to convert.")
-            return {"error": "Unable to convert", "log_file": f"api/{ffmpeg_output_file}"}
+            log.info(f"Conversion took {round((time() - start_time), 1)} seconds.")
+            delete_file(progress_file_path)
 
-        log.info(f"Conversion took {round((time() - start_time), 1)} seconds.")
-        delete_file(progress_file_path)
-
-        return {
-            "error": None,
-            "ext": os.path.splitext(output_name)[1],
-            "download_path": f"api/{output_name}",
-            "log_file": f"api/{ffmpeg_output_file}",
-        }
+            return {
+                "error": None,
+                "ext": os.path.splitext(output_name)[1],
+                "download_path": f"api/{output_name}",
+                "log_file": f"api/{ffmpeg_output_file}",
+            }
 
 
 # AAC
@@ -139,7 +139,6 @@ def aac(
     bitrate,
     vbr_quality,
 ):
-    log.info(encoding_type)
     if is_keep_video == "yes":
         output_ext = Path(uploaded_file_path).suffix
 
@@ -393,6 +392,11 @@ def opus(
     opus_vorbis_slider,
     opus_cbr_bitrate,
 ):
+    if is_mono_audio(uploaded_file_path):
+        if int(opus_vorbis_slider) > 256 or int(opus_cbr_bitrate) > 256:
+            opus_vorbis_slider = 256
+            opus_cbr_bitrate = 256
+
     if opus_encoding_type == "opus_vbr":
         return run_ffmpeg(
             progress_filename,
