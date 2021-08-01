@@ -1,28 +1,22 @@
 function reset() {
-  document.getElementById("alert_wrapper").style.display = "none";
-  const convertButton = document.getElementById("convert_btn");
-  const cancelButton = document.getElementById("cancel_btn");
-  const outputNameBox = document.getElementById("output_name");
-  const uploadingButton = document.getElementById("uploading_btn");
-  const progressWrapper = document.getElementById("progress_wrapper");
-  const progressParagraph = document.getElementById("progress");
-  document.getElementById("converting_btn").style.display = "none ";
-  const conversionProgress = document.getElementById("progress");
-  conversionProgress.style.display = "none";
   const input = document.getElementById("file_input");
+  const outputNameBox = document.getElementById("output_name");
+  const convertButton = document.getElementById("convert_btn");
+  const uploadingButton = document.getElementById("uploading_btn");
+  const cancelButton = document.getElementById("cancel_btn");
+  const convertingButton = document.getElementById("converting_btn");
+  const progressWrapper = document.getElementById("progress_wrapper");
+  const conversionProgress = document.getElementById("progress");
+
   input.disabled = false;
-  input.value = "";
-  const inputLabel = document.getElementById("file_input_label");
-  inputLabel.innerText = "Select file";
-  convertButton.classList.remove("d-none");
-  document.getElementById("converting_btn").style.display = "none";
-  document.getElementById("progress").style.display = "none";
-  cancelButton.classList.add("d-none");
   outputNameBox.disabled = false;
+
+  convertButton.classList.remove("d-none");
   uploadingButton.classList.add("d-none");
+  cancelButton.classList.add("d-none");
+  convertingButton.style.display = "none ";
   progressWrapper.style.display = "none";
-  outputNameBox.value = "";
-  progressParagraph.style.display = "none";
+  conversionProgress.style.display = "none";
 }
 
 export default reset;
