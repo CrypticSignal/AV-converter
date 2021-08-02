@@ -8,13 +8,14 @@ import FileInput from "./components/FileInput";
 import EncodingTypeSelector from "./components/AAC/EncodingTypeSelector";
 import AC3 from "./components/AC3";
 import DTS from "./components/DTS";
+import VorbisEncodingType from "./components/Vorbis/EncodingType";
 import FLAC from "./components/FLAC";
 import IsKeepVideo from "./components/IsKeepVideo";
 import MKVMP4 from "./components/MKVMP4";
 import MP3EncodingTypeSelector from "./components/MP3/EncodingTypeSelector";
 import NoOptions from "./components/NoOptions";
 import Opus from "./components/Opus";
-import EncodingType from "./components/Vorbis/EncodingType";
+import ProgressBar from "react-bootstrap/ProgressBar";
 import WavBitDepth from "./components/WAV";
 import SubmitButton from "./components/SubmitButton";
 
@@ -261,7 +262,7 @@ function App() {
         );
       case "Vorbis":
         return (
-          <EncodingType
+          <VorbisEncodingType
             onVorbisEncodingTypeChange={onVorbisEncodingTypeChange}
             vorbisEncodingType={vorbisEncodingType}
             onSliderMoved={onVorbisSliderMoved}
@@ -351,18 +352,10 @@ function App() {
                 {/*Upload progress bar*/}
                 <div id="progress_wrapper" style={{ display: "none" }}>
                   <br />
-                  <div className="progress mb-3">
-                    {" "}
-                    {/*Bootstrap class*/}
-                    <div
-                      id="progress_bar"
-                      className="progress-bar"
-                      role="progressbar"
-                      aria-valuenow={0}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                    />
-                  </div>
+                  <ProgressBar
+                    now={useSelector((state) => state.progress.progress)}
+                    label={`${useSelector((state) => state.progress.progress)}}%`}
+                  />
                   <p id="progress_status" />
                 </div>
               </>

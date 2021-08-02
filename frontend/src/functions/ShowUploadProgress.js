@@ -1,5 +1,5 @@
-import { update } from "../redux/uploadProgressSlice";
 import store from "../app/store";
+import { update } from "../redux/uploadProgressSlice";
 
 let previousTime = Date.now() / 1000;
 let previousLoaded = 0;
@@ -9,11 +9,11 @@ function showUploadProgress(event) {
   const loaded = event.loaded / 10 ** 6;
   const total = event.total / 10 ** 6;
   const percentageComplete = Math.floor((loaded / total) * 100);
-  //store.dispatch(update(percentageComplete));
+  store.dispatch(update(percentageComplete));
 
   const progressBar = document.getElementById("progress_bar");
   // Add a style attribute to the progress div, i.e. style="width: x%"
-  progressBar.setAttribute("style", `width: ${percentageComplete}%`);
+  //progressBar.setAttribute("style", `width: ${percentageComplete}%`);
 
   const progressStatus = document.getElementById("progress_status");
   progressStatus.innerHTML = `${Math.floor(percentageComplete)}%`;
