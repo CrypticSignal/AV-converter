@@ -7,7 +7,7 @@ function MP3EncodingTypeSelector(props) {
     switch (props.mp3EncodingType) {
       case "cbr":
       case "abr":
-        return <BitrateSlider sliderValue="192" min="64" max="320" step="64" />;
+        return <BitrateSlider initialValue="192" min="64" max="320" step="64" />;
       case "vbr":
         return (
           <VbrDropdown

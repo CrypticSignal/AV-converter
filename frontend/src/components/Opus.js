@@ -13,7 +13,7 @@ function Opus(props) {
       </select>
       <BitrateSlider
         onBitrateSliderMoved={props.onBitrateSliderMoved}
-        sliderValue={props.sliderValue}
+        initialValue={props.initialSliderValue}
         min="16"
         max="512"
         step="16"

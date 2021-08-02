@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { selectSliderValue } from "./redux/bitrateSliderSlice";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import AlertDiv from "./components/AlertDiv";
@@ -143,14 +144,13 @@ function App() {
     setWavBitDepth(e.target.value);
   };
 
-  // The first "bitrate" is the name of the reducer in store.js, and the 2nd is the name of the state variable.
-  const sliderBitrate = useSelector((state) => state.bitrate.bitrate);
+  const sliderValue = useSelector(selectSliderValue);
 
   const onSubmitClicked = () => {
     const states = {
       file: file,
       codec: codec,
-      sliderValue: sliderBitrate,
+      sliderValue: sliderValue,
       mp3EncodingType: mp3EncodingType,
       mp3VbrSetting: mp3VbrSetting,
       aacEncodingType: aacEncodingType,
@@ -182,7 +182,7 @@ function App() {
           <div>
             <MP3EncodingTypeSelector
               mp3EncodingType={mp3EncodingType}
-              sliderValue="192"
+              initialSliderValue="192"
               onMp3EncodingTypeChange={onMp3EncodingTypeChange}
               onMp3VbrSettingChange={onMp3VbrSettingChange}
               vbrSetting={mp3VbrSetting}
@@ -196,7 +196,7 @@ function App() {
             <EncodingTypeSelector
               onAacEncodingTypeChange={onAacEncodingTypeChange}
               encodingType={aacEncodingType}
-              sliderValue="192"
+              initialSliderValue="192"
               onVbrModeChange={onAacVbrModeChange}
               vbrMode={aacVbrMode}
             />
@@ -258,7 +258,11 @@ function App() {
         );
       case "Opus":
         return (
-          <Opus onOpusTypeChange={onOpusTypeChange} opusType={opusEncodingType} sliderValue="192" />
+          <Opus
+            onOpusTypeChange={onOpusTypeChange}
+            opusType={opusEncodingType}
+            initialSliderValue="192"
+          />
         );
       case "Vorbis":
         return (
@@ -267,7 +271,7 @@ function App() {
             vorbisEncodingType={vorbisEncodingType}
             onSliderMoved={onVorbisSliderMoved}
             qValue={qValue}
-            sliderValue="192"
+            initialSliderValue="192"
           />
         );
       case "WAV":

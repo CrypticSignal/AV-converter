@@ -8,19 +8,14 @@ function EncodingTypeSelector(props) {
         return (
           <BitrateSlider
             onBitrateSliderMoved={props.onBitrateSliderMoved}
-            sliderValue={props.sliderValue}
+            initialValue={props.initialSliderValue}
             min="32"
             max="512"
             step="32"
           />
         );
       case "vbr":
-        return (
-          <VbrDropdown
-            onVbrModeChange={props.onVbrModeChange}
-            vbrMode={props.vbrMode}
-          />
-        );
+        return <VbrDropdown onVbrModeChange={props.onVbrModeChange} vbrMode={props.vbrMode} />;
       default:
         return null;
     }
@@ -29,11 +24,7 @@ function EncodingTypeSelector(props) {
   return (
     <div id="FDK">
       <label htmlFor="fdk_encoding">CBR or VBR:</label>
-      <select
-        id="fdk_encoding"
-        onChange={props.onAacEncodingTypeChange}
-        value={props.encodingType}
-      >
+      <select id="fdk_encoding" onChange={props.onAacEncodingTypeChange} value={props.encodingType}>
         <option disabled value>
           Select Encoding Type
         </option>

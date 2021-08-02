@@ -32,6 +32,7 @@ async function sendConversionRequest(inputFilename, progressFilePath, state) {
   data.append("filename", inputFilename);
   data.append("output_name", document.getElementById("output_name").value);
   data.append("states", JSON.stringify(state));
+  console.log(state);
 
   const conversionResponse = await fetch("/api/convert", {
     method: "POST",

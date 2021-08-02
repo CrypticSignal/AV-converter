@@ -8,7 +8,7 @@ function VorbisEncodingType(props) {
         return (
           <BitrateSlider
             onBitrateSliderMoved={props.onBitrateSliderMoved}
-            sliderValue={props.sliderValue}
+            initialValue={props.initialSliderValue}
             min="32"
             max="512"
             step="32"

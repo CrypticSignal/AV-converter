@@ -1,19 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const bitrateSliderSlice = createSlice({
-  name: "bitrate",
+  name: "sliderValue",
   initialState: {
-    bitrate: "192",
+    value: "192",
   },
   reducers: {
     setDefault: (state, action) => {
-      state.bitrate = action.payload;
+      state.value = action.payload;
     },
     change: (state, action) => {
-      state.bitrate = action.payload;
+      state.value = action.payload;
     },
   },
 });
 
 export const { setDefault, change } = bitrateSliderSlice.actions;
 export default bitrateSliderSlice.reducer;
+export const selectSliderValue = (state) => state.bitrate.value;

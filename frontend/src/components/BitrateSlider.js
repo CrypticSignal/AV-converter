@@ -1,13 +1,12 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { setDefault, change } from "../redux/bitrateSliderSlice";
+import { setDefault, change, selectSliderValue } from "../redux/bitrateSliderSlice";
 
 function BitrateSlider(props) {
-  const { bitrate } = useSelector((state) => state.bitrate);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setDefault("192"));
+    dispatch(setDefault(props.initialValue));
   }, []);
 
   return (
@@ -19,11 +18,11 @@ function BitrateSlider(props) {
         className="slider"
         min={props.min}
         max={props.max}
-        value={bitrate}
+        value={useSelector(selectSliderValue)}
         step={props.step}
         onChange={(e) => dispatch(change(e.target.value))}
       />
-      <span>{` ${bitrate} kbps`}</span>
+      <span>{` ${useSelector(selectSliderValue)} kbps`}</span>
     </div>
   );
 }
