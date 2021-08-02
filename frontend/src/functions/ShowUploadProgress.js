@@ -1,16 +1,23 @@
+import { update } from "../redux/uploadProgressSlice";
+import store from "../app/store";
+
 let previousTime = Date.now() / 1000;
 let previousLoaded = 0;
 let previousPercentageComplete = 0;
 
 function showUploadProgress(event) {
+  //console.log(store.getState().progress.progress);
   const loaded = event.loaded / 10 ** 6;
   const total = event.total / 10 ** 6;
   const percentageComplete = Math.floor((loaded / total) * 100);
+  store.dispatch(update(percentageComplete));
+
   const progressBar = document.getElementById("progress_bar");
-  const progressStatus = document.getElementById("progress_status");
-  progressStatus.innerHTML = `${Math.floor(percentageComplete)}%`;
   // Add a style attribute to the progress div, i.e. style="width: x%"
   progressBar.setAttribute("style", `width: ${percentageComplete}%`);
+
+  const progressStatus = document.getElementById("progress_status");
+  progressStatus.innerHTML = `${Math.floor(percentageComplete)}%`;
 
   // MB loaded in this interval is (loaded - previousLoaded) and
   // ((Date.now() / 1000) - previousTime) will give us the time since the last time interval.

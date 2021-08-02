@@ -1,30 +1,29 @@
-import store from "../configureStore";
-
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import AboutPage from "./pages/AboutPage";
-import Filetypes from "./pages/Filetypes";
-import YoutubePage from "./pages/YouTubePage";
-import buttonClicked from "../functions/yt";
-
-import AlertDiv from "./AlertDiv";
-import TopBar from "./TopBar";
-import FileInput from "./FileInput";
-import EncodingTypeSelector from "./AAC/EncodingTypeSelector";
-import AC3 from "./AC3";
-import DTS from "./DTS";
-import FLAC from "./FLAC";
-import IsKeepVideo from "./IsKeepVideo";
-import MKVMP4 from "./MKVMP4";
-import MP3EncodingTypeSelector from "./MP3/EncodingTypeSelector";
-import NoOptions from "./NoOptions";
-import Opus from "./Opus";
-import EncodingType from "./Vorbis/EncodingType";
-import WavBitDepth from "./WAV";
-import SubmitButton from "./SubmitButton";
+import AlertDiv from "../components/AlertDiv";
+import TopBar from "../components/TopBar";
+import FileInput from "../components/FileInput";
+import EncodingTypeSelector from "../components/AAC/EncodingTypeSelector";
+import AC3 from "../components/AC3";
+import DTS from "../components/DTS";
+import FLAC from "../components/FLAC";
+import IsKeepVideo from "../components/IsKeepVideo";
+import MKVMP4 from "../components/MKVMP4";
+import MP3EncodingTypeSelector from "../components/MP3/EncodingTypeSelector";
+import NoOptions from "../components/NoOptions";
+import Opus from "../components/Opus";
+import EncodingType from "../components/Vorbis/EncodingType";
+import WavBitDepth from "../components/WAV";
+import SubmitButton from "../components/SubmitButton";
 
 import start from "../functions/Start";
+import buttonClicked from "../functions/yt";
+
+import AboutPage from "../pages/AboutPage";
+import Filetypes from "../pages/Filetypes";
+import YoutubePage from "../pages/YouTubePage";
 
 function App() {
   const [codec, setCodec] = useState("MP3");
@@ -143,11 +142,14 @@ function App() {
     setWavBitDepth(e.target.value);
   };
 
+  // The first "bitrate" is the name of the reducer in store.js, and the 2nd is the name of the state variable.
+  const sliderBitrate = useSelector((state) => state.bitrate.bitrate);
+
   const onSubmitClicked = () => {
     const states = {
       file: file,
       codec: codec,
-      sliderValue: store.getState().sliderBitrate,
+      sliderValue: sliderBitrate,
       mp3EncodingType: mp3EncodingType,
       mp3VbrSetting: mp3VbrSetting,
       aacEncodingType: aacEncodingType,

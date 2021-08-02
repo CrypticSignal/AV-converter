@@ -3,8 +3,6 @@ function ProgressBar() {
     <div id="progress_wrapper" style={{ display: "none" }}>
       <br />
       <div className="progress mb-3">
-        {" "}
-        {/*Bootstrap class*/}
         <div
           id="progress_bar"
           className="progress-bar"
