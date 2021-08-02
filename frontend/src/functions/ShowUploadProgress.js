@@ -6,11 +6,10 @@ let previousLoaded = 0;
 let previousPercentageComplete = 0;
 
 function showUploadProgress(event) {
-  //console.log(store.getState().progress.progress);
   const loaded = event.loaded / 10 ** 6;
   const total = event.total / 10 ** 6;
   const percentageComplete = Math.floor((loaded / total) * 100);
-  store.dispatch(update(percentageComplete));
+  //store.dispatch(update(percentageComplete));
 
   const progressBar = document.getElementById("progress_bar");
   // Add a style attribute to the progress div, i.e. style="width: x%"
