@@ -1,17 +1,15 @@
+import ProgressBar from "react-bootstrap/ProgressBar";
+import store from "../app/store";
+
 function ProgressBar() {
   return (
     <div id="progress_wrapper" style={{ display: "none" }}>
       <br />
-      <div className="progress mb-3">
-        <div
-          id="progress_bar"
-          className="progress-bar"
-          role="progressbar"
-          aria-valuenow={0}
-          aria-valuemin={0}
-          aria-valuemax={100}
-        />
-      </div>
+      <ProgressBar
+        now={store.getState().progress.progress}
+        label={`${store.getState().progress.progress}%`}
+      />
+      ;
       <label id="progress_status" />
     </div>
   );
