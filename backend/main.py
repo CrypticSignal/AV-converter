@@ -45,16 +45,13 @@ os.makedirs("conversions", exist_ok=True)
 @app.route("/api", methods=["POST"])
 def homepage():
     uploaded_file = request.files["uploadedFile"]
-    log.info(uploaded_file)
     log_this(f'Uploaded {uploaded_file.filename}')
 
     filename_secure = secure_filename(uploaded_file.filename)
-
     # Save the uploaded file to the uploads folder.
     uploaded_file.save(os.path.join("uploads", filename_secure))
 
     session["progress_filename"] = f"{str(time())[:-8]}.txt"
-    log.info(session["progress_filename"])
     with open(os.path.join("ffmpeg-progress", session["progress_filename"]), "w"):
         pass
 
@@ -63,7 +60,6 @@ def homepage():
 
 @app.route("/api/convert", methods=["POST"])
 def convert_file():
-    log.info("IN CONVERT")
     input_filename = request.form["inputFilename"]
     log.info(input_filename)
     uploaded_file_path = os.path.join("uploads", secure_filename(input_filename))
