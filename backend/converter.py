@@ -308,15 +308,16 @@ def mp3(
             return run_ffmpeg(
                 progress_filename,
                 uploaded_file_path,
-                "-c:v copy -c:a libmp3lame --abr 1 "
-                f"-b:a {mp3_bitrate}k {output_path}.{output_ext}",
+                f"-c:v copy -c:a libmp3lame --abr 1 -b:a {mp3_bitrate}k",
+                f"{output_path}.{output_ext}",
             )
         # VBR was selected.
         else:
             return run_ffmpeg(
                 progress_filename,
                 uploaded_file_path,
-                "-c:v copy -c:a libmp3lame " f"-q:a {mp3_vbr_setting} {output_path}.{output_ext}",
+                "-c:v copy -c:a libmp3lame " f"-q:a {mp3_vbr_setting}",
+                f"{output_path}.{output_ext}",
             )
 
     # Keep the video was not selected - audio only output file:

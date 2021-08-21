@@ -28,18 +28,19 @@ async function sendConversionRequest(inputFilename, progressFilePath, state) {
   showConversionProgress(progressFilePath);
 
   const data = new FormData();
-  data.append("request_type", "convert");
-  data.append("filename", inputFilename);
-  data.append("output_name", document.getElementById("output_name").value);
+  data.append("inputFilename", inputFilename);
+  data.append("outputName", document.getElementById("output_name").value);
   data.append("states", JSON.stringify(state));
   console.log(state);
+
+  document.getElementById("convert_btn").style.display = "none";
+  document.getElementById("converting_btn").style.display = "block";
 
   const conversionResponse = await fetch("/api/convert", {
     method: "POST",
     body: data,
   });
 
-  console.log(conversionResponse);
   shouldLog = false;
   reset();
 

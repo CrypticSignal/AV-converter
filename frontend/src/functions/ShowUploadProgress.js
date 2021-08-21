@@ -11,11 +11,7 @@ function showUploadProgress(event) {
   const percentageComplete = Math.floor((loaded / total) * 100);
   store.dispatch(update(percentageComplete));
 
-  const progressBar = document.getElementById("progress_bar");
-  // Add a style attribute to the progress div, i.e. style="width: x%"
-  //progressBar.setAttribute("style", `width: ${percentageComplete}%`);
-
-  const progressStatus = document.getElementById("progress_status");
+  const progressStatus = document.getElementById("progress_values");
   progressStatus.innerHTML = `${Math.floor(percentageComplete)}%`;
 
   // MB loaded in this interval is (loaded - previousLoaded) and

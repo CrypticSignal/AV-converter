@@ -16,9 +16,8 @@ import MKVMP4 from "./components/MKVMP4";
 import MP3EncodingTypeSelector from "./components/MP3/EncodingTypeSelector";
 import NoOptions from "./components/NoOptions";
 import Opus from "./components/Opus";
-import ProgressBar from "react-bootstrap/ProgressBar";
 import WavBitDepth from "./components/WAV";
-import SubmitButton from "./components/SubmitButton";
+import ConvertButton from "./components/ConvertButton";
 
 import start from "./functions/Start";
 import buttonClicked from "./functions/yt";
@@ -26,6 +25,11 @@ import buttonClicked from "./functions/yt";
 import AboutPage from "./pages/AboutPage";
 import Filetypes from "./pages/Filetypes";
 import YoutubePage from "./pages/YouTubePage";
+// React-Bootstrap
+import Spinner from "react-bootstrap/Spinner";
+import ProgressBar from "react-bootstrap/ProgressBar";
+import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
 
 function App() {
   const [codec, setCodec] = useState("MP3");
@@ -290,7 +294,7 @@ function App() {
     <Router>
       <Switch>
         <Route exact path="/">
-          <div>
+          <Container>
             <TopBar />
             <h1>Audio / Video Converter</h1>
             <div className="container">
@@ -312,8 +316,8 @@ function App() {
                 <option value="Vorbis">Vorbis (.ogg)</option>
                 <option value="WAV">WAV</option>
               </select>
-              <br></br>
-              <br></br>
+              <br />
+              <br />
               <hr />
               <h5>Encoder Settings</h5>
               {renderComponent()}
@@ -330,45 +334,36 @@ function App() {
               />
               <br />
               <AlertDiv />
-              <SubmitButton onSubmitClicked={onSubmitClicked} />
-              <button className="btn btn-primary d-none" id="uploading_btn" type="button" disabled>
-                <span
-                  className="spinner-border spinner-border-sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-                Uploading file for conversion...
-              </button>
-              <>
-                {/*"Cancel upload" button (Bootstrap class)*/}
-                <button type="button" id="cancel_btn" className="btn btn-secondary d-none">
-                  Cancel upload
-                </button>
-              </>
-              <>
-                {/*"Converting..." button (Bootstrap class)*/}
-                <div className="text-center" id="converting_btn" style={{ display: "none" }}>
-                  <button className="btn btn-info" disabled>
-                    <span className="spinner-border spinner-border-sm" />
-                    Converting...
-                  </button>
-                </div>
-                {/*Upload progress bar*/}
-                <div id="progress_wrapper" style={{ display: "none" }}>
-                  <br />
+              <ConvertButton onSubmitClicked={onSubmitClicked} />
+
+              <div id="uploading_div" style={{ display: "none" }}>
+                <Spinner id="uploading_btn" animation="border" /> Uploading file for conversion...
+                <div id="upload_progress">
                   <ProgressBar
                     now={useSelector((state) => state.progress.progress)}
-                    label={`${useSelector((state) => state.progress.progress)}}%`}
+                    label={`${useSelector((state) => state.progress.progress)}%`}
                   />
-                  <p id="progress_status" />
+                  <p id="progress_values" />
                 </div>
-              </>
-              <>
-                {/*ENCODER PROGRESS*/}
-                <p id="progress" style={{ display: "none" }}></p>
-              </>
+                <Button id="cancel_btn" variant="secondary">
+                  Cancel Upload
+                </Button>{" "}
+              </div>
+
+              {/*"Converting..." button (Bootstrap class)*/}
+              <button
+                id="converting_btn"
+                className="btn btn-info"
+                style={{ display: "none" }}
+                disabled
+              >
+                <span className="spinner-border spinner-border-sm" />
+                Converting...
+              </button>
+              {/*ENCODER PROGRESS*/}
+              <p id="progress" style={{ display: "none" }}></p>
             </div>
-          </div>
+          </Container>
         </Route>
 
         <Route exact path="/about">
