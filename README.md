@@ -55,7 +55,3 @@ Window 2:
 - `npm install`
 
 - Enter `npm start` and after a moment you should be taken to http://127.0.0.1:3000
-
-**If you want to convert to AAC when running this web application locally:**
-
-_When running locally, you will not be able to convert to AAC unless your build of FFmpeg has `--enable-libfdk-aac` in the configuration (if unsure, enter `ffmpeg -buildconf` in the terminal and look under `configuration:`). This is because this web application uses the high quality [fdk-aac](https://github.com/mstorsjo/fdk-aac) AAC encoder, and "the license of libfdk_aac is not compatible with GPL" ([source](https://trac.ffmpeg.org/wiki/Encode/AAC)). Therefore, you cannot download a pre-built FFmpeg binary that supports that encoder. [Here's](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu) how to complile FFmpeg on Ubuntu/Debian/Mint with libfdk_aac support, if your build of FFmpeg does not have `--enable-libfdk-aac`. Or, if you know what you're doing, you can edit the code in converter.py to use FFmpeg's native AAC encoder instead._
