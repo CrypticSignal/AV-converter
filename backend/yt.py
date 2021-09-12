@@ -76,7 +76,10 @@ def return_download_path():
 
     try:
         # Rename the file.
-        os.replace(os.path.join(download_dir, filename), os.path.join(download_dir, new_filename))
+        os.replace(
+            os.path.join(download_dir, filename),
+            os.path.join(download_dir, new_filename),
+        )
     except Exception as e:
         log.info(f"Unable to rename {filename} to {new_filename}:\n{e}")
         clean_up(Path(filename).stem)
@@ -207,7 +210,11 @@ def yt_downloader():
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "writethumbnail": True,
             "postprocessors": [
-                {"key": "FFmpegExtractAudio", "preferredcodec": "mp3", "preferredquality": "0"},
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "0",
+                },
                 {"key": "EmbedThumbnail"},
             ],
             "restrictfilenames": True,
@@ -235,8 +242,3 @@ def send_file(filename):
         return send_from_directory(download_dir, filename, mimetype=mimetype_value)
     finally:
         delete_file(os.path.join("downloads", filename))
-
-
-# @yt.app_errorhandler(500)
-# def error_handler(error):
-#     return session['youtube_dl_error'], 500

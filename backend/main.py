@@ -45,7 +45,7 @@ os.makedirs("conversions", exist_ok=True)
 @app.route("/api", methods=["POST"])
 def homepage():
     uploaded_file = request.files["uploadedFile"]
-    log_this(f'Uploaded {uploaded_file.filename}')
+    log_this(f"Uploaded {uploaded_file.filename}")
 
     filename_secure = secure_filename(uploaded_file.filename)
     # Save the uploaded file to the uploads folder.
@@ -61,31 +61,30 @@ def homepage():
 @app.route("/api/convert", methods=["POST"])
 def convert_file():
     input_filename = request.form["inputFilename"]
-    log.info(input_filename)
     uploaded_file_path = os.path.join("uploads", secure_filename(input_filename))
 
     data = request.form["states"]
 
+    chosen_codec = json.loads(data)["codec"]
     crf_value = json.loads(data)["crfValue"]
     is_keep_video = json.loads(data)["isKeepVideo"]
     opus_vorbis_slider = json.loads(data)["sliderValue"]
     video_mode = json.loads(data)["videoSetting"]
 
-    chosen_codec = json.loads(data)["codec"]
     output_name = request.form["outputName"]
     output_path = os.path.join("conversions", output_name)
 
-    log.info(f"They chose {chosen_codec} | Output Filename: {output_name}")
-    
+    log.info(f"{input_filename} --> {output_name} [{chosen_codec}]")
+
     # These parameters are applicable no matter which codec was chosen.
     mutual_params = [session["progress_filename"], uploaded_file_path, output_path]
-    
+
     # AAC
     if chosen_codec == "AAC":
-        aac_encoding_type = json.loads(data)["aacEncodingType"]
+        encoding_type = json.loads(data)["aacEncodingType"]
         bitrate = json.loads(data)["sliderValue"]
         vbr_quality = json.loads(data)["aacVbrMode"]
-        params = [*mutual_params, is_keep_video, aac_encoding_type, bitrate, vbr_quality]
+        params = [*mutual_params, is_keep_video, encoding_type, bitrate, vbr_quality]
         converter_result_dictionary = converter.aac(*params)
     # AC3
     elif chosen_codec == "AC3":
@@ -117,10 +116,10 @@ def convert_file():
         converter_result_dictionary = converter.mkv(*params)
     # MP3
     elif chosen_codec == "MP3":
-        mp3_encoding_type = json.loads(data)["mp3EncodingType"]
-        mp3_bitrate = json.loads(data)["sliderValue"]
-        mp3_vbr_setting = json.loads(data)["mp3VbrSetting"]
-        params = [*mutual_params, is_keep_video, mp3_encoding_type, mp3_bitrate, mp3_vbr_setting]
+        encoding_type = json.loads(data)["mp3EncodingType"]
+        bitrate = json.loads(data)["sliderValue"]
+        vbr_setting = json.loads(data)["mp3VbrSetting"]
+        params = [*mutual_params, is_keep_video, encoding_type, bitrate, vbr_setting]
         converter_result_dictionary = converter.mp3(*params)
     # MP4
     elif chosen_codec == "MP4":
@@ -128,15 +127,15 @@ def convert_file():
         converter_result_dictionary = converter.mp4(*params)
     # Opus
     elif chosen_codec == "Opus":
-        opus_cbr_bitrate = json.loads(data)["sliderValue"]
-        opus_encoding_type = json.loads(data)["opusEncodingType"]
-        params = [*mutual_params, opus_encoding_type, opus_vorbis_slider, opus_cbr_bitrate]
+        cbr_bitrate = json.loads(data)["sliderValue"]
+        encoding_type = json.loads(data)["opusEncodingType"]
+        params = [*mutual_params, encoding_type, opus_vorbis_slider, cbr_bitrate]
         converter_result_dictionary = converter.opus(*params)
     # Vorbis
     elif chosen_codec == "Vorbis":
-        vorbis_encoding = json.loads(data)["vorbisEncodingType"]
-        vorbis_quality = json.loads(data)["qValue"]
-        params = [*mutual_params, vorbis_encoding, vorbis_quality, opus_vorbis_slider]
+        encoding_type = json.loads(data)["vorbisEncodingType"]
+        quality_level = json.loads(data)["qValue"]
+        params = [*mutual_params, encoding_type, quality_level, opus_vorbis_slider]
         converter_result_dictionary = converter.vorbis(*params)
     # WAV
     elif chosen_codec == "WAV":

@@ -25,20 +25,13 @@ else:
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     progress_file_path = os.path.join("ffmpeg-progress", progress_filename)
-    params = params.split(" ")
-    params.append(output_name)
-    try:
-        log.info(params)
-    except Exception as e:
-        log.info("Unable to print the FFmpeg parameters:\n{e}")
-
     ffmpeg_output_file = os.path.join("ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt")
 
-    with open(ffmpeg_output_file, "w"):
-        pass
-    log.info(f"Converting {uploaded_file_path}...")
+    params = params.split(" ")
+    log.info(params)
+    params.append(output_name)
+    ffmpeg_start_time = time()
 
-    start_time = time()
     process = subprocess.Popen(
         [
             ffmpeg_path,
@@ -69,42 +62,40 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     except Exception:
         log.info(f"Unable to get the duration of {uploaded_file_path}")
 
-    character_set = "utf-8"
-
     while True:
         # The process is in progress.
         if process.poll() is None:
             try:
-                output = process.stdout.readline().decode(character_set)
-            except UnicodeDecodeError as e:
-                character_set = "latin-1"
-                log.info(f"{e}\nCharacter set changed to latin-1.")
+                output = process.stdout.readline().decode("utf-8")
+            except Exception:
+                log.info("Unable to decode the FFmpeg output.")
 
-            with open(ffmpeg_output_file, "a", encoding="utf-8") as f:
-                f.write(output)
+            else:
+                with open(ffmpeg_output_file, "w", encoding="utf-8") as f:
+                    f.write(output)
 
-            if "out_time_ms" in output:
-                microseconds = int(output.strip()[12:])
-                secs = microseconds / 1_000_000
-                try:
-                    percentage = (secs / file_duration) * 100
-                except Exception:
-                    percentage = "unknown"
+                if "out_time_ms" in output:
+                    microseconds = int(output.strip()[12:])
+                    secs = microseconds / 1_000_000
+                    try:
+                        percentage = (secs / file_duration) * 100
+                    except Exception:
+                        percentage = "unknown"
 
-            elif "speed" in output:
-                speed = output.strip()[6:]
-                speed = 0 if " " in speed or "N/A" in speed else float(speed[:-1])
-                try:
-                    eta = (file_duration - secs) / speed
-                except Exception:
-                    continue
-                else:
-                    minutes = round(eta / 60)
-                    seconds = f"{round(eta % 60):02d}"
-                    with open(progress_file_path, "w") as f:
-                        f.write(
-                            f"Progress: {round(percentage, 1)}% | Speed: {speed}x | ETA: {minutes}:{seconds} [M:S]"
-                        )
+                elif "speed" in output:
+                    speed = output.strip()[6:]
+                    speed = 0 if " " in speed or "N/A" in speed else float(speed[:-1])
+                    try:
+                        eta = (file_duration - secs) / speed
+                    except Exception:
+                        continue
+                    else:
+                        minutes = round(eta / 60)
+                        seconds = f"{round(eta % 60):02d}"
+                        with open(progress_file_path, "w") as f:
+                            f.write(
+                                f"Progress: {round(percentage, 1)}% | Speed: {speed}x | ETA: {minutes}:{seconds} [M:S]"
+                            )
 
         # process.poll() is not None - the FFmpeg process has completed:
         else:
@@ -116,9 +107,12 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             # The return code is not 0 if an error occurred.
             if process.returncode != 0:
                 log.info("Unable to convert.")
-                return {"error": "Unable to convert", "log_file": f"api/{ffmpeg_output_file}"}
+                return {
+                    "error": "Unable to convert",
+                    "log_file": f"api/{ffmpeg_output_file}",
+                }
 
-            log.info(f"Conversion took {round((time() - start_time), 1)} seconds.")
+            log.info(f"Conversion took {round((time() - ffmpeg_start_time), 1)} seconds.")
             delete_file(progress_file_path)
 
             return {
@@ -187,7 +181,10 @@ def ac3(progress_filename, uploaded_file_path, output_path, is_keep_video, ac3_b
         )
     # Audio only output file.
     return run_ffmpeg(
-        progress_filename, uploaded_file_path, f"-c:a ac3 -b:a {ac3_bitrate}k", f"{output_path}.ac3"
+        progress_filename,
+        uploaded_file_path,
+        f"-c:a ac3 -b:a {ac3_bitrate}k",
+        f"{output_path}.ac3",
     )
 
 
@@ -195,7 +192,10 @@ def ac3(progress_filename, uploaded_file_path, output_path, is_keep_video, ac3_b
 def alac(progress_filename, uploaded_file_path, output_path, is_keep_video):
     if is_keep_video == "yes":
         return run_ffmpeg(
-            progress_filename, uploaded_file_path, "-c:v copy -c:a alac", f"{output_path}.mkv"
+            progress_filename,
+            uploaded_file_path,
+            "-c:v copy -c:a alac",
+            f"{output_path}.mkv",
         )
     # Audio only output file.
     return run_ffmpeg(progress_filename, uploaded_file_path, "-c:a alac", f"{output_path}.m4a")
@@ -246,7 +246,10 @@ def flac(progress_filename, uploaded_file_path, output_path, is_keep_video, flac
 # MKA
 def mka(progress_filename, uploaded_file_path, output_path):
     return run_ffmpeg(
-        progress_filename, uploaded_file_path, "-map 0:a -c:a copy", f"{output_path}.mka"
+        progress_filename,
+        uploaded_file_path,
+        "-map 0:a -c:a copy",
+        f"{output_path}.mka",
     )
 
 
@@ -255,7 +258,10 @@ def mkv(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
     # No transcoding, simply change the container to MKV.
     if video_mode == "keep_codecs":
         return run_ffmpeg(
-            progress_filename, uploaded_file_path, f"-map 0 -c copy", f"{output_path}.mkv"
+            progress_filename,
+            uploaded_file_path,
+            f"-map 0 -c copy",
+            f"{output_path}.mkv",
         )
     # Keep the video as-is, encode the audio.
     elif video_mode == "keep_video_codec":
@@ -290,25 +296,25 @@ def mp3(
     uploaded_file_path,
     output_path,
     is_keep_video,
-    mp3_encoding_type,
-    mp3_bitrate,
-    mp3_vbr_setting,
+    encoding_type,
+    bitrate,
+    vbr_setting,
 ):
     if is_keep_video == "yes":
         output_ext = "mkv" if Path(uploaded_file_path).suffix != "mp4" else "mp4"
 
-        if mp3_encoding_type == "cbr":
+        if encoding_type == "cbr":
             return run_ffmpeg(
                 progress_filename,
                 uploaded_file_path,
-                "-c:v copy -c:a libmp3lame -b:a {mp3_bitrate}k",
+                "-c:v copy -c:a libmp3lame -b:a {bitrate}k",
                 f"{output_path}.{output_ext}",
             )
-        elif mp3_encoding_type == "abr":
+        elif encoding_type == "abr":
             return run_ffmpeg(
                 progress_filename,
                 uploaded_file_path,
-                f"-c:v copy -c:a libmp3lame --abr 1 -b:a {mp3_bitrate}k",
+                f"-c:v copy -c:a libmp3lame --abr 1 -b:a {bitrate}k",
                 f"{output_path}.{output_ext}",
             )
         # VBR was selected.
@@ -316,24 +322,24 @@ def mp3(
             return run_ffmpeg(
                 progress_filename,
                 uploaded_file_path,
-                "-c:v copy -c:a libmp3lame " f"-q:a {mp3_vbr_setting}",
+                "-c:v copy -c:a libmp3lame " f"-q:a {vbr_setting}",
                 f"{output_path}.{output_ext}",
             )
 
     # Keep the video was not selected - audio only output file:
 
-    if mp3_encoding_type == "cbr":
+    if encoding_type == "cbr":
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-c:a libmp3lame -b:a {mp3_bitrate}k",
+            f"-c:a libmp3lame -b:a {bitrate}k",
             f"{output_path}.mp3",
         )
-    elif mp3_encoding_type == "abr":
+    elif encoding_type == "abr":
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-c:a libmp3lame --abr 1 -b:a {mp3_bitrate}k",
+            f"-c:a libmp3lame --abr 1 -b:a {bitrate}k",
             f"{output_path}.mp3",
         )
     # VBR was selected.
@@ -341,7 +347,7 @@ def mp3(
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-c:a libmp3lame -q:a {mp3_vbr_setting}",
+            f"-c:a libmp3lame -q:a {vbr_setting}",
             f"{output_path}.mp3",
         )
 
@@ -386,55 +392,46 @@ def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
 
 # Opus
 def opus(
-    progress_filename,
-    uploaded_file_path,
-    output_path,
-    opus_encoding_type,
-    opus_vorbis_slider,
-    opus_cbr_bitrate,
+    progress_filename, uploaded_file_path, output_path, encoding_type, vbr_bitrate, cbr_bitrate
 ):
     if is_mono_audio(uploaded_file_path):
-        if int(opus_vorbis_slider) > 256 or int(opus_cbr_bitrate) > 256:
-            opus_vorbis_slider = 256
-            opus_cbr_bitrate = 256
+        if int(vbr_bitrate) > 256:
+            vbr_bitrate = 256
+        elif int(cbr_bitrate) > 256:
+            cbr_bitrate = 256
 
     if opus_encoding_type == "opus_vbr":
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-c:a libopus -b:a {opus_vorbis_slider}k",
+            f"-c:a libopus -b:a {vbr_bitrate}k",
             f"{output_path}.opus",
         )
     # CBR
     return run_ffmpeg(
         progress_filename,
         uploaded_file_path,
-        f"-c:a libopus -vbr off -b:a {opus_cbr_bitrate}k",
+        f"-c:a libopus -vbr off -b:a {cbr_bitrate}k",
         f"{output_path}.opus",
     )
 
 
 # Vorbis
 def vorbis(
-    progress_filename,
-    uploaded_file_path,
-    output_path,
-    vorbis_encoding,
-    vorbis_quality,
-    opus_vorbis_slider,
+    progress_filename, uploaded_file_path, output_path, encoding_type, quality_level, bitrate
 ):
-    if vorbis_encoding == "abr":
+    if encoding_type == "abr":
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-c:a libvorbis -b:a {opus_vorbis_slider}k",
+            f"-c:a libvorbis -b:a {bitrate}k",
             f"{output_path}.ogg",
         )
     # Constant quality mode.
     return run_ffmpeg(
         progress_filename,
         uploaded_file_path,
-        f"-c:a libvorbis -q:a {vorbis_quality}",
+        f"-c:a libvorbis -q:a {quality_level}",
         f"{output_path}.ogg",
     )
 
@@ -450,5 +447,8 @@ def wav(progress_filename, uploaded_file_path, output_path, is_keep_video, wav_b
         )
     # Audio only output file.
     return run_ffmpeg(
-        progress_filename, uploaded_file_path, f"-c:a pcm_s{wav_bit_depth}le", f"{output_path}.wav"
+        progress_filename,
+        uploaded_file_path,
+        f"-c:a pcm_s{wav_bit_depth}le",
+        f"{output_path}.wav",
     )
