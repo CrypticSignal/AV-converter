@@ -394,13 +394,14 @@ def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
 def opus(
     progress_filename, uploaded_file_path, output_path, encoding_type, vbr_bitrate, cbr_bitrate
 ):
+    # Opus does not support >256 kbps per channel.
     if is_mono_audio(uploaded_file_path):
         if int(vbr_bitrate) > 256:
             vbr_bitrate = 256
         elif int(cbr_bitrate) > 256:
             cbr_bitrate = 256
 
-    if opus_encoding_type == "opus_vbr":
+    if encoding_type == "opus_vbr":
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
