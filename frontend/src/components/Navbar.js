@@ -1,15 +1,13 @@
 import { Link } from "react-router-dom";
 
-const topBar = () => {
+const Navbar = () => {
   function myFunction(e) {
     e.preventDefault();
     let x = document.getElementById("top_bar");
     if (x.className === "top") {
       x.className += " mobile";
-      document.getElementById("coffee").style.display = "none";
     } else {
       x.className = "top";
-      document.getElementById("coffee").style.display = "block";
     }
   }
 
@@ -50,4 +48,4 @@ const topBar = () => {
   );
 };
 
-export default topBar;
+export default Navbar;

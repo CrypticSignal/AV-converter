@@ -34,7 +34,7 @@ async function sendConversionRequest(inputFilename, progressFilePath, state) {
   console.log(state);
 
   document.getElementById("convert_btn").style.display = "none";
-  document.getElementById("converting_btn").style.display = "block";
+  document.getElementById("converting_div").style.display = "block";
 
   const conversionResponse = await fetch("/api/convert", {
     method: "POST",

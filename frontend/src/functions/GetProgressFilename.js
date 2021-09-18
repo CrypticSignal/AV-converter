@@ -9,7 +9,7 @@ function getProgressFilename(request, inputFilename, state) {
   // document.getElementById("upload_progress").classList.add("d-none");
   if (request.status == 200) {
     const progressFilename = request.responseText;
-    document.getElementById("converting_btn").style.display = "block";
+    document.getElementById("converting_div").style.display = "block";
     sendConversionRequest(inputFilename, progressFilename, state);
   } else {
     showAlert(request.responseText, "danger");

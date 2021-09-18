@@ -91,10 +91,8 @@ function start(state) {
   outputNameBox.disabled = true;
 
   const cancelButton = document.getElementById("cancel_btn");
-  cancelButton.style.display = "block";
+  cancelButton.style.display = "inline-block";
   cancelButton.addEventListener("click", () => abortUpload(progressFilenameRequest));
-
-  document.getElementById("upload_progress").style.display = "block";
 
   // The convesion progress will be written to a txt file. This request will receive the name of the txt file.
   const progressFilenameRequest = new XMLHttpRequest();

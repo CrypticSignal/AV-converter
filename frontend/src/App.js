@@ -2,34 +2,36 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSliderValue } from "./redux/bitrateSliderSlice";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
+// Pages
+import AboutPage from "./pages/AboutPage";
+import Filetypes from "./pages/Filetypes";
+import YoutubePage from "./pages/YouTubePage";
+// General Components
 import AlertDiv from "./components/AlertDiv";
-import TopBar from "./components/TopBar";
-import FileInput from "./components/FileInput";
+import ConvertButton from "./components/ConvertButton";
 import EncodingTypeSelector from "./components/AAC/EncodingTypeSelector";
+import FileInput from "./components/FileInput";
+import FormatSelector from "./components/FormatSelector";
+import IsKeepVideo from "./components/IsKeepVideo";
+import Navbar from "./components/Navbar";
+// Output Format Related Components
 import AC3 from "./components/AC3";
 import DTS from "./components/DTS";
-import VorbisEncodingType from "./components/Vorbis/EncodingType";
 import FLAC from "./components/FLAC";
-import IsKeepVideo from "./components/IsKeepVideo";
 import MKVMP4 from "./components/MKVMP4";
 import MP3EncodingTypeSelector from "./components/MP3/EncodingTypeSelector";
 import NoOptions from "./components/NoOptions";
 import Opus from "./components/Opus";
+import VorbisEncodingType from "./components/Vorbis/EncodingType";
 import WavBitDepth from "./components/WAV";
-import ConvertButton from "./components/ConvertButton";
-
-import start from "./functions/Start";
-import buttonClicked from "./functions/yt";
-
-import AboutPage from "./pages/AboutPage";
-import Filetypes from "./pages/Filetypes";
-import YoutubePage from "./pages/YouTubePage";
 // React-Bootstrap
-import Spinner from "react-bootstrap/Spinner";
-import ProgressBar from "react-bootstrap/ProgressBar";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
+import ProgressBar from "react-bootstrap/ProgressBar";
+import Spinner from "react-bootstrap/Spinner";
+// Functions
+import start from "./functions/Start";
+import buttonClicked from "./functions/yt";
 
 function App() {
   const [codec, setCodec] = useState("MP3");
@@ -179,7 +181,7 @@ function App() {
     buttonClicked(document.getElementById("link").value, e.target.value);
   };
 
-  const renderComponent = () => {
+  const showFormatSettings = () => {
     switch (codec) {
       case "MP3":
         return (
@@ -241,7 +243,13 @@ function App() {
           </div>
         );
       case "MKA":
-        return <NoOptions />;
+        return (
+          <i>
+            Only the audio streams will be kept, it will be left as-is (no transcoding will be done)
+            and the Matroska container will be used. The file extension will be{" "}
+            <strong>.mka</strong>
+          </i>
+        );
       case "MKV":
         return (
           <MKVMP4
@@ -294,89 +302,67 @@ function App() {
     <Router>
       <Switch>
         <Route exact path="/">
+          <Navbar />
+
+          <h1>Audio / Video Converter</h1>
+
           <Container>
-            <TopBar />
-            <h1>Audio / Video Converter</h1>
-            <div className="container">
-              <FileInput updateBoxes={onFileInput} />
-              <hr></hr>
-              <h5>Desired Format</h5>
-              <select id="codecs" onChange={onCodecChange} value={codec}>
-                <option value="AAC">AAC (.m4a)</option>
-                <option value="AC3">AC3 (Dolby Digital)</option>
-                <option value="ALAC">ALAC</option>
-                <option value="CAF">CAF (.caf)</option>
-                <option value="DTS">DTS</option>
-                <option value="FLAC">FLAC</option>
-                <option value="MKA">MKA (extract audio without encoding it)</option>
-                <option value="MKV">MKV (.mkv)</option>
-                <option value="MP3">MP3</option>
-                <option value="MP4">MP4 (.mp4)</option>
-                <option value="Opus">Opus (.opus)</option>
-                <option value="Vorbis">Vorbis (.ogg)</option>
-                <option value="WAV">WAV</option>
-              </select>
-              <br />
-              <br />
-              <hr />
-              <h5>Encoder Settings</h5>
-              {renderComponent()}
-              <br />
-              <hr />
-              <h5>Output Filename</h5>
-              <input
-                type="text"
-                autoComplete="off"
-                className="form-control"
-                maxLength="200"
-                id="output_name"
-                required
-              />
-              <br />
-              <AlertDiv />
-              <ConvertButton onSubmitClicked={onSubmitClicked} />
+            <FileInput updateBoxes={onFileInput} />
+            <hr />
+            <FormatSelector onCodecChange={onCodecChange} codec={codec} />
+            <hr />
+            <h5>Encoder Settings</h5>
+            {showFormatSettings()}
+            <br />
+            <hr />
 
-              <div id="uploading_div" style={{ display: "none" }}>
-                <Spinner id="uploading_btn" animation="border" /> Uploading file for conversion...
-                <div id="upload_progress">
-                  <ProgressBar
-                    now={useSelector((state) => state.progress.progress)}
-                    label={`${useSelector((state) => state.progress.progress)}%`}
-                  />
-                  <p id="progress_values" />
-                </div>
-                <Button id="cancel_btn" variant="secondary">
-                  Cancel Upload
-                </Button>{" "}
+            <h5>Output Filename</h5>
+            <input
+              type="text"
+              autoComplete="off"
+              className="form-control"
+              maxLength="200"
+              id="output_name"
+              required
+            />
+            <br />
+
+            <AlertDiv />
+
+            <ConvertButton onSubmitClicked={onSubmitClicked} />
+
+            <div id="uploading_div" style={{ display: "none" }}>
+              <div id="upload_progress">
+                <ProgressBar
+                  now={useSelector((state) => state.progress.progress)}
+                  label={`${useSelector((state) => state.progress.progress)}%`}
+                />
+                <p id="progress_values" />
               </div>
+              <Button id="cancel_btn" variant="secondary">
+                Cancel
+              </Button>
+            </div>
 
-              {/*"Converting..." button (Bootstrap class)*/}
-              <button
-                id="converting_btn"
-                className="btn btn-info"
-                style={{ display: "none" }}
-                disabled
-              >
-                <span className="spinner-border spinner-border-sm" />
-                Converting...
-              </button>
-              {/*ENCODER PROGRESS*/}
-              <p id="progress" style={{ display: "none" }}></p>
+            <div id="converting_div" style={{ display: "none" }}>
+              <p id="progress"></p>
+              <Spinner id="converting_btn" animation="border" /> Converting...
             </div>
           </Container>
         </Route>
 
         <Route exact path="/about">
-          <TopBar />
+          <Navbar />
           <AboutPage />
         </Route>
 
         <Route exact path="/filetypes">
+          <Navbar />
           <Filetypes />
         </Route>
 
         <Route exact path="/yt">
-          <TopBar />
+          <Navbar />
           <YoutubePage onYtButtonClicked={onYtButtonClicked} buttonClicked={whichButtonClicked} />
         </Route>
       </Switch>

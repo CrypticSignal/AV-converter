@@ -10,7 +10,6 @@ from werkzeug.utils import secure_filename
 
 import converter  # converter.py
 from loggers import log, log_this
-from trimmer import trimmer  # Import the 'trimmer' blueprint in trimmer.py
 from utils import delete_file
 from yt import yt  # Import the 'yt' blueprint in yt.py
 
@@ -25,7 +24,6 @@ app.config["MAX_CONTENT_LENGTH"] = max_upload_size * 1000 * 1000 * 1000
 app.jinja_env.auto_reload = True
 
 app.register_blueprint(yt)
-app.register_blueprint(trimmer)
 
 # The database object (db) needs to be defined in main.py even though we're not using the database in main.py
 # Otherwise you get the following error:

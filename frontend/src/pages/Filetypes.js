@@ -1,9 +1,6 @@
-import TopBar from "../components/TopBar";
-
 function Filetypes() {
   return (
     <div>
-      <TopBar />
       <h1>Supported Filetypes</h1>
       <br />
       <div className="audiofiletypes">
