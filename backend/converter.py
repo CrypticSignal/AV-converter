@@ -198,7 +198,12 @@ def alac(progress_filename, uploaded_file_path, output_path, is_keep_video):
             f"{output_path}.mkv",
         )
     # Audio only output file.
-    return run_ffmpeg(progress_filename, uploaded_file_path, "-c:a alac", f"{output_path}.m4a")
+    return run_ffmpeg(
+        progress_filename,
+        uploaded_file_path,
+        "-map 0:a -c:a alac",
+        f"{output_path}.m4a",
+    )
 
 
 # CAF
@@ -392,7 +397,12 @@ def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
 
 # Opus
 def opus(
-    progress_filename, uploaded_file_path, output_path, encoding_type, vbr_bitrate, cbr_bitrate
+    progress_filename,
+    uploaded_file_path,
+    output_path,
+    encoding_type,
+    vbr_bitrate,
+    cbr_bitrate,
 ):
     # Opus does not support >256 kbps per channel.
     if is_mono_audio(uploaded_file_path):
@@ -419,7 +429,12 @@ def opus(
 
 # Vorbis
 def vorbis(
-    progress_filename, uploaded_file_path, output_path, encoding_type, quality_level, bitrate
+    progress_filename,
+    uploaded_file_path,
+    output_path,
+    encoding_type,
+    quality_level,
+    bitrate,
 ):
     if encoding_type == "abr":
         return run_ffmpeg(
