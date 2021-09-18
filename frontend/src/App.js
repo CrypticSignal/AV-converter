@@ -245,9 +245,8 @@ function App() {
       case "MKA":
         return (
           <i>
-            Only the audio streams will be kept, it will be left as-is (no transcoding will be done)
-            and the Matroska container will be used. The file extension will be{" "}
-            <strong>.mka</strong>
+            Only the audio streams will be kept and left as-is (no transcoding will be done). The
+            Matroska container will be used.
           </i>
         );
       case "MKV":
