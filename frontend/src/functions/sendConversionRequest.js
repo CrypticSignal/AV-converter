@@ -1,5 +1,5 @@
-import showAlert from "./ShowAlert";
-import reset from "./Reset";
+import showAlert from "./showAlert";
+import reset from "./reset";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

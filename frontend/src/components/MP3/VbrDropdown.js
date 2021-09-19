@@ -19,6 +19,7 @@ function VbrDropdown(props) {
         For more details about the settings, click{" "}
         <a
           target="_blank"
+          rel="noreferrer"
           href="http://wiki.hydrogenaud.io/index.php?title=LAME#Recommended_settings_details"
         >
           here

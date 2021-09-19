@@ -4,9 +4,9 @@ import { setDefault, change, selectSliderValue } from "../redux/bitrateSliderSli
 
 function BitrateSlider(props) {
   const dispatch = useDispatch();
-
   useEffect(() => {
     dispatch(setDefault(props.initialValue));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -30,8 +30,8 @@ import Container from "react-bootstrap/Container";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Spinner from "react-bootstrap/Spinner";
 // Functions
-import start from "./functions/Start";
-import buttonClicked from "./functions/yt";
+import uploadFile from "./functions/uploadFile";
+import buttonClicked from "./functions/ytDownloaderFunctions";
 
 function App() {
   const [codec, setCodec] = useState("MP3");
@@ -172,7 +172,7 @@ function App() {
       qValue: qValue,
       wavBitDepth: wavBitDepth,
     };
-    start(states);
+    uploadFile(states);
   };
 
   // YT downloader page

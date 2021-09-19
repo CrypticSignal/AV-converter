@@ -4,20 +4,12 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.6.1",
-    "@testing-library/jest-dom": "^5.11.6",
-    "@testing-library/react": "^11.2.2",
-    "@testing-library/user-event": "^12.3.0",
-    "bootstrap": "^5.1.0",
-    "http-proxy-middleware": "^1.0.6",
     "react": "^17.0.1",
     "react-bootstrap": "^2.0.0-beta.5",
     "react-dom": "^17.0.1",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
-    "react-script-tag": "^1.1.2",
-    "react-scripts": "4.0.1",
-    "redux": "^4.1.0",
-    "web-vitals": "^0.2.4"
+    "react-scripts": "4.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -26,7 +26,7 @@ function MKVMP4(props) {
         When using a preset (options 4 to 12), the video codec is converted to H.264 (AVC) and the
         audio codec is converted to AAC, using libfdk_aac with VBR mode 5. More details about the
         presets can be found
-        <a href="https://trac.ffmpeg.org/wiki/Encode/H.264" target="_blank">
+        <a href="https://trac.ffmpeg.org/wiki/Encode/H.264" target="_blank" rel="noreferrer">
           {" "}
           here
         </a>
@@ -57,7 +57,7 @@ function MKVMP4(props) {
         <i>
           A lower CRF means higher video quality, at the expense of a larger file size. A CRF of 17
           or 18 is considered to be visually lossless or nearly so. More details{" "}
-          <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf" target="_blank">
+          <a href="https://trac.ffmpeg.org/wiki/Encode/H.264#crf" target="_blank" rel="noreferrer">
             here
           </a>
           .

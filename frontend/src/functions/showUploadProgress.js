@@ -1,9 +1,8 @@
-import store from "../app/store";
+import store from "../redux/store";
 import { update } from "../redux/uploadProgressSlice";
 
 let previousTime = Date.now() / 1000;
 let previousLoaded = 0;
-let previousPercentageComplete = 0;
 
 function showUploadProgress(event) {
   const loaded = event.loaded / 10 ** 6;
@@ -32,7 +31,6 @@ function showUploadProgress(event) {
 
   previousLoaded = loaded;
   previousTime = Date.now() / 1000;
-  previousPercentageComplete = percentageComplete;
 }
 
 export default showUploadProgress;

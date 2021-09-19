@@ -1,7 +1,7 @@
-import showAlert from "./ShowAlert";
-import reset from "./Reset";
-import showUploadProgress from "./ShowUploadProgress";
-import getProgressFilename from "./GetProgressFilename";
+import showAlert from "./showAlert";
+import reset from "./reset";
+import showUploadProgress from "./showUploadProgress";
+import getProgressFilename from "./getProgressFilename";
 
 function showError(progressFilenameRequest) {
   showAlert(`${progressFilenameRequest.responseText}`, "danger");
@@ -14,7 +14,7 @@ function abortUpload(progressFilenameRequest) {
   reset();
 }
 
-function start(state) {
+export default function uploadFile(state) {
   const input = document.getElementById("file_input");
   const outputNameBox = document.getElementById("output_name");
 
@@ -69,8 +69,7 @@ function start(state) {
   // Show an alert if an incompatible filetype has been selected.
   if (!allowedFiletypes.includes(fileExt)) {
     showAlert(
-      'Incompatible filetype selected. Click <a href="/filetypes" \
-          target="_blank">here</a> to see the list of compatible filetypes.',
+      'Incompatible filetype selected. Click <a href="/filetypes" target="_blank">here</a> to see the list of compatible filetypes.',
       "danger"
     );
     reset();
@@ -113,5 +112,3 @@ function start(state) {
   progressFilenameRequest.open("POST", "/api");
   progressFilenameRequest.send(data);
 }
-
-export default start;

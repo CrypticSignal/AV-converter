@@ -17,6 +17,7 @@ function QualitySlider(props) {
         Quality range is from "-q 0" (lowest) to "-q 10" (highest). For more details, click{" "}
         <a
           target="_blank"
+          rel="noreferrer"
           href="https://wiki.hydrogenaud.io/index.php?title=Recommended_Ogg_Vorbis#Recommended_Encoder_Settings"
         >
           here

@@ -1,4 +1,4 @@
-import showAlert from "./ShowAlert";
+import showAlert from "./showAlert";
 
 // A function that creates a synchronous sleep.
 function sleep(milliseconds) {
@@ -43,7 +43,7 @@ async function showDownloadProgress(progressFilePath) {
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(url, whichButton) {
   const linkBox = document.getElementById("link");
-  if (linkBox.value == "") {
+  if (linkBox.value === "") {
     showAlert("Trying to download something without pasting the URL? You silly billy.", "warning");
     return;
   }
@@ -84,7 +84,7 @@ async function buttonClicked(url, whichButton) {
     shouldLog = false;
     is_downloading_audio = false;
 
-    if (secondRequest.status == 200) {
+    if (secondRequest.status === 200) {
       const response = await secondRequest.text();
       const anchorTag = document.createElement("a");
       anchorTag.href = response;
