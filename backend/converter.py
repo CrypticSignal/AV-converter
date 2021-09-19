@@ -26,6 +26,7 @@ else:
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     progress_file_path = os.path.join("ffmpeg-progress", progress_filename)
     ffmpeg_output_file = os.path.join("ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt")
+    with open(ffmpeg_output_file, "w"): pass
 
     params = params.split(" ")
     log.info(params)
@@ -36,7 +37,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         [
             ffmpeg_path,
             "-loglevel",
-            "debug",
+            "info",
             "-progress",
             "-",
             "-nostats",
@@ -62,65 +63,61 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     except Exception:
         log.info(f"Unable to get the duration of {uploaded_file_path}")
 
-    while True:
-        # The process is in progress.
-        if process.poll() is None:
-            try:
-                output = process.stdout.readline().decode("utf-8")
-            except Exception:
-                log.info("Unable to decode the FFmpeg output.")
+    while process.poll() is None:
+        try:
+            output = process.stdout.readline().decode("utf-8")
+        except Exception:
+            log.info("Unable to decode the FFmpeg output.")
 
-            else:
-                with open(ffmpeg_output_file, "w", encoding="utf-8") as f:
-                    f.write(output)
-
-                if "out_time_ms" in output:
-                    microseconds = int(output.strip()[12:])
-                    secs = microseconds / 1_000_000
-                    try:
-                        percentage = (secs / file_duration) * 100
-                    except Exception:
-                        percentage = "unknown"
-
-                elif "speed" in output:
-                    speed = output.strip()[6:]
-                    speed = 0 if " " in speed or "N/A" in speed else float(speed[:-1])
-                    try:
-                        eta = (file_duration - secs) / speed
-                    except Exception:
-                        continue
-                    else:
-                        minutes = round(eta / 60)
-                        seconds = f"{round(eta % 60):02d}"
-                        with open(progress_file_path, "w") as f:
-                            f.write(
-                                f"Progress: {round(percentage, 1)}% | Speed: {speed}x | ETA: {minutes}:{seconds} [M:S]"
-                            )
-
-        # process.poll() is not None - the FFmpeg process has completed:
         else:
-            # Empty the uploads folder if there is less than 2 GB free storage space.
-            free_space_gb = shutil.disk_usage("/")[2] / 1_000_000_000
-            if free_space_gb < 2:
-                empty_folder("uploads")
+            with open(ffmpeg_output_file, "a", encoding="utf-8") as f:
+                f.write(output)
 
-            # The return code is not 0 if an error occurred.
-            if process.returncode != 0:
-                log.info("Unable to convert.")
-                return {
-                    "error": "Unable to convert",
-                    "log_file": f"api/{ffmpeg_output_file}",
-                }
+            if "out_time_ms" in output:
+                microseconds = int(output.strip()[12:])
+                secs = microseconds / 1_000_000
+                try:
+                    percentage = (secs / file_duration) * 100
+                except Exception:
+                    percentage = "unknown"
 
-            log.info(f"Conversion took {round((time() - ffmpeg_start_time), 1)} seconds.")
-            delete_file(progress_file_path)
+            elif "speed" in output:
+                speed = output.strip()[6:]
+                speed = 0 if " " in speed or "N/A" in speed else float(speed[:-1])
+                try:
+                    eta = (file_duration - secs) / speed
+                except Exception:
+                    continue
+                else:
+                    minutes = int(eta / 60)
+                    seconds = round(eta % 60)
+                    with open(progress_file_path, "w") as f:
+                        f.write(
+                            f"Progress: {round(percentage, 1)}% | Speed: {speed}x | ETA: {minutes}m {seconds}s"
+                        )
+       
+    # Empty the uploads folder if there is less than 2 GB free storage space.
+    free_space_gb = shutil.disk_usage("/")[2] / 1_000_000_000
+    if free_space_gb < 2:
+        empty_folder("uploads")
 
-            return {
-                "error": None,
-                "ext": os.path.splitext(output_name)[1],
-                "download_path": f"api/{output_name}",
-                "log_file": f"api/{ffmpeg_output_file}",
-            }
+    # The return code is not 0 if an error occurred.
+    if process.returncode != 0:
+        log.info("Unable to convert.")
+        return {
+            "error": "Unable to convert",
+            "log_file": f"api/{ffmpeg_output_file}",
+        }
+
+    log.info(f"Conversion took {round((time() - ffmpeg_start_time), 1)} seconds.")
+    delete_file(progress_file_path)
+
+    return {
+        "error": None,
+        "ext": os.path.splitext(output_name)[1],
+        "download_path": f"api/{output_name}",
+        "log_file": f"api/{ffmpeg_output_file}",
+    }
 
 
 # AAC
