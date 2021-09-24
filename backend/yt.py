@@ -18,7 +18,7 @@ SESSION_TYPE = "filesystem"
 app.config.from_object(__name__)
 Session(app)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:test1@localhost/website"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
@@ -38,7 +38,7 @@ def update_database(mb_downloaded):
         user.mb_downloaded += mb_downloaded
         db.session.commit()
     else:
-        new_user = User(ip=user_ip, times_used_yt_downloader=1, mb_downloaded=0)
+        new_user = User(ip=user_ip, times_used_yt_downloader=1, mb_downloaded=mb_downloaded)
         db.session.add(new_user)
         db.session.commit()
 
