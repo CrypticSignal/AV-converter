@@ -28,7 +28,7 @@ app.register_blueprint(yt)
 # The database object (db) needs to be defined in main.py even though we're not using the database in main.py
 # Otherwise you get the following error:
 # 'AssertionError: The sqlalchemy extension was not registered to the current application.'
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:test1@localhost/website"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
@@ -161,12 +161,15 @@ def view_ffmpeg_output(filename):
 
 @app.route("/api/conversions/<filename>", methods=["GET"])
 def send_file(filename):
-    log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
     mimetype_value = "audio/mp4" if os.path.splitext(filename)[1] == ".m4a" else ""
     try:
         return send_from_directory(
             "conversions", filename, mimetype=mimetype_value, as_attachment=True
         )
+    except Exception as e:
+        log.info(f"Unable to return the converted file:\n{e}")
+    else:
+        log.info(f'{datetime.now().strftime("[%H:%M:%S]")} {filename}')
     finally:
         delete_file(os.path.join("conversions", filename))
 
