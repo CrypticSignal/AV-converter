@@ -32,13 +32,13 @@ def update_database(mb_downloaded):
     # Use the get_ip function imported from loggers.py
     user_ip = get_ip()
     # Query the database by IP.
-    user = User.query.filter_by(ip=user_ip).first()
+    user = DownloaderDB.query.filter_by(ip=user_ip).first()
     if user:
-        user.times_used_yt_downloader += 1
+        user.times_used += 1
         user.mb_downloaded += mb_downloaded
         db.session.commit()
     else:
-        new_user = User(ip=user_ip, times_used_yt_downloader=1, mb_downloaded=mb_downloaded)
+        new_user = DownloaderDB(ip=user_ip, times_used=1, mb_downloaded=mb_downloaded)
         db.session.add(new_user)
         db.session.commit()
 
@@ -110,16 +110,16 @@ class Logger:
         pass
 
 
-# This class is a table in the database.
-class User(db.Model):
+# Defining a DownloaderDB table in the database.
+class DownloaderDB(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(20), unique=True, nullable=False)
-    times_used_yt_downloader = db.Column(db.Integer, default=0)
+    times_used = db.Column(db.Integer, default=0)
     mb_downloaded = db.Column(db.Float, default=0)
 
-    def __init__(self, ip, times_used_yt_downloader, mb_downloaded):
+    def __init__(self, ip, times_used, mb_downloaded):
         self.ip = ip
-        self.times_used_yt_downloader = times_used_yt_downloader
+        self.times_used = times_used
         self.mb_downloaded = mb_downloaded
 
 
@@ -142,11 +142,11 @@ def yt_downloader():
 
     user_ip = get_ip()
     # Query the database by IP.
-    user = User.query.filter_by(ip=user_ip).first()
+    user = DownloaderDB.query.filter_by(ip=user_ip).first()
     if user:
         string = (
-            f"{user.times_used_yt_downloader} times"
-            if user.times_used_yt_downloader > 1
+            f"{user.times_used} times"
+            if user.times_used > 1
             else "once"
         )
         log.info(f"This user has used the downloader {string} before.")

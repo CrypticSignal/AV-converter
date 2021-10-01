@@ -9,13 +9,12 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 
 import converter  # converter.py
-from loggers import log, log_this
+from loggers import get_ip, log, log_this
 from utils import delete_file
 from yt import yt  # Import the 'yt' blueprint in yt.py
 
 app = Flask(__name__)
-secret_key = str(os.urandom(16))
-app.secret_key = secret_key
+app.secret_key = str(os.urandom(16))
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 # Set the maximum upload size to 3 GB.
 max_upload_size = 3  # in GB.
@@ -35,6 +34,35 @@ db = SQLAlchemy(app)
 SESSION_TYPE = "filesystem"
 app.config.from_object(__name__)
 Session(app)
+
+
+# Defining a ConverterDB table in the database.
+class ConverterDB(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(20), unique=True, nullable=False)
+    times_used = db.Column(db.Integer, default=0)
+
+    def __init__(self, ip, times_used):
+        self.ip = ip
+        self.times_used= times_used
+
+# Create the above table.
+db.create_all()
+
+
+def update_database():
+    # Use the get_ip function imported from loggers.py
+    user_ip = get_ip()
+    # Query the database by IP.
+    user = ConverterDB.query.filter_by(ip=user_ip).first()
+    if user:
+        user.times_used+= 1
+        db.session.commit()
+    else:
+        new_user = ConverterDB(ip=user_ip, times_used=1)
+        db.session.add(new_user)
+        db.session.commit()
+
 
 os.makedirs("uploads", exist_ok=True)
 os.makedirs("conversions", exist_ok=True)
@@ -143,6 +171,7 @@ def convert_file():
 
     # The 'error' key is set to None if the file converted successfully.
     if converter_result_dictionary["error"] is None:
+        update_database()
         return converter_result_dictionary
     # Return a 500 error if the file conversion was not successful.
     else:
