@@ -3,6 +3,7 @@ import logging
 import os
 
 from flask import request
+from user_agents import parse
 
 
 def setup_logger(name, log_file):
@@ -37,7 +38,9 @@ visit = setup_logger("visit", "logs/visit.log")
 def log_this(message):
     current_datetime = datetime.now().strftime("%d-%m-%y at %H:%M:%S")
     client = get_ip()
-    log.info(f"\n[{current_datetime}] {client} {message}")
+    ua_string = request.headers.get("User-Agent")
+    user_agent = parse(ua_string)
+    log.info(f"\n[{current_datetime}] {client} {message}\n{str(user_agent)}")
 
 
 # visit.log

@@ -11,11 +11,11 @@ var is_downloading_audio = false;
 
 async function showDownloadProgress(progressFilePath) {
   while (shouldLog) {
-    await sleep(250);
+    await sleep(500);
     const response = await fetch(progressFilePath);
     if (response.ok) {
-      const textInFile = await response.text();
-      const lines = textInFile.split("\n");
+      const ytdlOutput = await response.text();
+      const lines = ytdlOutput.split("\n");
       const lastLine = lines[lines.length - 2];
       if (is_downloading_audio) {
         if (lastLine.includes("[download]")) {
@@ -24,7 +24,7 @@ async function showDownloadProgress(progressFilePath) {
           showAlert("Merging the audio and video...", "info");
         }
       } else {
-        if (textInFile.includes(".m4a") && !textInFile.includes("pass -k to keep")) {
+        if (ytdlOutput.includes(".m4a") && !ytdlOutput.includes("pass -k to keep")) {
           is_downloading_audio = true;
         } else if (lastLine.includes("[download]")) {
           showAlert(lastLine.substring(11), "info");
@@ -86,9 +86,10 @@ async function buttonClicked(url, whichButton) {
 
     if (secondRequest.status === 200) {
       const response = await secondRequest.text();
+      console.log(response);
       const anchorTag = document.createElement("a");
+      anchorTag.setAttribute("download", "");
       anchorTag.href = response;
-      anchorTag.download = "";
       anchorTag.click();
       // Sometimes the alert below didn't show up, adding a delay seems to fix this.
       await sleep(1000);
