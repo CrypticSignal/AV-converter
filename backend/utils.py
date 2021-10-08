@@ -45,6 +45,8 @@ def empty_folder(folder_path):
             os.remove(os.path.join(folder_path, file))
         except Exception as e:
             log.info(f"Unable to delete {folder_path}/{file}:\n{e}")
+        else:
+            log.info(f"{file} deleted.")
 
 
 # This function returns True if the first audio stream is mono.
