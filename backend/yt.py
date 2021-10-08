@@ -48,18 +48,16 @@ def update_database(mb_downloaded):
 def run_youtube_dl(video_link, options):
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(video_link, download=False)
-
-    session["filename_stem"] = Path(ydl.prepare_filename(info)).stem
-
-    try:
-        ydl.download([video_link])
-    except Exception as error:
-        log.info(f'Error downloading {session["filename_stem"]}:\n{error}')
-        return str(error), 500
-    else:
-        log_downloads_per_day()
-
-    return True
+        session["filename_stem"] = Path(ydl.prepare_filename(info)).stem
+        try:
+            ydl.download([video_link])
+        except Exception as e:
+            log.info(f'Error downloading {session["filename_stem"]}:\n{error}\n')
+            log.info(f'Progress File: {session["progress_file_path"]}')
+            return str(e), 500
+        else:
+            log_downloads_per_day()
+            return True
 
 
 def return_download_path():
@@ -73,7 +71,7 @@ def return_download_path():
     filesize = round((os.path.getsize(os.path.join(download_dir, filename)) / 1_000_000), 2)
     update_database(filesize)
 
-    # Remove any hashtags or pecentage symbols as they cause an issue 
+    # Remove any hashtags or pecentage symbols as they cause an issue
     # and make the filename more aesthetically pleasing by replacing the underscores with spaces.
     new_filename = filename.replace("#", "").replace("%", "").replace("_", " ")
 
@@ -86,14 +84,15 @@ def return_download_path():
     except Exception as e:
         log.info(f"Unable to rename {filename} to {new_filename}:\n{e}")
         clean_up(Path(filename).stem)
+        return os.path.join("api", "downloads", filename)
     else:
         log.info(f"{new_filename} | {filesize} MB")
         clean_up(Path(new_filename).stem)
-
         # Update the list of videos downloaded.
-        with open("logs/downloads.txt", "a") as f:
-            f.write(f"\n{new_filename}")
-
+        with open("logs/downloads.txt", "a+") as f:
+            f.seek(0)
+            if new_filename not in f.read():
+                f.write(f"\n{new_filename}")
         # Return the download link.
         return os.path.join("api", "downloads", new_filename)
 
@@ -102,9 +101,9 @@ class Logger:
     def debug(self, msg):
         with open(session["progress_file_path"], "a") as f:
             try:
-                f.write(f"{msg}\n")
+                f.write(msg.strip() + "\n")
             except Exception as e:
-                log.info("Unable to write YT progress to file:\n{e}")
+                log.info(f"Unable to write the following ytdl progress:\n{msg.strip()}\n{e}")
 
     def warning(self, msg):
         pass
@@ -239,5 +238,9 @@ def send_file(filename):
     mimetype_value = "audio/mp4" if Path(filename).suffix == ".m4a" else ""
     try:
         return send_from_directory(download_dir, filename, mimetype=mimetype_value)
+    except Exception as e:
+        log.info(f"Unable to return the final file:\n{e}\nFilename: {filename}")
     finally:
         delete_file(os.path.join("downloads", filename))
+
+        
