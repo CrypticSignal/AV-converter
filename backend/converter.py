@@ -14,7 +14,9 @@ os.makedirs("ffmpeg-output", exist_ok=True)
 # If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
 ffmpeg_path = "/home/h/bin/ffmpeg"
 
-if "libfdk-aac" in subprocess.check_output([ffmpeg_path, "-buildconf"]).decode("utf-8"):
+if "libfdk-aac" in subprocess.check_output([ffmpeg_path, "-hide_banner", "-buildconf"]).decode(
+    "utf-8"
+):
     aac_encoder = "libfdk_aac"
     aac_vbr_enabler = "-vbr"
 # FFmpeg was not compiled with libfdk-aac support, use the native AAC encoder.
@@ -26,76 +28,85 @@ else:
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
     progress_file_path = os.path.join("ffmpeg-progress", progress_filename)
     ffmpeg_output_file = os.path.join("ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt")
-    with open(ffmpeg_output_file, "w"): pass
+    with open(ffmpeg_output_file, "w"):
+        pass
 
     params = params.split(" ")
     log.info(params)
     params.append(output_name)
     ffmpeg_start_time = time()
 
-    process = subprocess.Popen(
-        [
-            ffmpeg_path,
-            "-loglevel",
-            "info",
-            "-progress",
-            "-",
-            "-nostats",
-            "-y",
-            "-i",
-            uploaded_file_path,
-            "-metadata",
-            "comment=Transcoded using av-converter.com",
-            "-metadata",
-            "encoded_by=av-converter.com",
-            "-id3v2_version",
-            "3",
-            "-write_id3v1",
-            "true",
-        ]
-        + params,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
+    with open(ffmpeg_output_file, "a") as f:
+        process = subprocess.Popen(
+            [
+                ffmpeg_path,
+                "-hide_banner",
+                "-loglevel",
+                "verbose",
+                "-progress",
+                "-",
+                "-nostats",
+                "-y",
+                "-i",
+                uploaded_file_path,
+                "-metadata",
+                "comment=Transcoded using av-converter.com",
+                "-metadata",
+                "encoded_by=av-converter.com",
+                "-id3v2_version",
+                "3",
+                "-write_id3v1",
+                "true",
+            ]
+            + params,
+            stdout=subprocess.PIPE,
+            stderr=f,
+        )
 
     try:
         file_duration = float(probe(uploaded_file_path)["format"]["duration"])
-    except Exception:
-        log.info(f"Unable to get the duration of {uploaded_file_path}")
+    except Exception as e:
+        can_get_duration = False
+        log.info(f"Unable to get the duration of {uploaded_file_path}:\n{e}")
+    else:
+        can_get_duration = True
+        log.info(f"File Duration: {file_duration}")
 
-    while process.poll() is None:
-        try:
-            output = process.stdout.readline().decode("utf-8")
-        except Exception:
-            log.info("Unable to decode the FFmpeg output.")
+    if can_get_duration:
+        percentage = "unknown"
+        speed = "unknown"
+        eta_string = "unknown"
 
-        else:
-            with open(ffmpeg_output_file, "a", encoding="utf-8") as f:
-                f.write(output)
+        while process.poll() is None:
+            try:
+                output = process.stdout.readline().decode().strip()
+            except Exception as e:
+                log.info(f"Unable to decode the FFmpeg output:\n{e}\nFFmpeg Output:\n{output}")
+            else:
+                if "out_time_ms" in output:
+                    seconds_processed = int(output[12:]) / 1_000_000
+                    try:
+                        percentage = (seconds_processed / file_duration) * 100
+                    except Exception as e:
+                        log.info(f"Unable to calculate percentage progress:\n{e}\n")
+                        log.info(f"Seconds Processed: {seconds_processed}\n")
+                    else:
+                        percentage = round(percentage, 1)
 
-            if "out_time_ms" in output:
-                microseconds = int(output.strip()[12:])
-                secs = microseconds / 1_000_000
-                try:
-                    percentage = (secs / file_duration) * 100
-                except Exception:
-                    percentage = "unknown"
+                elif "speed" in output:
+                    speed = float(output[6:][:-1])
+                    try:
+                        eta = (file_duration - seconds_processed) / speed
+                    except Exception as e:
+                        log.info(f"Unable to calculate ETA:\n{e}\nSpeed:\n{speed}")
+                    else:
+                        minutes = int(eta / 60)
+                        seconds = round(eta % 60)
+                        eta_string = f"{minutes}m {seconds}s"
 
-            elif "speed" in output:
-                speed = output.strip()[6:]
-                speed = 0 if " " in speed or "N/A" in speed else float(speed[:-1])
-                try:
-                    eta = (file_duration - secs) / speed
-                except Exception:
-                    continue
-                else:
-                    minutes = int(eta / 60)
-                    seconds = round(eta % 60)
-                    with open(progress_file_path, "w") as f:
-                        f.write(
-                            f"Progress: {round(percentage, 1)}% | Speed: {speed}x | ETA: {minutes}m {seconds}s"
-                        )
-       
+            with open(progress_file_path, "w") as f:
+                f.write(f"Progress: {percentage}% | Speed: {speed}x | ETA: {eta_string}")
+
     # Empty the uploads folder if there is less than 2 GB free storage space.
     free_space_gb = shutil.disk_usage("/")[2] / 1_000_000_000
     if free_space_gb < 2:
