@@ -107,9 +107,10 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             with open(progress_file_path, "w") as f:
                 f.write(f"Progress: {percentage}% | Speed: {speed}x | ETA: {eta_string}")
 
-    # Empty the uploads folder if there is less than 2 GB free storage space.
-    free_space_gb = shutil.disk_usage("/")[2] / 1_000_000_000
-    if free_space_gb < 2:
+    # Empty the uploads folder if there is less than 500 MB free storage space.
+    free_space_mb = shutil.disk_usage("/")[2] / 1_000_000_000_000
+    if free_space_mb < 500:
+        log.info(f"{free_space_mb} MB storage space remaining. Emptying the uploads folder...")
         empty_folder("uploads")
 
     # The return code is not 0 if an error occurred.
@@ -121,6 +122,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         }
 
     log.info(f"Conversion took {round((time() - ffmpeg_start_time), 1)} seconds.")
+    delete_file(uploaded_file_path)
     delete_file(progress_file_path)
 
     return {
