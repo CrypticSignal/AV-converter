@@ -18,8 +18,10 @@ SESSION_TYPE = "filesystem"
 app.config.from_object(__name__)
 Session(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:test1@localhost/website"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:test1@localhost/website"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_size": 15}
+
 db = SQLAlchemy(app)
 
 os.makedirs("yt-progress", exist_ok=True)
@@ -71,7 +73,8 @@ def return_download_path():
     filesize = round((os.path.getsize(os.path.join(download_dir, filename)) / 1_000_000), 2)
     update_database(filesize)
 
-    # Remove any hashtags or pecentage symbols as they cause an issue and make the filename more aesthetically pleasing.
+    # Remove any hashtags or pecentage symbols as they cause an issue 
+    # and make the filename more aesthetically pleasing by replacing the underscores with spaces.
     new_filename = filename.replace("#", "").replace("%", "").replace("_", " ")
 
     try:
@@ -144,11 +147,7 @@ def yt_downloader():
     # Query the database by IP.
     user = DownloaderDB.query.filter_by(ip=user_ip).first()
     if user:
-        string = (
-            f"{user.times_used} times"
-            if user.times_used > 1
-            else "once"
-        )
+        string = f"{user.times_used} times" if user.times_used > 1 else "once"
         log.info(f"This user has used the downloader {string} before.")
 
     video_link = request.form["link"]
