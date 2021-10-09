@@ -6,11 +6,8 @@ from time import time
 
 from ffmpeg import probe
 
-from loggers import log
-from utils import delete_file, empty_folder, is_mono_audio
+from flask_app.utils import delete_file, empty_folder, is_mono_audio, log
 
-os.makedirs("ffmpeg-progress", exist_ok=True)
-os.makedirs("ffmpeg-output", exist_ok=True)
 # If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
 ffmpeg_path = "/home/h/bin/ffmpeg"
 
@@ -26,14 +23,15 @@ else:
 
 
 def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
-    progress_file_path = os.path.join("ffmpeg-progress", progress_filename)
-    ffmpeg_output_file = os.path.join("ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt")
+    progress_file_path = os.path.join("flask_app", "ffmpeg-progress", progress_filename)
+    ffmpeg_output_file = os.path.join("flask_app", "ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt")
     with open(ffmpeg_output_file, "w"):
         pass
 
     params = params.split(" ")
     log.info(params)
     params.append(output_name)
+
     ffmpeg_start_time = time()
 
     with open(ffmpeg_output_file, "a") as f:
@@ -113,6 +111,8 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         log.info(f"{free_space_mb} MB storage space remaining. Emptying the uploads folder...")
         empty_folder("uploads")
 
+    log.info(process.returncode)
+
     # The return code is not 0 if an error occurred.
     if process.returncode != 0:
         log.info("Unable to convert.")
@@ -120,17 +120,17 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             "error": "Unable to convert",
             "log_file": f"api/{ffmpeg_output_file}",
         }
+    else:
+        log.info(f"Conversion took {round((time() - ffmpeg_start_time), 1)} seconds.")
+        #delete_file(uploaded_file_path)
+        #delete_file(progress_file_path)
 
-    log.info(f"Conversion took {round((time() - ffmpeg_start_time), 1)} seconds.")
-    delete_file(uploaded_file_path)
-    delete_file(progress_file_path)
-
-    return {
-        "error": None,
-        "ext": os.path.splitext(output_name)[1],
-        "download_path": f"api/{output_name}",
-        "log_file": f"api/{ffmpeg_output_file}",
-    }
+        return {
+            "error": None,
+            "ext": os.path.splitext(output_name)[1],
+            "download_path": f"api/{output_name}",
+            "log_file": f"api/{ffmpeg_output_file}",
+        }
 
 
 # AAC

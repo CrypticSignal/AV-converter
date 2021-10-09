@@ -1,20 +1,14 @@
 # Backend
 __pycache__
 /backend/logs
-/backend/site.db
-/backend/conversions
-/backend/downloads
-/backend/uploads
-/backend/ffmpeg-progress
-/backend/ffmpeg_output
+/backend/flask_app/conversions
+/backend/flask_app/uploads
+/backend/flask_app/ffmpeg-progress
+/backend/flask_app/ffmpeg-output
 /backend/flask_session
-/backend/trims
-/backend/yt-progress
-
 # Frontend
 **/node_modules
 /frontend/build
-
 # Misc
 .prettierrc
 .vscode

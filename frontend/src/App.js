@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 // Pages
 import AboutPage from "./pages/AboutPage";
 import Filetypes from "./pages/Filetypes";
-import YoutubePage from "./pages/YouTubePage";
 // General Components
 import AlertDiv from "./components/AlertDiv";
 import ConvertButton from "./components/ConvertButton";
@@ -31,7 +30,6 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import Spinner from "react-bootstrap/Spinner";
 // Functions
 import uploadFile from "./functions/uploadFile";
-import buttonClicked from "./functions/ytDownloaderFunctions";
 
 function App() {
   const [codec, setCodec] = useState("MP3");
@@ -173,12 +171,6 @@ function App() {
       wavBitDepth: wavBitDepth,
     };
     uploadFile(states);
-  };
-
-  // YT downloader page
-  const onYtButtonClicked = (e) => {
-    setWhichButtonClicked(e.target.value);
-    buttonClicked(document.getElementById("link").value, e.target.value);
   };
 
   const showFormatSettings = () => {
@@ -358,11 +350,6 @@ function App() {
         <Route exact path="/filetypes">
           <Navbar />
           <Filetypes />
-        </Route>
-
-        <Route exact path="/yt">
-          <Navbar />
-          <YoutubePage onYtButtonClicked={onYtButtonClicked} buttonClicked={whichButtonClicked} />
         </Route>
       </Switch>
     </Router>
