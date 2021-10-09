@@ -145,8 +145,6 @@ def get_file(filename):
 
 @app.route("/api/flask_app/ffmpeg-output/<filename>", methods=["GET"])
 def view_ffmpeg_output(filename):
-    log.info(filename)
-    log.info('IN DFJDSKH')
     return send_from_directory("ffmpeg-output", filename)
 
 

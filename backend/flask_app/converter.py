@@ -111,8 +111,6 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
         log.info(f"{free_space_mb} MB storage space remaining. Emptying the uploads folder...")
         empty_folder("uploads")
 
-    log.info(process.returncode)
-
     # The return code is not 0 if an error occurred.
     if process.returncode != 0:
         log.info("Unable to convert.")
