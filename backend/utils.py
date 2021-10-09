@@ -10,11 +10,10 @@ ytdl_format_codes = ["f137", "f140", "f251", "f401"]
 
 
 def clean_up(filename_stem):
-    empty_folder("yt-progress")
-    # Empty the downloads folder if there is less than 2 GB free storage space.
+    # Empty the downloads folder if there is less than 500 MB free storage space.
     free_space = shutil.disk_usage("/")[2]
-    free_space_gb = free_space / 1_000_000_000
-    if free_space_gb < 2:
+    free_space_gb = free_space / 1_000_000
+    if free_space_gb < 500:
         empty_folder("downloads")
     else:
         for file in os.listdir("downloads"):

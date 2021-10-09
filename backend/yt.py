@@ -61,6 +61,7 @@ def run_youtube_dl(video_link, options):
 
 
 def return_download_path():
+    os.remove(session["progress_file_path"])
     filename = [
         file
         for file in os.listdir(download_dir)
