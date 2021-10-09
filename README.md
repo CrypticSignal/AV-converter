@@ -8,22 +8,10 @@ On https://av-converter.com you can:
 - Convert a video to an audio-only file (to any of the above formats).
 - Convert a video to the MP4 or MKV format.
 - Change the audio codec of a video to MP3, AAC, AC3, DTS, WAV, FLAC or ALAC.
-- Download a YouTube video or just the audio.
-
-## Features (audio/video converter):
-
-- You can see the file upload progress as a percentage and also amount uploaded (MB) in realtime.
-- Upload completion time is shown in realtime.
-- Whilst the file is being converted, an alert shows how much of the file (HH:MM:SS) has been converted so far. The alert is updated every second.
-
-## Features (YouTube downloader):
-
-- Download the video. MP4 format is available.
-- Download the audio only. MP3 format is available.
 
 ## Supported Filetypes:
 
-Many filetypes are supported, click [here](https://free-av-tools.com/filetypes) for details.
+Many filetypes are supported, click [here](https://av-converter.com/filetypes) for details.
 
 ## Requirements for running locally:
 
@@ -34,7 +22,7 @@ You can run the Flask app locally for development purposes or if you want audio/
 - [FFmpeg](https://ffmpeg.org/download.html)
 - `cd backend`, `pip3 install -r requirements.txt`
 
-## How to self-host:
+## How to run locally:
 
 - Clone this repository.
 - add `"proxy": "http://127.0.0.1:5000"` to `frontend/package.json`.
@@ -46,12 +34,19 @@ Window 1:
 
 - `cd backend`
 - `pip3 install -r requirements.txt`
-- `python3 main.py`
+- Create the database table by entering the following in the terminal:
+
+```
+python3
+from flask_app import db
+db.create_all()
+exit()
+```
+
+- `python3 run.py`
 
 Window 2:
 
 - `cd frontend`
-
 - `npm install`
-
 - Enter `npm start` and after a moment you should be taken to http://127.0.0.1:3000
