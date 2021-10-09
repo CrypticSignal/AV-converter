@@ -20,7 +20,6 @@ const Navbar = () => {
       <Link to="/">Home</Link>
       <Link to="about">About</Link>
       <Link to="filetypes">Filetypes</Link>
-      <Link to="yt">YT downloader</Link>
       <Link
         to="game"
         onClick={() => {
