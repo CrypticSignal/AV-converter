@@ -9,21 +9,7 @@ from werkzeug.utils import secure_filename
 from flask_app import app, db
 import flask_app.converter as converter
 from flask_app.models import ConverterDB
-from flask_app.utils import delete_file, get_ip, log, log_this
-
-
-def update_database():
-    # Use the get_ip function imported from loggers.py
-    user_ip = get_ip()
-    # Query the database by IP.
-    user = ConverterDB.query.filter_by(ip=user_ip).first()
-    if user:
-        user.times_used+= 1
-        db.session.commit()
-    else:
-        new_user = ConverterDB(ip=user_ip, times_used=1)
-        db.session.add(new_user)
-        db.session.commit()
+from flask_app.utils import delete_file, log, log_this, update_database
 
 
 # This route is hit when a file has been uploaded.
