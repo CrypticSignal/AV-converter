@@ -94,4 +94,18 @@ def setup_logger(name, log_file):
     logger.addHandler(file_handler)
     return logger
 
+
+def update_database():
+    # Use the get_ip function imported from loggers.py
+    user_ip = get_ip()
+    # Query the database by IP.
+    user = ConverterDB.query.filter_by(ip=user_ip).first()
+    if user:
+        user.times_used+= 1
+        db.session.commit()
+    else:
+        new_user = ConverterDB(ip=user_ip, times_used=1)
+        db.session.add(new_user)
+        db.session.commit()
+
 log = setup_logger("log", "./logs/info.txt")
