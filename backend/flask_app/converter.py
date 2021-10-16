@@ -22,44 +22,60 @@ else:
     aac_vbr_enabler = "-q:a"
 
 
-def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
+def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name):
+    os.makedirs("flask_app/ffmpeg-progress", exist_ok=True)
+    os.makedirs("flask_app/ffmpeg-output", exist_ok=True)
     progress_file_path = os.path.join("flask_app", "ffmpeg-progress", progress_filename)
     ffmpeg_output_file = os.path.join("flask_app", "ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt")
     with open(ffmpeg_output_file, "w"):
         pass
 
-    params = params.split(" ")
-    log.info(params)
-    params.append(output_name)
+    encoding_args = encoding_args.split(" ")
+    log.info(encoding_args)
+
+    base_ffmpeg_args = [
+        ffmpeg_path,
+        "-hide_banner",
+        "-loglevel",
+        "verbose",
+        "-progress",
+        "-",
+        "-nostats",
+        "-y",
+        "-i",
+        uploaded_file_path,
+        "-metadata",
+        "comment=Transcoded using av-converter.com",
+        "-metadata",
+        "encoded_by=av-converter.com",
+        "-id3v2_version",
+        "3",
+        "-write_id3v1",
+        "true",
+    ]
 
     ffmpeg_start_time = time()
 
     with open(ffmpeg_output_file, "a") as f:
-        process = subprocess.Popen(
-            [
-                ffmpeg_path,
-                "-hide_banner",
-                "-loglevel",
-                "verbose",
-                "-progress",
-                "-",
-                "-nostats",
-                "-y",
-                "-i",
-                uploaded_file_path,
-                "-metadata",
-                "comment=Transcoded using av-converter.com",
-                "-metadata",
-                "encoded_by=av-converter.com",
-                "-id3v2_version",
-                "3",
-                "-write_id3v1",
-                "true",
-            ]
-            + params,
-            stdout=subprocess.PIPE,
-            stderr=f,
-        )
+        try:
+            process = subprocess.Popen(
+                base_ffmpeg_args + encoding_args + [output_name],
+                stdout=subprocess.PIPE,
+                stderr=f,
+            )
+        # Handle "UnicodeEncodeError: 'latin-1' codec can't encode character..." error.
+        except UnicodeEncodeError as e:
+            log.info(e)
+            # Replace the characters that have a Unicode code point of >256 
+            output_name = "".join([i if ord(i) <= 256 else "_" for i in output_name])
+            try:
+                process = subprocess.Popen(
+                    base_ffmpeg_args + encoding_args + [output_name],
+                    stdout=subprocess.PIPE,
+                    stderr=f,
+                )
+            except Exception as e:
+                log.info(f"Subprocess Error:\n{e}")
 
     try:
         file_duration = float(probe(uploaded_file_path)["format"]["duration"])
@@ -79,7 +95,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, params, output_name):
             try:
                 output = process.stdout.readline().decode().strip()
             except Exception as e:
-                log.info(f"Unable to decode the FFmpeg output:\n{e}\nFFmpeg Output:\n{output}")
+                log.info(f"Unable to decode the FFmpeg output:\n{e}\nFFmpeg Output:\n{process.stdout}")
             else:
                 if "out_time_ms" in output:
                     seconds_processed = int(output[12:]) / 1_000_000

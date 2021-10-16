@@ -22,9 +22,4 @@ SESSION_TYPE = "filesystem"
 app.config.from_object(__name__)
 Session(app)
 
-os.makedirs("flask_app/uploads", exist_ok=True)
-os.makedirs("flask_app/conversions", exist_ok=True)
-os.makedirs("flask_app/ffmpeg-progress", exist_ok=True)
-os.makedirs("flask_app/ffmpeg-output", exist_ok=True)
-
 from flask_app import views

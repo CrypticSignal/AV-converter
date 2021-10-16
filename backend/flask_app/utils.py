@@ -8,6 +8,9 @@ from ffmpeg import probe
 from flask import request
 from user_agents import parse
 
+from flask_app import db # Import db from __init__.py
+from flask_app.models import ConverterDB
+
 
 ytdl_format_codes = ["f137", "f140", "f251", "f401"]
 
@@ -85,7 +88,7 @@ def log_this(message):
 
 def setup_logger(name, log_file):
     log_format = logging.Formatter("%(message)s")
-    file_handler = logging.FileHandler(log_file)
+    file_handler = logging.FileHandler(log_file, encoding="utf-8")
     file_handler.setFormatter(log_format)
     logger = logging.getLogger(name)
     if logger.hasHandlers():
