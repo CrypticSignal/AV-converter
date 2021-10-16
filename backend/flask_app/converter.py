@@ -6,7 +6,7 @@ from time import time
 
 from ffmpeg import probe
 
-from flask_app.utils import delete_file, empty_folder, is_mono_audio, log
+from flask_app.utils import delete_file, is_mono_audio, log
 
 # If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
 ffmpeg_path = "/home/h/bin/ffmpeg"
@@ -21,6 +21,47 @@ else:
     aac_encoder = "aac"
     aac_vbr_enabler = "-q:a"
 
+
+def run_converter(chosen_codec, mutual_params, is_keep_video, data, slider_value):
+    # AAC
+    if chosen_codec == "AAC":
+        return aac(*mutual_params, is_keep_video, data["aacEncodingType"], slider_value, data["aacVbrMode"])
+    # AC3
+    elif chosen_codec == "AC3":
+        return ac3(*mutual_params, is_keep_video, data["ac3Bitrate"])
+    # ALAC
+    elif chosen_codec == "ALAC":
+        return alac(*mutual_params, is_keep_video)
+    # CAF
+    elif chosen_codec == "CAF":
+        return caf(*mutual_params)
+    # DTS
+    elif chosen_codec == "DTS":
+        return dts(*mutual_params, is_keep_video, data["dtsBitrate"])
+    # FLAC
+    elif chosen_codec == "FLAC":
+        return flac(*mutual_params, is_keep_video, data["flacCompression"])
+    # MKA
+    elif chosen_codec == "MKA":
+        return mka(*mutual_params)
+    # MKV
+    elif chosen_codec == "MKV":
+        return mkv(*mutual_params, data["videoSetting"], data["crfValue"])
+    # MP3
+    elif chosen_codec == "MP3":
+        return mp3(*mutual_params, is_keep_video, data["mp3EncodingType"], slider_value, data["mp3VbrSetting"])
+    # MP4
+    elif chosen_codec == "MP4":
+        return mp4(*mutual_params, data["videoSetting"], data["crfValue"])
+    # Opus
+    elif chosen_codec == "Opus":
+        return opus(*mutual_params, data["opusEncodingType"], slider_value)
+    # Vorbis
+    elif chosen_codec == "Vorbis":
+        return vorbis(*mutual_params, data["vorbisEncodingType"], data["qValue"], slider_value)
+    # WAV
+    elif chosen_codec == "WAV":
+        return wav(*mutual_params, is_keep_video, data["wavBitDepth"])
 
 def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name):
     os.makedirs("flask_app/ffmpeg-progress", exist_ok=True)
@@ -45,9 +86,9 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
         "-i",
         uploaded_file_path,
         "-metadata",
-        "comment=Transcoded using av-converter.com",
+        "comment=Transcoded using av-com",
         "-metadata",
-        "encoded_by=av-converter.com",
+        "encoded_by=av-com",
         "-id3v2_version",
         "3",
         "-write_id3v1",
@@ -425,8 +466,7 @@ def opus(
     uploaded_file_path,
     output_path,
     encoding_type,
-    vbr_bitrate,
-    cbr_bitrate,
+    bitrate
 ):
     # Opus does not support >256 kbps per channel.
     if is_mono_audio(uploaded_file_path):

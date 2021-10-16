@@ -11,7 +11,6 @@ from user_agents import parse
 from flask_app import db # Import db from __init__.py
 from flask_app.models import ConverterDB
 
-
 ytdl_format_codes = ["f137", "f140", "f251", "f401"]
 
 
@@ -104,6 +103,8 @@ def update_database():
     # Query the database by IP.
     user = ConverterDB.query.filter_by(ip=user_ip).first()
     if user:
+        string = "time" if user.times_used == 1 else "times"
+        log.info(f"This user has used the converter {user.times_used} {string} before.")
         user.times_used+= 1
         db.session.commit()
     else:
