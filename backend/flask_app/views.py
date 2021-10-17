@@ -1,22 +1,25 @@
 from datetime import datetime
 import json
 import os
+from pathlib import Path
 from time import time
 
 from flask import render_template, request, send_from_directory, session
+from youtube_dl import YoutubeDL
 from werkzeug.utils import secure_filename
 
 from flask_app import app, db
 from flask_app.converter import run_converter
-from flask_app.utils import delete_file, log, log_this, update_database
-
+from flask_app.models import DownloaderDB
+from flask_app.utils import delete_file, log, get_ip, log_this, update_converter_database
+from flask_app.yt_downloader import return_download_path, run_yt_downloader
 
 # This route is hit when a file has been uploaded.
 @app.route("/api", methods=["POST"])
 def homepage():
     uploaded_file = request.files["uploadedFile"]
     log_this(f"Uploaded {uploaded_file.filename}")
-    update_database()
+    update_converter_database()
 
     filename_secure = secure_filename(uploaded_file.filename)
     # Save the uploaded file to the uploads folder.
@@ -36,12 +39,11 @@ def convert_file():
     uploaded_file_path = os.path.join("flask_app", "uploads", secure_filename(input_filename))
 
     data = json.loads(request.form["states"])
-    
     chosen_codec = data["codec"]
     slider_value = data["sliderValue"]
     is_keep_video = data["isKeepVideo"]
 
-    os.makedirs("flask_app/conversions", exist_ok=True)
+    Path("conversions").mkdir(exist_ok=True)
     output_path = os.path.join("flask_app", "conversions", request.form["outputName"])
 
     log.info(f"{input_filename} --> {request.form['outputName']} [{chosen_codec}]")
@@ -80,6 +82,58 @@ def send_file(filename):
         log.info(f"Unable to return the converted file:\n{e}")
     finally:
         delete_file(os.path.join("flask_app", "conversions", filename))
+
+
+# YOUTUBE DOWNLOADER:
+
+
+@app.route("/api/yt", methods=["POST"])
+def yt_downloader():
+    # First POST request:
+    if request.form["button_clicked"] == "yes":
+        progress_file_name = f"{str(time())[:-8]}.txt"
+        session["progress_file_path"] = os.path.join("flask_app", "yt-progress", session["progress_filename"])
+        return session["progress_file_path"], 200
+
+    # Second POST request:
+
+    log_this(f'Clicked on {request.form["button_clicked"]}')
+
+    user_ip = get_ip()
+    # Query the database by IP.
+    user = DownloaderDB.query.filter_by(ip=user_ip).first()
+    if user:
+        string = f"{user.times_used} times" if user.times_used > 1 else "once"
+        log.info(f"This user has used the downloader {string} before.")
+
+    video_link = request.form["link"]
+    log.info(video_link)
+
+    result = run_yt_downloader(request.form, video_link)
+
+    if result == True:
+        return return_download_path()
+
+    return result
+
+# This is where the youtube-dl progress file is.
+@app.route("/api/flask_app/yt-progress/<filename>")
+def get_progress_file(filename):
+    return send_from_directory("yt-progress", filename)
+
+
+@app.route("/api/downloads/<filename>", methods=["GET"])
+def send_download(filename):
+    mimetype_value = "audio/mp4" if Path(filename).suffix == ".m4a" else ""
+    try:
+        return send_from_directory("downloads", filename, mimetype=mimetype_value, as_attachment=True)
+    except Exception as e:
+        log.info(f"Unable to return {filename}:\n{e}")
+    finally:
+        delete_file(os.path.join("flask_app", "downloads", filename))
+
+
+# GAME:
 
 
 @app.route("/game")

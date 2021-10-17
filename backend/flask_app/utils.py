@@ -5,23 +5,22 @@ from pathlib import Path
 import shutil
 
 from ffmpeg import probe
-from flask import request
+from flask import request, session
 from user_agents import parse
 
 from flask_app import db # Import db from __init__.py
-from flask_app.models import ConverterDB
-
-ytdl_format_codes = ["f137", "f140", "f251", "f401"]
+from flask_app.models import ConverterDB, DownloaderDB
 
 
-def clean_up(filename_stem):
+def clean_downloads_folder(download_dir, filename_stem):
     # Empty the downloads folder if there is less than 500 MB free storage space.
     free_space = shutil.disk_usage("/")[2]
     free_space_gb = free_space / 1_000_000
     if free_space_gb < 500:
-        empty_folder("downloads")
+        empty_folder(download_dir)
     else:
-        for file in os.listdir("downloads"):
+        ytdl_format_codes = ["f137", "f140", "f251", "f401"]
+        for file in os.listdir(download_dir):
             if filename_stem in file and Path(file).suffix != "":
                 if (
                     Path(file).suffix in [".part", ".webp", ".ytdl"]
@@ -29,16 +28,16 @@ def clean_up(filename_stem):
                     or ".part" in file
                 ):
                     try:
-                        os.remove(os.path.join("downloads", file))
-                    except Exception as e:
-                        log.info(f"[CLEAN UP] Unable to delete {file}:\n{e}")
+                        os.remove(os.path.join(download_dir, file))
+                    except Exception:
+                        log.info(f"Unable to delete {file}")
 
 
 def delete_file(filepath):
     try:
         os.remove(filepath)
-    except Exception as e:
-        log.info(f"Unable to delete {filepath}:\n{e}")
+    except Exception:
+        log.info(f"Unable to delete {filepath}")
     else:
         log.info(f"{filepath} deleted.")
 
@@ -85,6 +84,45 @@ def log_this(message):
     log.info(f"\n[{current_datetime}] {client} {message}\n{str(user_agent)}")
 
 
+def return_download_path(download_dir):
+    unwanted_filetypes = [".part", ".jpg", ".ytdl", ".webp"]
+    # Get the filename of the completed download.
+    filename = [
+        file
+        for file in os.listdir(download_dir)
+        if Path(file).suffix not in unwanted_filetypes
+        and Path(file).stem == session["filename_stem"]
+    ][0]
+
+    clean_downloads_folder(download_dir, Path(filename).stem)
+
+    filesize = round((os.path.getsize(os.path.join(download_dir, filename)) / 1_000_000), 2)
+    update_downloader_database(filesize)
+
+    # Remove any hashtags or pecentage symbols as they cause an issue
+    # and make the filename more aesthetically pleasing by replacing the underscores with spaces.
+    new_filename = filename.replace("#", "").replace("%", "").replace("_", " ")
+
+    try:
+        # Rename the file.
+        os.replace(
+            os.path.join(download_dir, filename),
+            os.path.join(download_dir, new_filename),
+        )
+    except Exception as e:
+        log.info(f"Unable to rename {filename} to {new_filename}:\n{e}")
+        return os.path.join(download_dir, filename)
+    else:
+        log.info(f"{new_filename} | {filesize} MB")
+        # Update the list of videos downloaded.
+        with open("logs/downloads.txt", "a+") as f:
+            f.seek(0)
+            if new_filename not in f.read():
+                f.write(f"\n{new_filename}")
+        # Return the download link.
+        return os.path.join("api", "downloads", new_filename)
+
+
 def setup_logger(name, log_file):
     log_format = logging.Formatter("%(message)s")
     file_handler = logging.FileHandler(log_file, encoding="utf-8")
@@ -97,7 +135,7 @@ def setup_logger(name, log_file):
     return logger
 
 
-def update_database():
+def update_converter_database():
     # Use the get_ip function imported from loggers.py
     user_ip = get_ip()
     # Query the database by IP.
@@ -109,6 +147,21 @@ def update_database():
         db.session.commit()
     else:
         new_user = ConverterDB(ip=user_ip, times_used=1)
+        db.session.add(new_user)
+        db.session.commit()
+
+
+def update_downloader_database(mb_downloaded):
+    # Use the get_ip function imported from loggers.py
+    user_ip = get_ip()
+    # Query the database by IP.
+    user = DownloaderDB.query.filter_by(ip=user_ip).first()
+    if user:
+        user.times_used += 1
+        user.mb_downloaded += mb_downloaded
+        db.session.commit()
+    else:
+        new_user = DownloaderDB(ip=user_ip, times_used=1, mb_downloaded=mb_downloaded)
         db.session.add(new_user)
         db.session.commit()
 
