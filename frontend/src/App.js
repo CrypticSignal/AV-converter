@@ -31,7 +31,7 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import Spinner from "react-bootstrap/Spinner";
 // Functions
 import uploadFile from "./functions/uploadFile";
-import buttonClicked from "./functions/ytDownloaderFunctions";
+import buttonClicked from "./functions/youtubeDownloader";
 
 function App() {
   const [codec, setCodec] = useState("MP3");

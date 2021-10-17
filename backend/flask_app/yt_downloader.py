@@ -6,7 +6,7 @@ from time import time
 from flask import Flask, request, send_from_directory, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
-from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 
 from flask_app.utils import log, return_download_path
 

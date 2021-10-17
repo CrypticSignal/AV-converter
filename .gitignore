@@ -1,6 +1,8 @@
 # Backend
 __pycache__
 /backend/logs
+/backend/flask_app/downloads
+/backend/flask_app/yt-progress
 /backend/flask_app/conversions
 /backend/flask_app/uploads
 /backend/flask_app/ffmpeg-progress
