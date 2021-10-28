@@ -128,7 +128,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
     try:
         file_duration = float(probe(uploaded_file_path)["format"]["duration"])
     except Exception as e:
-        can_get_duration = True
+        can_get_duration = False
         log.info(f"Unable to get the duration of {uploaded_file_path}:\n{e}")
     else:
         can_get_duration = True
