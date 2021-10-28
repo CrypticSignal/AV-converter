@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import os
 from pathlib import Path
 from time import time
@@ -29,9 +30,14 @@ class Logger:
         pass
 
 
+audio_options = {}
+video_options = {}
+
+
 def run_youtube_dl(video_link, options):
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(video_link, download=False)
+
         session["filename_stem"] = Path(ydl.prepare_filename(info)).stem
         try:
             ydl.download([video_link])
@@ -118,8 +124,3 @@ def run_yt_downloader(formdata, video_link):
             return return_download_path(download_dir)
 
         return result
-
-
-
-
-        

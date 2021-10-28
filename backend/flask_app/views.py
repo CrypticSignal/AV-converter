@@ -5,7 +5,6 @@ from pathlib import Path
 from time import time
 
 from flask import render_template, request, send_from_directory, session
-from youtube_dl import YoutubeDL
 from werkzeug.utils import secure_filename
 
 from flask_app import app, db
@@ -15,27 +14,25 @@ from flask_app.utils import delete_file, log, get_ip, log_this, update_converter
 from flask_app.yt_downloader import return_download_path, run_yt_downloader
 
 # This route is hit when a file has been uploaded.
-@app.route("/api", methods=["POST"])
+@app.route("/api", methods=["GET", "POST"])
 def homepage():
     uploaded_file = request.files["uploadedFile"]
     log_this(f"Uploaded {uploaded_file.filename}")
     update_converter_database()
 
     filename_secure = secure_filename(uploaded_file.filename)
+
+    os.makedirs(os.path.join("flask_app", "uploads"), exist_ok=True)
     # Save the uploaded file to the uploads folder.
     uploaded_file.save(os.path.join("flask_app/uploads", filename_secure))
 
-    session["progress_filename"] = f"{str(time())[:-8]}.txt"
-    with open(os.path.join("flask_app", "ffmpeg-progress", session["progress_filename"]), "w"):
-        pass
-
-    return os.path.join("api", "ffmpeg-progress", session["progress_filename"])
+    session["progress_filename"] = str(time())[:-8] + ".txt"
+    return os.path.join("api", "flask_app", "ffmpeg-progress", session["progress_filename"])
 
 
 @app.route("/api/convert", methods=["POST"])
 def convert_file():
     input_filename = request.form["inputFilename"]
-    os.makedirs("flask_app/uploads", exist_ok=True)
     uploaded_file_path = os.path.join("flask_app", "uploads", secure_filename(input_filename))
 
     data = json.loads(request.form["states"])
@@ -43,7 +40,7 @@ def convert_file():
     slider_value = data["sliderValue"]
     is_keep_video = data["isKeepVideo"]
 
-    Path("conversions").mkdir(exist_ok=True)
+    os.makedirs(os.path.join("flask_app", "conversions"), exist_ok=True)
     output_path = os.path.join("flask_app", "conversions", request.form["outputName"])
 
     log.info(f"{input_filename} --> {request.form['outputName']} [{chosen_codec}]")
@@ -61,7 +58,7 @@ def convert_file():
         return converter_result, 500
 
 
-@app.route("/api/ffmpeg-progress/<filename>", methods=["GET"])
+@app.route("/api/flask_app/ffmpeg-progress/<filename>", methods=["GET"])
 def get_file(filename):
     return send_from_directory("ffmpeg-progress", filename)
 
@@ -91,8 +88,9 @@ def send_file(filename):
 def yt_downloader():
     # First POST request:
     if request.form["button_clicked"] == "yes":
-        progress_file_name = f"{str(time())[:-8]}.txt"
-        session["progress_file_path"] = os.path.join("flask_app", "yt-progress", session["progress_filename"])
+        progress_filename = str(time())[:-8] + ".txt"
+        os.makedirs(os.path.join("flask_app", "yt-progress"), exist_ok=True)
+        session["progress_file_path"] = os.path.join("flask_app", "yt-progress", progress_filename)
         return session["progress_file_path"], 200
 
     # Second POST request:
@@ -116,6 +114,7 @@ def yt_downloader():
 
     return result
 
+
 # This is where the youtube-dl progress file is.
 @app.route("/api/flask_app/yt-progress/<filename>")
 def get_progress_file(filename):
@@ -126,7 +125,9 @@ def get_progress_file(filename):
 def send_download(filename):
     mimetype_value = "audio/mp4" if Path(filename).suffix == ".m4a" else ""
     try:
-        return send_from_directory("downloads", filename, mimetype=mimetype_value, as_attachment=True)
+        return send_from_directory(
+            "downloads", filename, mimetype=mimetype_value, as_attachment=True
+        )
     except Exception as e:
         log.info(f"Unable to return {filename}:\n{e}")
     finally:

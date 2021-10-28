@@ -8,7 +8,7 @@ from ffmpeg import probe
 from flask import request, session
 from user_agents import parse
 
-from flask_app import db # Import db from __init__.py
+from flask_app import db  # Import db from __init__.py
 from flask_app.models import ConverterDB, DownloaderDB
 
 
@@ -51,7 +51,7 @@ def empty_folder(folder_path):
         else:
             log.info(f"{file} deleted.")
 
-        
+
 def get_ip():  # The contents of this function is from https://stackoverflow.com/a/49760261/13231825
     if (
         request.environ.get("HTTP_X_FORWARDED_FOR") is None
@@ -143,7 +143,7 @@ def update_converter_database():
     if user:
         string = "time" if user.times_used == 1 else "times"
         log.info(f"This user has used the converter {user.times_used} {string} before.")
-        user.times_used+= 1
+        user.times_used += 1
         db.session.commit()
     else:
         new_user = ConverterDB(ip=user_ip, times_used=1)
@@ -164,5 +164,6 @@ def update_downloader_database(mb_downloaded):
         new_user = DownloaderDB(ip=user_ip, times_used=1, mb_downloaded=mb_downloaded)
         db.session.add(new_user)
         db.session.commit()
+
 
 log = setup_logger("log", "./logs/info.txt")

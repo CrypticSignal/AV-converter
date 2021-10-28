@@ -1,0 +1,8 @@
+FROM alfg/ffmpeg:latest
+RUN apk update
+RUN apk add --no-cache python3 python3-dev py3-pip build-base
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+COPY /backend .
+EXPOSE 5000
+CMD ["gunicorn", "-k", "eventlet", "-w", "3", "-b", ":5000", "--timeout=9999", "run:app"]

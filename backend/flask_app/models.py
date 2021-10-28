@@ -9,7 +9,7 @@ class ConverterDB(db.Model):
 
     def __init__(self, ip, times_used):
         self.ip = ip
-        self.times_used= times_used
+        self.times_used = times_used
 
 
 # Defining a DownloaderDB table in the database.
@@ -23,5 +23,6 @@ class DownloaderDB(db.Model):
         self.ip = ip
         self.times_used = times_used
         self.mb_downloaded = mb_downloaded
+
 
 db.create_all()

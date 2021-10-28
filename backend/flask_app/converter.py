@@ -9,11 +9,9 @@ from ffmpeg import probe
 from flask_app.utils import delete_file, is_mono_audio, log
 
 # If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
-ffmpeg_path = "/home/h/bin/ffmpeg"
+FFMPEG_PATH = "ffmpeg"
 
-if "libfdk-aac" in subprocess.check_output([ffmpeg_path, "-hide_banner", "-buildconf"]).decode(
-    "utf-8"
-):
+if "libfdk-aac" in subprocess.check_output([FFMPEG_PATH, "-hide_banner", "-buildconf"]).decode():
     aac_encoder = "libfdk_aac"
     aac_vbr_enabler = "-vbr"
 # FFmpeg was not compiled with libfdk-aac support, use the native AAC encoder.
@@ -25,7 +23,9 @@ else:
 def run_converter(chosen_codec, mutual_params, is_keep_video, data, slider_value):
     # AAC
     if chosen_codec == "AAC":
-        return aac(*mutual_params, is_keep_video, data["aacEncodingType"], slider_value, data["aacVbrMode"])
+        return aac(
+            *mutual_params, is_keep_video, data["aacEncodingType"], slider_value, data["aacVbrMode"]
+        )
     # AC3
     elif chosen_codec == "AC3":
         return ac3(*mutual_params, is_keep_video, data["ac3Bitrate"])
@@ -49,7 +49,13 @@ def run_converter(chosen_codec, mutual_params, is_keep_video, data, slider_value
         return mkv(*mutual_params, data["videoSetting"], data["crfValue"])
     # MP3
     elif chosen_codec == "MP3":
-        return mp3(*mutual_params, is_keep_video, data["mp3EncodingType"], slider_value, data["mp3VbrSetting"])
+        return mp3(
+            *mutual_params,
+            is_keep_video,
+            data["mp3EncodingType"],
+            slider_value,
+            data["mp3VbrSetting"],
+        )
     # MP4
     elif chosen_codec == "MP4":
         return mp4(*mutual_params, data["videoSetting"], data["crfValue"])
@@ -63,19 +69,20 @@ def run_converter(chosen_codec, mutual_params, is_keep_video, data, slider_value
     elif chosen_codec == "WAV":
         return wav(*mutual_params, is_keep_video, data["wavBitDepth"])
 
+
 def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name):
-    os.makedirs("flask_app/ffmpeg-progress", exist_ok=True)
-    os.makedirs("flask_app/ffmpeg-output", exist_ok=True)
+    os.makedirs(os.path.join("flask_app", "ffmpeg-progress"), exist_ok=True)
+    os.makedirs(os.path.join("flask_app", "ffmpeg-output"), exist_ok=True)
     progress_file_path = os.path.join("flask_app", "ffmpeg-progress", progress_filename)
-    ffmpeg_output_file = os.path.join("flask_app", "ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt")
-    with open(ffmpeg_output_file, "w"):
-        pass
+    ffmpeg_output_file = os.path.join(
+        "flask_app", "ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt"
+    )
 
     encoding_args = encoding_args.split(" ")
     log.info(encoding_args)
 
     base_ffmpeg_args = [
-        ffmpeg_path,
+        FFMPEG_PATH,
         "-hide_banner",
         "-loglevel",
         "verbose",
@@ -107,7 +114,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
         # Handle "UnicodeEncodeError: 'latin-1' codec can't encode character..." error.
         except UnicodeEncodeError as e:
             log.info(e)
-            # Replace the characters that have a Unicode code point of >256 
+            # Replace the characters that have a Unicode code point of >256
             output_name = "".join([i if ord(i) <= 256 else "_" for i in output_name])
             try:
                 process = subprocess.Popen(
@@ -121,7 +128,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
     try:
         file_duration = float(probe(uploaded_file_path)["format"]["duration"])
     except Exception as e:
-        can_get_duration = False
+        can_get_duration = True
         log.info(f"Unable to get the duration of {uploaded_file_path}:\n{e}")
     else:
         can_get_duration = True
@@ -136,7 +143,9 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
             try:
                 output = process.stdout.readline().decode().strip()
             except Exception as e:
-                log.info(f"Unable to decode the FFmpeg output:\n{e}\nFFmpeg Output:\n{process.stdout}")
+                log.info(
+                    f"Unable to decode the FFmpeg output:\n{e}\nFFmpeg Output:\n{process.stdout}"
+                )
             else:
                 if "out_time_ms" in output:
                     seconds_processed = int(output[12:]) / 1_000_000
@@ -149,15 +158,19 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
                         percentage = round(percentage, 1)
 
                 elif "speed" in output:
-                    speed = float(output[6:][:-1])
                     try:
-                        eta = (file_duration - seconds_processed) / speed
-                    except Exception as e:
-                        log.info(f"Unable to calculate ETA:\n{e}\nSpeed:\n{speed}")
+                        speed = float(output[6:][:-1])
+                    except Exception:
+                        pass
                     else:
-                        minutes = int(eta / 60)
-                        seconds = round(eta % 60)
-                        eta_string = f"{minutes}m {seconds}s"
+                        try:
+                            eta = (file_duration - seconds_processed) / speed
+                        except Exception as e:
+                            log.info(f"Unable to calculate ETA:\n{e}\nSpeed:\n{speed}")
+                        else:
+                            minutes = int(eta / 60)
+                            seconds = round(eta % 60)
+                            eta_string = f"{minutes}m {seconds}s"
 
             with open(progress_file_path, "w") as f:
                 f.write(f"Progress: {percentage}% | Speed: {speed}x | ETA: {eta_string}")
@@ -424,7 +437,7 @@ def mp3(
 
 # MP4
 def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_value):
-    constant_options = "-map 0:V? -map 0:a? -map 0:s? -movflags faststart"
+    constant_options = "-map 0:V? -map 0:a? -map 0:s? -c:s mov_text -movflags faststart"
     # No transcoding, simply change the container to MP4.
     if video_mode == "keep_codecs":
         return run_ffmpeg(
@@ -461,13 +474,7 @@ def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
 
 
 # Opus
-def opus(
-    progress_filename,
-    uploaded_file_path,
-    output_path,
-    encoding_type,
-    bitrate
-):
+def opus(progress_filename, uploaded_file_path, output_path, encoding_type, bitrate):
     # Opus does not support >256 kbps per channel.
     if is_mono_audio(uploaded_file_path):
         if int(vbr_bitrate) > 256:
