@@ -1,4 +1,4 @@
-eventlet==0.30.2
+eventlet==0.31.0
 ffmpeg-python==0.2.0
 Flask==2.0.1
 Flask-Session==0.3.2
