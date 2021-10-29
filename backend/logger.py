@@ -4,7 +4,7 @@ import os
 from flask_app import ENVIRONMENT
 
 logging.basicConfig(
-    format="%(message)s",
+    format="%(message)s [%(levelname)s]",
     level=10,
     filename=os.path.join("logs", "backend.log"),
 )
