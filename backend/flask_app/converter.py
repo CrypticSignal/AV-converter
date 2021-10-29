@@ -1,12 +1,12 @@
 import os
 from pathlib import Path
-import shutil
 import subprocess
 from time import time
 
 from ffmpeg import probe
 
-from flask_app.utils import delete_file, is_mono_audio, log
+from flask_app.utils import delete_file, is_mono_audio
+from logger import log
 
 # If you want to run this web app locally, change this (if necessary) to the path of your FFmpeg executable.
 FFMPEG_PATH = "ffmpeg"
@@ -71,8 +71,6 @@ def run_converter(chosen_codec, mutual_params, is_keep_video, data, slider_value
 
 
 def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name):
-    os.makedirs(os.path.join("flask_app", "ffmpeg-progress"), exist_ok=True)
-    os.makedirs(os.path.join("flask_app", "ffmpeg-output"), exist_ok=True)
     progress_file_path = os.path.join("flask_app", "ffmpeg-progress", progress_filename)
     ffmpeg_output_file = os.path.join(
         "flask_app", "ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt"
@@ -174,12 +172,6 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
 
             with open(progress_file_path, "w") as f:
                 f.write(f"Progress: {percentage}% | Speed: {speed}x | ETA: {eta_string}")
-
-    # # Empty the uploads folder if there is less than 500 MB free storage space.
-    # free_space_mb = shutil.disk_usage("/")[2] / 1_000_000
-    # if free_space_mb < 500:
-    #     log.info(f"{free_space_mb} MB storage space remaining. Emptying the uploads folder...")
-    #     empty_folder("uploads")
 
     # The return code is not 0 if an error occurred.
     if process.returncode != 0:

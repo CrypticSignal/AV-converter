@@ -10,8 +10,9 @@ from werkzeug.utils import secure_filename
 from flask_app import app, db
 from flask_app.converter import run_converter
 from flask_app.models import DownloaderDB
-from flask_app.utils import delete_file, log, get_ip, log_this, update_converter_database
+from flask_app.utils import delete_file, get_ip, log_this, update_converter_database
 from flask_app.yt_downloader import return_download_path, run_yt_downloader
+from logger import log
 
 # This route is hit when a file has been uploaded.
 @app.route("/api", methods=["GET", "POST"])
@@ -21,8 +22,6 @@ def homepage():
     update_converter_database()
 
     filename_secure = secure_filename(uploaded_file.filename)
-
-    os.makedirs(os.path.join("flask_app", "uploads"), exist_ok=True)
     # Save the uploaded file to the uploads folder.
     uploaded_file.save(os.path.join("flask_app/uploads", filename_secure))
 
@@ -40,7 +39,6 @@ def convert_file():
     slider_value = data["sliderValue"]
     is_keep_video = data["isKeepVideo"]
 
-    os.makedirs(os.path.join("flask_app", "conversions"), exist_ok=True)
     output_path = os.path.join("flask_app", "conversions", request.form["outputName"])
 
     log.info(f"{input_filename} --> {request.form['outputName']} [{chosen_codec}]")

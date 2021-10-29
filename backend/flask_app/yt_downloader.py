@@ -9,7 +9,8 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from yt_dlp import YoutubeDL
 
-from flask_app.utils import log, return_download_path
+from flask_app.utils import return_download_path
+from logger import log
 
 download_dir = os.path.join("flask_app", "downloads")
 os.makedirs(download_dir, exist_ok=True)
@@ -28,10 +29,6 @@ class Logger:
 
     def error(self, msg):
         pass
-
-
-audio_options = {}
-video_options = {}
 
 
 def run_youtube_dl(video_link, options):

@@ -10,6 +10,7 @@ from user_agents import parse
 
 from flask_app import db  # Import db from __init__.py
 from flask_app.models import ConverterDB, DownloaderDB
+from logger import log
 
 
 def clean_downloads_folder(download_dir, filename_stem):
@@ -123,18 +124,6 @@ def return_download_path(download_dir):
         return os.path.join("api", "downloads", new_filename)
 
 
-def setup_logger(name, log_file):
-    log_format = logging.Formatter("%(message)s")
-    file_handler = logging.FileHandler(log_file, encoding="utf-8")
-    file_handler.setFormatter(log_format)
-    logger = logging.getLogger(name)
-    if logger.hasHandlers():
-        logger.handlers.clear()
-    logger.setLevel(10)
-    logger.addHandler(file_handler)
-    return logger
-
-
 def update_converter_database():
     # Use the get_ip function imported from loggers.py
     user_ip = get_ip()
@@ -164,6 +153,3 @@ def update_downloader_database(mb_downloaded):
         new_user = DownloaderDB(ip=user_ip, times_used=1, mb_downloaded=mb_downloaded)
         db.session.add(new_user)
         db.session.commit()
-
-
-log = setup_logger("log", "./logs/info.txt")

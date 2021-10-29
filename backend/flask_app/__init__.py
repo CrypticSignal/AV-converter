@@ -27,5 +27,9 @@ app.config.from_object(__name__)
 Session(app)
 
 os.makedirs("logs", exist_ok=True)
+os.makedirs(os.path.join("flask_app", "uploads"), exist_ok=True)
+os.makedirs(os.path.join("flask_app", "conversions"), exist_ok=True)
+os.makedirs(os.path.join("flask_app", "ffmpeg-progress"), exist_ok=True)
+os.makedirs(os.path.join("flask_app", "ffmpeg-output"), exist_ok=True)
 
 from flask_app import views
