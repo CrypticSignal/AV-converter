@@ -4,7 +4,7 @@ from flask import Flask
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
-ENVIRONMENT = 'production'
+ENVIRONMENT = "production"
 
 app = Flask(__name__)
 app.secret_key = str(os.urandom(16))
@@ -14,7 +14,7 @@ app.jinja_env.auto_reload = True
 
 if ENVIRONMENT == "production":
     database_uri = "postgresql://postgres:test1@localhost/website"
-else: 
+else:
     database_uri = "sqlite:///sqlite-db.db"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
