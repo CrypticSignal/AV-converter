@@ -22,7 +22,7 @@ class Logger:
             try:
                 f.write(msg.strip() + "\n")
             except Exception as e:
-                log.info(f"Unable to write the following ytdl progress:\n{msg.strip()}\n{e}")
+                log.error(f"Unable to write the following ytdl progress:\n{msg.strip()}\n{e}")
 
     def warning(self, msg):
         pass
@@ -39,7 +39,7 @@ def run_youtube_dl(video_link, options):
         try:
             ydl.download([video_link])
         except Exception as e:
-            log.info(f'Error downloading {session["filename_stem"]}:\n{e}\n')
+            log.error(f'Error downloading {session["filename_stem"]}:\n{e}\n')
             log.info(f'Progress File: {session["progress_file_path"]}')
             return str(e), 500
         else:

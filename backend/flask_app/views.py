@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from flask_app import app, db
 from flask_app.converter import run_converter
 from flask_app.models import DownloaderDB
-from flask_app.utils import delete_file, get_ip, log_this, update_converter_database
+from flask_app.utils import delete_file, detailed_log, get_ip, update_converter_database
 from flask_app.yt_downloader import return_download_path, run_yt_downloader
 from logger import log
 
@@ -18,7 +18,7 @@ from logger import log
 @app.route("/api", methods=["GET", "POST"])
 def homepage():
     uploaded_file = request.files["uploadedFile"]
-    log_this(f"Uploaded {uploaded_file.filename}")
+    detailed_log(f"Uploaded {uploaded_file.filename}")
     update_converter_database()
 
     filename_secure = secure_filename(uploaded_file.filename)
@@ -74,7 +74,7 @@ def send_file(filename):
             "conversions", filename, mimetype=mimetype_value, as_attachment=True
         )
     except Exception as e:
-        log.info(f"Unable to return the converted file:\n{e}")
+        log.error(f"Unable to return the converted file:\n{e}")
     finally:
         delete_file(os.path.join("flask_app", "conversions", filename))
 
@@ -127,7 +127,7 @@ def send_download(filename):
             "downloads", filename, mimetype=mimetype_value, as_attachment=True
         )
     except Exception as e:
-        log.info(f"Unable to return {filename}:\n{e}")
+        log.error(f"Unable to return {filename}:\n{e}")
     finally:
         delete_file(os.path.join("flask_app", "downloads", filename))
 

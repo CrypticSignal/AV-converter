@@ -111,7 +111,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
             )
         # Handle "UnicodeEncodeError: 'latin-1' codec can't encode character..." error.
         except UnicodeEncodeError as e:
-            log.info(e)
+            log.error(e)
             # Replace the characters that have a Unicode code point of >256
             output_name = "".join([i if ord(i) <= 256 else "_" for i in output_name])
             try:
@@ -121,13 +121,13 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
                     stderr=f,
                 )
             except Exception as e:
-                log.info(f"Subprocess Error:\n{e}")
+                log.error(f"Subprocess Error:\n{e}")
 
     try:
         file_duration = float(probe(uploaded_file_path)["format"]["duration"])
     except Exception as e:
         can_get_duration = False
-        log.info(f"Unable to get the duration of {uploaded_file_path}:\n{e}")
+        log.error(f"Unable to get the duration of {uploaded_file_path}:\n{e}")
     else:
         can_get_duration = True
         log.info(f"File Duration: {file_duration}")
@@ -141,16 +141,15 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
             try:
                 output = process.stdout.readline().decode().strip()
             except Exception as e:
-                log.info(
-                    f"Unable to decode the FFmpeg output:\n{e}\nFFmpeg Output:\n{process.stdout}"
-                )
+                log.error(f"Unable to decode the FFmpeg output:\n{e}\n")
+                log.info(f"FFmpeg Output:\n{process.stdout}")
             else:
                 if "out_time_ms" in output:
                     seconds_processed = int(output[12:]) / 1_000_000
                     try:
                         percentage = (seconds_processed / file_duration) * 100
                     except Exception as e:
-                        log.info(f"Unable to calculate percentage progress:\n{e}\n")
+                        log.error(f"Unable to calculate percentage progress:\n{e}\n")
                         log.info(f"Seconds Processed: {seconds_processed}\n")
                     else:
                         percentage = round(percentage, 1)
@@ -164,7 +163,7 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
                         try:
                             eta = (file_duration - seconds_processed) / speed
                         except Exception as e:
-                            log.info(f"Unable to calculate ETA:\n{e}\nSpeed:\n{speed}")
+                            log.error(f"Unable to calculate ETA:\n{e}\nSpeed:\n{speed}")
                         else:
                             minutes = int(eta / 60)
                             seconds = round(eta % 60)

@@ -31,16 +31,25 @@ def clean_downloads_folder(download_dir, filename_stem):
                     try:
                         os.remove(os.path.join(download_dir, file))
                     except Exception:
-                        log.info(f"Unable to delete {file}")
+                        log.error(f"Unable to delete {file}")
 
 
 def delete_file(filepath):
     try:
         os.remove(filepath)
     except Exception:
-        log.info(f"Unable to delete {filepath}")
+        log.error(f"Unable to delete {filepath}")
     else:
         log.info(f"{filepath} deleted.")
+
+
+def detailed_log(message):
+    current_datetime = datetime.now().strftime("%d-%m-%y at %H:%M:%S")
+    # client = get_ip()
+    ua_string = request.headers.get("User-Agent")
+    user_agent = parse(ua_string)
+    log.info("------------------------------------------------------------------------------------")
+    log.info(f"[{current_datetime}] {message}\n {user_agent}")
 
 
 def empty_folder(folder_path):
@@ -48,15 +57,14 @@ def empty_folder(folder_path):
         try:
             os.remove(os.path.join(folder_path, file))
         except Exception as e:
-            log.info(f"Unable to delete {folder_path}/{file}:\n{e}")
+            log.error(f"Unable to delete {folder_path}/{file}:\n{e}")
         else:
             log.info(f"{file} deleted.")
 
 
-def get_ip():  # The contents of this function is from https://stackoverflow.com/a/49760261/13231825
-    if (
-        request.environ.get("HTTP_X_FORWARDED_FOR") is None
-    ):  # This is the case when running locally.
+# https://stackoverflow.com/a/49760261/13231825
+def get_ip():
+    if request.environ.get("HTTP_X_FORWARDED_FOR") is None:
         return request.environ["REMOTE_ADDR"]
     else:
         return request.environ["HTTP_X_FORWARDED_FOR"]
@@ -68,21 +76,13 @@ def is_mono_audio(filepath):
         first_audio_stream = [
             stream for stream in probe(filepath)["streams"] if stream["codec_type"] == "audio"
         ][0]
-    except Exception:
-        log.info(f"ffprobe was unable to detect an audio stream in {filepath}")
+    except Exception as e:
+        log.error(f"ffprobe was unable to detect an audio stream in {filepath}:\n{e}")
     else:
         if first_audio_stream["channels"] == 1:
             return True
 
     return False
-
-
-def log_this(message):
-    current_datetime = datetime.now().strftime("%d-%m-%y at %H:%M:%S")
-    client = get_ip()
-    ua_string = request.headers.get("User-Agent")
-    user_agent = parse(ua_string)
-    log.info(f"\n[{current_datetime}] {client} {message}\n{str(user_agent)}")
 
 
 def return_download_path(download_dir):
@@ -111,7 +111,7 @@ def return_download_path(download_dir):
             os.path.join(download_dir, new_filename),
         )
     except Exception as e:
-        log.info(f"Unable to rename {filename} to {new_filename}:\n{e}")
+        log.error(f"Unable to rename {filename} to {new_filename}:\n{e}")
         return os.path.join(download_dir, filename)
     else:
         log.info(f"{new_filename} | {filesize} MB")
