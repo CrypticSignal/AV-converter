@@ -93,7 +93,7 @@ def yt_downloader():
 
     # Second POST request:
 
-    log_this(f'Clicked on {request.form["button_clicked"]}')
+    detailed_log(f'Clicked on {request.form["button_clicked"]}')
 
     user_ip = get_ip()
     # Query the database by IP.
