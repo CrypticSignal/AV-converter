@@ -24,7 +24,7 @@ def run_converter(chosen_codec, mutual_params, is_keep_video, data, slider_value
     # AAC
     if chosen_codec == "AAC":
         return aac(
-            *mutual_params, is_keep_video, data["aacEncodingType"], slider_value, data["aacVbrMode"]
+            *mutual_params, data["aacExtension"], is_keep_video, data["aacEncodingType"], slider_value, data["aacVbrMode"]
         )
     # AC3
     elif chosen_codec == "AC3":
@@ -91,9 +91,9 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
         "-i",
         uploaded_file_path,
         "-metadata",
-        "comment=Transcoded using av-com",
+        "comment=Transcoded using av-converter.com",
         "-metadata",
-        "encoded_by=av-com",
+        "encoded_by=av-converter.com",
         "-id3v2_version",
         "3",
         "-write_id3v1",
@@ -197,6 +197,7 @@ def aac(
     progress_filename,
     uploaded_file_path,
     output_path,
+    extension,
     is_keep_video,
     encoding_type,
     bitrate,
@@ -226,15 +227,15 @@ def aac(
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-map 0:a -c:a {aac_encoder} -b:a {bitrate}k -f adts",
-            f"{output_path}.m4a",
+            f"-map 0:a -c:a {aac_encoder} -b:a {bitrate}k",
+            f"{output_path}.{extension}",
         )
     # VBR was selected.
     return run_ffmpeg(
         progress_filename,
         uploaded_file_path,
         f"-map 0:a -c:a {aac_encoder} {aac_vbr_enabler} {vbr_quality}",
-        f"{output_path}.m4a",
+        f"{output_path}.{extension}",
     )
 
 

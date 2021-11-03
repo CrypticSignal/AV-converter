@@ -15,6 +15,7 @@ import FormatSelector from "./components/FormatSelector";
 import IsKeepVideo from "./components/IsKeepVideo";
 import Navbar from "./components/Navbar";
 // Output Format Related Components
+import AacExtensionSelector from "./components/AAC/AacExtensionSelector";
 import AC3 from "./components/AC3";
 import DTS from "./components/DTS";
 import FLAC from "./components/FLAC";
@@ -40,6 +41,7 @@ function App() {
   const [mp3EncodingType, setMp3EncodingType] = useState("cbr");
   const [mp3VbrSetting, setMp3VbrSetting] = useState("0");
   // AAC
+  const [aacExtension, setAacExtension] = useState("m4a");
   const [aacEncodingType, setAacEncodingType] = useState("cbr");
   const [aacVbrMode, setAacVbrMode] = useState("5");
   // AC3
@@ -96,6 +98,9 @@ function App() {
   };
 
   // AAC
+  const onAacExtensionChange = (e) => {
+    setAacExtension(e.target.value);
+  };
   const onAacEncodingTypeChange = (e) => {
     setAacEncodingType(e.target.value);
   };
@@ -160,6 +165,7 @@ function App() {
       mp3EncodingType: mp3EncodingType,
       mp3VbrSetting: mp3VbrSetting,
       aacEncodingType: aacEncodingType,
+      aacExtension: aacExtension,
       aacVbrMode: aacVbrMode,
       ac3Bitrate: ac3Bitrate,
       dtsBitrate: dtsBitrate,
@@ -308,8 +314,16 @@ function App() {
           <Container>
             <FileInput updateBoxes={onFileInput} />
             <hr />
+
             <FormatSelector onCodecChange={onCodecChange} codec={codec} />
+            {codec === "AAC" ? (
+              <AacExtensionSelector
+                onAacExtensionChange={onAacExtensionChange}
+                aacExtension={aacExtension}
+              />
+            ) : null}
             <hr />
+
             <h5>Encoder Settings</h5>
             {showFormatSettings()}
             <br />
