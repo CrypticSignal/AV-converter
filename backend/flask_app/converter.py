@@ -226,7 +226,7 @@ def aac(
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-map 0:a -c:a {aac_encoder} -b:a {bitrate}k",
+            f"-map 0:a -c:a {aac_encoder} -b:a {bitrate}k -f adts",
             f"{output_path}.m4a",
         )
     # VBR was selected.
@@ -468,23 +468,20 @@ def mp4(progress_filename, uploaded_file_path, output_path, video_mode, crf_valu
 def opus(progress_filename, uploaded_file_path, output_path, encoding_type, bitrate):
     # Opus does not support >256 kbps per channel.
     if is_mono_audio(uploaded_file_path):
-        if int(vbr_bitrate) > 256:
-            vbr_bitrate = 256
-        elif int(cbr_bitrate) > 256:
-            cbr_bitrate = 256
-
+        bitrate = "256" if int(bitrate) > 256 else bitrate
+    # VBR
     if encoding_type == "opus_vbr":
         return run_ffmpeg(
             progress_filename,
             uploaded_file_path,
-            f"-c:a libopus -b:a {vbr_bitrate}k",
+            f"-c:a libopus -b:a {bitrate}k",
             f"{output_path}.opus",
         )
     # CBR
     return run_ffmpeg(
         progress_filename,
         uploaded_file_path,
-        f"-c:a libopus -vbr off -b:a {cbr_bitrate}k",
+        f"-c:a libopus -vbr off -b:a {bitrate}k",
         f"{output_path}.opus",
     )
 
