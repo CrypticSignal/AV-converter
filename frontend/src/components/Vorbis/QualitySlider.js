@@ -11,10 +11,10 @@ function QualitySlider(props) {
         onChange={props.onSliderMoved}
         value={props.qValue}
       />
-      <span>{` -q${props.qValue}`}</span>
+      <span>{props.qValue}</span>
       <br />
       <i>
-        Quality range is from "-q 0" (lowest) to "-q 10" (highest). For more details, click{" "}
+        Quality range is from 0 (lowest) to 10 (highest). For more details, click
         <a
           target="_blank"
           rel="noreferrer"
@@ -22,7 +22,7 @@ function QualitySlider(props) {
         >
           here
         </a>
-        .
+        and refer to the rows for -q 0 to -q 10.
       </i>
     </div>
   );
