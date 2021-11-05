@@ -51,7 +51,7 @@ def run_yt_downloader(formdata, video_link):
     # Video (best quality)
     if formdata["button_clicked"] == "video_best":
         options = {
-            "format": "bestvideo+bestaudio/best",
+            "format": "bv*+ba/b",
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "restrictfilenames": True,
             "logger": Logger(),
@@ -67,7 +67,7 @@ def run_yt_downloader(formdata, video_link):
     # MP4
     elif formdata["button_clicked"] == "mp4":
         options = {
-            "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+            "format": "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*+ba/b",
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "restrictfilenames": True,
             "logger": Logger(),
@@ -83,7 +83,7 @@ def run_yt_downloader(formdata, video_link):
     # Audio (best quality)
     elif formdata["button_clicked"] == "audio_best":
         options = {
-            "format": "bestaudio/best",
+            "format": "ba/ba*/b",
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "postprocessors": [{"key": "FFmpegExtractAudio"}],
             "restrictfilenames": True,
@@ -100,7 +100,7 @@ def run_yt_downloader(formdata, video_link):
     # MP3
     elif formdata["button_clicked"] == "audio_mp3":
         options = {
-            "format": "bestaudio/best",
+            "format": "ba/ba*/b",
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "writethumbnail": True,
             "postprocessors": [
