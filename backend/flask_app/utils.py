@@ -35,12 +35,8 @@ def clean_downloads_folder(download_dir, filename_stem):
 
 
 def delete_file(filepath):
-    try:
+    if os.path.isfile(filepath):
         os.remove(filepath)
-    except Exception:
-        log.error(f"Unable to delete {filepath}")
-    else:
-        log.info(f"{filepath} deleted.")
 
 
 def detailed_log(message):
