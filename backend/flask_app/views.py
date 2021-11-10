@@ -123,11 +123,15 @@ def get_progress_file(filename):
 def send_download(filename):
     mimetype_value = "audio/mp4" if Path(filename).suffix == ".m4a" else ""
     try:
-        return send_from_directory(
-            "downloads", filename, mimetype=mimetype_value, as_attachment=True
-        )
-    except Exception as e:
-        log.error(f"Unable to return {filename}:\n{e}")
+        if os.path.isfile(os.path.join("flask_app", "downloads", filename)):
+            return send_from_directory(
+                "downloads", filename, mimetype=mimetype_value, as_attachment=True
+            )
+        # On mobile, when using Chrome/Samsung Internet, for some reason the send_download function is hit multiple times.
+        # We need to return a response after the file has been deleted otherwise there will be the following error:
+        # "The function either returned None or ended without a return statement."
+        else:
+            return ""
     finally:
         delete_file(os.path.join("flask_app", "downloads", filename))
 
