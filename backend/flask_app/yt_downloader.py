@@ -12,13 +12,13 @@ from yt_dlp import YoutubeDL
 from flask_app.utils import return_download_path
 from logger import log
 
-download_dir = os.path.join("flask_app", "downloads")
-os.makedirs(download_dir, exist_ok=True)
+# The directory is relative to the location of run.py
+download_dir = "downloads"
 
 
 class Logger:
     def debug(self, msg):
-        with open(session["progress_file_path"], "a") as f:
+        with open(session["yt_progress_url"], "a") as f:
             try:
                 f.write(msg.strip() + "\n")
             except Exception as e:
@@ -40,10 +40,10 @@ def run_youtube_dl(video_link, options):
             ydl.download([video_link])
         except Exception as e:
             log.error(f'Error downloading {session["filename_stem"]}:\n{e}\n')
-            log.info(f'Progress File: {session["progress_file_path"]}')
+            log.info(f'Progress File: {session["yt_progress_url"]}')
             return str(e), 500
         else:
-            os.remove(session["progress_file_path"])
+            os.remove(session["yt_progress_url"])
             return True
 
 

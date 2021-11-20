@@ -71,10 +71,8 @@ def run_converter(chosen_codec, mutual_params, is_keep_video, data, slider_value
 
 
 def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name):
-    progress_file_path = os.path.join("flask_app", "ffmpeg-progress", progress_filename)
-    ffmpeg_output_file = os.path.join(
-        "flask_app", "ffmpeg-output", f"{Path(uploaded_file_path).stem}.txt"
-    )
+    progress_file_path = os.path.join("ffmpeg_progress", progress_filename)
+    ffmpeg_output_file = os.path.join("ffmpeg_output", f"{Path(uploaded_file_path).stem}.txt")
 
     encoding_args = encoding_args.split(" ")
     log.info(encoding_args)
