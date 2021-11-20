@@ -1,12 +1,12 @@
 # Backend
 __pycache__
 /backend/logs
-/backend/flask_app/conversions
-/backend/flask_app/downloads
-/backend/flask_app/uploads
-/backend/flask_app/ffmpeg-progress
-/backend/flask_app/ffmpeg-output
-/backend/flask_app/yt-progress
+/backend/conversions
+/backend/downloads
+/backend/uploads
+/backend/ffmpeg_progress
+/backend/ffmpeg_output
+/backend/yt_progress
 /backend/flask_session
 # Frontend
 **/node_modules
