@@ -26,7 +26,11 @@ def progress_hooks(data):
             progress_string = f"{downloaded_megabytes}MB downloaded..."
 
         if data['eta'] is not None:
-            eta_string = f"ETA: {data['eta']}s"   
+            eta_string = f"ETA: {data['eta']}s"
+        else:
+            eta_string = "ETA: unknown"
+        
+        write_to_file(session["yt_progress_url"], f"{progress_string} [{eta_string}]")   
 
     elif data['status'] == 'finished':
         write_to_file(session["yt_progress_url"], "Postprocessing...")
