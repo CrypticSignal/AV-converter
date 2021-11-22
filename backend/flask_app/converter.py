@@ -131,44 +131,29 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
         log.info(f"File Duration: {file_duration}")
 
     if can_get_duration:
-        percentage = "unknown"
-        speed = "unknown"
-        eta_string = "unknown"
-
         while process.poll() is None:
-            try:
-                output = process.stdout.readline().decode().strip()
-            except Exception as e:
-                log.error(f"Unable to decode the FFmpeg output:\n{e}\n")
-                log.info(f"FFmpeg Output:\n{process.stdout}")
-            else:
-                if "out_time_ms" in output:
-                    seconds_processed = int(output[12:]) / 1_000_000
-                    try:
-                        percentage = (seconds_processed / file_duration) * 100
-                    except Exception as e:
-                        log.error(f"Unable to calculate percentage progress:\n{e}\n")
-                        log.info(f"Seconds Processed: {seconds_processed}\n")
-                    else:
-                        percentage = round(percentage, 1)
+            ffmpeg_output = process.stdout.readline().decode().strip()
 
-                elif "speed" in output:
-                    try:
-                        speed = float(output[6:][:-1])
-                    except Exception:
-                        pass
-                    else:
-                        try:
-                            eta = (file_duration - seconds_processed) / speed
-                        except Exception as e:
-                            log.error(f"Unable to calculate ETA:\n{e}\nSpeed:\n{speed}")
-                        else:
-                            minutes = int(eta / 60)
-                            seconds = round(eta % 60)
-                            eta_string = f"{minutes}m {seconds}s"
+            if "out_time_ms" in ffmpeg_output:
+                microseconds = int(ffmpeg_output[12:])
+                secs = microseconds / 1_000_000
+                percentage = round((secs / file_duration) * 100, 1)
 
-            with open(progress_file_path, "w") as f:
-                f.write(f"Progress: {percentage}% | Speed: {speed}x | ETA: {eta_string}")
+            elif "speed" in ffmpeg_output:
+                speed = ffmpeg_output.split("=")[1].strip()
+                speed = 0 if " " in speed or "N/A" in speed else float(speed[:-1])
+                if speed != 0:
+                    eta = (file_duration - secs) / speed
+                    minutes = int(eta / 60)
+                    seconds = round(eta % 60)
+                    eta_string = f"{minutes}m {seconds}s"
+
+                with open(progress_file_path, "w") as f:
+                    f.write(f"Progress: {percentage}% | Speed: {speed}x | ETA: {eta_string}")
+    # ffprobe was unable to get the duration of the input file.
+    else:
+        with open(progress_file_path, "w") as f:
+            f.write(process.stdout.readline().decode().strip())
 
     # The return code is not 0 if an error occurred.
     if process.returncode != 0:
@@ -181,7 +166,6 @@ def run_ffmpeg(progress_filename, uploaded_file_path, encoding_args, output_name
         log.info(f"Conversion took {round((time() - ffmpeg_start_time), 1)} seconds.")
         delete_file(uploaded_file_path)
         delete_file(progress_file_path)
-
         return {
             "error": None,
             "ext": os.path.splitext(output_name)[1],
