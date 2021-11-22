@@ -149,3 +149,8 @@ def update_downloader_database(mb_downloaded):
         new_user = DownloaderDB(ip=user_ip, times_used=1, mb_downloaded=mb_downloaded)
         db.session.add(new_user)
         db.session.commit()
+
+def write_to_file(filepath, content, mode="w"):
+    with open(filepath, mode) as f:
+        f.write(content)
+
