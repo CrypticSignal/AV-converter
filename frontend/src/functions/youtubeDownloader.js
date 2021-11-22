@@ -7,35 +7,16 @@ function sleep(milliseconds) {
 
 let shouldLog = false;
 // This needs to be a "var" variable so that it can be set to "true" in the showDownloadProgress function.
-var is_downloading_audio = false;
+let is_downloading_audio = false;
 
 async function showDownloadProgress(progressFilePath) {
   while (shouldLog) {
     await sleep(500);
     const response = await fetch(progressFilePath);
     if (response.ok) {
-      const ytdlOutput = await response.text();
-      const lines = ytdlOutput.split("\n");
-      const lastLine = lines[lines.length - 2];
-      if (is_downloading_audio) {
-        if (lastLine.includes("[download]")) {
-          showAlert(lastLine.replace("[download]", "[audio]"), "info");
-        } else if (lastLine.includes("[ffmpeg] Merging")) {
-          showAlert("Merging the audio and video...", "info");
-        }
-      } else {
-        if (ytdlOutput.includes(".m4a") && !ytdlOutput.includes("pass -k to keep")) {
-          is_downloading_audio = true;
-        } else if (lastLine.includes("[download]")) {
-          showAlert(lastLine.substring(11), "info");
-        } else if (lastLine.includes(".mp3")) {
-          showAlert("Converting to MP3...", "info");
-        } else if (lastLine.includes("[ffmpeg] Merging")) {
-          showAlert("Merging the audio and video...", "info");
-        } else if (lastLine.includes("Deleting original file ")) {
-          showAlert("Your file is almost ready...", "info");
-        }
-      }
+      const ytdlpOutput = await response.text();
+      showAlert(ytdlpOutput, "info");
+      console.log(ytdlpOutput);
     }
   }
 }
