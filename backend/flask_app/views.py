@@ -76,7 +76,7 @@ def send_file(filename):
     except Exception as e:
         log.error(f"Unable to return the converted file:\n{e}")
     finally:
-        delete_file(os.path.join("../conversions", filename))
+        delete_file(os.path.join("conversions", filename))
 
 
 # YOUTUBE DOWNLOADER:
@@ -88,6 +88,7 @@ def yt_downloader():
     if request.form["button_clicked"] == "yes":
         ffmpeg_progress_url = str(time())[:-8] + ".txt"
         session["yt_progress_url"] = os.path.join("yt_progress", ffmpeg_progress_url)
+        with open(session["yt_progress_url"], "x"):  pass
         return session["yt_progress_url"], 200
 
     # Second POST request:
@@ -132,7 +133,7 @@ def send_download(filename):
         else:
             return ""
     finally:
-        delete_file(os.path.join("../downloads", filename))
+        delete_file(os.path.join("downloads", filename))
 
 
 # GAME:
