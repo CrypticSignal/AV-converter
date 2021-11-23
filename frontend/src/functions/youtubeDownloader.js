@@ -15,8 +15,10 @@ async function showDownloadProgress(progressFilePath) {
     const response = await fetch(progressFilePath);
     if (response.ok) {
       const ytdlpOutput = await response.text();
-      showAlert(ytdlpOutput, "info");
-      console.log(ytdlpOutput);
+      if (ytdlpOutput !== "") {
+        showAlert(ytdlpOutput, "info");
+        console.log(ytdlpOutput);
+      }
     }
   }
 }
