@@ -41,11 +41,10 @@ def delete_file(filepath):
 
 def detailed_log(message):
     current_datetime = datetime.now().strftime("%d-%m-%y at %H:%M:%S")
-    # client = get_ip()
     ua_string = request.headers.get("User-Agent")
     user_agent = parse(ua_string)
     log.info("------------------------------------------------------------------------------------")
-    log.info(f"[{current_datetime}] {message}\n {user_agent}")
+    log.info(f"[{current_datetime}] {get_ip()} {message}\n {user_agent}")
 
 
 def empty_folder(folder_path):

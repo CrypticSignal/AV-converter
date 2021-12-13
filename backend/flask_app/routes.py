@@ -18,14 +18,13 @@ from logger import log
 @app.route("/api/get-ffmpeg-args", methods=["POST"])
 def convert_file():
     data = json.loads(request.form["state"])
-
     input_filename = data["inputFilename"]
+    detailed_log(f"Wants to convert {input_filename}")
     output_name = data["outputName"]
     chosen_codec = data["codec"]
     slider_value = data["sliderValue"]
     is_keep_video = data["isKeepVideo"]
 
-    log.info(f"{input_filename} --> {output_name} [{chosen_codec}]")
     update_converter_database()
 
     return get_ffmpeg_args(
