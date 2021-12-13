@@ -17,22 +17,22 @@ download_dir = "downloads"
 
 
 def progress_hooks(data):
-    if data['status'] == "downloading":
-        downloaded_megabytes = round(data['downloaded_bytes'] / 1_000_000, 1)
-        if data['total_bytes'] is not None:
-            total_megabytes = round(data['total_bytes'] / 1_000_000, 1)
+    if data["status"] == "downloading":
+        downloaded_megabytes = round(data["downloaded_bytes"] / 1_000_000, 1)
+        if data["total_bytes"] is not None:
+            total_megabytes = round(data["total_bytes"] / 1_000_000, 1)
             progress_string = f"{downloaded_megabytes}/{total_megabytes}MB..."
         else:
             progress_string = f"{downloaded_megabytes}MB downloaded..."
 
-        if data['eta'] is not None:
+        if data["eta"] is not None:
             eta_string = f"ETA: {data['eta']}s"
         else:
             eta_string = "ETA: unknown"
-        
-        write_to_file(session["yt_progress_url"], f"{progress_string} [{eta_string}]")   
 
-    elif data['status'] == 'finished':
+        write_to_file(session["yt_progress_url"], f"{progress_string} [{eta_string}]")
+
+    elif data["status"] == "finished":
         write_to_file(session["yt_progress_url"], "Postprocessing...")
 
 
@@ -58,7 +58,7 @@ def run_yt_downloader(formdata, video_link):
             "format": "bv*+ba/b",
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "restrictfilenames": True,
-            'progress_hooks': [progress_hooks]
+            "progress_hooks": [progress_hooks],
         }
 
         result = run_youtube_dl(video_link, options)
@@ -74,7 +74,7 @@ def run_yt_downloader(formdata, video_link):
             "format": "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*+ba/b",
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "restrictfilenames": True,
-            'progress_hooks': [progress_hooks]
+            "progress_hooks": [progress_hooks],
         }
 
         result = run_youtube_dl(video_link, options)
@@ -91,7 +91,7 @@ def run_yt_downloader(formdata, video_link):
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "postprocessors": [{"key": "FFmpegExtractAudio"}],
             "restrictfilenames": True,
-            'progress_hooks': [progress_hooks]
+            "progress_hooks": [progress_hooks],
         }
 
         result = run_youtube_dl(video_link, options)
@@ -116,7 +116,7 @@ def run_yt_downloader(formdata, video_link):
                 {"key": "EmbedThumbnail"},
             ],
             "restrictfilenames": True,
-            'progress_hooks': [progress_hooks]
+            "progress_hooks": [progress_hooks],
         }
 
         result = run_youtube_dl(video_link, options)
