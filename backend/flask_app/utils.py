@@ -150,7 +150,7 @@ def update_downloader_database(mb_downloaded):
         db.session.add(new_user)
         db.session.commit()
 
+
 def write_to_file(filepath, content, mode="w"):
     with open(filepath, mode) as f:
         f.write(content)
-

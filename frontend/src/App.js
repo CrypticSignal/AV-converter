@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSliderValue } from "./redux/bitrateSliderSlice";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+// FFmpeg WASM
+import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 // Pages
 import AboutPage from "./pages/AboutPage";
 import Filetypes from "./pages/Filetypes";
@@ -31,12 +33,13 @@ import Container from "react-bootstrap/Container";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Spinner from "react-bootstrap/Spinner";
 // Functions
-import uploadFile from "./functions/uploadFile";
+import showAlert from "./functions/showAlert";
 import buttonClicked from "./functions/youtubeDownloader";
 
 function App() {
-  const [codec, setCodec] = useState("MP3");
   const [file, setFile] = useState(null);
+  const [inputFilename, setInputFilename] = useState("");
+  const [codec, setCodec] = useState("MP3");
   // MP3
   const [mp3EncodingType, setMp3EncodingType] = useState("cbr");
   const [mp3VbrSetting, setMp3VbrSetting] = useState("0");
@@ -57,6 +60,8 @@ function App() {
   const [crfValue, setCrfValue] = useState("18");
   // Opus
   const [opusEncodingType, setOpusEncodingType] = useState("vbr");
+  // Conversion progress.
+  const [progress, setProgress] = useState("Initialising...");
   // Vorbis
   const [vorbisEncodingType, setVorbisEncodingType] = useState("abr");
   const [qValue, setQValue] = useState("6");
@@ -65,8 +70,41 @@ function App() {
   // Which button was clicked on the YT downloader page.
   const [whichButtonClicked, setWhichButtonClicked] = useState(null);
 
+  // ...............................................................................................
+
+  const getFFmpegWASMLogs = ({ message }) => {
+    if (message.includes("FS.readFile")) {
+      showAlert("Conversion complete. The converted file should be downloading :)", "success");
+      setProgress("Initialising...");
+    } else if (message !== "use ffmpeg.wasm v0.9.8") {
+      showAlert(`${progress}<br>${message}`, "info");
+    }
+  };
+
+  const getProgress = ({ ratio }) => {
+    setProgress(`Conversion is ${(ratio * 100).toFixed(1)}% complete...`);
+  };
+
+  const ffmpeg = createFFmpeg({
+    logger: getFFmpegWASMLogs,
+    progress: getProgress,
+  });
+
+  const convertFile = async (ffmpegArgs, outputFilename) => {
+    await ffmpeg.load();
+    ffmpeg.FS("writeFile", inputFilename, await fetchFile(file));
+    await ffmpeg.run(...ffmpegArgs);
+    const data = ffmpeg.FS("readFile", outputFilename);
+    const anchorTag = document.createElement("a");
+    console.log(URL.createObjectURL(new Blob([data.buffer])));
+    anchorTag.href = URL.createObjectURL(new Blob([data.buffer]));
+    anchorTag.download = outputFilename;
+    anchorTag.click();
+  };
+
   const onFileInput = (e) => {
     setFile(e.target.files[0]);
+    setInputFilename(e.target.files[0].name);
     const filename = e.target.files[0].name;
     const inputLabel = document.getElementById("file_input_label");
     const outputNameBox = document.getElementById("output_name");
@@ -157,8 +195,11 @@ function App() {
 
   const sliderValue = useSelector(selectSliderValue);
 
-  const onSubmitClicked = () => {
-    const states = {
+  const onConvertClicked = async () => {
+    console.log("test");
+    const state = {
+      inputFilename: inputFilename,
+      outputName: document.getElementById("output_name").value,
       file: file,
       codec: codec,
       sliderValue: sliderValue,
@@ -178,7 +219,24 @@ function App() {
       qValue: qValue,
       wavBitDepth: wavBitDepth,
     };
-    uploadFile(states);
+
+    const formdata = new FormData();
+    formdata.append("state", JSON.stringify(state));
+
+    const conversionResponse = await fetch("/api/get-ffmpeg-args", {
+      method: "POST",
+      body: formdata,
+    });
+
+    const json = await conversionResponse.json();
+    const ffmpegArgs = json["ffmpeg_args"].split(" ");
+    const outputFilename = json["output_name"];
+
+    ffmpegArgs.unshift(inputFilename);
+    ffmpegArgs.unshift("-i");
+    ffmpegArgs.push(outputFilename);
+
+    convertFile(ffmpegArgs, outputFilename);
   };
 
   // YT downloader page
@@ -342,7 +400,7 @@ function App() {
 
             <AlertDiv />
 
-            <ConvertButton onSubmitClicked={onSubmitClicked} />
+            <ConvertButton onConvertClicked={onConvertClicked} />
 
             <div id="uploading_div" style={{ display: "none" }}>
               <div id="upload_progress">

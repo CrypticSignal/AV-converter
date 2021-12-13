@@ -27,11 +27,7 @@ app.config.from_object(__name__)
 Session(app)
 
 os.makedirs("logs", exist_ok=True)
-os.makedirs("uploads", exist_ok=True)
-os.makedirs("conversions", exist_ok=True)
-os.makedirs("ffmpeg_progress", exist_ok=True)
-os.makedirs("ffmpeg_output", exist_ok=True)
 os.makedirs("yt_progress", exist_ok=True)
 os.makedirs("downloads", exist_ok=True)
 
-from flask_app import views
+from flask_app import routes
