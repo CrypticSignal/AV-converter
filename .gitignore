@@ -12,6 +12,7 @@ __pycache__
 **/node_modules
 /frontend/build
 # Misc
+**/.DS_Store
 .prettierrc
 .vscode
 .eslintcache
