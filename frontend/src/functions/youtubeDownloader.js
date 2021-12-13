@@ -6,8 +6,6 @@ function sleep(milliseconds) {
 }
 
 let shouldLog = false;
-// This needs to be a "var" variable so that it can be set to "true" in the showDownloadProgress function.
-let is_downloading_audio = false;
 
 async function showDownloadProgress(progressFilePath) {
   while (shouldLog) {
@@ -65,7 +63,6 @@ async function buttonClicked(url, whichButton) {
     });
 
     shouldLog = false;
-    is_downloading_audio = false;
 
     if (secondRequest.status === 200) {
       const response = await secondRequest.text();
