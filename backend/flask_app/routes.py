@@ -19,7 +19,7 @@ from logger import log
 def convert_file():
     data = json.loads(request.form["state"])
     input_filename = data["inputFilename"]
-    detailed_log(f"Wants to convert {input_filename}")
+    detailed_log(f"| {input_filename}")
     output_name = data["outputName"]
     chosen_codec = data["codec"]
     slider_value = data["sliderValue"]
@@ -27,9 +27,7 @@ def convert_file():
 
     update_converter_database()
 
-    return get_ffmpeg_args(
-        chosen_codec, input_filename, output_name, is_keep_video, data, slider_value
-    )
+    return get_ffmpeg_args(chosen_codec, output_name, is_keep_video, data, slider_value)
 
 
 # YOUTUBE DOWNLOADER:
