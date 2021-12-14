@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSliderValue } from "./redux/bitrateSliderSlice";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -58,8 +58,12 @@ function App() {
   // MKV and MP4
   const [videoSetting, setVideoSetting] = useState("veryfast");
   const [crfValue, setCrfValue] = useState("18");
+  // Object URL of the converted file.
+  const [objectURL, setObjectURL] = useState("");
   // Opus
   const [opusEncodingType, setOpusEncodingType] = useState("vbr");
+  // Output filename.
+  const [outputFilename, setOutputFilename] = useState("");
   // Conversion progress.
   const [progress, setProgress] = useState("Initialising...");
   // Vorbis
@@ -70,11 +74,19 @@ function App() {
   // Which button was clicked on the YT downloader page.
   const [whichButtonClicked, setWhichButtonClicked] = useState(null);
 
+  useEffect(() => {
+    if (objectURL.includes("blob")) {
+      showAlert(
+        `Conversion complete. The converted file should be downloading :)<br>If it isn't, click <a href="${objectURL}" download="${outputFilename}">here</a> to start the download.`,
+        "success"
+      );
+    }
+  }, [objectURL]);
+
   // ...............................................................................................
 
   const getFFmpegWASMLogs = ({ message }) => {
     if (message.includes("FS.readFile")) {
-      showAlert("Conversion complete. The converted file should be downloading :)", "success");
       setProgress("Initialising...");
     } else if (message !== "use ffmpeg.wasm v0.9.8") {
       showAlert(`${progress}<br>${message}`, "info");
@@ -95,9 +107,11 @@ function App() {
     ffmpeg.FS("writeFile", inputFilename, await fetchFile(file));
     await ffmpeg.run(...ffmpegArgs);
     const data = ffmpeg.FS("readFile", outputFilename);
+
+    setObjectURL(URL.createObjectURL(new Blob([data.buffer])));
+
     const anchorTag = document.createElement("a");
-    console.log(URL.createObjectURL(new Blob([data.buffer])));
-    anchorTag.href = URL.createObjectURL(new Blob([data.buffer]));
+    anchorTag.href = objectURL;
     anchorTag.download = outputFilename;
     anchorTag.click();
   };
@@ -196,7 +210,6 @@ function App() {
   const sliderValue = useSelector(selectSliderValue);
 
   const onConvertClicked = async () => {
-    console.log("test");
     const state = {
       inputFilename: inputFilename,
       outputName: document.getElementById("output_name").value,
@@ -231,6 +244,7 @@ function App() {
     const json = await conversionResponse.json();
     const ffmpegArgs = json["ffmpeg_args"].split(" ");
     const outputFilename = json["output_name"];
+    setOutputFilename(outputFilename);
 
     ffmpegArgs.unshift(inputFilename);
     ffmpegArgs.unshift("-i");
