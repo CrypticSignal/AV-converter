@@ -11,7 +11,7 @@ import YoutubePage from "./pages/YouTubePage";
 // General Components
 import AlertDiv from "./components/AlertDiv";
 import ConvertButton from "./components/ConvertButton";
-import EncodingTypeSelector from "./components/AAC/EncodingTypeSelector";
+import AacEncodingTypeSelector from "./components/AAC/EncodingTypeSelector";
 import FileInput from "./components/FileInput";
 import FormatSelector from "./components/FormatSelector";
 import IsKeepVideo from "./components/IsKeepVideo";
@@ -21,7 +21,7 @@ import AacExtensionSelector from "./components/AAC/AacExtensionSelector";
 import AC3 from "./components/AC3";
 import DTS from "./components/DTS";
 import FLAC from "./components/FLAC";
-import MKVMP4 from "./components/MKVMP4";
+import H264 from "./components/H264";
 import MP3EncodingTypeSelector from "./components/MP3/EncodingTypeSelector";
 import NoOptions from "./components/NoOptions";
 import Opus from "./components/Opus";
@@ -55,15 +55,19 @@ function App() {
   const [flacCompression, setFlacCompression] = useState("5");
   // Keep the video?
   const [isKeepVideo, setIsKeepVideo] = useState("no");
-  // MKV and MP4
-  const [videoSetting, setVideoSetting] = useState("veryfast");
+  // H.264/AVC
   const [crfValue, setCrfValue] = useState("18");
+  const [transcodeVideosAudio, setTranscodeVideosAudio] = useState(true);
+  const [transcodeVideo, setTranscodeVideo] = useState("yes");
+  const [videoBitrate, setVideoBitrate] = useState("8");
+  const [videoContainer, setVideoContainer] = useState("mp4");
+  const [videoEncodingType, setVideoEncodingType] = useState("crf");
+  //const [videoFilesize, setVideoFilesize] = useState("100");
+  const [x264Preset, setX264Preset] = useState("medium");
   // Object URL of the converted file.
   const [objectURL, setObjectURL] = useState("");
   // Opus
   const [opusEncodingType, setOpusEncodingType] = useState("vbr");
-  // Output filename.
-  const [outputFilename, setOutputFilename] = useState("");
   // Conversion progress.
   const [progress, setProgress] = useState("Initialising...");
   // Vorbis
@@ -74,21 +78,26 @@ function App() {
   // Which button was clicked on the YT downloader page.
   const [whichButtonClicked, setWhichButtonClicked] = useState(null);
 
-  useEffect(() => {
-    if (objectURL.includes("blob")) {
-      showAlert(
-        `Conversion complete. The converted file should be downloading :)<br>If it isn't, click <a href="${objectURL}" download="${outputFilename}">here</a> to start the download.`,
-        "success"
-      );
-    }
-  }, [objectURL]);
+  // useEffect(() => {
+  //   if (conversionSuccessful) {
+  //     console.log("in if");
+  //     const anchorTag = document.createElement("a");
+  //     console.log(objectURL);
+  //     anchorTag.href = objectURL;
+  //     anchorTag.download = outputFilename;
+  //     anchorTag.click();
+  //     showAlert(
+  //       `Conversion complete. The converted file should be downloading :)<br>If it isn't, click <a href="${objectURL}" download="${outputFilename}">here</a> to start the download.`,
+  //       "success"
+  //     );
+  //   }
+  // }, [conversionSuccessful]);
 
   // ...............................................................................................
 
   const getFFmpegWASMLogs = ({ message }) => {
-    if (message.includes("FS.readFile")) {
-      setProgress("Initialising...");
-    } else if (message !== "use ffmpeg.wasm v0.9.8") {
+    console.log(message);
+    if (message !== "use ffmpeg.wasm v0.10.0") {
       showAlert(`${progress}<br>${message}`, "info");
     }
   };
@@ -98,6 +107,7 @@ function App() {
   };
 
   const ffmpeg = createFFmpeg({
+    log: true,
     logger: getFFmpegWASMLogs,
     progress: getProgress,
   });
@@ -106,20 +116,24 @@ function App() {
     await ffmpeg.load();
     ffmpeg.FS("writeFile", inputFilename, await fetchFile(file));
     await ffmpeg.run(...ffmpegArgs);
+    setProgress("Initialising...");
     const data = ffmpeg.FS("readFile", outputFilename);
-
     setObjectURL(URL.createObjectURL(new Blob([data.buffer])));
-
     const anchorTag = document.createElement("a");
+    console.log(objectURL);
     anchorTag.href = objectURL;
     anchorTag.download = outputFilename;
     anchorTag.click();
+    showAlert(
+      `Conversion complete. The converted file should be downloading :)<br>If it isn't, click <a href="${objectURL}" download="${outputFilename}">here</a> to start the download.`,
+      "success"
+    );
   };
 
   const onFileInput = (e) => {
     setFile(e.target.files[0]);
-    setInputFilename(e.target.files[0].name);
     const filename = e.target.files[0].name;
+    setInputFilename(filename);
     const inputLabel = document.getElementById("file_input_label");
     const outputNameBox = document.getElementById("output_name");
     // Show the name of the selected file.
@@ -133,11 +147,6 @@ function App() {
   };
 
   const onCodecChange = (e) => {
-    if (e.target.value === "MKV") {
-      setVideoSetting("keep_codecs");
-    } else if (e.target.value === "MP4") {
-      setVideoSetting("veryfast");
-    }
     setCodec(e.target.value);
   };
 
@@ -181,12 +190,30 @@ function App() {
     setIsKeepVideo(e.target.value);
   };
 
-  // MKV and MP4
-  const onVideoSettingChange = (e) => {
-    setVideoSetting(e.target.value);
+  // H.264/AVC (MP4 or MKV container)
+  const onTranscodeVideoChange = (e) => {
+    setTranscodeVideo(e.target.value);
   };
   const onCrfChange = (e) => {
     setCrfValue(e.target.value);
+  };
+  const onTranscodeAudioCheckbox = () => {
+    setTranscodeVideosAudio(!transcodeVideosAudio);
+  };
+  const onVideoContainerChange = (e) => {
+    setVideoContainer(e.target.value);
+  };
+  const onVideoBitrateChange = (e) => {
+    setVideoBitrate(e.target.value);
+  };
+  const onVideoEncodingTypeChange = (e) => {
+    setVideoEncodingType(e.target.value);
+  };
+  // const onVideoFilesizeChange = (e) => {
+  //   setVideoFilesize(e.target.value);
+  // };
+  const onX264PresetChange = (e) => {
+    setX264Preset(e.target.value);
   };
 
   // Opus
@@ -211,26 +238,32 @@ function App() {
 
   const onConvertClicked = async () => {
     const state = {
-      inputFilename: inputFilename,
-      outputName: document.getElementById("output_name").value,
-      file: file,
-      codec: codec,
-      sliderValue: sliderValue,
-      mp3EncodingType: mp3EncodingType,
-      mp3VbrSetting: mp3VbrSetting,
       aacEncodingType: aacEncodingType,
       aacExtension: aacExtension,
       aacVbrMode: aacVbrMode,
       ac3Bitrate: ac3Bitrate,
+      codec: codec,
+      crfValue: crfValue,
       dtsBitrate: dtsBitrate,
+      file: file,
       flacCompression: flacCompression,
       isKeepVideo: isKeepVideo,
-      videoSetting: videoSetting,
-      crfValue: crfValue,
+      inputFilename: inputFilename,
+      mp3EncodingType: mp3EncodingType,
+      mp3VbrSetting: mp3VbrSetting,
       opusEncodingType: opusEncodingType,
-      vorbisEncodingType: vorbisEncodingType,
+      outputName: document.getElementById("output_name").value,
       qValue: qValue,
+      sliderValue: sliderValue,
+      transcodeVideo: transcodeVideo,
+      transcodeVideosAudio: transcodeVideosAudio,
+      videoBitrate: videoBitrate,
+      videoContainer: videoContainer,
+      videoEncodingType: videoEncodingType,
+      //videoFilesize: videoFilesize,
+      vorbisEncodingType: vorbisEncodingType,
       wavBitDepth: wavBitDepth,
+      x264Preset: x264Preset,
     };
 
     const formdata = new FormData();
@@ -241,10 +274,9 @@ function App() {
       body: formdata,
     });
 
-    const json = await conversionResponse.json();
-    const ffmpegArgs = json["ffmpeg_args"].split(" ");
-    const outputFilename = json["output_name"];
-    setOutputFilename(outputFilename);
+    const response = await conversionResponse.json();
+    const ffmpegArgs = response["args"].split(" ");
+    const outputFilename = response["output_filename"];
 
     ffmpegArgs.unshift(inputFilename);
     ffmpegArgs.unshift("-i");
@@ -277,7 +309,7 @@ function App() {
       case "AAC":
         return (
           <div>
-            <EncodingTypeSelector
+            <AacEncodingTypeSelector
               onAacEncodingTypeChange={onAacEncodingTypeChange}
               encodingType={aacEncodingType}
               initialSliderValue="192"
@@ -327,22 +359,25 @@ function App() {
             Matroska container will be used.
           </i>
         );
-      case "MKV":
+      case "H264":
         return (
-          <MKVMP4
-            onVideoSettingChange={onVideoSettingChange}
-            videoSetting={videoSetting}
+          <H264
+            onVideoContainerChange={onVideoContainerChange}
+            onTranscodeVideoChange={onTranscodeVideoChange}
             onCrfChange={onCrfChange}
             crfValue={crfValue}
-          />
-        );
-      case "MP4":
-        return (
-          <MKVMP4
-            onVideoSettingChange={onVideoSettingChange}
-            videoSetting={videoSetting}
-            onCrfChange={onCrfChange}
-            crfValue={crfValue}
+            transcodeVideosAudio={transcodeVideosAudio}
+            onTranscodeAudioCheckbox={onTranscodeAudioCheckbox}
+            transcodeVideo={transcodeVideo}
+            videoContainer={videoContainer}
+            videoBitrate={videoBitrate}
+            onVideoBitrateChange={onVideoBitrateChange}
+            videoEncodingType={videoEncodingType}
+            onVideoEncodingTypeChange={onVideoEncodingTypeChange}
+            // videoFilesize={videoFilesize}
+            // onVideoFilesizeChange={onVideoFilesizeChange}
+            x264Preset={x264Preset}
+            onX264PresetChange={onX264PresetChange}
           />
         );
       case "Opus":

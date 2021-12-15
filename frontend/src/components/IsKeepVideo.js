@@ -6,6 +6,7 @@ function IsKeepVideo(props) {
         <label className="form-check-label">
           <input
             type="radio"
+            onChange={props.onIsKeepVideoChange}
             className="form-check-input"
             value="yes"
             checked={props.isKeepVideo === "yes"}
@@ -17,6 +18,7 @@ function IsKeepVideo(props) {
         <label className="form-check-label">
           <input
             type="radio"
+            onChange={props.onIsKeepVideoChange}
             className="form-check-input"
             value="no"
             checked={props.isKeepVideo === "no"}

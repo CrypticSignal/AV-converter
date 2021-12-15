@@ -57,6 +57,10 @@ def empty_folder(folder_path):
             log.info(f"{file} deleted.")
 
 
+def get_file_duration(self):
+    return float(probe(self._video_path)["format"]["duration"])
+
+
 # https://stackoverflow.com/a/49760261/13231825
 def get_ip():
     if request.environ.get("HTTP_X_FORWARDED_FOR") is None:

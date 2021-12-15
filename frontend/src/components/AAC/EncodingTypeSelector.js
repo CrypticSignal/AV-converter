@@ -1,7 +1,7 @@
 import BitrateSlider from "../BitrateSlider";
 import VbrDropdown from "./VbrDropdown";
 
-function EncodingTypeSelector(props) {
+function AacEncodingTypeSelector(props) {
   function renderComponent() {
     switch (props.encodingType) {
       case "cbr":
@@ -36,4 +36,4 @@ function EncodingTypeSelector(props) {
   );
 }
 
-export default EncodingTypeSelector;
+export default AacEncodingTypeSelector;

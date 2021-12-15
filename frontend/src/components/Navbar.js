@@ -13,8 +13,7 @@ const Navbar = () => {
 
   return (
     <div id="top_bar" className="top">
-      <Link className="hamburger" onClick={myFunction}>
-        {" "}
+      <Link to="/" className="hamburger" onClick={myFunction}>
         <i className="fa fa-bars"></i>
       </Link>
       <Link to="/">Home</Link>

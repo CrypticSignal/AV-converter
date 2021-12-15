@@ -9,10 +9,9 @@ export default function FormatSelector(props) {
         <option value="CAF">CAF (.caf)</option>
         <option value="DTS">DTS (.dts)</option>
         <option value="FLAC">FLAC (.flac)</option>
+        <option value="H264">H.264/AVC (.mp4 or .mkv)</option>
         <option value="MKA">MKA (.mka)</option>
-        <option value="MKV">MKV (.mkv)</option>
         <option value="MP3">MP3 (.mp3)</option>
-        <option value="MP4">MP4 (.mp4)</option>
         <option value="Opus">Opus (.opus)</option>
         <option value="Vorbis">Vorbis (.ogg)</option>
         <option value="WAV">WAV (.wav)</option>

@@ -1162,15 +1162,15 @@
     "minimatch" "^3.0.4"
     "strip-json-comments" "^3.1.1"
 
-"@ffmpeg/core@^0.9.0":
-  "integrity" "sha512-d931yzQpb8GRgTZr+T7+BMqglPZ1R8FPH3W3UA8I21RzuasRHsMwQ4MQTlS9twjfqvUGIkD8p/8mNToUVN/Yrw=="
-  "resolved" "https://registry.npmjs.org/@ffmpeg/core/-/core-0.9.0.tgz"
-  "version" "0.9.0"
+"@ffmpeg/core@0.10.0":
+  "integrity" "sha512-qunWJl5PezpXEm31tb8Qu5z37B5KVA1VYZCpXchMhuAb3X9T7PuE3SlhOwphEoRhzaOa3lpofDfzihAUMFaVPQ=="
+  "resolved" "https://registry.npmjs.org/@ffmpeg/core/-/core-0.10.0.tgz"
+  "version" "0.10.0"
 
-"@ffmpeg/ffmpeg@^0.9.8":
-  "integrity" "sha512-QradleJx78hHJBtI1wRsus1L1jxQB3v4h6k8c3CERI9fssm+NSSppuofmsOei7uq7iQEYq3oK9tJNAyEsRoNng=="
-  "resolved" "https://registry.npmjs.org/@ffmpeg/ffmpeg/-/ffmpeg-0.9.8.tgz"
-  "version" "0.9.8"
+"@ffmpeg/ffmpeg@0.10.0":
+  "integrity" "sha512-W+d0ysYTO6d4vue/0KMYrxaprh9wvmnPqh6qyHXavBWLrDcE7gI3cJ/EQVfwe9nrt2e0Pi7873P2I18VEDgRfA=="
+  "resolved" "https://registry.npmjs.org/@ffmpeg/ffmpeg/-/ffmpeg-0.10.0.tgz"
+  "version" "0.10.0"
   dependencies:
     "is-url" "^1.2.4"
     "node-fetch" "^2.6.1"
