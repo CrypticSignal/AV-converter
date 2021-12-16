@@ -21,16 +21,14 @@ def progress_hooks(data):
         downloaded_megabytes = round(data["downloaded_bytes"] / 1_000_000, 1)
         if data["total_bytes"] is not None:
             total_megabytes = round(data["total_bytes"] / 1_000_000, 1)
-            progress_string = f"{downloaded_megabytes}/{total_megabytes}MB..."
+            progress_string = f"Downloaded {downloaded_megabytes}/{total_megabytes}MB"
         else:
             progress_string = f"{downloaded_megabytes}MB downloaded..."
 
-        if data["eta"] is not None:
-            eta_string = f"ETA: {data['eta']}s"
-        else:
-            eta_string = "ETA: unknown"
+        eta = data["eta"] if data["eta"] else "unknown"
+        speed = f"{round(data['speed'] / 1000)}kb/s" if data['speed'] else "unknown"
 
-        write_to_file(session["yt_progress_url"], f"{progress_string} [{eta_string}]")
+        write_to_file(session["yt_progress_url"], f"{progress_string} @ {speed} [ETA: {eta}]")
 
     elif data["status"] == "finished":
         write_to_file(session["yt_progress_url"], "Postprocessing...")
