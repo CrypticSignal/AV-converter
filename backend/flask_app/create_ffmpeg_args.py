@@ -183,7 +183,7 @@ def h264(output_name, data):
 
     # Transcode to H.264/AVC.
     else:
-        ffmpeg_args += f" -c:V libx264 -preset {data['x264Preset']}"
+        ffmpeg_args += f" -c:V libx264 -x264-params threads={data['numLogicalProcessors']} -preset {data['x264Preset']}"
         # CRF mode.
         if data["videoEncodingType"] == "crf":
             ffmpeg_args += f" -crf {data['crfValue']}"
