@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSliderValue } from "./redux/bitrateSliderSlice";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -78,26 +78,12 @@ function App() {
   // Which button was clicked on the YT downloader page.
   const [whichButtonClicked, setWhichButtonClicked] = useState(null);
 
-  // useEffect(() => {
-  //   if (conversionSuccessful) {
-  //     console.log("in if");
-  //     const anchorTag = document.createElement("a");
-  //     console.log(objectURL);
-  //     anchorTag.href = objectURL;
-  //     anchorTag.download = outputFilename;
-  //     anchorTag.click();
-  //     showAlert(
-  //       `Conversion complete. The converted file should be downloading :)<br>If it isn't, click <a href="${objectURL}" download="${outputFilename}">here</a> to start the download.`,
-  //       "success"
-  //     );
-  //   }
-  // }, [conversionSuccessful]);
-
   // ...............................................................................................
 
   const getFFmpegWASMLogs = ({ message }) => {
-    console.log(message);
-    if (message !== "use ffmpeg.wasm v0.10.0") {
+    if (message.includes("http://www.videolan.org/x264.html - options")) {
+      console.log(message);
+    } else if (message !== "use ffmpeg.wasm v0.10.0") {
       showAlert(`${progress}<br>${message}`, "info");
     }
   };
@@ -107,7 +93,7 @@ function App() {
   };
 
   const ffmpeg = createFFmpeg({
-    log: true,
+    //log: true,
     logger: getFFmpegWASMLogs,
     progress: getProgress,
   });
@@ -115,15 +101,22 @@ function App() {
   const convertFile = async (ffmpegArgs, outputFilename) => {
     await ffmpeg.load();
     ffmpeg.FS("writeFile", inputFilename, await fetchFile(file));
+
+    console.log("Starting conversion...");
+    const startTime = Date.now() / 1000;
     await ffmpeg.run(...ffmpegArgs);
+    console.log(`Conversion took ${(Date.now() / 1000 - startTime).toFixed(1)} seconds.`);
+    // Reset the value of progress.
     setProgress("Initialising...");
+
     const data = ffmpeg.FS("readFile", outputFilename);
     setObjectURL(URL.createObjectURL(new Blob([data.buffer])));
+
     const anchorTag = document.createElement("a");
-    console.log(objectURL);
     anchorTag.href = objectURL;
     anchorTag.download = outputFilename;
     anchorTag.click();
+
     showAlert(
       `Conversion complete. The converted file should be downloading :)<br>If it isn't, click <a href="${objectURL}" download="${outputFilename}">here</a> to start the download.`,
       "success"
@@ -251,6 +244,7 @@ function App() {
       inputFilename: inputFilename,
       mp3EncodingType: mp3EncodingType,
       mp3VbrSetting: mp3VbrSetting,
+      numLogicalProcessors: window.navigator.hardwareConcurrency,
       opusEncodingType: opusEncodingType,
       outputName: document.getElementById("output_name").value,
       qValue: qValue,
@@ -281,6 +275,7 @@ function App() {
     ffmpegArgs.unshift(inputFilename);
     ffmpegArgs.unshift("-i");
     ffmpegArgs.push(outputFilename);
+    console.log(ffmpegArgs);
 
     convertFile(ffmpegArgs, outputFilename);
   };
