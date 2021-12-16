@@ -24,9 +24,8 @@ def clean_downloads_folder(download_dir, filename_stem):
         for file in os.listdir(download_dir):
             if filename_stem in file and Path(file).suffix != "":
                 if (
-                    Path(file).suffix in [".part", ".webp", ".ytdl"]
+                    Path(file).suffix in [".webp", ".ytdl"]
                     or file.split(".")[-2] in ytdl_format_codes
-                    or ".part" in file
                 ):
                     try:
                         os.remove(os.path.join(download_dir, file))
