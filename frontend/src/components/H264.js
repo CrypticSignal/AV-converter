@@ -79,7 +79,6 @@ function H264(props) {
           <option value="slow">slow</option>
           <option value="medium">medium</option>
           <option value="fast">fast</option>
-          <option value="faster">faster</option>
           <option value="superfast">superfast</option>
           <option value="ultrafast">ultrafast</option>
         </select>
