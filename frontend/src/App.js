@@ -63,9 +63,7 @@ function App() {
   const [videoContainer, setVideoContainer] = useState("mp4");
   const [videoEncodingType, setVideoEncodingType] = useState("crf");
   //const [videoFilesize, setVideoFilesize] = useState("100");
-  const [x264Preset, setX264Preset] = useState("medium");
-  // Object URL of the converted file.
-  const [objectURL, setObjectURL] = useState("");
+  const [x264Preset, setX264Preset] = useState("superfast");
   // Opus
   const [opusEncodingType, setOpusEncodingType] = useState("vbr");
   // Conversion progress.
@@ -110,7 +108,7 @@ function App() {
     setProgress("Initialising...");
 
     const data = ffmpeg.FS("readFile", outputFilename);
-    setObjectURL(URL.createObjectURL(new Blob([data.buffer])));
+    const objectURL = URL.createObjectURL(new Blob([data.buffer]));
 
     const anchorTag = document.createElement("a");
     anchorTag.href = objectURL;
