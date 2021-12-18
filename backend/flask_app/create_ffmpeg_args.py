@@ -187,7 +187,10 @@ def h264(output_name, data):
 
     # Transcode to H.264/AVC.
     else:
-        ffmpeg_args += f" -c:V libx264 -x264-params threads={data['numLogicalProcessors']} -preset {data['x264Preset']}"
+        threads_value = data["numLogicalProcessors"] * 1.5
+        # A value of 12+ causes "null function or function signature mismatch" error.
+        threads_value = threads_value if threads_value < 12 else 11
+        ffmpeg_args += f" -c:V libx264 -x264-params threads={threads_value} -preset {data['x264Preset']}"
         # CRF mode.
         if data["videoEncodingType"] == "crf":
             ffmpeg_args += f" -crf {data['crfValue']}"
