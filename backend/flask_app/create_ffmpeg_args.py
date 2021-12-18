@@ -236,11 +236,8 @@ def mp3(output_name, is_keep_video, encoding_type, bitrate, vbr_setting):
 
 # Opus
 def opus(output_name, encoding_type, bitrate):
-    # Opus does not support >256 kbps per channel.
-    if is_mono_audio(input_filename):
-        bitrate = "256" if int(bitrate) > 256 else bitrate
     # VBR
-    if encoding_type == "opus_vbr":
+    if encoding_type == "vbr":
         return send_args_to_ffmpeg_wasm(f"-c:a libopus -b:a {bitrate}k", f"{output_name}.opus")
     # CBR
     return send_args_to_ffmpeg_wasm(f"-c:a libopus -vbr off -b:a {bitrate}k", f"{output_name}.opus")
