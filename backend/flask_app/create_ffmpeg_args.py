@@ -253,9 +253,9 @@ def opus(output_name, encoding_type, bitrate):
 # Vorbis
 def vorbis(output_name, encoding_type, quality_level, bitrate):
     if encoding_type == "abr":
-        return send_args_to_ffmpeg_wasm(f"-c:a libvorbis -b:a {bitrate}k", f"{output_name}.ogg")
+        return send_args_to_ffmpeg_wasm(f"-map 0:a -c:a libvorbis -b:a {bitrate}k", f"{output_name}.ogg")
     # Constant quality mode.
-    return send_args_to_ffmpeg_wasm(f"-c:a libvorbis -q:a {quality_level}", f"{output_name}.ogg")
+    return send_args_to_ffmpeg_wasm(f"-map 0:a -c:a libvorbis -q:a {quality_level}", f"{output_name}.ogg")
 
 
 # WAV
