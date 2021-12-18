@@ -28,7 +28,6 @@ import Opus from "./components/Opus";
 import VorbisEncodingType from "./components/Vorbis/EncodingType";
 import WavBitDepth from "./components/WAV";
 // React-Bootstrap
-import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Spinner from "react-bootstrap/Spinner";
@@ -67,7 +66,7 @@ function App() {
   // Opus
   const [opusEncodingType, setOpusEncodingType] = useState("vbr");
   // Conversion progress.
-  const [progress, setProgress] = useState("Initialising...");
+  const [progress, setProgress] = useState(0);
   // Vorbis
   const [vorbisEncodingType, setVorbisEncodingType] = useState("abr");
   const [qValue, setQValue] = useState("6");
@@ -80,14 +79,13 @@ function App() {
 
   const getFFmpegWASMLogs = ({ message }) => {
     if (message.includes("http://www.videolan.org/x264.html - options")) {
-      console.log(message);
-    } else if (message !== "use ffmpeg.wasm v0.10.0") {
-      showAlert(`${progress}<br>${message}`, "info");
+    } else if (message !== "use ffmpeg.wasm v0.10.1") {
+      showAlert(message, "info");
     }
   };
 
   const getProgress = ({ ratio }) => {
-    setProgress(`Conversion is ${(ratio * 100).toFixed(1)}% complete...`);
+    setProgress((ratio * 100).toFixed(1));
   };
 
   const ffmpeg = createFFmpeg({
@@ -98,14 +96,20 @@ function App() {
 
   const convertFile = async (ffmpegArgs, outputFilename) => {
     await ffmpeg.load();
+
     ffmpeg.FS("writeFile", inputFilename, await fetchFile(file));
 
     console.log("Starting conversion...");
+    document.getElementById("converting_spinner").style.display = "block";
+    document.getElementById("conversion_progress").style.display = "block";
     const startTime = Date.now() / 1000;
     await ffmpeg.run(...ffmpegArgs);
+
     console.log(`Conversion took ${(Date.now() / 1000 - startTime).toFixed(1)} seconds.`);
+    document.getElementById("converting_spinner").style.display = "none";
+    document.getElementById("conversion_progress").style.display = "none";
     // Reset the value of progress.
-    setProgress("Initialising...");
+    setProgress(0);
 
     const data = ffmpeg.FS("readFile", outputFilename);
     const objectURL = URL.createObjectURL(new Blob([data.buffer]));
@@ -115,10 +119,14 @@ function App() {
     anchorTag.download = outputFilename;
     anchorTag.click();
 
+    // Delete file from MEMFS
+    ffmpeg.FS("unlink", outputFilename);
+
     showAlert(
       `Conversion complete. The converted file should be downloading :)<br>If it isn't, click <a href="${objectURL}" download="${outputFilename}">here</a> to start the download.`,
       "success"
     );
+    document.getElementById("convert_btn").style.display = "block";
   };
 
   const onFileInput = (e) => {
@@ -228,6 +236,11 @@ function App() {
   const sliderValue = useSelector(selectSliderValue);
 
   const onConvertClicked = async () => {
+    if (file === null) {
+      showAlert("You must choose an input file.", "danger");
+      return;
+    }
+
     const state = {
       aacEncodingType: aacEncodingType,
       aacExtension: aacExtension,
@@ -269,6 +282,13 @@ function App() {
     const response = await conversionResponse.json();
     const ffmpegArgs = response["args"].split(" ");
     const outputFilename = response["output_filename"];
+
+    if (outputFilename === inputFilename) {
+      showAlert("Output filename cannot be same as the input filename.", "danger");
+      return;
+    }
+
+    document.getElementById("convert_btn").style.display = "none";
 
     ffmpegArgs.unshift(inputFilename);
     ffmpegArgs.unshift("-i");
@@ -438,28 +458,20 @@ function App() {
               id="output_name"
               required
             />
-            <br />
+
+            <div id="converting_spinner" style={{ display: "none" }}>
+              <Spinner id="converting_btn" animation="border" /> Converting...
+            </div>
+
+            <div id="conversion_progress" style={{ display: "none" }}>
+              <ProgressBar now={progress} label={`${progress}%`} />
+            </div>
 
             <AlertDiv />
 
-            <ConvertButton onConvertClicked={onConvertClicked} />
-
-            <div id="uploading_div" style={{ display: "none" }}>
-              <div id="upload_progress">
-                <ProgressBar
-                  now={useSelector((state) => state.progress.progress)}
-                  label={`${useSelector((state) => state.progress.progress)}%`}
-                />
-                <p id="progress_values" />
-              </div>
-              <Button id="cancel_btn" variant="secondary">
-                Cancel
-              </Button>
-            </div>
-
-            <div id="converting_div" style={{ display: "none" }}>
-              <p id="progress"></p>
-              <Spinner id="converting_btn" animation="border" /> Converting...
+            <div id="convert_btn">
+              <br />
+              <ConvertButton onConvertClicked={onConvertClicked} />
             </div>
           </Container>
         </Route>
