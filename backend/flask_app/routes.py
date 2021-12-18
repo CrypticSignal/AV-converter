@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from time import time
 
-from flask import render_template, request, send_from_directory, session
+from flask import render_template, request, send_file, send_from_directory, session
 from werkzeug.utils import secure_filename
 
 from flask_app import app, db
@@ -94,3 +94,18 @@ def send_download(filename):
 @app.route("/game")
 def game():
     return render_template("game.html")
+
+
+@app.route("/node_modules/@ffmpeg/core/dist/ffmpeg-core.worker.js")
+def send_ffmpeg_core_worker():
+    return send_file("../../frontend/node_modules/@ffmpeg/core/dist/ffmpeg-core.worker.js", mimetype="application/javascript")
+
+
+@app.route("/node_modules/@ffmpeg/core/dist/ffmpeg-core.js")
+def send_ffmpeg_core():
+    return send_file("../../frontend/node_modules/@ffmpeg/core/dist/ffmpeg-core.js", mimetype="application/javascript")
+
+
+@app.route("/node_modules/@ffmpeg/core/dist/ffmpeg-core.wasm")
+def send_ffmpeg_core_wasm():
+    return send_file("../../frontend/node_modules/@ffmpeg/core/dist/ffmpeg-core.wasm", mimetype="application/wasm")
