@@ -77,10 +77,7 @@ def send_args_to_ffmpeg_wasm(encoding_args, output_filename):
         "true",
     ] + encoding_args
 
-    return {
-        "args": " ".join(ffmpeg_args),
-        "output_filename": output_filename
-    }
+    return {"args": " ".join(ffmpeg_args), "output_filename": output_filename}
 
 
 # AAC
@@ -93,17 +90,21 @@ def aac(output_name, extension, is_keep_video, encoding_type, bitrate, vbr_quali
 
         if encoding_type == "cbr":
             return send_args_to_ffmpeg_wasm(
-                f"{mutual_args} -b:a {bitrate}k", f"{output_name}.{output_ext}",
+                f"{mutual_args} -b:a {bitrate}k",
+                f"{output_name}.{output_ext}",
             )
         # VBR was selected.
         return send_args_to_ffmpeg_wasm(
-            f"{mutual_args} {aac_vbr_enabler} {vbr_quality}", f"{output_name}.{output_ext}",
+            f"{mutual_args} {aac_vbr_enabler} {vbr_quality}",
+            f"{output_name}.{output_ext}",
         )
 
     # Keep video was not selected:
 
     if encoding_type == "cbr":
-        return send_args_to_ffmpeg_wasm(f"{mutual_args} -b:a {bitrate}k", f"{output_name}.{extension}")
+        return send_args_to_ffmpeg_wasm(
+            f"{mutual_args} -b:a {bitrate}k", f"{output_name}.{extension}"
+        )
     # VBR was selected.
     return send_args_to_ffmpeg_wasm(
         f"{mutual_args} {aac_vbr_enabler} {vbr_quality}", f"{output_name}.{extension}"
@@ -142,14 +143,17 @@ def dts(output_name, is_keep_video, dts_bitrate):
             f"-c:v copy -c:a dca -b:a {dts_bitrate}k -strict -2", f"{output_name}.{output_ext}"
         )
     # Audio only output file.
-    return send_args_to_ffmpeg_wasm(f"-c:a dca -b:a {dts_bitrate}k -strict -2", f"{output_name}.dts")
+    return send_args_to_ffmpeg_wasm(
+        f"-c:a dca -b:a {dts_bitrate}k -strict -2", f"{output_name}.dts"
+    )
 
 
 # FLAC
 def flac(output_name, is_keep_video, flac_compression):
     if is_keep_video == "yes":
         return send_args_to_ffmpeg_wasm(
-            f"-map 0 -c:v copy -c:s copy -c:a flac -compression_level {flac_compression}", f"{output_name}.mkv"
+            f"-map 0 -c:v copy -c:s copy -c:a flac -compression_level {flac_compression}",
+            f"{output_name}.mkv",
         )
     # Audio only output file.
     return send_args_to_ffmpeg_wasm(
@@ -190,8 +194,8 @@ def h264(output_name, data):
             return send_args_to_ffmpeg_wasm(ffmpeg_args, output_filename)
         # Target a bitrate.
         elif data["videoEncodingType"] == "bitrate":
-            #bufsize = str((float(data['videoBitrate']) * 2)) + "M"
-            bitrate = data['videoBitrate'] + "M"
+            # bufsize = str((float(data['videoBitrate']) * 2)) + "M"
+            bitrate = data["videoBitrate"] + "M"
             ffmpeg_args += f" -b:v {bitrate}"
             return send_args_to_ffmpeg_wasm(ffmpeg_args, output_filename)
 
@@ -208,16 +212,19 @@ def mp3(output_name, is_keep_video, encoding_type, bitrate, vbr_setting):
 
         if encoding_type == "cbr":
             return send_args_to_ffmpeg_wasm(
-                f"-c:v copy -c:a libmp3lame -b:a {bitrate}k", f"{output_name}.{output_ext}",
+                f"-c:v copy -c:a libmp3lame -b:a {bitrate}k",
+                f"{output_name}.{output_ext}",
             )
         elif encoding_type == "abr":
             return send_args_to_ffmpeg_wasm(
-                f"-c:v copy -c:a libmp3lame --abr 1 -b:a {bitrate}k", f"{output_name}.{output_ext}",
+                f"-c:v copy -c:a libmp3lame --abr 1 -b:a {bitrate}k",
+                f"{output_name}.{output_ext}",
             )
         # VBR was selected.
         else:
             return send_args_to_ffmpeg_wasm(
-                f"-c:v copy -c:a libmp3lame " f"-q:a {vbr_setting}", f"{output_name}.{output_ext}",
+                f"-c:v copy -c:a libmp3lame " f"-q:a {vbr_setting}",
+                f"{output_name}.{output_ext}",
             )
 
     # Keep the video was not selected - audio only output file:
@@ -254,6 +261,8 @@ def vorbis(output_name, encoding_type, quality_level, bitrate):
 # WAV
 def wav(output_name, is_keep_video, wav_bit_depth):
     if is_keep_video == "yes":
-        return send_args_to_ffmpeg_wasm(f"-c:v copy -c:a pcm_s{wav_bit_depth}le", f"{output_name}.mkv")
+        return send_args_to_ffmpeg_wasm(
+            f"-c:v copy -c:a pcm_s{wav_bit_depth}le", f"{output_name}.mkv"
+        )
     # Audio only output file.
     return send_args_to_ffmpeg_wasm(f"-c:a pcm_s{wav_bit_depth}le", f"{output_name}.wav")

@@ -98,14 +98,23 @@ def game():
 
 @app.route("/node_modules/@ffmpeg/core/dist/ffmpeg-core.worker.js")
 def send_ffmpeg_core_worker():
-    return send_file("../../frontend/node_modules/@ffmpeg/core/dist/ffmpeg-core.worker.js", mimetype="application/javascript")
+    return send_file(
+        "../../frontend/node_modules/@ffmpeg/core/dist/ffmpeg-core.worker.js",
+        mimetype="application/javascript",
+    )
 
 
 @app.route("/node_modules/@ffmpeg/core/dist/ffmpeg-core.js")
 def send_ffmpeg_core():
-    return send_file("../../frontend/node_modules/@ffmpeg/core/dist/ffmpeg-core.js", mimetype="application/javascript")
+    return send_file(
+        "../../frontend/node_modules/@ffmpeg/core/dist/ffmpeg-core.js",
+        mimetype="application/javascript",
+    )
 
 
 @app.route("/node_modules/@ffmpeg/core/dist/ffmpeg-core.wasm")
 def send_ffmpeg_core_wasm():
-    return send_file("../../frontend/node_modules/@ffmpeg/core/dist/ffmpeg-core.wasm", mimetype="application/wasm")
+    return send_file(
+        "../../frontend/node_modules/@ffmpeg/core/dist/ffmpeg-core.wasm",
+        mimetype="application/wasm",
+    )

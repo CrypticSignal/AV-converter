@@ -26,7 +26,7 @@ def progress_hooks(data):
             progress_string = f"{downloaded_megabytes}MB downloaded..."
 
         eta = data["eta"] if data["eta"] else "unknown"
-        speed = f"{round(data['speed'] / 1000)}kb/s" if data['speed'] else "unknown"
+        speed = f"{round(data['speed'] / 1000)}kb/s" if data["speed"] else "unknown"
 
         write_to_file(session["yt_progress_url"], f"{progress_string} @ {speed} [ETA: {eta}]")
 
