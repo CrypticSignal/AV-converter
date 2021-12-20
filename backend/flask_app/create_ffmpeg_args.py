@@ -16,6 +16,7 @@ def get_ffmpeg_args(chosen_codec, output_name, is_keep_video, data, slider_value
     # AAC
     if chosen_codec == "AAC":
         return aac(
+            data["inputFilename"],
             output_name,
             data["aacExtension"],
             is_keep_video,
@@ -25,7 +26,7 @@ def get_ffmpeg_args(chosen_codec, output_name, is_keep_video, data, slider_value
         )
     # AC3
     elif chosen_codec == "AC3":
-        return ac3(output_name, is_keep_video, data["ac3Bitrate"])
+        return ac3(data["inputFilename"], output_name, is_keep_video, data["ac3Bitrate"])
     # ALAC
     elif chosen_codec == "ALAC":
         return alac(output_name, is_keep_video)
@@ -34,7 +35,7 @@ def get_ffmpeg_args(chosen_codec, output_name, is_keep_video, data, slider_value
         return caf(output_name)
     # DTS
     elif chosen_codec == "DTS":
-        return dts(output_name, is_keep_video, data["dtsBitrate"])
+        return dts(data["inputFilename"], output_name, is_keep_video, data["dtsBitrate"])
     # FLAC
     elif chosen_codec == "FLAC":
         return flac(output_name, is_keep_video, data["flacCompression"])
@@ -44,6 +45,7 @@ def get_ffmpeg_args(chosen_codec, output_name, is_keep_video, data, slider_value
     # MP3
     elif chosen_codec == "MP3":
         return mp3(
+            data["inputFilename"],
             output_name,
             is_keep_video,
             data["mp3EncodingType"],
@@ -81,7 +83,7 @@ def send_args_to_ffmpeg_wasm(encoding_args, output_filename):
 
 
 # AAC
-def aac(output_name, extension, is_keep_video, encoding_type, bitrate, vbr_quality):
+def aac(input_filename, output_name, extension, is_keep_video, encoding_type, bitrate, vbr_quality):
     mutual_args = f"-map 0:a -c:a {aac_encoder}"
 
     if is_keep_video == "yes":
@@ -112,7 +114,7 @@ def aac(output_name, extension, is_keep_video, encoding_type, bitrate, vbr_quali
 
 
 # AC3
-def ac3(output_name, is_keep_video, ac3_bitrate):
+def ac3(input_filename, output_name, is_keep_video, ac3_bitrate):
     if is_keep_video == "yes":
         output_ext = Path(input_filename).suffix
         return send_args_to_ffmpeg_wasm(
@@ -136,7 +138,7 @@ def caf(output_name):
 
 
 # DTS
-def dts(output_name, is_keep_video, dts_bitrate):
+def dts(input_filename, output_name, is_keep_video, dts_bitrate):
     if is_keep_video == "yes":
         output_ext = Path(input_filename).suffix
         return send_args_to_ffmpeg_wasm(
@@ -209,7 +211,7 @@ def mka(output_name):
 
 
 # MP3
-def mp3(output_name, is_keep_video, encoding_type, bitrate, vbr_setting):
+def mp3(input_filename, output_name, is_keep_video, encoding_type, bitrate, vbr_setting):
     if is_keep_video == "yes":
         output_ext = "mkv" if Path(input_filename).suffix != "mp4" else "mp4"
 
