@@ -12,8 +12,10 @@ __pycache__
 **/node_modules
 /frontend/build
 # Misc
+*.log
 *.mkv
 *.mp4
+*.txt
 **/.DS_Store
 .prettierrc
 .vscode
