@@ -37,10 +37,11 @@ def convert_file():
 def yt_downloader():
     # First POST request:
     if request.form["button_clicked"] == "yes":
-        ffmpeg_progress_url = str(time())[:-8] + ".txt"
-        session["yt_progress_url"] = os.path.join("yt_progress", ffmpeg_progress_url)
+        session["yt_progress_url"] = str(time())[:-8] + ".txt"
+
         with open(session["yt_progress_url"], "x"):
             pass
+
         return session["yt_progress_url"], 200
 
     # Second POST request:
@@ -65,27 +66,25 @@ def yt_downloader():
 
 
 # This is where the youtube-dl progress file is.
-@app.route("/api/yt_progress/<filename>")
+@app.route("/api/<filename>")
 def get_progress_file(filename):
-    return send_from_directory("../yt_progress", filename)
+    if os.path.isfile(filename):
+        return send_file(f"../{filename}")
+    return ""
 
 
-@app.route("/api/downloads/<filename>", methods=["GET"])
+@app.route("/api/download/<filename>", methods=["GET"])
 def send_download(filename):
     mimetype_value = "audio/mp4" if Path(filename).suffix == ".m4a" else ""
     try:
-        # isfile() is from the perspective of run.py hence the path is "downloads" rather than "../downloads"
-        if os.path.isfile(os.path.join("downloads", filename)):
-            return send_from_directory(
-                "../downloads", filename, mimetype=mimetype_value, as_attachment=True
-            )
+        if os.path.isfile(f"../{filename}"):
+            return send_file(f"../../{filename}", mimetype=mimetype_value, as_attachment=True)
         # On mobile, when using Chrome/Samsung Internet, for some reason the send_download function is hit multiple times.
         # We need to return a response after the file has been deleted otherwise there will be the following error:
         # "The function either returned None or ended without a return statement."
-        else:
-            return ""
+        return ""
     finally:
-        delete_file(os.path.join("downloads", filename))
+        delete_file(f"../{filename}")
 
 
 # GAME:

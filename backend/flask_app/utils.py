@@ -114,13 +114,12 @@ def return_download_path(download_dir):
     else:
         log.info(f"{new_filename} | {filesize} MB")
         # Update the list of videos downloaded.
-        with open("logs/downloads.txt", "a+") as f:
+        with open("../downloads.txt", "a+") as f:
             f.seek(0)
             if new_filename not in f.read():
                 f.write(f"\n{new_filename}")
         # Return the download link.
-        return os.path.join("api", "downloads", new_filename)
-
+        return os.path.join("api", "download", new_filename)
 
 def update_converter_database():
     # Use the get_ip function imported from loggers.py

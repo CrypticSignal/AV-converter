@@ -13,7 +13,7 @@ from flask_app.utils import return_download_path, write_to_file
 from logger import log
 
 # The directory is relative to the location of run.py
-download_dir = "downloads"
+download_dir = "../"
 
 
 def progress_hooks(data):

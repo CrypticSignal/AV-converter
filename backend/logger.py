@@ -6,7 +6,7 @@ from flask_app import ENVIRONMENT
 logging.basicConfig(
     format=" [%(levelname)s] %(message)s",
     level=10,
-    filename=os.path.join("logs", "backend.log"),
+    filename="../backend.log"
 )
 
 if ENVIRONMENT != "production":
