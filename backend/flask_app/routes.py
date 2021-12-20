@@ -1,13 +1,11 @@
-from datetime import datetime
 import json
 import os
 from pathlib import Path
 from time import time
 
-from flask import render_template, request, send_file, send_from_directory, session
-from werkzeug.utils import secure_filename
+from flask import render_template, request, send_file, session
 
-from flask_app import app, db
+from flask_app import app
 from flask_app.create_ffmpeg_args import get_ffmpeg_args
 from flask_app.models import DownloaderDB
 from flask_app.utils import delete_file, detailed_log, get_ip, update_converter_database
