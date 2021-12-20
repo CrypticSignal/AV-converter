@@ -26,6 +26,4 @@ SESSION_TYPE = "filesystem"
 app.config.from_object(__name__)
 Session(app)
 
-os.makedirs("../logs", exist_ok=True)
-
 from flask_app import routes
