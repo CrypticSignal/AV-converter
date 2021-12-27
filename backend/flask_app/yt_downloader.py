@@ -19,11 +19,15 @@ download_dir = "../"
 def progress_hooks(data):
     if data["status"] == "downloading":
         downloaded_megabytes = round(data["downloaded_bytes"] / 1_000_000, 1)
-        if data["total_bytes"] is not None:
-            total_megabytes = round(data["total_bytes"] / 1_000_000, 1)
-            progress_string = f"Downloaded {downloaded_megabytes}/{total_megabytes}MB"
-        else:
-            progress_string = f"{downloaded_megabytes}MB downloaded..."
+
+        total_mb_string = ""
+
+        if "total_bytes" in data:
+            total_mb_string = f"/{round(data['total_bytes'] / 1_000_000, 1)}MB"
+        elif "total_bytes_estimate" in data:
+            total_mb_string = f"/{round(data['total_bytes_estimate'] / 1_000_000, 1)}MB"
+
+        progress_string = f"{downloaded_megabytes}{total_mb_string} downloaded..."
 
         eta = data["eta"] if data["eta"] else "unknown"
         speed = f"{round(data['speed'] / 1000)}kb/s" if data["speed"] else "unknown"
