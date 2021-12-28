@@ -20,5 +20,6 @@ Click [here](https://av-converter.com/filetypes) for a list of supported filetyp
 4. `docker build -f Dockerfile.backend -t backend .`
 5. `docker build -f Dockerfile.frontend -t frontend .`
 6. `docker-compose up`
+7. Visit http://localhost:3000
 
-_The web application will run on http://localhost:3000_
+_If you get a "sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) table "converterDB" already exists" error, re-running `docker-compose up` fixed the issue for me._
