@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 import shutil
 
-from ffmpeg import probe
 from flask import request, session
 from user_agents import parse
 
@@ -56,10 +55,6 @@ def empty_folder(folder_path):
             log.info(f"{file} deleted.")
 
 
-def get_file_duration(self):
-    return float(probe(self._video_path)["format"]["duration"])
-
-
 # https://stackoverflow.com/a/49760261/13231825
 def get_ip():
     if request.environ.get("HTTP_X_FORWARDED_FOR") is None:
@@ -67,22 +62,7 @@ def get_ip():
     else:
         return request.environ["HTTP_X_FORWARDED_FOR"]
 
-
-# This function returns True if the first audio stream is mono.
-def is_mono_audio(filepath):
-    try:
-        first_audio_stream = [
-            stream for stream in probe(filepath)["streams"] if stream["codec_type"] == "audio"
-        ][0]
-    except Exception as e:
-        log.error(f"ffprobe was unable to detect an audio stream in {filepath}:\n{e}")
-    else:
-        if first_audio_stream["channels"] == 1:
-            return True
-
-    return False
-
-
+        
 def return_download_path(download_dir):
     unwanted_filetypes = [".part", ".jpg", ".ytdl", ".webp"]
     # Get the filename of the completed download.
