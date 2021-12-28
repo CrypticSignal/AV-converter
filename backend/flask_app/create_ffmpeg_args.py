@@ -3,9 +3,7 @@ from pathlib import Path
 import subprocess
 from time import time
 
-from ffmpeg import probe
-
-from flask_app.utils import delete_file, get_file_duration, is_mono_audio
+from flask_app.utils import delete_file
 from logger import log
 
 aac_encoder = "libfdk_aac"
