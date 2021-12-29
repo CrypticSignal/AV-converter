@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSliderValue } from "./redux/bitrateSliderSlice";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -37,8 +37,16 @@ import buttonClicked from "./functions/youtubeDownloader";
 // Images
 import ffmpegLogo from "./images/ffmpeg-25.png";
 import webAssemblyLogo from "./images/webassembly-25.png";
+// React Google Analytics module
+import ReactGA from "react-ga";
+
+ReactGA.initialize("UA-216028081-1");
 
 function App() {
+  useEffect(() => {
+    ReactGA.pageview(window.location.pathname);
+  });
+
   const [file, setFile] = useState(null);
   const [inputFilename, setInputFilename] = useState("");
   const [codec, setCodec] = useState("MP3");
