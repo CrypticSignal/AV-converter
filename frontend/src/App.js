@@ -34,6 +34,9 @@ import Spinner from "react-bootstrap/Spinner";
 // Functions
 import showAlert from "./functions/showAlert";
 import buttonClicked from "./functions/youtubeDownloader";
+// Images
+import ffmpegLogo from "./images/ffmpeg-25.png";
+import webAssemblyLogo from "./images/webassembly-25.png";
 
 function App() {
   const [file, setFile] = useState(null);
@@ -431,8 +434,20 @@ function App() {
 
           <h1>Audio / Video Converter</h1>
 
+          <div id="powered_by">
+            <i id="ffmpeg">Powered by FFmpeg</i>
+            <a href="https://ffmpeg.org/" target="_blank">
+              <img src={ffmpegLogo} id="ffmpeg_logo" />
+            </a>
+            <i id="webassembly">and WebAssembly</i>
+            <a href="https://webassembly.org/" target="_blank">
+              <img src={webAssemblyLogo} />
+            </a>
+          </div>
+
           <Container>
             <FileInput updateBoxes={onFileInput} />
+            <i style={{ fontSize: "80%" }}>Max Filesize: 2 GB</i>
             <hr />
 
             <FormatSelector onCodecChange={onCodecChange} codec={codec} />

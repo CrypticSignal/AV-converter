@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
+import gitHubLogo from "../images/GitHub-Mark-Light-32px.png";
 
 const Navbar = () => {
   function myFunction(e) {
     e.preventDefault();
-    let x = document.getElementById("top_bar");
+    let x = document.getElementById("subdomains");
     if (x.className === "top") {
       x.className += " mobile";
     } else {
@@ -12,7 +13,7 @@ const Navbar = () => {
   }
 
   return (
-    <div id="top_bar" className="top">
+    <div id="subdomains" className="top">
       <Link to="/" className="hamburger" onClick={myFunction}>
         <i className="fa fa-bars"></i>
       </Link>
@@ -28,21 +29,10 @@ const Navbar = () => {
       >
         Game
       </Link>
-      <div id="coffee">
-        <script
-          type="text/javascript"
-          src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-          data-name="bmc-button"
-          data-slug="fezcgrfkb"
-          data-color="#000000"
-          data-emoji=""
-          data-font="Cookie"
-          data-text="Buy me a coffee"
-          data-outline-color="#fff"
-          data-font-color="#fff"
-          data-coffee-color="#fd0"
-        ></script>
-      </div>
+
+      <a href="https://github.com/CrypticSignal/av-converter" id="github_link">
+        <img src={gitHubLogo} />
+      </a>
     </div>
   );
 };

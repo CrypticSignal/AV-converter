@@ -15,8 +15,10 @@
   display: block;
   color: white;
   text-align: center;
-  padding: 9px;
-  font-size: 17px;
+  padding: 10px;
+}
+#github_link {
+  float: right;
 }
 /* When hovering over a link on the navigation bar */
 .top a:hover {
@@ -26,12 +28,27 @@
 
 h1 {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 200%;
+  font-size: 200% !important;
   text-align: center;
   background: black;
   color: white;
-  padding-top: 11px;
-  padding-bottom: 22px;
+  margin-bottom: 0 !important;
+}
+
+#powered_by {
+  margin-bottom: 20px;
+  font-size: 80%;
+  color: white;
+  background: black;
+}
+#ffmpeg {
+  margin-right: 5px;
+}
+#ffmpeg_logo {
+  margin-right: 5px;
+}
+#webassembly {
+  margin-right: 5px;
 }
 
 .slider {
@@ -70,6 +87,9 @@ h1 {
   /* Don't show the links */
   .top a {
     display: none;
+  }
+  #github_link {
+    display: block;
   }
   .top a.hamburger {
     background-color: black;
