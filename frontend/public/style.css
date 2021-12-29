@@ -28,11 +28,12 @@
 
 h1 {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 200% !important;
+  font-size: 225% !important;
   text-align: center;
   background: black;
   color: white;
   margin-bottom: 0 !important;
+  padding-bottom: 5px;
 }
 
 #powered_by {
