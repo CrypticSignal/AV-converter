@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSliderValue } from "./redux/bitrateSliderSlice";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, useLocation } from "react-router-dom";
 // FFmpeg WASM
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 // Pages
@@ -43,9 +43,11 @@ import ReactGA from "react-ga";
 ReactGA.initialize("UA-216028081-1");
 
 function App() {
+  const location = useLocation();
+
   useEffect(() => {
-    ReactGA.pageview(window.location.pathname);
-  });
+    ReactGA.pageview(location.pathname);
+  }, [location]);
 
   const [file, setFile] = useState(null);
   const [inputFilename, setInputFilename] = useState("");
@@ -435,86 +437,84 @@ function App() {
   };
 
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <Navbar />
+    <Switch>
+      <Route exact path="/">
+        <Navbar />
 
-          <h1>Audio / Video Converter</h1>
+        <h1>Audio / Video Converter</h1>
 
-          <div id="powered_by">
-            <i id="ffmpeg">Powered by FFmpeg</i>
-            <a href="https://ffmpeg.org/" target="_blank">
-              <img src={ffmpegLogo} id="ffmpeg_logo" />
-            </a>
-            <i id="webassembly">and WebAssembly</i>
-            <a href="https://webassembly.org/" target="_blank">
-              <img src={webAssemblyLogo} />
-            </a>
+        <div id="powered_by">
+          <i id="ffmpeg">Powered by FFmpeg</i>
+          <a href="https://ffmpeg.org/" target="_blank">
+            <img src={ffmpegLogo} id="ffmpeg_logo" />
+          </a>
+          <i id="webassembly">and WebAssembly</i>
+          <a href="https://webassembly.org/" target="_blank">
+            <img src={webAssemblyLogo} />
+          </a>
+        </div>
+
+        <Container>
+          <FileInput updateBoxes={onFileInput} />
+          <i style={{ fontSize: "80%" }}>Max Filesize: 2 GB</i>
+          <hr />
+
+          <FormatSelector onCodecChange={onCodecChange} codec={codec} />
+          {codec === "AAC" ? (
+            <AacExtensionSelector
+              onAacExtensionChange={onAacExtensionChange}
+              aacExtension={aacExtension}
+            />
+          ) : null}
+          <hr />
+
+          <h5>Encoder Settings</h5>
+          {showFormatSettings()}
+          <br />
+          <hr />
+
+          <h5>Output Filename</h5>
+          <input
+            type="text"
+            autoComplete="off"
+            className="form-control"
+            maxLength="200"
+            id="output_name"
+            required
+          />
+
+          <div id="converting_spinner" style={{ display: "none" }}>
+            <Spinner id="converting_btn" animation="border" /> Converting...
           </div>
 
-          <Container>
-            <FileInput updateBoxes={onFileInput} />
-            <i style={{ fontSize: "80%" }}>Max Filesize: 2 GB</i>
-            <hr />
+          <div id="conversion_progress" style={{ display: "none" }}>
+            <ProgressBar now={progress} label={`${progress}%`} />
+          </div>
 
-            <FormatSelector onCodecChange={onCodecChange} codec={codec} />
-            {codec === "AAC" ? (
-              <AacExtensionSelector
-                onAacExtensionChange={onAacExtensionChange}
-                aacExtension={aacExtension}
-              />
-            ) : null}
-            <hr />
+          <AlertDiv />
 
-            <h5>Encoder Settings</h5>
-            {showFormatSettings()}
+          <div id="convert_btn">
             <br />
-            <hr />
+            <ConvertButton onConvertClicked={onConvertClicked} />
+          </div>
+        </Container>
+      </Route>
 
-            <h5>Output Filename</h5>
-            <input
-              type="text"
-              autoComplete="off"
-              className="form-control"
-              maxLength="200"
-              id="output_name"
-              required
-            />
+      <Route exact path="/about">
+        <Navbar />
+        <AboutPage />
+      </Route>
 
-            <div id="converting_spinner" style={{ display: "none" }}>
-              <Spinner id="converting_btn" animation="border" /> Converting...
-            </div>
+      <Route exact path="/filetypes">
+        <Navbar />
+        <Filetypes />
+      </Route>
 
-            <div id="conversion_progress" style={{ display: "none" }}>
-              <ProgressBar now={progress} label={`${progress}%`} />
-            </div>
-
-            <AlertDiv />
-
-            <div id="convert_btn">
-              <br />
-              <ConvertButton onConvertClicked={onConvertClicked} />
-            </div>
-          </Container>
-        </Route>
-
-        <Route exact path="/about">
-          <Navbar />
-          <AboutPage />
-        </Route>
-
-        <Route exact path="/filetypes">
-          <Navbar />
-          <Filetypes />
-        </Route>
-
-        <Route exact path="/yt">
-          <Navbar />
-          <YoutubePage onYtButtonClicked={onYtButtonClicked} buttonClicked={whichButtonClicked} />
-        </Route>
-      </Switch>
-    </Router>
+      <Route exact path="/yt">
+        <Navbar />
+        <YoutubePage onYtButtonClicked={onYtButtonClicked} buttonClicked={whichButtonClicked} />
+      </Route>
+    </Switch>
   );
 }
 
