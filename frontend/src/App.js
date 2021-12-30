@@ -91,9 +91,9 @@ function App() {
   // ...............................................................................................
 
   const getFFmpegWASMLogs = ({ message }) => {
-    if (message.includes("http://www.videolan.org/x264.html - options")) {
-    } else if (message !== "use ffmpeg.wasm v0.10.1") {
+    if (message !== "use ffmpeg.wasm v0.10.1") {
       showAlert(message, "info");
+      console.log(message);
     }
   };
 
@@ -102,7 +102,6 @@ function App() {
   };
 
   const ffmpeg = createFFmpeg({
-    //log: true,
     logger: getFFmpegWASMLogs,
     progress: getProgress,
   });
@@ -112,7 +111,6 @@ function App() {
 
     ffmpeg.FS("writeFile", inputFilename, await fetchFile(file));
 
-    console.log("Starting conversion...");
     document.getElementById("converting_spinner").style.display = "block";
     document.getElementById("conversion_progress").style.display = "block";
     const startTime = Date.now() / 1000;
