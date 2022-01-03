@@ -14,13 +14,22 @@ from logger import log
 download_dir = "../"
 
 
+class MyLogger:
+    def debug(self, msg):
+        if "Merging formats into" in msg:
+            write_to_file(session["yt_progress_url"], "Merging the downloaded streams...")
+        elif "[ExtractAudio]" in msg and ".opus" in msg:
+            write_to_file(session["yt_progress_url"], "Extracting the audio..."),
+        elif "[ExtractAudio]" in msg and ".mp3" in msg:
+            write_to_file(session["yt_progress_url"], "Converting to MP3..."),
+
+
 def progress_hooks(data):
     if data["status"] == "downloading":
         tmp_filename = Path(data["tmpfilename"]).name
         tmp_filename_string = f"<br><i>Currently writing to <strong>{tmp_filename}<strong></i>"
     
         downloaded_mb = round(data["downloaded_bytes"] / 1_000_000, 1)
-        log.info(f"Downloaded: {downloaded_mb}")
 
         if "total_bytes" in data and data["total_bytes"]:
             total_mb = round(data["total_bytes"] / 1_000_000, 1)
@@ -30,7 +39,6 @@ def progress_hooks(data):
             total_mb = None
 
         if total_mb:
-            log.info(f"Total: {total_mb}")
             percentage_progress = round((downloaded_mb / total_mb) * 100, 1)
             progress_string = f"{percentage_progress}% of ~{total_mb} MB downloaded"
         else:
@@ -48,23 +56,19 @@ def progress_hooks(data):
             f"{progress_string} @ {speed} [ETA: {eta}]{tmp_filename_string}",
         )
 
-    elif data["status"] == "finished":
-        write_to_file(session["yt_progress_url"], "Postprocessing...")
-
 
 def run_youtube_dl(video_link, options):
     with YoutubeDL(options) as ydl:
         info = ydl.extract_info(video_link, download=False)
-        session["filename_stem"] = Path(ydl.prepare_filename(info)).stem
         try:
             ydl.download([video_link])
         except Exception as e:
-            log.error(f'Error downloading {session["filename_stem"]}:\n{e}\n')
-            log.info(f'Progress File: {session["yt_progress_url"]}')
+            log.error(f"Unable to download {ydl.prepare_filename(info)}:\n{e}")
             return str(e), 500
         else:
-            delete_file(session["yt_progress_url"])
             return "success"
+        finally:
+            delete_file(session["yt_progress_url"])
 
 
 def run_yt_downloader(formdata, video_link):
@@ -75,6 +79,7 @@ def run_yt_downloader(formdata, video_link):
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "restrictfilenames": True,
             "progress_hooks": [progress_hooks],
+            "logger": MyLogger()
         }
 
         result = run_youtube_dl(video_link, options)
@@ -91,6 +96,7 @@ def run_yt_downloader(formdata, video_link):
             "outtmpl": f"{download_dir}/%(title)s.%(ext)s",
             "restrictfilenames": True,
             "progress_hooks": [progress_hooks],
+            "logger": MyLogger()
         }
 
         result = run_youtube_dl(video_link, options)
@@ -108,6 +114,7 @@ def run_yt_downloader(formdata, video_link):
             "postprocessors": [{"key": "FFmpegExtractAudio"}],
             "restrictfilenames": True,
             "progress_hooks": [progress_hooks],
+            "logger": MyLogger()
         }
 
         result = run_youtube_dl(video_link, options)
@@ -133,6 +140,7 @@ def run_yt_downloader(formdata, video_link):
             ],
             "restrictfilenames": True,
             "progress_hooks": [progress_hooks],
+            "logger": MyLogger()
         }
 
         result = run_youtube_dl(video_link, options)
