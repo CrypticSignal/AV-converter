@@ -35,6 +35,8 @@ def clean_downloads_folder(download_dir, filename_stem):
 def delete_file(filepath):
     if os.path.isfile(filepath):
         os.remove(filepath)
+    else:
+        log.info(f"Unable to delete {filepath} as it does not exist.")
 
 
 def detailed_log(message):
