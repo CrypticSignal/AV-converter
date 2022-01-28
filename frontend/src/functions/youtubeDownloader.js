@@ -1,21 +1,24 @@
 import showAlert from "./showAlert";
+const axios = require("axios");
 
 // A function that creates a synchronous sleep.
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-let shouldLog = false;
+let shouldLog = true;
 
 async function showDownloadProgress(progressFilePath) {
   while (shouldLog) {
     await sleep(500);
-    const response = await fetch(progressFilePath);
+    const response = await fetch(`/api/progress/${progressFilePath}`);
     if (response.ok) {
       const ytdlpOutput = await response.text();
-      if (ytdlpOutput !== "") {
-        showAlert(ytdlpOutput, "info");
-        console.log(ytdlpOutput);
+      if (ytdlpOutput !== "" && !ytdlpOutput.includes("pass -k to keep")) {
+        const lines = ytdlpOutput.split("\n");
+        const mostRecentOutput = lines[lines.length - 2];
+        showAlert(mostRecentOutput, "info");
+        console.log(mostRecentOutput);
       }
     }
   }
@@ -23,6 +26,7 @@ async function showDownloadProgress(progressFilePath) {
 
 // This function runs when one of the download buttons is clicked.
 async function buttonClicked(url, whichButton) {
+  console.clear();
   const linkBox = document.getElementById("link");
   if (linkBox.value === "") {
     showAlert("Trying to download something without pasting the URL? You silly billy.", "warning");
@@ -31,54 +35,47 @@ async function buttonClicked(url, whichButton) {
 
   showAlert("Initialising...", "warning");
 
-  const firstFormData = new FormData();
-  firstFormData.append("button_clicked", "yes");
+  const progressFilename = `${Date.now()}.txt`;
+  shouldLog = true;
+  showDownloadProgress(progressFilename);
 
-  // 1st POST request to get the path of the progress file.
-  const requestProgressPath = await fetch("/api/yt", {
+  const response = await axios({
+    url: "/api/yt",
     method: "POST",
-    body: firstFormData,
+    data: {
+      link: url,
+      buttonClicked: whichButton,
+      progressFilename: progressFilename,
+    },
+    responseType: "blob",
+    onDownloadProgress: (progressEvent) => {
+      const loaded = progressEvent.loaded;
+      const total = progressEvent.total;
+      const percentageProgress = ((loaded / total) * 100).toFixed(1);
+      showAlert(`Sent ${percentageProgress}% of the file to your browser...`, "info");
+    },
   });
 
-  if (!requestProgressPath.ok) {
-    const error = await requestProgressPath.text();
+  shouldLog = false;
+
+  if (response.status === 200) {
+    const filename = response.headers["content-disposition"]
+      .replace('attachment; filename="', "")
+      .replace('"', "");
+    const url = window.URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", filename);
+    link.click();
+    showAlert("File downloaded :)", "success");
+    //Sometimes the alert below didn't show up, adding a delay seems to fix this.
+    //await sleep(1000);
+    return;
+  } else {
+    const error = await response.text();
     showAlert(error, "danger");
     console.log(error);
     return;
-  } else {
-    let progressFilePath = await requestProgressPath.text();
-    progressFilePath = `api/${progressFilePath}`;
-    console.log(`https://free-av-tools.com/${progressFilePath}`);
-    const secondFormData = new FormData();
-    secondFormData.append("link", url);
-    secondFormData.append("button_clicked", whichButton);
-
-    shouldLog = true;
-    showDownloadProgress(progressFilePath);
-
-    // 2nd POST request to get the download link.
-    const secondRequest = await fetch("/api/yt", {
-      method: "POST",
-      body: secondFormData,
-    });
-
-    shouldLog = false;
-
-    if (secondRequest.status === 200) {
-      const response = await secondRequest.text();
-      console.log(response);
-      const anchorTag = document.createElement("a");
-      anchorTag.setAttribute("download", "");
-      anchorTag.href = response;
-      anchorTag.click();
-      // Sometimes the alert below didn't show up, adding a delay seems to fix this.
-      await sleep(1000);
-      showAlert("Your browser should have started downloading the file.", "success");
-    } else {
-      const error = await secondRequest.text();
-      showAlert(error, "danger");
-      return;
-    }
   }
 }
 

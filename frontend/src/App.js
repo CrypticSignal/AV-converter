@@ -32,6 +32,7 @@ import Container from "react-bootstrap/Container";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Spinner from "react-bootstrap/Spinner";
 // Functions
+import { createFFmpegArgs } from "./functions/createFFmpegArgs";
 import showAlert from "./functions/showAlert";
 import buttonClicked from "./functions/youtubeDownloader";
 // Images
@@ -74,7 +75,6 @@ function App() {
   const [videoBitrate, setVideoBitrate] = useState("8");
   const [videoContainer, setVideoContainer] = useState("mp4");
   const [videoEncodingType, setVideoEncodingType] = useState("crf");
-  //const [videoFilesize, setVideoFilesize] = useState("100");
   const [x264Preset, setX264Preset] = useState("superfast");
   // Opus
   const [opusEncodingType, setOpusEncodingType] = useState("vbr");
@@ -219,9 +219,6 @@ function App() {
   const onVideoEncodingTypeChange = (e) => {
     setVideoEncodingType(e.target.value);
   };
-  // const onVideoFilesizeChange = (e) => {
-  //   setVideoFilesize(e.target.value);
-  // };
   const onX264PresetChange = (e) => {
     setX264Preset(e.target.value);
   };
@@ -252,47 +249,35 @@ function App() {
       return;
     }
 
-    const state = {
-      aacEncodingType: aacEncodingType,
-      aacExtension: aacExtension,
-      aacVbrMode: aacVbrMode,
-      ac3Bitrate: ac3Bitrate,
-      codec: codec,
-      crfValue: crfValue,
-      dtsBitrate: dtsBitrate,
-      file: file,
-      flacCompression: flacCompression,
-      isKeepVideo: isKeepVideo,
-      inputFilename: inputFilename,
-      mp3EncodingType: mp3EncodingType,
-      mp3VbrSetting: mp3VbrSetting,
-      numLogicalProcessors: window.navigator.hardwareConcurrency,
-      opusEncodingType: opusEncodingType,
-      outputName: document.getElementById("output_name").value,
-      qValue: qValue,
-      sliderValue: sliderValue,
-      transcodeVideo: transcodeVideo,
-      transcodeVideosAudio: transcodeVideosAudio,
-      videoBitrate: videoBitrate,
-      videoContainer: videoContainer,
-      videoEncodingType: videoEncodingType,
-      //videoFilesize: videoFilesize,
-      vorbisEncodingType: vorbisEncodingType,
-      wavBitDepth: wavBitDepth,
-      x264Preset: x264Preset,
-    };
+    console.clear();
 
-    const formdata = new FormData();
-    formdata.append("state", JSON.stringify(state));
-
-    const conversionResponse = await fetch("/api/get-ffmpeg-args", {
-      method: "POST",
-      body: formdata,
-    });
-
-    const response = await conversionResponse.json();
-    const ffmpegArgs = response["args"].split(" ");
-    const outputFilename = response["output_filename"];
+    const { ffmpegArgs, outputFilename } = createFFmpegArgs(
+      aacEncodingType,
+      aacExtension,
+      aacVbrMode,
+      ac3Bitrate,
+      codec,
+      crfValue,
+      dtsBitrate,
+      flacCompression,
+      isKeepVideo,
+      inputFilename,
+      mp3EncodingType,
+      mp3VbrSetting,
+      window.navigator.hardwareConcurrency, // numLogicalProcessors
+      opusEncodingType,
+      document.getElementById("output_name").value,
+      qValue,
+      sliderValue,
+      transcodeVideo,
+      transcodeVideosAudio,
+      videoBitrate,
+      videoContainer,
+      videoEncodingType,
+      vorbisEncodingType,
+      wavBitDepth,
+      x264Preset
+    );
 
     if (outputFilename === inputFilename) {
       showAlert("Output filename cannot be same as the input filename.", "danger");
@@ -304,7 +289,6 @@ function App() {
     ffmpegArgs.unshift(inputFilename);
     ffmpegArgs.unshift("-i");
     ffmpegArgs.push(outputFilename);
-    console.log(ffmpegArgs);
 
     convertFile(ffmpegArgs, outputFilename);
   };
