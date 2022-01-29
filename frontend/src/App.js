@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter as Route, Switch, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectSliderValue } from "./redux/bitrateSliderSlice";
-import { BrowserRouter as Router, Route, Switch, useLocation } from "react-router-dom";
-// FFmpeg WASM
-import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
-// Pages
-import AboutPage from "./pages/AboutPage";
-import Filetypes from "./pages/Filetypes";
-import YoutubePage from "./pages/YouTubePage";
+// Converter
+import { convertFile } from "./utils/convertFile";
+import { createFFmpegArgs } from "./utils/createFFmpegArgs";
+// Downloader
+import { sendDownloadRequest } from "./utils/sendDownloadRequest";
 // General Components
 import AlertDiv from "./components/AlertDiv";
 import ConvertButton from "./components/ConvertButton";
@@ -16,6 +15,9 @@ import FileInput from "./components/FileInput";
 import FormatSelector from "./components/FormatSelector";
 import IsKeepVideo from "./components/IsKeepVideo";
 import Navbar from "./components/Navbar";
+// Images
+import ffmpegLogo from "./images/ffmpeg-25.png";
+import webAssemblyLogo from "./images/webassembly-25.png";
 // Output Format Related Components
 import AacExtensionSelector from "./components/AAC/AacExtensionSelector";
 import AC3 from "./components/AC3";
@@ -27,19 +29,18 @@ import NoOptions from "./components/NoOptions";
 import Opus from "./components/Opus";
 import VorbisEncodingType from "./components/Vorbis/EncodingType";
 import WavBitDepth from "./components/WAV";
+// Pages
+import AboutPage from "./pages/AboutPage";
+import Filetypes from "./pages/Filetypes";
+import YoutubePage from "./pages/YouTubePage";
 // React-Bootstrap
 import Container from "react-bootstrap/Container";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Spinner from "react-bootstrap/Spinner";
-// Functions
-import { createFFmpegArgs } from "./functions/createFFmpegArgs";
-import showAlert from "./functions/showAlert";
-import buttonClicked from "./functions/youtubeDownloader";
-// Images
-import ffmpegLogo from "./images/ffmpeg-25.png";
-import webAssemblyLogo from "./images/webassembly-25.png";
 // React Google Analytics module
 import ReactGA from "react-ga";
+// Utils
+import { showAlert } from "./utils/showAlert";
 
 ReactGA.initialize("UA-216028081-1");
 
@@ -85,60 +86,6 @@ function App() {
   const [qValue, setQValue] = useState("6");
   // WAV
   const [wavBitDepth, setWavBitDepth] = useState("16");
-  // Which button was clicked on the YT downloader page.
-  const [whichButtonClicked, setWhichButtonClicked] = useState(null);
-
-  // ...............................................................................................
-
-  const getFFmpegWASMLogs = ({ message }) => {
-    if (message !== "use ffmpeg.wasm v0.10.1") {
-      showAlert(message, "info");
-      console.log(message);
-    }
-  };
-
-  const getProgress = ({ ratio }) => {
-    setProgress((ratio * 100).toFixed(1));
-  };
-
-  const ffmpeg = createFFmpeg({
-    logger: getFFmpegWASMLogs,
-    progress: getProgress,
-  });
-
-  const convertFile = async (ffmpegArgs, outputFilename) => {
-    await ffmpeg.load();
-
-    ffmpeg.FS("writeFile", inputFilename, await fetchFile(file));
-
-    document.getElementById("converting_spinner").style.display = "block";
-    document.getElementById("conversion_progress").style.display = "block";
-    const startTime = Date.now() / 1000;
-    await ffmpeg.run(...ffmpegArgs);
-
-    console.log(`Conversion took ${(Date.now() / 1000 - startTime).toFixed(1)} seconds.`);
-    document.getElementById("converting_spinner").style.display = "none";
-    document.getElementById("conversion_progress").style.display = "none";
-    // Reset the value of progress.
-    setProgress(0);
-
-    const data = ffmpeg.FS("readFile", outputFilename);
-    const objectURL = URL.createObjectURL(new Blob([data.buffer]));
-
-    const anchorTag = document.createElement("a");
-    anchorTag.href = objectURL;
-    anchorTag.download = outputFilename;
-    anchorTag.click();
-
-    // Delete file from MEMFS
-    ffmpeg.FS("unlink", outputFilename);
-
-    showAlert(
-      `Conversion complete. The converted file should be downloading :)<br>If it isn't, click <a href="${objectURL}" download="${outputFilename}">here</a> to start the download.`,
-      "success"
-    );
-    document.getElementById("convert_btn").style.display = "block";
-  };
 
   const onFileInput = (e) => {
     setFile(e.target.files[0]);
@@ -146,14 +93,8 @@ function App() {
     setInputFilename(filename);
     const inputLabel = document.getElementById("file_input_label");
     const outputNameBox = document.getElementById("output_name");
-    // Show the name of the selected file.
     inputLabel.innerText = filename;
-    // Filename without the extension.
-    const nameWithoutExt = filename.split(".").slice(0, -1).join(".");
-    // Remove percentage sign(s) as this causes an issue when secure_filename is used in main.py
-    const defaultOutputName = nameWithoutExt.replace(/%/g, "");
-    // Set the value of the Output Name box to defaultOutputName.
-    outputNameBox.value = defaultOutputName;
+    outputNameBox.value = filename.split(".").slice(0, -1).join(".");
   };
 
   const onCodecChange = (e) => {
@@ -167,7 +108,6 @@ function App() {
   const onMp3VbrSettingChange = (e) => {
     setMp3VbrSetting(e.target.value);
   };
-
   // AAC
   const onAacExtensionChange = (e) => {
     setAacExtension(e.target.value);
@@ -178,28 +118,23 @@ function App() {
   const onAacVbrModeChange = (e) => {
     setAacVbrMode(e.target.value);
   };
-
   // AC3
   const onAc3BitrateChange = (e) => {
     setAc3Bitrate(e.target.value);
   };
-
   // DTS
   const onDtsBitrateChange = (e) => {
     setDtsBitrate(e.target.value);
     console.log(e.target.value);
   };
-
   // FLAC
   const onFlacCompressionChange = (e) => {
     setFlacCompression(e.target.value);
   };
-
   // isKeepVideo
   const onIsKeepVideoChange = (e) => {
     setIsKeepVideo(e.target.value);
   };
-
   // H.264/AVC (MP4 or MKV container)
   const onTranscodeVideoChange = (e) => {
     setTranscodeVideo(e.target.value);
@@ -222,12 +157,10 @@ function App() {
   const onX264PresetChange = (e) => {
     setX264Preset(e.target.value);
   };
-
   // Opus
   const onOpusTypeChange = (e) => {
     setOpusEncodingType(e.target.value);
   };
-
   // Vorbis
   const onVorbisEncodingTypeChange = (e) => {
     setVorbisEncodingType(e.target.value);
@@ -235,7 +168,6 @@ function App() {
   const onVorbisSliderMoved = (e) => {
     setQValue(e.target.value);
   };
-
   // WAV
   const onWavBitDepthChange = (e) => {
     setWavBitDepth(e.target.value);
@@ -284,19 +216,17 @@ function App() {
       return;
     }
 
-    document.getElementById("convert_btn").style.display = "none";
-
     ffmpegArgs.unshift(inputFilename);
     ffmpegArgs.unshift("-i");
     ffmpegArgs.push(outputFilename);
 
-    convertFile(ffmpegArgs, outputFilename);
+    document.getElementById("convert_btn").style.display = "none";
+    convertFile(file, ffmpegArgs, inputFilename, outputFilename, setProgress);
   };
 
   // YT downloader page
   const onYtButtonClicked = (e) => {
-    setWhichButtonClicked(e.target.value);
-    buttonClicked(document.getElementById("link").value, e.target.value);
+    sendDownloadRequest(document.getElementById("link").value, e.target.value);
   };
 
   const showFormatSettings = () => {
@@ -494,7 +424,7 @@ function App() {
 
       <Route exact path="/yt">
         <Navbar />
-        <YoutubePage onYtButtonClicked={onYtButtonClicked} buttonClicked={whichButtonClicked} />
+        <YoutubePage onYtButtonClicked={onYtButtonClicked} />
       </Route>
     </Switch>
   );

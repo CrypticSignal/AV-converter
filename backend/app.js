@@ -15,7 +15,7 @@ const port = 9090;
 
 const log = new Logger();
 
-app.post("/api/yt", async (req, res) => {
+app.post("/api/download", async (req, res) => {
   const { buttonClicked, link, progressFilename } = req.body;
   await fs.promises.writeFile(progressFilename, "");
   log.info("-------------------------------------------------------------------------------------");
@@ -54,8 +54,6 @@ app.post("/api/yt", async (req, res) => {
   filenameProcess.stdout.on("close", () => {
     try {
       const downloadProcess = spawn("/home/h/.local/bin/yt-dlp", [...opts]);
-      const writableStream = fs.createWriteStream(progressFilename);
-      downloadProcess.stdout.pipe(writableStream);
       handleDownloadEvents(res, downloadProcess, progressFilename, filenameWithoutExt);
     } catch (err) {
       log.error(err);
@@ -63,7 +61,7 @@ app.post("/api/yt", async (req, res) => {
   });
 });
 
-app.get("/api/progress/:progressFilename", async (req, res) => {
+app.get("/api/:progressFilename", async (req, res) => {
   const data = await fs.promises.readFile(req.params.progressFilename);
   res.send(data);
 });
