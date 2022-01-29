@@ -22,12 +22,9 @@ const deleteFile = async (filepath) => {
 };
 
 exports.handleDownloadEvents = (res, process, progressFilename, filenameWithoutExt) => {
-  process.stdout.on("data", async (data) => {
-    fs.writeFileSync(progressFilename, data.toString().trim());
-  });
-
-  process.stderr.on("data", (data) => {
-    log.error(`yt-dlp stderr: \n${data}`);
+  process.stdout.on("data", (data) => {
+    const writableStream = fs.createWriteStream(progressFilename);
+    writableStream.write(data);
   });
 
   process.on("error", (error) => {
