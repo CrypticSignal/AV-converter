@@ -1,6 +1,7 @@
 const cors = require("cors");
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 const { spawn } = require("child_process");
 const { handleDownloadEvents } = require("./handleDownloadEvents");
 const { Logger } = require("./logger");
@@ -8,7 +9,7 @@ const { Logger } = require("./logger");
 app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname + "/game"));
+app.use(express.static("../frontend/src/game"));
 
 const port = 9090;
 
@@ -68,8 +69,7 @@ app.get("/api/progress/:progressFilename", async (req, res) => {
 });
 
 app.get("/game", (req, res) => {
-  log.info("GAME");
-  res.sendFile(__dirname + "/game/game.html");
+  res.sendFile(path.resolve("../frontend/src/game/game.html"));
 });
 
 app.listen(port);
