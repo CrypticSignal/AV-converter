@@ -65,9 +65,11 @@ export const sendDownloadRequest = async (url, whichButton) => {
         .replace('"', "");
 
       const anchorTag = document.createElement("a");
-      anchorTag.href = window.URL.createObjectURL(response.data);
-      anchorTag.setAttribute("download", filename);
+      const objectURL = window.URL.createObjectURL(response.data);
+      anchorTag.href = objectURL;
+      anchorTag.setAttribute("download", "");
       anchorTag.click();
+      window.URL.revokeObjectURL(objectURL);
       showAlert("File downloaded :)", "success");
     }
   } catch (err) {
