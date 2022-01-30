@@ -67,7 +67,7 @@ export const sendDownloadRequest = async (url, whichButton) => {
       const anchorTag = document.createElement("a");
       const objectURL = window.URL.createObjectURL(response.data);
       anchorTag.href = objectURL;
-      anchorTag.setAttribute("download", "");
+      anchorTag.setAttribute("download", filename);
       anchorTag.click();
       window.URL.revokeObjectURL(objectURL);
       showAlert("File downloaded :)", "success");
