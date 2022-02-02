@@ -1,16 +1,19 @@
 import ReactDOM from "react-dom";
 import { Fragment } from "react";
-import App from "./App";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+import { LocationProvider } from "@reach/router";
+import App from "./App";
 
 ReactDOM.render(
   <Fragment>
     <Provider store={store}>
-      <Router>
-        <App />
-      </Router>
+      <BrowserRouter>
+        <LocationProvider>
+          <App />
+        </LocationProvider>
+      </BrowserRouter>
     </Provider>
   </Fragment>,
   document.getElementById("root")

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter as Route, Switch, useLocation } from "react-router-dom";
+import { useLocation } from "@reach/router";
+import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectSliderValue } from "./redux/bitrateSliderSlice";
 // Converter
@@ -312,8 +313,6 @@ function App() {
             onVideoBitrateChange={onVideoBitrateChange}
             videoEncodingType={videoEncodingType}
             onVideoEncodingTypeChange={onVideoEncodingTypeChange}
-            // videoFilesize={videoFilesize}
-            // onVideoFilesizeChange={onVideoFilesizeChange}
             x264Preset={x264Preset}
             onX264PresetChange={onX264PresetChange}
           />
@@ -349,84 +348,102 @@ function App() {
   };
 
   return (
-    <Switch>
-      <Route exact path="/">
-        <Navbar />
+    <Routes>
+      <Route
+        exact
+        path="/"
+        element={
+          <>
+            <Navbar />
+            <h1>Audio / Video Converter</h1>
+            <div id="powered_by">
+              <i id="ffmpeg">Powered by FFmpeg</i>
+              <a href="https://ffmpeg.org/" target="_blank">
+                <img src={ffmpegLogo} id="ffmpeg_logo" />
+              </a>
+              <i id="webassembly">and WebAssembly</i>
+              <a href="https://webassembly.org/" target="_blank">
+                <img src={webAssemblyLogo} />
+              </a>
+            </div>
+            <Container>
+              <FileInput updateBoxes={onFileInput} />
+              <i style={{ fontSize: "80%" }}>Max Filesize: 2 GB</i>
+              <hr />
 
-        <h1>Audio / Video Converter</h1>
+              <FormatSelector onCodecChange={onCodecChange} codec={codec} />
+              {codec === "AAC" ? (
+                <AacExtensionSelector
+                  onAacExtensionChange={onAacExtensionChange}
+                  aacExtension={aacExtension}
+                />
+              ) : null}
+              <hr />
 
-        <div id="powered_by">
-          <i id="ffmpeg">Powered by FFmpeg</i>
-          <a href="https://ffmpeg.org/" target="_blank">
-            <img src={ffmpegLogo} id="ffmpeg_logo" />
-          </a>
-          <i id="webassembly">and WebAssembly</i>
-          <a href="https://webassembly.org/" target="_blank">
-            <img src={webAssemblyLogo} />
-          </a>
-        </div>
+              <h5>Encoder Settings</h5>
+              {showFormatSettings()}
+              <br />
+              <hr />
 
-        <Container>
-          <FileInput updateBoxes={onFileInput} />
-          <i style={{ fontSize: "80%" }}>Max Filesize: 2 GB</i>
-          <hr />
+              <h5>Output Filename</h5>
+              <input
+                type="text"
+                autoComplete="off"
+                className="form-control"
+                maxLength="200"
+                id="output_name"
+                required
+              />
 
-          <FormatSelector onCodecChange={onCodecChange} codec={codec} />
-          {codec === "AAC" ? (
-            <AacExtensionSelector
-              onAacExtensionChange={onAacExtensionChange}
-              aacExtension={aacExtension}
-            />
-          ) : null}
-          <hr />
+              <div id="converting_spinner" style={{ display: "none" }}>
+                <Spinner id="converting_btn" animation="border" /> Converting...
+              </div>
 
-          <h5>Encoder Settings</h5>
-          {showFormatSettings()}
-          <br />
-          <hr />
+              <div id="conversion_progress" style={{ display: "none" }}>
+                <ProgressBar now={progress} label={`${progress}%`} />
+              </div>
 
-          <h5>Output Filename</h5>
-          <input
-            type="text"
-            autoComplete="off"
-            className="form-control"
-            maxLength="200"
-            id="output_name"
-            required
-          />
+              <AlertDiv />
 
-          <div id="converting_spinner" style={{ display: "none" }}>
-            <Spinner id="converting_btn" animation="border" /> Converting...
-          </div>
+              <div id="convert_btn">
+                <br />
+                <ConvertButton onConvertClicked={onConvertClicked} />
+              </div>
+            </Container>
+          </>
+        }
+      />
 
-          <div id="conversion_progress" style={{ display: "none" }}>
-            <ProgressBar now={progress} label={`${progress}%`} />
-          </div>
+      <Route
+        path="/about"
+        element={
+          <>
+            <Navbar />
+            <AboutPage />
+          </>
+        }
+      />
 
-          <AlertDiv />
+      <Route
+        path="/filetypes"
+        element={
+          <>
+            <Navbar />
+            <Filetypes />
+          </>
+        }
+      />
 
-          <div id="convert_btn">
-            <br />
-            <ConvertButton onConvertClicked={onConvertClicked} />
-          </div>
-        </Container>
-      </Route>
-
-      <Route exact path="/about">
-        <Navbar />
-        <AboutPage />
-      </Route>
-
-      <Route exact path="/filetypes">
-        <Navbar />
-        <Filetypes />
-      </Route>
-
-      <Route exact path="/yt">
-        <Navbar />
-        <YoutubePage onYtButtonClicked={onYtButtonClicked} />
-      </Route>
-    </Switch>
+      <Route
+        path="/yt"
+        element={
+          <>
+            <Navbar />
+            <YoutubePage onYtButtonClicked={onYtButtonClicked} />
+          </>
+        }
+      />
+    </Routes>
   );
 }
 
