@@ -18,8 +18,11 @@ const log = new Logger();
 app.post("/api/download", async (req, res) => {
   const { buttonClicked, link, progressFilename } = req.body;
   await fs.promises.writeFile(progressFilename, "");
+
+  const currentTime = new Date().toLocaleTimeString();
+
   log.info("-------------------------------------------------------------------------------------");
-  log.info(`${req.headers["x-real-ip"]} chose ${buttonClicked}`);
+  log.info(`[${currentTime}] ${req.headers["x-real-ip"]} chose ${buttonClicked}`);
   log.info(req.headers["user-agent"]);
   log.info(link);
 
