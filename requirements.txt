@@ -1,7 +1,0 @@
-eventlet==0.30.2
-Flask==2.0.1
-Flask-Session==0.3.2
-Flask-SQLAlchemy==2.5.1
-gunicorn
-user_agents
-yt-dlp==2021.10.10
