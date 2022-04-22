@@ -1,10 +1,13 @@
-# Cannot use Python 3.10 https://stackoverflow.com/a/69474757/13231825
-FROM python:3.9.9-slim 
-RUN apt-get update -y
-RUN apt-get upgrade -y
-RUN apt-get install ffmpeg -y
-COPY requirements.txt .
-RUN pip3 install -r requirements.txt
+FROM node:18-alpine
+
 COPY /backend .
-EXPOSE 5000
-CMD ["gunicorn", "-k", "eventlet", "-w", "3", "-b", ":5000", "--timeout=9999", "run:app"]
+
+RUN apk --no-cache add curl
+RUN yarn install
+
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+RUN chmod a+rx /usr/local/bin/yt-dlp
+
+EXPOSE 9090
+
+CMD ["node", "app.js"]

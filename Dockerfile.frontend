@@ -1,10 +1,4 @@
-# React frontend
-FROM node:16-alpine as build-step
+FROM node:16-alpine
 COPY /frontend .
 RUN yarn install
-RUN yarn build
-
-# Nginx
-FROM nginx:stable-alpine
-COPY --from=build-step /build /usr/share/nginx/html
-COPY /nginx.conf /etc/nginx/conf.d/default.conf
+CMD ["yarn", "run", "start"]

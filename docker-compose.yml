@@ -1,15 +1,15 @@
 services:
   backend:
-    environment:
-      - PYTHONUNBUFFERED=1
     build:
       context: .
       dockerfile: Dockerfile.backend
     image: backend
+
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
     image: frontend
     ports:
-      - "3000:80"
+      - "3000:3000"
+      #- "3000:80"
