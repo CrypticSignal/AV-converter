@@ -40,4 +40,4 @@ Simply visit https://av-converter.com. Alternatively, you can run this web appli
 1. Clone this repository.
 2. `cd av-converter`
 3. `docker-compose up --build`
-4. Visit http://localhost:3050
+4. Visit http://localhost:3000
