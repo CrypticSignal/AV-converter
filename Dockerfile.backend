@@ -1,12 +1,17 @@
-FROM node:18-alpine
+FROM node:16-alpine
 
 COPY /backend .
 
-RUN apk --no-cache add curl
+# Install the dependencies in package.json
 RUN yarn install
-
+# To download yt-dlp using curl
+RUN apk --no-cache add curl
+# Install yt-dlp
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
 RUN chmod a+rx /usr/local/bin/yt-dlp
+# Python and FFmpeg are used by yt-dlp
+RUN apk add --no-cache python3
+RUN apk add  --no-cache ffmpeg
 
 EXPOSE 9090
 
