@@ -14,6 +14,7 @@ export const convertFile = async (file, ffmpegArgs, inputFilename, outputFilenam
   };
 
   const ffmpeg = createFFmpeg({
+    corePath: "https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js",
     logger: getFFmpegWASMLogs,
     progress: getProgress,
   });
