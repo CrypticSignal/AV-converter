@@ -10,6 +10,14 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     image: frontend
+
+  nginx:
+    depends_on:
+      - backend
+      - frontend
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-      #- "3000:80"
+      - "3050:80"
