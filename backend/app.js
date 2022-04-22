@@ -38,7 +38,7 @@ app.post("/api/download", async (req, res) => {
     opts.push(...["-x", "--audio-format", "mp3", "--audio-quality", "0"]);
   }
 
-  const filenameProcess = spawn("/home/h/.local/bin/yt-dlp", ["--get-filename", link]);
+  const filenameProcess = spawn("/usr/local/bin/yt-dlp", ["--get-filename", link]);
   let filenameWithoutExt;
 
   filenameProcess.stdout.on("data", (data) => {
@@ -56,7 +56,7 @@ app.post("/api/download", async (req, res) => {
 
   filenameProcess.stdout.on("close", () => {
     try {
-      const downloadProcess = spawn("/home/h/.local/bin/yt-dlp", [...opts]);
+      const downloadProcess = spawn("/usr/local/bin/yt-dlp", [...opts]);
       handleDownloadEvents(res, downloadProcess, progressFilename, filenameWithoutExt);
     } catch (err) {
       log.error(err);
