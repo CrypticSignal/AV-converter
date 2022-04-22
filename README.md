@@ -38,9 +38,6 @@ Simply visit https://av-converter.com. Alternatively, you can run this web appli
 # Docker Instructions
 
 1. Clone this repository.
-2. Change the value of `ENVIRONMENT` in /backend/flask_app/**init**.py to something other than "production".
-3. `cd av-converter`
-4. `docker build -f Dockerfile.backend -t backend .`
-5. `docker build -f Dockerfile.frontend -t frontend .`
-6. `docker-compose up`
-7. Visit http://localhost:3000
+2. `cd av-converter`
+3. `docker-compose up --build`
+4. Visit http://localhost:3050
