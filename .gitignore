@@ -1,22 +1,17 @@
-# Backend
-__pycache__
-/backend/logs
-/backend/conversions
-/backend/downloads
-/backend/uploads
-/backend/ffmpeg_progress
-/backend/ffmpeg_output
-/backend/yt_progress
-/backend/flask_session
-# Frontend
+**/.DS_Store
 **/node_modules
 /frontend/build
-# Misc
+
 *.log
+*.m4a
 *.mkv
+*.mp3
 *.mp4
+*.opus
 *.txt
-**/.DS_Store
+*.webm
+
+.env
+.eslintcache
 .prettierrc
 .vscode
-.eslintcache
