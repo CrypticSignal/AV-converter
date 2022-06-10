@@ -1,18 +1,16 @@
-const cors = require("cors");
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 const { handleDownloadEvents } = require("./handleDownloadEvents");
 const { Logger } = require("./logger");
+const { updateDatabase } = require("./utils");
 
 app = express();
-app.use(cors());
 app.use(express.json());
 app.use(express.static("../frontend/src/game"));
 
 const port = 9090;
-
 const log = new Logger();
 
 app.post("/api/download", async (req, res) => {
@@ -62,6 +60,8 @@ app.post("/api/download", async (req, res) => {
       log.error(err);
     }
   });
+
+  updateDatabase(req.headers["x-real-ip"]);
 });
 
 app.get("/api/:progressFilename", async (req, res) => {
@@ -69,7 +69,7 @@ app.get("/api/:progressFilename", async (req, res) => {
   res.send(data);
 });
 
-app.get("/game", (req, res) => {
+app.get("/game", (_, res) => {
   res.sendFile(path.resolve("../frontend/src/game/game.html"));
 });
 
