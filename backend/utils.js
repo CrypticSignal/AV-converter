@@ -43,7 +43,6 @@ function sendFile(res, filename) {
   res.download(filename, (err) => {
     if (err) {
       log.error(`Unable to send ${filename} to the browser: \n${err}`);
-      return;
     }
     deleteFile(filename);
   });

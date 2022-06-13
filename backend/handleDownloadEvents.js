@@ -15,16 +15,14 @@ exports.handleDownloadEvents = (res, process, progressFilename, filenameWithoutE
   });
 
   process.on("close", (code) => {
-    if (code !== 0) {
-      return;
+    if (code == 0) {
+      const filename = fs
+        .readdirSync(__dirname)
+        .filter((file) => file.includes(filenameWithoutExt))[0];
+
+      log.info(filename);
+      sendFile(res, filename);
     }
-
-    const filename = fs
-      .readdirSync(__dirname)
-      .filter((file) => file.includes(filenameWithoutExt))[0];
-
-    log.info(filename);
-    sendFile(res, filename);
     deleteFile(progressFilename);
   });
 };
