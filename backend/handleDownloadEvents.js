@@ -1,25 +1,8 @@
 const fs = require("fs");
+const { sendFile, deleteFile } = require("./utils");
 const { Logger } = require("./logger");
 
 const log = new Logger();
-
-const sendFile = (res, filename) => {
-  res.download(filename, (err) => {
-    if (err) {
-      log.error(`Unable to send ${filename} to the browser: \n${err}`);
-      return;
-    }
-    deleteFile(filename);
-  });
-};
-
-const deleteFile = async (filepath) => {
-  try {
-    await fs.promises.unlink(filepath);
-  } catch (err) {
-    log.error(`Unable to delete ${filepath}: \n${err}`);
-  }
-};
 
 exports.handleDownloadEvents = (res, process, progressFilename, filenameWithoutExt) => {
   process.stdout.on("data", (data) => {

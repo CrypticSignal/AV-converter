@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { Logger } = require("./logger");
 const { Pool } = require("pg"); // node-postgres
 
@@ -38,4 +39,22 @@ async function updateDatabase(ip) {
   }
 }
 
-module.exports = { updateDatabase };
+function sendFile(res, filename) {
+  res.download(filename, (err) => {
+    if (err) {
+      log.error(`Unable to send ${filename} to the browser: \n${err}`);
+      return;
+    }
+    deleteFile(filename);
+  });
+}
+
+async function deleteFile(filepath) {
+  try {
+    await fs.promises.unlink(filepath);
+  } catch (err) {
+    log.error(`Unable to delete ${filepath}: \n${err}`);
+  }
+}
+
+module.exports = { updateDatabase, sendFile, deleteFile };
