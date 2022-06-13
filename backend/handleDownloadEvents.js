@@ -23,18 +23,16 @@ const deleteFile = async (filepath) => {
 
 exports.handleDownloadEvents = (res, process, progressFilename, filenameWithoutExt) => {
   process.stdout.on("data", (data) => {
-    const writableStream = fs.createWriteStream(progressFilename);
-    writableStream.write(data);
+    fs.createWriteStream(progressFilename).write(data);
   });
 
-  process.on("error", (error) => {
-    log.error(`yt-dlp error: \n${error.message}`);
+  process.stderr.on("data", (data) => {
+    fs.createWriteStream(progressFilename).write(data);
+    log.error(data);
   });
 
   process.on("close", (code) => {
     if (code !== 0) {
-      log.error("The yt-dlp process encountered an error.");
-      log.error(`The output of yt-dlp can be found in ${progressFilename}`);
       return;
     }
 
