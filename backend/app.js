@@ -1,5 +1,6 @@
 const express = require("express");
 const fs = require("fs");
+const geoip = require("geoip-country");
 const path = require("path");
 const { spawn } = require("child_process");
 const { handleDownloadEvents } = require("./handleDownloadEvents");
@@ -61,7 +62,8 @@ app.post("/api/download", async (req, res) => {
     }
   });
 
-  updateDatabase(req.headers["x-real-ip"]);
+  const ip = req.headers["x-real-ip"];
+  updateDatabase(ip, geoip.lookup(ip).country);
 });
 
 app.get("/api/:progressFilename", async (req, res) => {

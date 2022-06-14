@@ -14,7 +14,7 @@ const pool = new Pool({
   port: process.env.PGPORT,
 });
 
-async function updateDatabase(ip) {
+async function updateDatabase(ip, country) {
   const { rows } = await pool.query(`SELECT * FROM users WHERE ip=$1`, [ip]);
 
   if (rows[0]) {
@@ -33,9 +33,12 @@ async function updateDatabase(ip) {
         if (err) log.error(`[Postgres UPDATE] ${err.stack}`);
       };
   } else {
-    pool.query(`INSERT into users(ip, times_used) VALUES ('${ip}', 1);`, (err, _) => {
-      if (err) log.error(`[Postgres INSERT] ${err.stack}`);
-    });
+    pool.query(
+      `INSERT into users(ip, country, times_used) VALUES ('${ip}', '${country}', 1);`,
+      (err, _) => {
+        if (err) log.error(`[Postgres INSERT] ${err.stack}`);
+      }
+    );
   }
 }
 
