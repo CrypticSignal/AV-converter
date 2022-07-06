@@ -1,4 +1,4 @@
-const express = require("express");
+import express, { Application, Request, Response } from "express";
 const fs = require("fs");
 const geoip = require("geoip-country");
 const path = require("path");
@@ -7,14 +7,14 @@ const { handleDownloadEvents } = require("./handleDownloadEvents");
 const { Logger } = require("./logger");
 const { updateDatabase } = require("./utils");
 
-app = express();
+const app: Application = express();
 app.use(express.json());
 app.use(express.static("../frontend/src/game"));
 
 const port = 9090;
 const log = new Logger();
 
-app.post("/api/download", async (req, res) => {
+app.post("/api/download", async (req: Request, res: Response) => {
   const { buttonClicked, link, progressFilename } = req.body;
   await fs.promises.writeFile(progressFilename, "");
 
@@ -38,18 +38,18 @@ app.post("/api/download", async (req, res) => {
   }
 
   const filenameProcess = spawn("/usr/local/bin/yt-dlp", ["--get-filename", link]);
-  let filenameWithoutExt;
+  let filenameWithoutExt: string;
 
-  filenameProcess.stdout.on("data", (data) => {
+  filenameProcess.stdout.on("data", (data: Buffer) => {
     const outputFilename = data.toString().trim();
     filenameWithoutExt = outputFilename.split(".").slice(0, -1).join(".");
   });
 
-  filenameProcess.stderr.on("data", (data) => {
+  filenameProcess.stderr.on("data", (data: Buffer) => {
     log.info(`filenameProcess stderr: \n${data}`);
   });
 
-  filenameProcess.on("error", (error) => {
+  filenameProcess.on("error", (error: any) => {
     log.error(`filenameProcess error: \n${error.message}`);
   });
 
@@ -66,12 +66,12 @@ app.post("/api/download", async (req, res) => {
   updateDatabase(ip, geoip.lookup(ip).country);
 });
 
-app.get("/api/:progressFilename", async (req, res) => {
+app.get("/api/:progressFilename", async (req: Request, res: Response) => {
   const data = await fs.promises.readFile(req.params.progressFilename);
   res.send(data);
 });
 
-app.get("/game", (_, res) => {
+app.get("/game", (_, res: Response) => {
   res.sendFile(path.resolve("../frontend/src/game/game.html"));
 });
 

@@ -14,7 +14,7 @@ const pool = new Pool({
   port: process.env.PGPORT,
 });
 
-async function updateDatabase(ip, country) {
+async function updateDatabase(ip: string, country: string) {
   const { rows } = await pool.query(`SELECT * FROM users WHERE ip=$1`, [ip]);
 
   if (rows[0]) {
@@ -29,21 +29,21 @@ async function updateDatabase(ip, country) {
         WHERE ip=$1`,
       [ip]
     ),
-      (err, _) => {
+      (err: any) => {
         if (err) log.error(`[Postgres UPDATE] ${err.stack}`);
       };
   } else {
     pool.query(
       `INSERT into users(ip, country, times_used) VALUES ('${ip}', '${country}', 1);`,
-      (err, _) => {
+      (err: any) => {
         if (err) log.error(`[Postgres INSERT] ${err.stack}`);
       }
     );
   }
 }
 
-function sendFile(res, filename) {
-  res.download(filename, (err) => {
+function sendFile(res: any, filename: string) {
+  res.download(filename, (err: any) => {
     if (err) {
       log.error(`Unable to send ${filename} to the browser: \n${err}`);
     }
@@ -51,7 +51,7 @@ function sendFile(res, filename) {
   });
 }
 
-async function deleteFile(filepath) {
+async function deleteFile(filepath: string) {
   try {
     await fs.promises.unlink(filepath);
   } catch (err) {
