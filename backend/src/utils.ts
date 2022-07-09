@@ -1,10 +1,11 @@
-const fs = require("fs");
+import dotenv from "dotenv";
+import fs from "fs";
 const { Logger } = require("./logger");
 const { Pool } = require("pg"); // node-postgres
 
 const log = new Logger();
 
-require("dotenv").config();
+dotenv.config({ path: __dirname + "/../.env" });
 
 const pool = new Pool({
   user: process.env.PGUSER,
@@ -24,10 +25,12 @@ async function updateDatabase(ip: string, country: string) {
     log.info(`This user has used the downloader ${timesPreviouslyUsed} ${timeOrTimes} before.`);
 
     pool.query(
-      `UPDATE users
-        SET times_used = ${timesPreviouslyUsed + 1}
-        WHERE ip=$1`,
-      [ip]
+      `
+      UPDATE users
+      SET times_used = $1, last_used = $2
+      WHERE ip=$3;
+      `,
+      [timesPreviouslyUsed + 1, new Date().toLocaleString(), ip]
     ),
       (err: any) => {
         if (err) log.error(`[Postgres UPDATE] ${err.stack}`);
