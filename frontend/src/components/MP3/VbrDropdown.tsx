@@ -2,7 +2,7 @@ import React from "react";
 
 interface VbrDropdownProps {
   onVbrSettingChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  vbrSetting: String;
+  vbrSetting: string;
 }
 
 const VbrDropdown: React.FC<VbrDropdownProps> = ({ onVbrSettingChange, vbrSetting }) => {

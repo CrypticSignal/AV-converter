@@ -1,7 +1,7 @@
 import React from "react";
 
 interface FlacProps {
-  onFlacCompressionChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onFlacCompressionChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   flacCompression: string;
 }
 

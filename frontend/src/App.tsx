@@ -115,7 +115,7 @@ const App: React.FC = () => {
     setAc3Bitrate(e.currentTarget.value);
   };
   // FLAC
-  const onFlacCompressionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onFlacCompressionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFlacCompression(e.currentTarget.value);
   };
   // isKeepVideo

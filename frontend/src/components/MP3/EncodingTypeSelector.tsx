@@ -4,9 +4,9 @@ import VbrDropdown from "./VbrDropdown";
 
 interface MP3EncodingTypeSelectorProps {
   onEncodingTypeChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  encodingType: String;
+  encodingType: string;
   onVbrSettingChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  vbrSetting: String;
+  vbrSetting: string;
 }
 
 const MP3EncodingTypeSelector: React.FC<MP3EncodingTypeSelectorProps> = ({
