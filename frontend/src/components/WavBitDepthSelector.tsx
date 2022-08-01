@@ -2,7 +2,7 @@ import React from "react";
 
 interface WavBitDepthSelectorProps {
   onBitDepthChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  bitDepth: String;
+  bitDepth: string;
 }
 
 const WavBitDepthSelector: React.FC<WavBitDepthSelectorProps> = ({
