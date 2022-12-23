@@ -2,13 +2,6 @@ import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import { Dispatch, SetStateAction } from "react";
 import showAlert from "./showAlert";
 
-const getFFmpegWASMLogs = ({ message }: { message: string }) => {
-  if (message !== "use ffmpeg.wasm v0.10.1") {
-    showAlert(message, "info");
-    console.log(message);
-  }
-};
-
 export const convertFile = async (
   file: File,
   ffmpegArgs: string[],
@@ -16,21 +9,24 @@ export const convertFile = async (
   outputFilename: string,
   setProgress: Dispatch<SetStateAction<number>>
 ) => {
+  document.getElementById("converting_spinner")!.style.display = "block";
+  document.getElementById("conversion_progress")!.style.display = "block";
+
   const getProgress = ({ ratio }: { ratio: number }) => {
     setProgress(parseInt((ratio * 100).toFixed(1)));
   };
 
   const ffmpeg = createFFmpeg({
-    corePath: "https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js",
-    logger: getFFmpegWASMLogs,
+    log: true,
     progress: getProgress,
+  });
+
+  ffmpeg.setLogger(({ message }: { message: string }) => {
+    showAlert(message, "info");
   });
 
   await ffmpeg.load();
   ffmpeg.FS("writeFile", inputFilename, await fetchFile(file));
-
-  document.getElementById("converting_spinner")!.style.display = "block";
-  document.getElementById("conversion_progress")!.style.display = "block";
 
   const startTime = Date.now() / 1000;
   // Run FFmpeg
