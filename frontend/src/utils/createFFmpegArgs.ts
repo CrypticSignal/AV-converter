@@ -127,10 +127,6 @@ export const createFFmpegArgs = (
     const outputFilename = `${outputName}.${videoContainer}`;
     let args = "-map 0:V? -map 0:a? -map 0:s?";
 
-    if (videoContainer === "mp4") {
-      args += " -c:a libfdk_aac -vbr 5";
-    }
-
     if (transcodeAudio) {
       args += " -c:a libfdk_aac -vbr 5";
     } else {
@@ -139,26 +135,30 @@ export const createFFmpegArgs = (
 
     if (!transcodeVideo) {
       if (videoContainer === "mp4") {
-        args += " -c:V copy -f mp4";
+        args += " -c:V copy -f mp4"
         return createConversionData(args, outputFilename);
       }
       // MKV container.
       args += " -c:V copy -c:s copy -f matroska";
       return createConversionData(args, outputFilename);
-    } else {
-      let threads = numLogicalProcessors * 1.5;
-      // A value of 12+ causes "null function or function signature mismatch" error.
-      threads = threads < 12 ? threads : 11;
-      args += ` -c:V libx264 -x264-params threads=${threads} -preset ${x264Preset}`;
-      // CRF
-      if (videoEncodingType === "crf") {
-        args += ` -crf ${crfValue}`;
-        return createConversionData(args, outputFilename);
-      }
-      // Target a bitrate.
-      args += ` -b:v ${videoBitrate}M`;
+    }
+    // The user wants to transcode the video.
+    if (videoContainer === "mp4") {
+      args += " -c:s mov_text"
+    }
+
+    let threads = numLogicalProcessors * 1.5;
+    // A value of 12+ causes "null function or function signature mismatch" error.
+    threads = threads < 12 ? threads : 11;
+    args += ` -c:V libx264 -x264-params threads=${threads} -preset ${x264Preset}`;
+    // CRF
+    if (videoEncodingType === "crf") {
+      args += ` -crf ${crfValue}`;
       return createConversionData(args, outputFilename);
     }
+    // Target a bitrate.
+    args += ` -b:v ${videoBitrate}M`;
+    return createConversionData(args, outputFilename);
 
     // MKA
   } else if (codec === "MKA") {
