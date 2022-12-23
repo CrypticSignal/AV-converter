@@ -126,23 +126,14 @@ export const createFFmpegArgs = (
   } else if (codec === "H264") {
     const outputFilename = `${outputName}.${videoContainer}`;
     let args = "-map 0:V? -map 0:a? -map 0:s?";
-
-    if (transcodeAudio) {
-      args += " -c:a libfdk_aac -vbr 5";
-    } else {
-      args += " -c:a copy";
-    }
+    transcodeAudio ? args += " -c:a libfdk_aac -vbr 5" : args += " -c:a copy"
 
     if (!transcodeVideo) {
-      if (videoContainer === "mp4") {
-        args += " -c:V copy -f mp4"
-        return createConversionData(args, outputFilename);
-      }
-      // MKV container.
-      args += " -c:V copy -c:s copy -f matroska";
-      return createConversionData(args, outputFilename);
+      videoContainer === "mp4" ? args += " -c:V copy -f mp4" : args += " -c:V copy -c:s copy -f matroska";
+      return createConversionData(args, outputFilename)
     }
-    // The user wants to transcode the video.
+
+    // MP4 doesn't support all subtitle formats. Convert the subtitle tracks to mov_text which MP4 supports.
     if (videoContainer === "mp4") {
       args += " -c:s mov_text"
     }
