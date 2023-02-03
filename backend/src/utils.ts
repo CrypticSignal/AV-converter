@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import fs from "fs";
+import { readdir } from 'node:fs/promises';
 const { Logger } = require("./logger");
 const { Pool } = require("pg"); // node-postgres
 
@@ -15,7 +16,7 @@ const pool = new Pool({
   port: process.env.PGPORT,
 });
 
-async function updateDatabase(ip: string, country: string) {
+export async function updateDatabase(ip: string, country: string) {
   const { rows } = await pool.query(`SELECT * FROM users WHERE ip=$1`, [ip]);
 
   if (rows[0]) {
@@ -45,7 +46,7 @@ async function updateDatabase(ip: string, country: string) {
   }
 }
 
-function sendFile(res: any, filename: string) {
+export function sendFile(res: any, filename: string) {
   res.download(filename, (err: any) => {
     if (err) {
       log.error(`Unable to send ${filename} to the browser: \n${err}`);
@@ -54,7 +55,7 @@ function sendFile(res: any, filename: string) {
   });
 }
 
-async function deleteFile(filepath: string) {
+export async function deleteFile(filepath: string) {
   try {
     await fs.promises.unlink(filepath);
   } catch (err) {
@@ -62,4 +63,16 @@ async function deleteFile(filepath: string) {
   }
 }
 
-module.exports = { updateDatabase, sendFile, deleteFile };
+const substrings = [".mp4.part", ".m4a.part", ".webm.part", ".f137.mp4", ".f140.m4a", ".f401.mp4", ".temp.mp4", ".mp4.ytdl"]
+
+export async function purgeUnwantedFiles() {
+  try {
+    const files = await readdir(__dirname + "/../");
+    for (const file of files)
+      if (substrings.some(substring => file.includes(substring))) {
+        deleteFile(file)
+      }
+  } catch (err) {
+    log.error(err);
+  }
+}

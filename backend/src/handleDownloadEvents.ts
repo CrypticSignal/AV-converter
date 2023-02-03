@@ -1,7 +1,5 @@
-export {};
-
 const fs = require("fs");
-const { sendFile, deleteFile } = require("./utils");
+import { sendFile, deleteFile, purgeUnwantedFiles } from "./utils";
 const { Logger } = require("./logger");
 
 const log = new Logger();
@@ -31,5 +29,6 @@ exports.handleDownloadEvents = (
       sendFile(res, filename);
     }
     deleteFile(progressFilename);
+    purgeUnwantedFiles()
   });
 };
