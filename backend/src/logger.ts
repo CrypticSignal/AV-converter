@@ -1,20 +1,13 @@
-export {};
+import { appendFile } from "fs/promises";
 
-const fs = require("fs/promises");
-
-class Logger {
+export class Logger {
   async debug(msg: string) {
-    console.log(msg);
-    await fs.appendFile("../logs.txt", `\n[DEBUG]: ${msg}`);
+    await appendFile("../logs.txt", `\n[DEBUG]: ${msg}`);
   }
   async info(msg: string) {
-    console.log(msg);
-    await fs.appendFile("../logs.txt", `\n${msg}`);
+    await appendFile("../logs.txt", `\n${msg}`);
   }
   async error(msg: string) {
-    console.log(msg);
-    await fs.appendFile("../logs.txt", `\n[ERROR]: ${msg}`);
+    await appendFile("../logs.txt", `\n[ERROR]: ${msg}`);
   }
 }
-
-module.exports = { Logger };
