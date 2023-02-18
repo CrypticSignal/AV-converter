@@ -11,7 +11,7 @@ const app: Application = express();
 app.use(express.json());
 app.use(express.static("../frontend/src/game"));
 
-const port = 9090;
+const port = 8080;
 const log = new Logger();
 
 app.post("/api/download", async (req: Request, res: Response) => {
