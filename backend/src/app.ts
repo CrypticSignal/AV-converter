@@ -1,11 +1,12 @@
+import { ChildProcess } from "child_process";
 import express, { Application, Request, Response } from "express";
-const fs = require("fs");
+import { readFile, writeFile } from "fs/promises";
+import { parse, resolve } from "path";
+import { handleDownloadEvents } from "./handleDownloadEvents";
+import { Logger } from "./logger";
+import { updateDatabase } from "./utils";
 const geoip = require("geoip-country");
-const path = require("path");
-const { spawn } = require("child_process");
-const { handleDownloadEvents } = require("./handleDownloadEvents");
-const { Logger } = require("./logger");
-const { updateDatabase } = require("./utils");
+const youtubedl = require("youtube-dl-exec");
 
 const app: Application = express();
 app.use(express.json());
@@ -16,63 +17,51 @@ const log = new Logger();
 
 app.post("/api/download", async (req: Request, res: Response) => {
   const { buttonClicked, link, progressFilename } = req.body;
-  await fs.promises.writeFile(progressFilename, "");
+  await writeFile(progressFilename, "");
 
   const dateAndTime = new Date().toLocaleString("en-gb");
 
   log.info("-------------------------------------------------------------------------------------");
   log.info(`[${dateAndTime}] ${req.headers["x-real-ip"]} chose ${buttonClicked}`);
-  log.info(req.headers["user-agent"]);
+  log.info(req.headers["user-agent"]!);
   log.info(link);
 
-  let opts = [link];
+  let opts: { [key: string]: string | boolean } = {};
 
-  if (buttonClicked === "video_best") {
-    opts.push(...["-f", "bv*+ba/b"]);
-  } else if (buttonClicked === "audio_best") {
-    opts.push("-x");
-  } else if (buttonClicked === "mp4") {
-    opts.push(...["-f", "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*+ba/b"]);
-  } else if (buttonClicked === "audio_mp3") {
-    opts.push(...["-x", "--audio-format", "mp3", "--audio-quality", "0"]);
+  switch (buttonClicked) {
+    case "video_best":
+      opts["f"] = "bv*+ba/b";
+      break;
+    case "mp4":
+      opts["f"] = "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*+ba/b";
+      break;
+    case "audio_best":
+      opts["x"] = true;
+      break;
+    case "audio_mp3":
+      opts["x"] = true;
+      opts["audioFormat"] = "mp3";
+      opts["audioQuality"] = "0";
   }
 
-  const filenameProcess = spawn("/usr/local/bin/yt-dlp", ["--get-filename", link]);
-  let filenameWithoutExt: string;
-
-  filenameProcess.stdout.on("data", (data: Buffer) => {
-    const outputFilename = data.toString().trim();
-    filenameWithoutExt = outputFilename.split(".").slice(0, -1).join(".");
+  youtubedl(link, {
+    getFilename: true,
+  }).then((output: string) => {
+    const filenameWithoutExt = parse(output).name;
+    const downloadProcess: ChildProcess = youtubedl.exec(link, opts);
+    handleDownloadEvents(res, downloadProcess, progressFilename, filenameWithoutExt);
+    const ip = req.header("x-forwarded-for")!;
+    updateDatabase(ip, geoip.lookup(ip).country);
   });
-
-  filenameProcess.stderr.on("data", (data: Buffer) => {
-    log.info(`filenameProcess stderr: \n${data}`);
-  });
-
-  filenameProcess.on("error", (error: any) => {
-    log.error(`filenameProcess error: \n${error.message}`);
-  });
-
-  filenameProcess.stdout.on("close", () => {
-    try {
-      const downloadProcess = spawn("/usr/local/bin/yt-dlp", [...opts]);
-      handleDownloadEvents(res, downloadProcess, progressFilename, filenameWithoutExt);
-    } catch (err) {
-      log.error(err);
-    }
-  });
-
-  const ip = req.headers["x-real-ip"];
-  updateDatabase(ip, geoip.lookup(ip).country);
 });
 
 app.get("/api/:progressFilename", async (req: Request, res: Response) => {
-  const data = await fs.promises.readFile(req.params.progressFilename);
+  const data = await readFile(req.params.progressFilename);
   res.send(data);
 });
 
 app.get("/game", (_, res: Response) => {
-  res.sendFile(path.resolve("../frontend/src/game/game.html"));
+  res.sendFile(resolve("../frontend/src/game/game.html"));
 });
 
 app.listen(port);
