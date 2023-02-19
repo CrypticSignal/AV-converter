@@ -1,5 +1,5 @@
 import { ChildProcess } from "child_process";
-import { createWriteStream, readdirSync } from "fs";
+import { createWriteStream, readdir } from "fs";
 import { Logger } from "./logger";
 import { Response } from "express";
 import { sendFile, deleteFile, purgeUnwantedFiles } from "./utils";
@@ -25,12 +25,13 @@ export function handleDownloadEvents(
 
   process.on("close", (code: number) => {
     if (code === 0) {
-      const filename = readdirSync(__dirname + "/../").filter((file: string) =>
-        file.includes(filenameWithoutExt)
-      )[0];
-
-      log.info(filename);
-      sendFile(res, filename);
+      readdir(__dirname + "/../", (err, files) => {
+        if (!err) {
+          const filename = files.filter((file: string) => file.includes(filenameWithoutExt))[0];
+          log.info(filename);
+          sendFile(res, filename);
+        }
+      });
     }
     deleteFile(progressFilename);
     purgeUnwantedFiles();
