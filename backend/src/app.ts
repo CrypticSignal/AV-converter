@@ -5,8 +5,8 @@ import { parse, resolve } from "path";
 import { handleDownloadEvents } from "./handleDownloadEvents";
 import { Logger } from "./logger";
 import { updateDatabase } from "./utils";
-const geoip = require("geoip-country");
-const youtubedl = require("youtube-dl-exec");
+import geoip from "geoip-country";
+import youtubedl from "youtube-dl-exec";
 
 const app: Application = express();
 app.use(express.json());
@@ -46,12 +46,12 @@ app.post("/api/download", async (req: Request, res: Response) => {
 
   youtubedl(link, {
     getFilename: true,
-  }).then((output: string) => {
-    const filenameWithoutExt = parse(output).name;
+  }).then((output) => {
+    const filenameWithoutExt = parse(output.toString()).name;
     const downloadProcess: ChildProcess = youtubedl.exec(link, opts);
     handleDownloadEvents(res, downloadProcess, progressFilename, filenameWithoutExt);
     const ip = req.header("x-forwarded-for")!;
-    updateDatabase(ip, geoip.lookup(ip).country);
+    updateDatabase(ip, geoip.lookup(ip)!.country);
   });
 });
 

@@ -1,19 +1,21 @@
 import dotenv from "dotenv";
 import fs from "fs";
-import { readdir } from 'node:fs/promises';
-const { Logger } = require("./logger");
-const { Pool } = require("pg"); // node-postgres
+import { readdir } from "node:fs/promises";
+import { Logger } from "./logger";
+import pg from "pg";
 
 const log = new Logger();
 
 dotenv.config({ path: __dirname + "/../.env" });
+
+const { Pool } = pg;
 
 const pool = new Pool({
   user: process.env.PGUSER,
   host: process.env.PGHOST,
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
-  port: process.env.PGPORT,
+  port: parseInt(process.env.PGPORT!),
 });
 
 export async function updateDatabase(ip: string, country: string) {
@@ -63,16 +65,21 @@ export async function deleteFile(filepath: string) {
   }
 }
 
-const substrings = [".mp4.part", ".m4a.part", ".webm.part", ".f137.mp4", ".f140.m4a", ".f401.mp4", ".temp.mp4", ".mp4.ytdl"]
+const substrings = [
+  ".mp4.part",
+  ".m4a.part",
+  ".webm.part",
+  ".f137.mp4",
+  ".f140.m4a",
+  ".f401.mp4",
+  ".temp.mp4",
+  ".mp4.ytdl",
+];
 
 export async function purgeUnwantedFiles() {
-  try {
-    const files = await readdir(__dirname + "/../");
-    for (const file of files)
-      if (substrings.some(substring => file.includes(substring))) {
-        deleteFile(file)
-      }
-  } catch (err) {
-    log.error(err);
-  }
+  const files = await readdir(__dirname + "/../");
+  for (const file of files)
+    if (substrings.some((substring) => file.includes(substring))) {
+      deleteFile(file);
+    }
 }
