@@ -49,13 +49,26 @@ app.post("/api/download", async (req: Request, res: Response) => {
 
   youtubedl(link, {
     getFilename: true,
-  }).then((output) => {
-    const filenameWithoutExt = parse(output.toString()).name;
-    const downloadProcess: ChildProcess = youtubedl.exec(link, opts);
-    handleDownloadEvents(res, downloadProcess, progressFilename, filenameWithoutExt);
-    const ip = req.header("x-forwarded-for")!;
-    if (process.env.ENVIRONMENT) updateDatabase(ip, geoip.lookup(ip)!.country);
-  });
+  })
+    .then((output) => {
+      let downloadProcess: ChildProcess;
+
+      if (!output) {
+        const outputFilename = Date.now().toString();
+        opts["o"] = `${outputFilename}.%(ext)s`;
+        downloadProcess = youtubedl.exec(link, opts);
+        handleDownloadEvents(res, downloadProcess, progressFilename, outputFilename);
+      } else {
+        downloadProcess = youtubedl.exec(link, opts);
+        handleDownloadEvents(res, downloadProcess, progressFilename, parse(output.toString()).name);
+      }
+
+      const ip = req.header("x-forwarded-for")!;
+      if (process.env.ENVIRONMENT) updateDatabase(ip, geoip.lookup(ip)!.country);
+    })
+    .catch((error) => {
+      log.error(error);
+    });
 });
 
 app.get("/api/:progressFilename", async (req: Request, res: Response) => {
