@@ -4,6 +4,7 @@ FROM node:16-alpine as build-step
 WORKDIR /app
 
 COPY ./frontend/package.json ./frontend/yarn.lock ./
+COPY ./frontend/tsconfig.json ./
 COPY ./frontend/src ./src
 COPY ./frontend/public ./public
 

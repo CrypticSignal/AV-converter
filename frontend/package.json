@@ -7,13 +7,14 @@
     "@ffmpeg/ffmpeg": "^0.11.6",
     "@reach/router": "^1.3.4",
     "@reduxjs/toolkit": "^1.6.1",
+    "@types/react-dom": "^18.0.11",
     "axios": "^0.25.0",
     "react": "^17.0.1",
     "react-bootstrap": "^2.0.0-beta.5",
     "react-dom": "^17.0.1",
     "react-ga": "^3.3.0",
     "react-redux": "^7.2.4",
-    "react-router-dom": "^6.2.1",
+    "react-router-dom": "^6.8.2",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
@@ -43,7 +44,6 @@
   "devDependencies": {
     "@types/reach__router": "^1.3.10",
     "@types/react": "^18.0.15",
-    "@types/react-router-dom": "^5.3.3",
     "prettier": "2.2.1",
     "typescript": "^4.7.4"
   }

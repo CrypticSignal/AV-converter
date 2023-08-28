@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import { ChildProcess } from "child_process";
 import express, { Application, Request, Response } from "express";
 import { readFile, writeFile } from "fs/promises";
@@ -14,6 +15,8 @@ app.use(express.static("../frontend/src/game"));
 
 const port = 8080;
 const log = new Logger();
+
+dotenv.config({ path: __dirname + "/../.env" });
 
 app.post("/api/download", async (req: Request, res: Response) => {
   const { buttonClicked, link, progressFilename } = req.body;
@@ -51,13 +54,19 @@ app.post("/api/download", async (req: Request, res: Response) => {
     const downloadProcess: ChildProcess = youtubedl.exec(link, opts);
     handleDownloadEvents(res, downloadProcess, progressFilename, filenameWithoutExt);
     const ip = req.header("x-forwarded-for")!;
-    updateDatabase(ip, geoip.lookup(ip)!.country);
+    if (process.env.ENVIRONMENT) updateDatabase(ip, geoip.lookup(ip)!.country);
   });
 });
 
 app.get("/api/:progressFilename", async (req: Request, res: Response) => {
-  const data = await readFile(req.params.progressFilename);
-  res.send(data);
+  try {
+    const data = await readFile(req.params.progressFilename);
+    res.send(data);
+  } catch {
+    // Empty catch block because the frontend might request the progress file shortly after it's been deleted
+    // as the frontend only checks whether to request the progress file every 500ms.
+    // See frontend/src/utils/sendDownloadrequest.ts for further context.
+  }
 });
 
 app.get("/game", (_, res: Response) => {
