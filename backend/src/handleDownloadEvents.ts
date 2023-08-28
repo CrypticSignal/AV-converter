@@ -13,8 +13,16 @@ export function handleDownloadEvents(
   filenameWithoutExt: string
 ) {
   process.stdout?.on("data", (data: Buffer) => {
-    if (data.toString() !== "\n") {
-      createWriteStream(progressFilename).write(data.toString().trim());
+    const dataTrimmed = data.toString().trim();
+
+    if (dataTrimmed.startsWith("[download]")) {
+      const downloadInfo = dataTrimmed.split(" ").filter((n) => n);
+
+      const customDownloadProgress = `Downloaded ${downloadInfo[1]} of ${downloadInfo[3]} | ETA: ${downloadInfo[7]} @ ${downloadInfo[5]}`;
+
+      createWriteStream(progressFilename).write(customDownloadProgress);
+    } else {
+      createWriteStream(progressFilename).write(dataTrimmed);
     }
   });
 

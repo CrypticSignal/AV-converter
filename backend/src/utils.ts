@@ -77,9 +77,15 @@ const substrings = [
 ];
 
 export async function purgeUnwantedFiles() {
-  const files = await readdir(__dirname + "/../");
-  for (const file of files)
-    if (substrings.some((substring) => file.includes(substring))) {
-      deleteFile(file);
+  try {
+    const files = await readdir(__dirname + "/../");
+
+    for (const file of files) {
+      if (substrings.some((substring) => file.endsWith(substring))) {
+        deleteFile(file);
+      }
     }
+  } catch (error: unknown) {
+    if (error instanceof Error) log.error(`purgeUnwantedFiles:\n${error.message}`);
+  }
 }
