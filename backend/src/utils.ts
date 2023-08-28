@@ -53,7 +53,6 @@ export function sendFile(res: any, filename: string) {
     if (err) {
       log.error(`Unable to send ${filename} to the browser: \n${err}`);
     }
-    deleteFile(filename);
   });
 }
 
