@@ -39,7 +39,11 @@ Simply visit https://av-converter.com. Alternatively, you can run this web appli
 
 # Docker Instructions
 
-1. Clone this repository.
-2. `cd av-converter`
-3. `docker-compose up --build`
-4. Visit http://localhost:3000
+- Clone this repository.
+- `cd av-converter`
+- ```
+   docker compose up --build --wait && docker compose alpha watch
+  ```
+- Visit http://localhost:3001
+
+Any changes you make in `/backend/src` or `/frontend/src` will be reflected without having to rebuild either container. Simply refresh your web browser.

@@ -1,14 +1,26 @@
 services:
   backend:
+    container_name: backend
     build:
-      context: .
       dockerfile: Dockerfile.backend
-    image: backend
+    x-develop:
+      watch:
+        - action: sync
+          path: ./backend/src
+          target: /backend/src
+          ignore:
+            - node_modules/
 
   frontend:
+    container_name: frontend
     build:
-      context: .
       dockerfile: Dockerfile.frontend
-    image: frontend
+    x-develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /frontend/src
+          ignore:
+            - node_modules/
     ports:
-      - "3000:80"
+      - 3001:3000

@@ -46,5 +46,6 @@
     "@types/react": "^18.0.15",
     "prettier": "2.2.1",
     "typescript": "^4.7.4"
-  }
+  },
+  "proxy": "http://backend:8080"
 }

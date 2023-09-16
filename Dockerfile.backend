@@ -1,12 +1,9 @@
-FROM node:16-alpine
+FROM node:20-alpine
 
-COPY /backend .
+WORKDIR /backend
 
-# Python and FFmpeg are used by youtube-dl-exec
-RUN apk add --no-cache python3
-RUN apk add  --no-cache ffmpeg
+COPY ./backend ./
 
-RUN yarn install
-RUN npx tsc
+RUN apk --no-cache add python3 ffmpeg && yarn install
 
-CMD ["node", "dist/app.js"]
+CMD ["yarn", "dev"]
