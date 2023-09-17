@@ -37,12 +37,10 @@ _If you are not sure which option to opt for, I recommend **Video (MP4)** and **
 
 Simply visit https://av-converter.com. Alternatively, you can run this web application in a Docker container.
 
-# Docker Instructions
+# Run locally with Docker
 
-- Clone this repository.
-- `cd av-converter`
 - ```
-   docker compose up --build --wait && docker compose alpha watch
+  cd docker/dev && docker compose up --build --wait && docker compose alpha watch
   ```
 - Visit http://localhost:3001
 
