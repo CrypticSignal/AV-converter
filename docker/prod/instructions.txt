@@ -1,0 +1,7 @@
+1. listen 80 server block - comment out the location / block and uncomment the acme-challenge block.
+2. Comment out the listen 443 server block.
+3. docker compose up -d
+4. docker compose run --rm  certbot certonly --force-renew --webroot --webroot-path /var/www/certbot/ --email hshafiq@hotmail.co.uk -d av-converter.com
+5. Uncomment the listen 443 server block.
+6. Remove or comment out the acme-challenge block in the listen 80 server server block and uncomment the location / block.
+7. docker compose restart nginx
