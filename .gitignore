@@ -10,7 +10,6 @@
 *.mp3
 *.mp4
 *.opus
-*.txt
 *.webm
 
 .env
