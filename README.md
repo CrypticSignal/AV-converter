@@ -4,9 +4,11 @@
   <img src="https://img.shields.io/badge/React-000000?style=for-the-badge&logo=react&logoColor=60DAFB" alt="React" />
   <img src="https://img.shields.io/badge/FFmpeg-000000?style=for-the-badge&logo=ffmpeg&logoColor=green" alt="FFmpeg" />
   <img src="https://img.shields.io/badge/Docker-000000?style=for-the-badge&logo=docker&logoColor=0db7ed" alt="Docker" />
+  <p>A web app that allows you to convert an audio or video file to another format or download YouTube videos.</p>
+  <p>Available at https://av-converter.com</p>
 </div>
 
-# AV converter
+## Converter
 
 Convert an audio or video file to any of the following formats:
 
@@ -20,9 +22,9 @@ Convert an audio or video file to any of the following formats:
 - Vorbis
 - WAV
 
-You can also convert a video to the MP4 or MKV format. You can simply change the container without transcoding, or change the video codec to H.264 (AVC) using the x264 encoder and the audio codec to AAC using the high quality Fraunhofer FDK AAC encoder.
+Converting a video to one of the above formats will turn it into an audio-only file. You can also convert a video to MP4 or MKV.
 
-# YouTube Downloader
+## YouTube Downloader
 
 Visit the `/yt` endpoint to use the YouTube downloader, which is essentially a frontend for [yt-dlp](https://github.com/yt-dlp/yt-dlp). There are four options:
 
@@ -33,15 +35,13 @@ Visit the `/yt` endpoint to use the YouTube downloader, which is essentially a f
 
 _If you are not sure which option to opt for, I recommend **Video (MP4)** and **Audio (MP3)** depending on whether you want the video or an audio-only file. This is because MP3 and MP4 files are more widely supported compared to Opus and WebM files._
 
-# Usage
+## Docker
 
-Simply visit https://av-converter.com. Alternatively, you can run this web application in a Docker container.
-
-# Run locally with Docker
+You can run this web app locally with a single command:
 
 - ```
   cd docker/dev && docker compose up --build --wait && docker compose alpha watch
   ```
 - Visit http://localhost:3001
 
-Any changes you make in `/backend/src` or `/frontend/src` will be reflected without having to rebuild either container. Simply refresh your web browser.
+_Any changes you make in `/backend/src` or `/frontend/src` will be reflected without having to rebuild any containers. Simply refresh your web browser._
