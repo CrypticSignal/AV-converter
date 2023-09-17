@@ -19,6 +19,7 @@ services:
       - ../../certbot/conf:/etc/letsencrypt/:ro
       - ../../certbot/www:/var/www/certbot/:ro
       - ../../frontend/build:/usr/share/nginx/html:ro
+      - ../../frontend/src/game:/game:ro
 
   certbot:
     container_name: certbot
