@@ -1,0 +1,9 @@
+FROM node:20-alpine
+
+WORKDIR /frontend
+
+COPY ./frontend/package.json ./frontend/tsconfig.json ./frontend/yarn.lock ./
+COPY ./frontend/src ./src
+COPY ./frontend/public ./public
+
+RUN yarn install && yarn build

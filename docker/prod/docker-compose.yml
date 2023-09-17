@@ -1,0 +1,42 @@
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ../../
+      dockerfile: docker/prod/Dockerfile.backend
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ../../
+      dockerfile: docker/prod/Dockerfile.frontend
+    volumes:
+      - frontend-build:/frontend/build
+
+  nginx:
+    container_name: nginx
+    depends_on:
+      - backend
+      - frontend
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../../certbot/conf:/etc/letsencrypt/:ro
+      - ../../certbot/www:/var/www/certbot/:ro
+      - frontend-build:/usr/share/nginx/html:ro
+
+  certbot:
+    container_name: certbot
+    build:
+      context: ../../
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+
+volumes:
+  frontend-build:

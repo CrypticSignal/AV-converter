@@ -17,6 +17,6 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only --watch src/ src/app.ts",
-    "deploy": "tsc --incremental && sudo systemctl restart website"
+    "deploy": "docker compose -f ../docker-compose-prod.yml up -d --no-deps --build backend"
   }
 }

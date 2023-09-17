@@ -2,7 +2,8 @@ services:
   backend:
     container_name: backend
     build:
-      dockerfile: Dockerfile.backend
+      context: ../../
+      dockerfile: docker/dev/Dockerfile.backend
     x-develop:
       watch:
         - action: sync
@@ -14,7 +15,8 @@ services:
   frontend:
     container_name: frontend
     build:
-      dockerfile: Dockerfile.frontend
+      context: ../../
+      dockerfile: docker/dev/Dockerfile.frontend
     x-develop:
       watch:
         - action: sync
