@@ -7,8 +7,6 @@ services:
 
   nginx:
     container_name: nginx
-    depends_on:
-      - backend
     image: nginx:latest
     ports:
       - 80:80
