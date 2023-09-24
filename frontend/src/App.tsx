@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation } from "@reach/router";
 import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectSliderValue } from "./redux/bitrateSliderSlice";
 // Converter
+import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { convertFile } from "./utils/convertFile";
 import { createFFmpegArgs } from "./utils/createFFmpegArgs";
 // Downloader
@@ -46,6 +47,9 @@ import showAlert from "./utils/showAlert";
 ReactGA.initialize("UA-216028081-1");
 
 const App: React.FC = () => {
+  const ffmpegRef = useRef(new FFmpeg());
+  const ffmpeg = ffmpegRef.current;
+
   const location = useLocation();
 
   useEffect(() => {
@@ -214,7 +218,7 @@ const App: React.FC = () => {
     ffmpegArgs.push(outputFilename);
 
     document.getElementById("convert_btn")!.style.display = "none";
-    convertFile(file, ffmpegArgs, inputFilename, outputFilename, setProgress);
+    convertFile(ffmpeg, file, ffmpegArgs, inputFilename, outputFilename, setProgress);
   };
 
   // YT downloader page
