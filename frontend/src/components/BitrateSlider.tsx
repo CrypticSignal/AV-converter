@@ -1,6 +1,6 @@
-import { useSelector, useDispatch } from "react-redux";
-import React, { useEffect } from "react";
-import { setDefault, change, selectSliderValue } from "../redux/bitrateSliderSlice";
+import { useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "../redux/hooks";
+import { change, setDefault } from "../redux/bitrateSliderSlice";
 
 interface BitrateSliderProps {
   initialValue: string;
@@ -10,10 +10,10 @@ interface BitrateSliderProps {
 }
 
 const BitrateSlider: React.FC<BitrateSliderProps> = ({ initialValue, min, max, step }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     dispatch(setDefault(initialValue));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -25,11 +25,11 @@ const BitrateSlider: React.FC<BitrateSliderProps> = ({ initialValue, min, max, s
         className="slider"
         min={min}
         max={max}
-        value={useSelector(selectSliderValue)}
+        value={useAppSelector((state) => state.bitrate.value)}
         step={step}
         onChange={(e) => dispatch(change(e.target.value))}
       />
-      <span>{` ${useSelector(selectSliderValue)} kbps`}</span>
+      <span>{` ${useAppSelector((state) => state.bitrate.value)} kbps`}</span>
     </div>
   );
 };

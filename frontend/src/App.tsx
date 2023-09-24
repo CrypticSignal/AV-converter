@@ -1,49 +1,48 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useLocation } from "@reach/router";
-import { Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { selectSliderValue } from "./redux/bitrateSliderSlice";
+import React, { useEffect, useState, useRef } from 'react';
+import { useLocation } from '@reach/router';
+import { Routes, Route } from 'react-router-dom';
+import { useAppSelector } from './redux/hooks';
 // Converter
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { convertFile } from "./utils/convertFile";
-import { createFFmpegArgs } from "./utils/createFFmpegArgs";
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { convertFile } from './utils/convertFile';
+import { createFFmpegArgs } from './utils/createFFmpegArgs';
 // Downloader
-import { sendDownloadRequest } from "./utils/sendDownloadRequest";
+import { sendDownloadRequest } from './utils/sendDownloadRequest';
 // General Components
-import AlertDiv from "./components/AlertDiv";
-import BitrateSlider from "./components/BitrateSlider";
-import ConvertButton from "./components/ConvertButton";
-import FileInput from "./components/FileInput";
-import FormatSelector from "./components/FormatSelector";
-import IsKeepVideo from "./components/IsKeepVideo";
-import Navbar from "./components/Navbar";
+import AlertDiv from './components/AlertDiv';
+import BitrateSlider from './components/BitrateSlider';
+import ConvertButton from './components/ConvertButton';
+import FileInput from './components/FileInput';
+import FormatSelector from './components/FormatSelector';
+import IsKeepVideo from './components/IsKeepVideo';
+import Navbar from './components/Navbar';
 // Images
-import ffmpegLogo from "./images/ffmpeg-25.png";
-import webAssemblyLogo from "./images/webassembly-25.png";
+import ffmpegLogo from './images/ffmpeg-25.png';
+import webAssemblyLogo from './images/webassembly-25.png';
 // Output Format Related Components
-import AC3 from "./components/AC3";
-import DTS from "./components/Dts";
-import FLAC from "./components/Flac";
-import H264 from "./components/H264";
-import MP3EncodingTypeSelector from "./components/MP3/EncodingTypeSelector";
-import NoSettingsApplicable from "./components/NoSettingsApplicable";
-import Opus from "./components/Opus";
-import VorbisEncodingType from "./components/Vorbis/EncodingType";
-import WavBitDepthSelector from "./components/WavBitDepthSelector";
+import AC3 from './components/AC3';
+import DTS from './components/Dts';
+import FLAC from './components/Flac';
+import H264 from './components/H264';
+import MP3EncodingTypeSelector from './components/MP3/EncodingTypeSelector';
+import NoSettingsApplicable from './components/NoSettingsApplicable';
+import Opus from './components/Opus';
+import VorbisEncodingType from './components/Vorbis/EncodingType';
+import WavBitDepthSelector from './components/WavBitDepthSelector';
 // Pages
-import AboutPage from "./pages/AboutPage";
-import Filetypes from "./pages/SupportedFiletypes";
-import YouTubeDownloader from "./pages/YouTubeDownloader";
+import AboutPage from './pages/AboutPage';
+import Filetypes from './pages/SupportedFiletypes';
+import YouTubeDownloader from './pages/YouTubeDownloader';
 // React-Bootstrap
-import Container from "react-bootstrap/Container";
-import ProgressBar from "react-bootstrap/ProgressBar";
-import Spinner from "react-bootstrap/Spinner";
+import Container from 'react-bootstrap/Container';
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import Spinner from 'react-bootstrap/Spinner';
 // React Google Analytics module
-import ReactGA from "react-ga";
+import ReactGA from 'react-ga';
 // Utils
-import showAlert from "./utils/showAlert";
+import showAlert from './utils/showAlert';
 
-ReactGA.initialize("UA-216028081-1");
+ReactGA.initialize('UA-216028081-1');
 
 const App: React.FC = () => {
   const ffmpegRef = useRef(new FFmpeg());
@@ -56,43 +55,43 @@ const App: React.FC = () => {
   }, [location]);
 
   const [file, setFile] = useState<File>();
-  const [inputFilename, setInputFilename] = useState("");
-  const [codec, setCodec] = useState("MP3");
+  const [inputFilename, setInputFilename] = useState('');
+  const [codec, setCodec] = useState('MP3');
   // Conversion progress.
   const [progress, setProgress] = useState(0);
   // AC3
-  const [ac3Bitrate, setAc3Bitrate] = useState("640");
+  const [ac3Bitrate, setAc3Bitrate] = useState('640');
   // FLAC
-  const [flacCompression, setFlacCompression] = useState("5");
+  const [flacCompression, setFlacCompression] = useState('5');
   // Keep the video?
   const [isKeepVideo, setIsKeepVideo] = useState(false);
   // H.264/AVC
-  const [crfValue, setCrfValue] = useState("18");
+  const [crfValue, setCrfValue] = useState('18');
   const [transcodeAudio, setTranscodeAudio] = useState(true);
   const [transcodeVideo, setTranscodeVideo] = useState(true);
-  const [videoBitrate, setVideoBitrate] = useState("8");
-  const [videoContainer, setVideoContainer] = useState("mp4");
-  const [videoEncodingType, setVideoEncodingType] = useState("crf");
-  const [x264Preset, setX264Preset] = useState("superfast");
+  const [videoBitrate, setVideoBitrate] = useState('8');
+  const [videoContainer, setVideoContainer] = useState('mp4');
+  const [videoEncodingType, setVideoEncodingType] = useState('crf');
+  const [x264Preset, setX264Preset] = useState('superfast');
   // MP3
-  const [mp3EncodingType, setMp3EncodingType] = useState("cbr");
-  const [mp3VbrSetting, setMp3VbrSetting] = useState("0");
+  const [mp3EncodingType, setMp3EncodingType] = useState('cbr');
+  const [mp3VbrSetting, setMp3VbrSetting] = useState('0');
   // Opus
-  const [opusEncodingType, setOpusEncodingType] = useState("vbr");
+  const [opusEncodingType, setOpusEncodingType] = useState('vbr');
   // Vorbis
-  const [vorbisEncodingType, setVorbisEncodingType] = useState("abr");
-  const [qValue, setQValue] = useState("6");
+  const [vorbisEncodingType, setVorbisEncodingType] = useState('abr');
+  const [qValue, setQValue] = useState('6');
   // WAV
-  const [wavBitDepth, setWavBitDepth] = useState("16");
+  const [wavBitDepth, setWavBitDepth] = useState('16');
 
   const onFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.currentTarget.files![0]);
     const filename = e.currentTarget.files![0].name;
     setInputFilename(filename);
-    const inputLabel = document.getElementById("file_input_label")!;
-    const outputNameBox = document.getElementById("output_name") as HTMLInputElement;
+    const inputLabel = document.getElementById('file_input_label')!;
+    const outputNameBox = document.getElementById('output_name') as HTMLInputElement;
     inputLabel.innerText = filename;
-    outputNameBox.value = filename.split(".").slice(0, -1).join(".");
+    outputNameBox.value = filename.split('.').slice(0, -1).join('.');
   };
 
   const onCodecChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -109,11 +108,11 @@ const App: React.FC = () => {
   };
   // isKeepVideo
   const onIsKeepVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.currentTarget.value === "yes" ? setIsKeepVideo(true) : setIsKeepVideo(false);
+    e.currentTarget.value === 'yes' ? setIsKeepVideo(true) : setIsKeepVideo(false);
   };
   // H.264/AVC (MP4 or MKV container)
   const onTranscodeVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.currentTarget.value === "yes" ? setTranscodeVideo(true) : setTranscodeVideo(false);
+    e.currentTarget.value === 'yes' ? setTranscodeVideo(true) : setTranscodeVideo(false);
   };
   const onCrfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCrfValue(e.currentTarget.value);
@@ -156,11 +155,11 @@ const App: React.FC = () => {
     setWavBitDepth(e.currentTarget.value);
   };
 
-  const bitrateSliderValue = useSelector(selectSliderValue);
+  const bitrateSliderValue = useAppSelector((state) => state.bitrate.value);
 
   const onConvertClicked = async () => {
     if (file === undefined) {
-      showAlert("You must choose an input file.", "danger");
+      showAlert('You must choose an input file.', 'danger');
       return;
     }
 
@@ -178,7 +177,7 @@ const App: React.FC = () => {
       mp3VbrSetting,
       window.navigator.hardwareConcurrency, // numLogicalProcessors
       opusEncodingType,
-      (document.getElementById("output_name") as HTMLInputElement).value,
+      (document.getElementById('output_name') as HTMLInputElement).value,
       qValue,
       transcodeVideo,
       transcodeAudio,
@@ -191,54 +190,54 @@ const App: React.FC = () => {
     );
 
     if (outputFilename === inputFilename) {
-      showAlert("Output filename cannot be same as the input filename.", "danger");
+      showAlert('Output filename cannot be same as the input filename.', 'danger');
       return;
     }
 
     ffmpegArgs.unshift(inputFilename);
-    ffmpegArgs.unshift("-i");
+    ffmpegArgs.unshift('-i');
     ffmpegArgs.push(outputFilename);
 
-    document.getElementById("convert_btn")!.style.display = "none";
+    document.getElementById('convert_btn')!.style.display = 'none';
     convertFile(ffmpeg, file, ffmpegArgs, inputFilename, outputFilename, setProgress);
   };
 
   // YT downloader page
   const onDownloadButtonClicked = (e: React.MouseEvent<HTMLButtonElement>) => {
     sendDownloadRequest(
-      (document.getElementById("link") as HTMLInputElement).value,
+      (document.getElementById('link') as HTMLInputElement).value,
       e.currentTarget.value
     );
   };
 
   const showFormatSettings = () => {
     switch (codec) {
-      case "AAC":
+      case 'AAC':
         return <BitrateSlider initialValue="192" min="32" max="256" step="32" />;
-      case "AC3":
+      case 'AC3':
         return (
           <div>
             <AC3 onAc3BitrateChange={onAc3BitrateChange} ac3Bitrate={ac3Bitrate} />
             <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
-      case "ALAC":
+      case 'ALAC':
         return (
           <div>
             <NoSettingsApplicable />
             <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
-      case "CAF":
+      case 'CAF':
         return <NoSettingsApplicable />;
-      case "DTS":
+      case 'DTS':
         return (
           <div>
             <DTS />
             <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
-      case "FLAC":
+      case 'FLAC':
         return (
           <div>
             <FLAC
@@ -248,7 +247,7 @@ const App: React.FC = () => {
             <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
-      case "MKA":
+      case 'MKA':
         return (
           <i>
             Only the audio streams will be kept and left as-is (no transcoding will be done). The
@@ -256,7 +255,7 @@ const App: React.FC = () => {
           </i>
         );
 
-      case "MP3":
+      case 'MP3':
         return (
           <div>
             <MP3EncodingTypeSelector
@@ -268,7 +267,7 @@ const App: React.FC = () => {
             <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
           </div>
         );
-      case "H264":
+      case 'H264':
         return (
           <H264
             onVideoContainerChange={onVideoContainerChange}
@@ -287,14 +286,14 @@ const App: React.FC = () => {
             onX264PresetChange={onX264PresetChange}
           />
         );
-      case "Opus":
+      case 'Opus':
         return (
           <Opus
             onOpusEncodingTypeChange={onOpusEncodingTypeChange}
             encodingType={opusEncodingType}
           />
         );
-      case "Vorbis":
+      case 'Vorbis':
         return (
           <VorbisEncodingType
             onVorbisEncodingTypeChange={onVorbisEncodingTypeChange}
@@ -303,7 +302,7 @@ const App: React.FC = () => {
             qValue={qValue}
           />
         );
-      case "WAV":
+      case 'WAV':
         return (
           <WavBitDepthSelector onBitDepthChange={onWavBitDepthChange} bitDepth={wavBitDepth} />
         );
@@ -332,7 +331,7 @@ const App: React.FC = () => {
             </div>
             <Container>
               <FileInput onFileInput={onFileInput} />
-              <i style={{ fontSize: "80%" }}>Max Filesize: 2 GB</i>
+              <i style={{ fontSize: '80%' }}>Max Filesize: 2 GB</i>
               <hr />
 
               <FormatSelector onCodecChange={onCodecChange} codec={codec} />
@@ -353,11 +352,11 @@ const App: React.FC = () => {
                 required
               />
 
-              <div id="converting_spinner" style={{ display: "none" }}>
+              <div id="converting_spinner" style={{ display: 'none' }}>
                 <Spinner id="converting_btn" animation="border" /> Converting...
               </div>
 
-              <div id="conversion_progress" style={{ display: "none" }}>
+              <div id="conversion_progress" style={{ display: 'none' }}>
                 <ProgressBar now={progress} label={`${progress}%`} />
               </div>
 

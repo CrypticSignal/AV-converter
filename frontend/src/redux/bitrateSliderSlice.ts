@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 
-interface SliderState {
+interface BitrateSliderState {
   value: string;
 }
 
-const initialState = { value: "192" } as SliderState;
+const initialState: BitrateSliderState = { value: "192" };
 
 const bitrateSliderSlice = createSlice({
-  name: "sliderValue",
+  name: "bitrateSlider",
   initialState,
   reducers: {
     setDefault: (state, action: PayloadAction<string>) => {
@@ -20,6 +20,8 @@ const bitrateSliderSlice = createSlice({
   },
 });
 
+export const { change, setDefault } = bitrateSliderSlice.actions;
+
+export const selectBitrateSliderValue = (state: RootState) => state.bitrate.value;
+
 export default bitrateSliderSlice.reducer;
-export const { setDefault, change } = bitrateSliderSlice.actions;
-export const selectSliderValue = (state: RootState) => state.bitrate.value;
