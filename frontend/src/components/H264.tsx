@@ -71,15 +71,7 @@ const H264: React.FC<H264Props> = ({
       <label>Transcode the audio to AAC</label>
       <br />
       <i style={{ display: transcodeAudio ? "block" : "none" }}>
-        FDK AAC at{" "}
-        <a
-          rel="noreferrer"
-          href="https://wiki.hydrogenaud.io/index.php?title=Fraunhofer_FDK_AAC#Bitrate_Modes"
-          target="_blank"
-        >
-          VBR mode 5
-        </a>{" "}
-        will be used.
+        The audio bitrate will be set to 256 kbps.
       </i>
       <div id="video_encoding_type" style={{ display: transcodeVideo ? "block" : "none" }}>
         <br />

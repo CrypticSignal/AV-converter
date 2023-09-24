@@ -24,9 +24,6 @@ const createConversionData = (encodingArgs: string, outputFilename: string): Con
 };
 
 export const createFFmpegArgs = (
-  aacEncodingType: string,
-  aacExtension: string,
-  aacVbrMode: string,
   ac3Bitrate: string,
   bitrateSliderValue: string,
   codec: string,
@@ -51,26 +48,15 @@ export const createFFmpegArgs = (
 ) => {
   // AAC
   if (codec === "AAC") {
-    let args = `-map 0:a -c:a libfdk_aac`;
+    let args = `-map 0:a -c:a aac`;
 
     if (isKeepVideo) {
       args += " -map 0:V -c:V copy";
       const ext = inputFilename.split(".").slice(0, -1).join(".");
-
-      if (aacEncodingType === "cbr") {
-        return createConversionData(`${args} -b:a ${bitrateSliderValue}k`, `${outputName}.${ext}`);
-      }
-      return createConversionData(`${args} -vbr ${aacVbrMode}`, `${outputName}.${ext}`);
+      return createConversionData(`${args} -b:a ${bitrateSliderValue}k`, `${outputName}.${ext}`);
     }
     // Audio only output file.
-    if (aacEncodingType === "cbr") {
-      return createConversionData(
-        `${args} -b:a ${bitrateSliderValue}`,
-        `${outputName}.${aacExtension}`
-      );
-    }
-    // VBR
-    return createConversionData(`${args} -vbr ${aacVbrMode}`, `${outputName}.${aacExtension}`);
+    return createConversionData(`${args} -b:a ${bitrateSliderValue}k`, `${outputName}.aac`);
 
     // AC3
   } else if (codec === "AC3") {
@@ -126,7 +112,7 @@ export const createFFmpegArgs = (
   } else if (codec === "H264") {
     const outputFilename = `${outputName}.${videoContainer}`;
     let args = "-map 0:V? -map 0:a? -map 0:s?";
-    transcodeAudio ? (args += " -c:a libfdk_aac -vbr 5") : (args += " -c:a copy");
+    transcodeAudio ? (args += " -c:a aac -b:a 256k") : (args += " -c:a copy");
 
     if (!transcodeVideo) {
       videoContainer === "mp4"

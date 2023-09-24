@@ -11,8 +11,8 @@ import { createFFmpegArgs } from "./utils/createFFmpegArgs";
 import { sendDownloadRequest } from "./utils/sendDownloadRequest";
 // General Components
 import AlertDiv from "./components/AlertDiv";
+import BitrateSlider from "./components/BitrateSlider";
 import ConvertButton from "./components/ConvertButton";
-import AacEncodingTypeSelector from "./components/AAC/EncodingTypeSelector";
 import FileInput from "./components/FileInput";
 import FormatSelector from "./components/FormatSelector";
 import IsKeepVideo from "./components/IsKeepVideo";
@@ -21,7 +21,7 @@ import Navbar from "./components/Navbar";
 import ffmpegLogo from "./images/ffmpeg-25.png";
 import webAssemblyLogo from "./images/webassembly-25.png";
 // Output Format Related Components
-import AacExtensionSelector from "./components/AAC/AacExtensionSelector";
+import Aac from "./components/Aac";
 import AC3 from "./components/AC3";
 import DTS from "./components/Dts";
 import FLAC from "./components/Flac";
@@ -61,10 +61,6 @@ const App: React.FC = () => {
   const [codec, setCodec] = useState("MP3");
   // Conversion progress.
   const [progress, setProgress] = useState(0);
-  // AAC
-  const [aacExtension, setAacExtension] = useState("m4a");
-  const [aacEncodingType, setAacEncodingType] = useState("cbr");
-  const [aacVbrMode, setAacVbrMode] = useState("5");
   // AC3
   const [ac3Bitrate, setAc3Bitrate] = useState("640");
   // FLAC
@@ -104,16 +100,6 @@ const App: React.FC = () => {
     setCodec(e.currentTarget.value);
   };
 
-  // AAC
-  const onAacExtensionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAacExtension(e.currentTarget.value);
-  };
-  const onAacEncodingTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setAacEncodingType(e.currentTarget.value);
-  };
-  const onAacVbrModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setAacVbrMode(e.currentTarget.value);
-  };
   // AC3
   const onAc3BitrateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setAc3Bitrate(e.currentTarget.value);
@@ -182,9 +168,6 @@ const App: React.FC = () => {
     console.clear();
 
     const { ffmpegArgs, outputFilename } = createFFmpegArgs(
-      aacEncodingType,
-      aacExtension,
-      aacVbrMode,
       ac3Bitrate,
       bitrateSliderValue,
       codec,
@@ -232,18 +215,7 @@ const App: React.FC = () => {
   const showFormatSettings = () => {
     switch (codec) {
       case "AAC":
-        return (
-          <div>
-            <AacEncodingTypeSelector
-              onAacEncodingTypeChange={onAacEncodingTypeChange}
-              encodingType={aacEncodingType}
-              initialSliderValue="192"
-              onVbrModeChange={onAacVbrModeChange}
-              vbrMode={aacVbrMode}
-            />
-            <IsKeepVideo onIsKeepVideoChange={onIsKeepVideoChange} isKeepVideo={isKeepVideo} />
-          </div>
-        );
+        return <BitrateSlider initialValue="192" min="32" max="256" step="32" />;
       case "AC3":
         return (
           <div>
@@ -365,12 +337,6 @@ const App: React.FC = () => {
               <hr />
 
               <FormatSelector onCodecChange={onCodecChange} codec={codec} />
-              {codec === "AAC" ? (
-                <AacExtensionSelector
-                  onAacExtensionChange={onAacExtensionChange}
-                  aacExtension={aacExtension}
-                />
-              ) : null}
               <hr />
 
               <h5>Encoder Settings</h5>
