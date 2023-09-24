@@ -7,7 +7,7 @@ services:
     x-develop:
       watch:
         - action: sync
-          path: ./backend/src
+          path: ../../backend/src
           target: /backend/src
           ignore:
             - node_modules/
@@ -20,7 +20,7 @@ services:
     x-develop:
       watch:
         - action: sync
-          path: ./frontend/src
+          path: ../../frontend/src
           target: /frontend/src
           ignore:
             - node_modules/
