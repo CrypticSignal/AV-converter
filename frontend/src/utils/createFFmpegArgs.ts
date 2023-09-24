@@ -104,7 +104,7 @@ export const createFFmpegArgs = (
     }
     // Audio only output file.
     return createConversionData(
-      `-c:a flac -compression_level ${flacCompression}`,
+      `-map 0:a -c:a flac -compression_level ${flacCompression}`,
       `${outputName}.flac`
     );
 
