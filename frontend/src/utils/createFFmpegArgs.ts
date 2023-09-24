@@ -109,10 +109,7 @@ export const createFFmpegArgs = (
         args += " -c:s mov_text";
       }
 
-      let threads = numLogicalProcessors * 1.5;
-      // A value of 12+ causes "null function or function signature mismatch" error.
-      threads = threads < 12 ? threads : 11;
-      args += ` -c:V libx264 -x264-params threads=${threads} -preset ${x264Preset}`;
+      args += ` -c:V libx264 -preset ${x264Preset}`;
 
       videoEncodingType === "crf"
         ? (args += ` -crf ${crfValue}`)
