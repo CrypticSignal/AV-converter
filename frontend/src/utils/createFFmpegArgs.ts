@@ -51,20 +51,21 @@ export const createFFmpegArgs = (
 
     if (isKeepVideo) {
       args += " -map 0:V -c:V copy";
-      const ext = inputFilename.split(".").slice(0, -1).join(".");
-      return createConversionData(`${args} -b:a ${bitrateSliderValue}k`, `${outputName}.${ext}`);
+      const ext = inputFilename.substring(inputFilename.lastIndexOf("."))
+      return createConversionData(`${args} -b:a ${bitrateSliderValue}k`, `${outputName}${ext}`);
     }
     // Audio only output file.
     return createConversionData(`${args} -b:a ${bitrateSliderValue}k`, `${outputName}.aac`);
 
     // AC3
   } else if (codec === "AC3") {
-    const ext = inputFilename.split(".").slice(0, -1).join(".");
+    const ext = inputFilename.substring(inputFilename.lastIndexOf("."))
+    
     if (isKeepVideo) {
-      return createConversionData(`-c:v copy -c:a ac3 -b:a ${ac3Bitrate}k`, `${outputName}.${ext}`);
+      return createConversionData(`-c:v copy -c:a ac3 -b:a ${ac3Bitrate}k`, `${outputName}${ext}`);
     }
     // Audio only output file.
-    return createConversionData(`-c:a ac3 -b:a ${ac3Bitrate}k`, `${outputName}.${ext}`);
+    return createConversionData(`-c:a ac3 -b:a ${ac3Bitrate}k`, `${outputName}.ac3`);
 
     // ALAC
   } else if (codec === "ALAC") {
@@ -80,17 +81,17 @@ export const createFFmpegArgs = (
 
     // DTS
   } else if (codec === "DTS") {
-    const ext = inputFilename.split(".").slice(0, -1).join(".");
+    const ext = inputFilename.substring(inputFilename.lastIndexOf("."))
     if (isKeepVideo) {
       return createConversionData(
         `-c:v copy -c:a dca -b:a ${bitrateSliderValue}k -strict -2`,
-        `${outputName}.${ext}`
+        `${outputName}${ext}`
       );
     }
     // Audio only output file.
     return createConversionData(
       `-c:a dca -b:a ${bitrateSliderValue}k -strict -2`,
-      `${outputName}.${ext}`
+      `${outputName}.dts`
     );
 
     // FLAC
@@ -145,25 +146,25 @@ export const createFFmpegArgs = (
     // MP3
   } else if (codec === "MP3") {
     if (isKeepVideo) {
-      const inputExt = inputFilename.split(".").slice(0, -1).join(".");
-      const outputExt = inputExt === "mp4" ? inputExt : "mkv";
+      const inputExt = inputFilename.substring(inputFilename.lastIndexOf("."))
+      const outputExt = inputExt === ".mp4" ? inputExt : ".mkv";
       // CBR
       if (mp3EncodingType === "cbr") {
         return createConversionData(
           `-c:v copy -c:a libmp3lame -b:a ${bitrateSliderValue}k`,
-          `${outputName}.${outputExt}`
+          `${outputName}${outputExt}`
         );
         // ABR
       } else if (mp3EncodingType === "abr") {
         return createConversionData(
           `-c:v copy -c:a libmp3lame --abr 1 -b:a ${bitrateSliderValue}k`,
-          `${outputName}.${outputExt}`
+          `${outputName}${outputExt}`
         );
       }
       // VBR
       return createConversionData(
         `-c:v copy -c:a libmp3lame -q:a ${mp3VbrSetting}`,
-        `${outputName}.${outputExt}`
+        `${outputName}${outputExt}`
       );
     }
     // Audio only output file.
