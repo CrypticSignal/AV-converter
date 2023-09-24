@@ -21,7 +21,6 @@ import Navbar from "./components/Navbar";
 import ffmpegLogo from "./images/ffmpeg-25.png";
 import webAssemblyLogo from "./images/webassembly-25.png";
 // Output Format Related Components
-import Aac from "./components/Aac";
 import AC3 from "./components/AC3";
 import DTS from "./components/Dts";
 import FLAC from "./components/Flac";
