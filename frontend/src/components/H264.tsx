@@ -114,7 +114,10 @@ const H264: React.FC<H264Props> = ({
           units="MB"
         />
       </div> */}
-      <div id="crf_div" style={{ display: videoEncodingType === "crf" ? "block" : "none" }}>
+      <div
+        id="crf_div"
+        style={{ display: transcodeVideo && videoEncodingType === "crf" ? "block" : "none" }}
+      >
         <strong>Constant Rate Factor (CRF)</strong>
         <br />
         <input
