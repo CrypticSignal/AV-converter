@@ -45,9 +45,9 @@ export const convertFile = async (
   document.getElementById("converting_spinner")!.style.display = "block";
   document.getElementById("conversion_progress")!.style.display = "block";
 
+  console.log(ffmpegArgs);
   const startTime = Date.now() / 1000;
-  // Run FFmpeg
-  await ffmpeg.exec([...ffmpegArgs]);
+  await ffmpeg.exec(ffmpegArgs);
 
   console.log(`Conversion took ${(Date.now() / 1000 - startTime).toFixed(1)} seconds.`);
   setProgress(0);

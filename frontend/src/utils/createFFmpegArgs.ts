@@ -4,7 +4,6 @@ interface ConversionData {
 }
 
 const createConversionData = (encodingArgs: string, outputFilename: string): ConversionData => {
-  console.log(`Encoding Args: ${encodingArgs}`);
   const encodingArgsArray = encodingArgs.split(" ");
 
   const ffmpegArgs = [
