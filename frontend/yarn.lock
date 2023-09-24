@@ -1203,10 +1203,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@ffmpeg/core@^0.12.3":
+"@ffmpeg/core-mt@^0.12.3":
   version "0.12.3"
-  resolved "https://registry.yarnpkg.com/@ffmpeg/core/-/core-0.12.3.tgz#ebe1fdc5bb10ec57f36efc4825cd8ab48b12c553"
-  integrity sha512-HjTvLnb7WEbApO7vmscLsKfnpCf2OT4AspatST1GntUt/NZWILMHSKHer0SVCKi1ce3LQQ7tUQqS7qkjn4T4mg==
+  resolved "https://registry.yarnpkg.com/@ffmpeg/core-mt/-/core-mt-0.12.3.tgz#28a9d560dbed11161ac111b978f0ed07d4b70e68"
+  integrity sha512-BuHya7GktKPXsJPwrrJpeUvHYlNjZOGjNh/IAZyIYyXLonl4VN36IeV7kPmhSGdsFRgiVtSS41EnTaSbwB+U8Q==
 
 "@ffmpeg/ffmpeg@^0.12.6":
   version "0.12.6"
