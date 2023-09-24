@@ -4,8 +4,8 @@ interface ConversionData {
 }
 
 const createConversionData = (encodingArgs: string, outputFilename: string): ConversionData => {
+  console.log(`Encoding Args: ${encodingArgs}`);
   const encodingArgsArray = encodingArgs.split(" ");
-  console.log(encodingArgs);
 
   const ffmpegArgs = [
     "-metadata",
@@ -126,16 +126,18 @@ export const createFFmpegArgs = (
   } else if (codec === "H264") {
     const outputFilename = `${outputName}.${videoContainer}`;
     let args = "-map 0:V? -map 0:a? -map 0:s?";
-    transcodeAudio ? args += " -c:a libfdk_aac -vbr 5" : args += " -c:a copy"
+    transcodeAudio ? (args += " -c:a libfdk_aac -vbr 5") : (args += " -c:a copy");
 
     if (!transcodeVideo) {
-      videoContainer === "mp4" ? args += " -c:V copy -f mp4" : args += " -c:V copy -c:s copy -f matroska";
-      return createConversionData(args, outputFilename)
+      videoContainer === "mp4"
+        ? (args += " -c:V copy -f mp4")
+        : (args += " -c:V copy -c:s copy -f matroska");
+      return createConversionData(args, outputFilename);
     }
 
     // MP4 doesn't support all subtitle formats. Convert the subtitle tracks to mov_text which MP4 supports.
     if (videoContainer === "mp4") {
-      args += " -c:s mov_text"
+      args += " -c:s mov_text";
     }
 
     let threads = numLogicalProcessors * 1.5;
@@ -197,12 +199,8 @@ export const createFFmpegArgs = (
 
     // Opus
   } else if (codec === "Opus") {
-    if (opusEncodingType === "abr") {
-      return createConversionData(`-c:a libopus -b:a ${bitrateSliderValue}k`, `${outputName}.opus`);
-    }
-    // CBR
     return createConversionData(
-      `-c:a libopus -vbr off -b:a ${bitrateSliderValue}k`,
+      `-c:a libopus ${opusEncodingType === "cbr" ? "-vbr off " : ""}-b:a ${bitrateSliderValue}k`,
       `${outputName}.opus`
     );
 

@@ -2,8 +2,9 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { toBlobURL, fetchFile } from "@ffmpeg/util";
 import { Dispatch, SetStateAction } from "react";
 import showAlert from "./showAlert";
+import reset from "./reset";
 
-const ffmpegCoreVersion = "0.12.3";
+const FFMPEG_CORE_VERSION = "0.12.3";
 
 export const convertFile = async (
   ffmpeg: FFmpeg,
@@ -13,9 +14,9 @@ export const convertFile = async (
   outputFilename: string,
   setProgress: Dispatch<SetStateAction<number>>
 ) => {
-  showAlert(`Loading @ffmpeg/core v${ffmpegCoreVersion}`, "warning");
+  showAlert(`Loading @ffmpeg/core v${FFMPEG_CORE_VERSION}...`, "warning");
 
-  const baseURL = `https://unpkg.com/@ffmpeg/core-mt@${ffmpegCoreVersion}/dist/umd`;
+  const baseURL = `https://unpkg.com/@ffmpeg/core-mt@${FFMPEG_CORE_VERSION}/dist/umd`;
 
   await ffmpeg.load({
     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
@@ -24,6 +25,12 @@ export const convertFile = async (
   });
 
   ffmpeg.on("log", ({ message }) => {
+    if (message === "Aborted()") {
+      reset();
+      showAlert("Unable to convert file.", "danger");
+      return;
+    }
+
     showAlert(message, "info");
     console.log(message);
   });
@@ -35,16 +42,15 @@ export const convertFile = async (
 
   await ffmpeg.writeFile(inputFilename, await fetchFile(file));
 
-  const startTime = Date.now() / 1000;
-  // Run FFmpeg
   document.getElementById("converting_spinner")!.style.display = "block";
   document.getElementById("conversion_progress")!.style.display = "block";
+
+  const startTime = Date.now() / 1000;
+  // Run FFmpeg
   await ffmpeg.exec([...ffmpegArgs]);
-  document.getElementById("converting_spinner")!.style.display = "none";
-  document.getElementById("conversion_progress")!.style.display = "none";
+
   console.log(`Conversion took ${(Date.now() / 1000 - startTime).toFixed(1)} seconds.`);
-  // // Reset the value of progress.
-  // setProgress(0);
+  setProgress(0);
 
   const fileData = await ffmpeg.readFile(outputFilename);
   const data = new Uint8Array(fileData as ArrayBuffer);
@@ -55,15 +61,10 @@ export const convertFile = async (
   anchorTag.download = outputFilename;
   anchorTag.click();
 
-  // Delete file from MEMFS
-  //ffmpeg.memfs
-
   showAlert(
-    `Conversion complete. The converted file should be downloading :)<br>If it isn't, click <a href="${objectURL}" download="${outputFilename}">here</a> to start the download.`,
+    `The converted file should have downloaded to your device.<br>If it hasn't, click <a href="${objectURL}" download="${outputFilename}">here</a>`,
     "success"
   );
 
-  document.getElementById("converting_spinner")!.style.display = "none";
-  document.getElementById("conversion_progress")!.style.display = "none";
-  document.getElementById("convert_btn")!.style.display = "block";
+  reset();
 };
