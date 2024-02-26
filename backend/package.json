@@ -17,6 +17,7 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only --watch src/ src/app.ts",
-    "deploy": "docker compose -f ../docker/prod/docker-compose.yml up -d --no-deps --build backend"
+    "deploy": "docker compose -f ../docker/prod/docker-compose.yml up -d --no-deps --build backend",
+    "start": "node dist/app.js"
   }
 }

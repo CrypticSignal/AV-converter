@@ -7,6 +7,8 @@ services:
     build:
       context: ../../
       dockerfile: docker/prod/Dockerfile.backend
+    volumes: 
+      - ../../logs:/backend:ro
 
   nginx:
     container_name: nginx
@@ -21,6 +23,8 @@ services:
       - ../../certbot/www:/var/www/certbot/:ro
       - ../../frontend/build:/usr/share/nginx/html:ro
       - ../../frontend/src/game:/game:ro
+    depends_on:
+      - backend
 
   certbot:
     container_name: certbot

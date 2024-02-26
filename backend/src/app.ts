@@ -86,4 +86,6 @@ app.get("/game", (_, res: Response) => {
   res.sendFile(resolve("../frontend/src/game/game.html"));
 });
 
-app.listen(port);
+app.listen(port, () => {
+  log.info(`Listening on port ${port}`)
+});
