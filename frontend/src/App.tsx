@@ -165,7 +165,7 @@ const App: React.FC = () => {
 
     console.clear();
 
-    const { ffmpegArgs, outputFilename } = createFFmpegArgs(
+    const conversionData = createFFmpegArgs(
       ac3Bitrate,
       bitrateSliderValue,
       codec,
@@ -189,6 +189,10 @@ const App: React.FC = () => {
       x264Preset
     );
 
+    if (conversionData === undefined) return;
+
+    const { ffmpegArgs, outputFilename } = conversionData;
+    
     if (outputFilename === inputFilename) {
       showAlert('Output filename cannot be same as the input filename.', 'danger');
       return;
@@ -200,6 +204,7 @@ const App: React.FC = () => {
 
     document.getElementById('convert_btn')!.style.display = 'none';
     convertFile(ffmpeg, file, ffmpegArgs, inputFilename, outputFilename, setProgress);
+ 
   };
 
   // YT downloader page
