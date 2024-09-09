@@ -40,8 +40,15 @@ _If you are not sure which option to opt for, I recommend **Video (MP4)** and **
 You can run this web app locally with a single command:
 
 - ```
-  cd docker/dev && docker compose up --build --wait && docker compose alpha watch
+  cd docker/dev && docker compose up --build --watch
   ```
+
+  Or if using PowerShell:
+
+  ```powershell
+  Set-Location docker/dev; if ($?) { docker compose up --build --watch }
+  ```
+
 - Visit http://localhost:3001
 
 _Any changes you make in `/backend/src` or `/frontend/src` will be reflected without having to rebuild any containers. Simply refresh your web browser._
