@@ -4,8 +4,6 @@ import { Dispatch, SetStateAction } from 'react';
 import showAlert from './showAlert';
 import reset from './reset';
 
-const FFMPEG_CORE_VERSION = '0.12.3';
-
 export const convertFile = async (
   ffmpeg: FFmpeg,
   file: File,
@@ -14,15 +12,16 @@ export const convertFile = async (
   outputFilename: string,
   setProgress: Dispatch<SetStateAction<number>>
 ) => {
-  showAlert(`Loading @ffmpeg/core-mt v${FFMPEG_CORE_VERSION}...`, 'warning');
+  showAlert('Loading @ffmpeg/core-mt...', 'warning');
 
-  const baseURL = `https://unpkg.com/@ffmpeg/core-mt@${FFMPEG_CORE_VERSION}/dist/umd`;
+  // Relative to the public folder
+  const ffmpegFolder = '/ffmpeg';
 
   await ffmpeg.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+    coreURL: await toBlobURL(`${ffmpegFolder}/ffmpeg-core.js`, 'text/javascript'),
+    wasmURL: await toBlobURL(`${ffmpegFolder}/ffmpeg-core.wasm`, 'application/wasm'),
     workerURL: await toBlobURL(
-      `${baseURL}/ffmpeg-core.worker.js`,
+      `${ffmpegFolder}/ffmpeg-core.worker.js`,
       'text/javascript'
     ),
   });
