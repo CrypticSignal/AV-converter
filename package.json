@@ -2,8 +2,8 @@
   "scripts": {
     "deploy-frontend": "cd frontend && yarn install && yarn build",
     "deploy-backend": "cd backend && yarn deploy",
-    "dev": "cd docker/dev && docker compose up --build --wait && docker compose alpha watch",
-    "dev-backend": "cd docker/dev && docker compose up backend --build --wait && docker compose alpha watch",
-    "dev-frontend": "cd docker/dev && docker compose up frontend --build --wait && docker compose alpha watch"
+    "dev": "cd docker/dev && docker compose up --build --watch",
+    "dev-backend": "cd docker/dev && docker compose up backend --build --watch",
+    "dev-frontend": "cd docker/dev && docker compose up frontend --build --watch"
   }
 }
